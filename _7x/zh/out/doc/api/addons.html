@@ -384,6 +384,23 @@
 <p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/assert.js">lib/assert.js</a></p>
 <p><code>node:assert</code> 模块提供了一组用于验证不变量的断言函数。</p>
 <section><h3>严格断言模式<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="addons"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.0.0</td>
+<td><p>Exposed as <code>require('node:assert/strict')</code>.</p></td></tr>
+<tr><td>v13.9.0, v12.16.2</td>
+<td><p>Changed "strict mode" to "strict assertion mode" and "legacy mode" to "legacy assertion mode" to avoid confusion with the more usual meaning of "strict mode".</p></td></tr>
+<tr><td>v9.9.0</td>
+<td><p>Added error diffs to the strict assertion mode.</p></td></tr>
+<tr><td>v9.9.0</td>
+<td><p>Added strict assertion mode to the assert module.</p></td></tr>
+<tr><td>v9.9.0</td>
+<td><p><span>Added in: v9.9.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
 <p>在严格断言模式下，非严格方法的行为类似于对应的严格方法。例如，<a href="#assertdeepequalactual-expected-message"><code>assert.deepEqual()</code></a> 的行为将类似于 <a href="#assertdeepstrictequalactual-expected-message"><code>assert.deepStrictEqual()</code></a>。</p>
 <p>在严格断言模式下，对象的错误消息会显示差异。在传统断言模式下，对象的错误消息会显示对象，通常会被截断。</p>
 <p>要使用严格断言模式：</p>
