@@ -5,8 +5,8 @@
 
 <!--introduced_in=v0.10.0-->
 
-* [About this documentation](documentation.md)
-* [Usage and example](synopsis.md)
+* [关于本文档](documentation.md)
+* [使用方法及示例](synopsis.md)
 
 <hr class="line"/>
 

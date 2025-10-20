@@ -167,3 +167,7 @@ __pycache__
 
 # === Rules for C++ development ===
 compile_commands.json
+
+
+# 7x
+_7x/**/out/*
