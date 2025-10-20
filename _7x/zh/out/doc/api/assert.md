@@ -6,10 +6,9 @@
 
 <!-- source_link=lib/assert.js -->
 
-The `node:assert` module provides a set of assertion functions for verifying
-invariants.
+`node:assert` 模块提供了一组用于验证不变量的断言函数。
 
-## Strict assertion mode
+## 严格断言模式
 
 <!-- YAML
 added: v9.9.0
@@ -32,14 +31,11 @@ changes:
     description: Added strict assertion mode to the assert module.
 -->
 
-In strict assertion mode, non-strict methods behave like their corresponding
-strict methods. For example, [`assert.deepEqual()`][] will behave like
-[`assert.deepStrictEqual()`][].
+在严格断言模式下，非严格方法的行为类似于对应的严格方法。例如，[`assert.deepEqual()`][] 的行为将类似于 [`assert.deepStrictEqual()`][]。
 
-In strict assertion mode, error messages for objects display a diff. In legacy
-assertion mode, error messages for objects display the objects, often truncated.
+在严格断言模式下，对象的错误消息会显示差异。在传统断言模式下，对象的错误消息会显示对象，通常会被截断。
 
-To use strict assertion mode:
+要使用严格断言模式：
 
 ```mjs
 import { strict as assert } from 'node:assert';
@@ -57,7 +53,7 @@ import assert from 'node:assert/strict';
 const assert = require('node:assert/strict');
 ```
 
-Example error diff:
+错误差异示例：
 
 ```mjs
 import { strict as assert } from 'node:assert';
@@ -97,21 +93,18 @@ assert.deepEqual([[[1, 2, 3]], 4, 5], [[[1, 2, '3']], 4, 5]);
 //   ]
 ```
 
-To deactivate the colors, use the `NO_COLOR` or `NODE_DISABLE_COLORS`
-environment variables. This will also deactivate the colors in the REPL. For
-more on color support in terminal environments, read the tty
-[`getColorDepth()`][] documentation.
+要停用颜色，请使用 `NO_COLOR` 或 `NODE_DISABLE_COLORS` 环境变量。这也会停用 REPL 中的颜色。有关终端环境中颜色支持的更多信息，请阅读 tty 的 [`getColorDepth()`][] 文档。
 
-## Legacy assertion mode
+## 传统断言模式
 
-Legacy assertion mode uses the [`==` operator][] in:
+传统断言模式在以下方法中使用 [`==` 运算符][]：
 
 * [`assert.deepEqual()`][]
 * [`assert.equal()`][]
 * [`assert.notDeepEqual()`][]
 * [`assert.notEqual()`][]
 
-To use legacy assertion mode:
+要使用传统断言模式：
 
 ```mjs
 import assert from 'node:assert';
@@ -121,20 +114,18 @@ import assert from 'node:assert';
 const assert = require('node:assert');
 ```
 
-Legacy assertion mode may have surprising results, especially when using
-[`assert.deepEqual()`][]:
+传统断言模式可能会产生令人惊讶的结果，特别是在使用 [`assert.deepEqual()`][] 时：
 
 ```cjs
-// WARNING: This does not throw an AssertionError in legacy assertion mode!
+// 警告：在传统断言模式下，这不会抛出 AssertionError！
 assert.deepEqual(/a/gi, new Date());
 ```
 
-## Class: `assert.AssertionError`
+## 类：`assert.AssertionError`
 
-* Extends: {errors.Error}
+* 继承自：{errors.Error}
 
-Indicates the failure of an assertion. All errors thrown by the `node:assert`
-module will be instances of the `AssertionError` class.
+表示断言失败。由 `node:assert` 模块抛出的所有错误都将是 `AssertionError` 类的实例。
 
 ### `new assert.AssertionError(options)`
 
@@ -143,41 +134,34 @@ added: v0.1.21
 -->
 
 * `options` {Object}
-  * `message` {string} If provided, the error message is set to this value.
-  * `actual` {any} The `actual` property on the error instance.
-  * `expected` {any} The `expected` property on the error instance.
-  * `operator` {string} The `operator` property on the error instance.
-  * `stackStartFn` {Function} If provided, the generated stack trace omits
-    frames before this function.
-  * `diff` {string} If set to `'full'`, shows the full diff in assertion errors. Defaults to `'simple'`.
-    Accepted values: `'simple'`, `'full'`.
+  * `message` {string} 如果提供，错误消息将设置为此值。
+  * `actual` {any} 错误实例上的 `actual` 属性。
+  * `expected` {any} 错误实例上的 `expected` 属性。
+  * `operator` {string} 错误实例上的 `operator` 属性。
+  * `stackStartFn` {Function} 如果提供，生成的堆栈跟踪将省略此函数之前的帧。
+  * `diff` {string} 如果设置为 `'full'`，则在断言错误中显示完整差异。默认为 `'simple'`。接受的值：`'simple'`、`'full'`。
 
-A subclass of {Error} that indicates the failure of an assertion.
+{Error} 的一个子类，表示断言失败。
 
-All instances contain the built-in `Error` properties (`message` and `name`)
-and:
+所有实例都包含内置的 `Error` 属性（`message` 和 `name`）以及：
 
-* `actual` {any} Set to the `actual` argument for methods such as
-  [`assert.strictEqual()`][].
-* `expected` {any} Set to the `expected` value for methods such as
-  [`assert.strictEqual()`][].
-* `generatedMessage` {boolean} Indicates if the message was auto-generated
-  (`true`) or not.
-* `code` {string} Value is always `ERR_ASSERTION` to show that the error is an
-  assertion error.
-* `operator` {string} Set to the passed in operator value.
+* `actual` {any} 设置为诸如 [`assert.strictEqual()`][] 等方法的 `actual` 参数。
+* `expected` {any} 设置为诸如 [`assert.strictEqual()`][] 等方法的 `expected` 值。
+* `generatedMessage` {boolean} 指示消息是否是自动生成的（`true`）。
+* `code` {string} 值始终为 `ERR_ASSERTION`，以表明错误是断言错误。
+* `operator` {string} 设置为传入的运算符值。
 
 ```mjs
 import assert from 'node:assert';
 
-// Generate an AssertionError to compare the error message later:
+// 生成一个 AssertionError 以稍后比较错误消息：
 const { message } = new assert.AssertionError({
   actual: 1,
   expected: 2,
   operator: 'strictEqual',
 });
 
-// Verify error output:
+// 验证错误输出：
 try {
   assert.strictEqual(1, 2);
 } catch (err) {
@@ -195,14 +179,14 @@ try {
 ```cjs
 const assert = require('node:assert');
 
-// Generate an AssertionError to compare the error message later:
+// 生成一个 AssertionError 以稍后比较错误消息：
 const { message } = new assert.AssertionError({
   actual: 1,
   expected: 2,
   operator: 'strictEqual',
 });
 
-// Verify error output:
+// 验证错误输出：
 try {
   assert.strictEqual(1, 2);
 } catch (err) {
@@ -217,13 +201,15 @@ try {
 }
 ```
 
-## Class: `assert.Assert`
+## 类：`assert.Assert`
 
 <!-- YAML
-added: v24.6.0
+added:
+ - v24.6.0
+ - v22.19.0
 -->
 
-The `Assert` class allows creating independent assertion instances with custom options.
+`Assert` 类允许创建具有自定义选项的独立断言实例。
 
 ### `new assert.Assert([options])`
 
@@ -235,39 +221,33 @@ changes:
 -->
 
 * `options` {Object}
-  * `diff` {string} If set to `'full'`, shows the full diff in assertion errors. Defaults to `'simple'`.
-    Accepted values: `'simple'`, `'full'`.
-  * `strict` {boolean} If set to `true`, non-strict methods behave like their
-    corresponding strict methods. Defaults to `true`.
-  * `skipPrototype` {boolean} If set to `true`, skips prototype and constructor
-    comparison in deep equality checks. Defaults to `false`.
+  * `diff` {string} 如果设置为 `'full'`，则在断言错误中显示完整差异。默认为 `'simple'`。接受的值：`'simple'`、`'full'`。
+  * `strict` {boolean} 如果设置为 `true`，非严格方法的行为类似于对应的严格方法。默认为 `true`。
+  * `skipPrototype` {boolean} 如果设置为 `true`，则在深度相等检查中跳过原型和构造函数的比较。默认为 `false`。
 
-Creates a new assertion instance. The `diff` option controls the verbosity of diffs in assertion error messages.
+创建一个新的断言实例。`diff` 选项控制断言错误消息中差异的详细程度。
 
 ```js
 const { Assert } = require('node:assert');
 const assertInstance = new Assert({ diff: 'full' });
 assertInstance.deepStrictEqual({ a: 1 }, { a: 2 });
-// Shows a full diff in the error message.
+// 在错误消息中显示完整差异。
 ```
 
-**Important**: When destructuring assertion methods from an `Assert` instance,
-the methods lose their connection to the instance's configuration options (such
-as `diff`, `strict`, and `skipPrototype` settings).
-The destructured methods will fall back to default behavior instead.
+**重要**：当从 `Assert` 实例解构断言方法时，这些方法会失去与实例配置选项（如 `diff`、`strict` 和 `skipPrototype` 设置）的连接。解构的方法将回退到默认行为。
 
 ```js
 const myAssert = new Assert({ diff: 'full' });
 
-// This works as expected - uses 'full' diff
+// 这按预期工作 - 使用 'full' 差异
 myAssert.strictEqual({ a: 1 }, { b: { c: 1 } });
 
-// This loses the 'full' diff setting - falls back to default 'simple' diff
+// 这失去了 'full' 差异设置 - 回退到默认的 'simple' 差异
 const { strictEqual } = myAssert;
 strictEqual({ a: 1 }, { b: { c: 1 } });
 ```
 
-The `skipPrototype` option affects all deep equality methods:
+`skipPrototype` 选项影响所有深度相等方法：
 
 ```js
 class Foo {
@@ -285,344 +265,16 @@ class Bar {
 const foo = new Foo(1);
 const bar = new Bar(1);
 
-// Default behavior - fails due to different constructors
+// 默认行为 - 由于不同的构造函数而失败
 const assert1 = new Assert();
 assert1.deepStrictEqual(foo, bar); // AssertionError
 
-// Skip prototype comparison - passes if properties are equal
+// 跳过原型比较 - 如果属性相等则通过
 const assert2 = new Assert({ skipPrototype: true });
 assert2.deepStrictEqual(foo, bar); // OK
 ```
 
-When destructured, methods lose access to the instance's `this` context and revert to default assertion behavior
-(diff: 'simple', non-strict mode).
-To maintain custom options when using destructured methods, avoid
-destructuring and call methods directly on the instance.
-
-## Class: `assert.CallTracker`
-
-<!-- YAML
-added:
-  - v14.2.0
-  - v12.19.0
-changes:
-  - version: v20.1.0
-    pr-url: https://github.com/nodejs/node/pull/47740
-    description: the `assert.CallTracker` class has been deprecated and will be
-                  removed in a future version.
--->
-
-> Stability: 0 - Deprecated
-
-This feature is deprecated and will be removed in a future version.
-Please consider using alternatives such as the
-[`mock`][] helper function.
-
-### `new assert.CallTracker()`
-
-<!-- YAML
-added:
-  - v14.2.0
-  - v12.19.0
--->
-
-Creates a new [`CallTracker`][] object which can be used to track if functions
-were called a specific number of times. The `tracker.verify()` must be called
-for the verification to take place. The usual pattern would be to call it in a
-[`process.on('exit')`][] handler.
-
-```mjs
-import assert from 'node:assert';
-import process from 'node:process';
-
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// callsfunc() must be called exactly 1 time before tracker.verify().
-const callsfunc = tracker.calls(func, 1);
-
-callsfunc();
-
-// Calls tracker.verify() and verifies if all tracker.calls() functions have
-// been called exact times.
-process.on('exit', () => {
-  tracker.verify();
-});
-```
-
-```cjs
-const assert = require('node:assert');
-const process = require('node:process');
-
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// callsfunc() must be called exactly 1 time before tracker.verify().
-const callsfunc = tracker.calls(func, 1);
-
-callsfunc();
-
-// Calls tracker.verify() and verifies if all tracker.calls() functions have
-// been called exact times.
-process.on('exit', () => {
-  tracker.verify();
-});
-```
-
-### `tracker.calls([fn][, exact])`
-
-<!-- YAML
-added:
-  - v14.2.0
-  - v12.19.0
--->
-
-* `fn` {Function} **Default:** A no-op function.
-* `exact` {number} **Default:** `1`.
-* Returns: {Function} A function that wraps `fn`.
-
-The wrapper function is expected to be called exactly `exact` times. If the
-function has not been called exactly `exact` times when
-[`tracker.verify()`][] is called, then [`tracker.verify()`][] will throw an
-error.
-
-```mjs
-import assert from 'node:assert';
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// Returns a function that wraps func() that must be called exact times
-// before tracker.verify().
-const callsfunc = tracker.calls(func);
-```
-
-```cjs
-const assert = require('node:assert');
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// Returns a function that wraps func() that must be called exact times
-// before tracker.verify().
-const callsfunc = tracker.calls(func);
-```
-
-### `tracker.getCalls(fn)`
-
-<!-- YAML
-added:
-  - v18.8.0
-  - v16.18.0
--->
-
-* `fn` {Function}
-
-* Returns: {Array} An array with all the calls to a tracked function.
-
-* Object {Object}
-  * `thisArg` {Object}
-  * `arguments` {Array} the arguments passed to the tracked function
-
-```mjs
-import assert from 'node:assert';
-
-const tracker = new assert.CallTracker();
-
-function func() {}
-const callsfunc = tracker.calls(func);
-callsfunc(1, 2, 3);
-
-assert.deepStrictEqual(tracker.getCalls(callsfunc),
-                       [{ thisArg: undefined, arguments: [1, 2, 3] }]);
-```
-
-```cjs
-const assert = require('node:assert');
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-const callsfunc = tracker.calls(func);
-callsfunc(1, 2, 3);
-
-assert.deepStrictEqual(tracker.getCalls(callsfunc),
-                       [{ thisArg: undefined, arguments: [1, 2, 3] }]);
-```
-
-### `tracker.report()`
-
-<!-- YAML
-added:
-  - v14.2.0
-  - v12.19.0
--->
-
-* Returns: {Array} An array of objects containing information about the wrapper
-  functions returned by [`tracker.calls()`][].
-* Object {Object}
-  * `message` {string}
-  * `actual` {number} The actual number of times the function was called.
-  * `expected` {number} The number of times the function was expected to be
-    called.
-  * `operator` {string} The name of the function that is wrapped.
-  * `stack` {Object} A stack trace of the function.
-
-The arrays contains information about the expected and actual number of calls of
-the functions that have not been called the expected number of times.
-
-```mjs
-import assert from 'node:assert';
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// Returns a function that wraps func() that must be called exact times
-// before tracker.verify().
-const callsfunc = tracker.calls(func, 2);
-
-// Returns an array containing information on callsfunc()
-console.log(tracker.report());
-// [
-//  {
-//    message: 'Expected the func function to be executed 2 time(s) but was
-//    executed 0 time(s).',
-//    actual: 0,
-//    expected: 2,
-//    operator: 'func',
-//    stack: stack trace
-//  }
-// ]
-```
-
-```cjs
-const assert = require('node:assert');
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// Returns a function that wraps func() that must be called exact times
-// before tracker.verify().
-const callsfunc = tracker.calls(func, 2);
-
-// Returns an array containing information on callsfunc()
-console.log(tracker.report());
-// [
-//  {
-//    message: 'Expected the func function to be executed 2 time(s) but was
-//    executed 0 time(s).',
-//    actual: 0,
-//    expected: 2,
-//    operator: 'func',
-//    stack: stack trace
-//  }
-// ]
-```
-
-### `tracker.reset([fn])`
-
-<!-- YAML
-added:
-  - v18.8.0
-  - v16.18.0
--->
-
-* `fn` {Function} a tracked function to reset.
-
-Reset calls of the call tracker.
-If a tracked function is passed as an argument, the calls will be reset for it.
-If no arguments are passed, all tracked functions will be reset.
-
-```mjs
-import assert from 'node:assert';
-
-const tracker = new assert.CallTracker();
-
-function func() {}
-const callsfunc = tracker.calls(func);
-
-callsfunc();
-// Tracker was called once
-assert.strictEqual(tracker.getCalls(callsfunc).length, 1);
-
-tracker.reset(callsfunc);
-assert.strictEqual(tracker.getCalls(callsfunc).length, 0);
-```
-
-```cjs
-const assert = require('node:assert');
-
-const tracker = new assert.CallTracker();
-
-function func() {}
-const callsfunc = tracker.calls(func);
-
-callsfunc();
-// Tracker was called once
-assert.strictEqual(tracker.getCalls(callsfunc).length, 1);
-
-tracker.reset(callsfunc);
-assert.strictEqual(tracker.getCalls(callsfunc).length, 0);
-```
-
-### `tracker.verify()`
-
-<!-- YAML
-added:
-  - v14.2.0
-  - v12.19.0
--->
-
-Iterates through the list of functions passed to
-[`tracker.calls()`][] and will throw an error for functions that
-have not been called the expected number of times.
-
-```mjs
-import assert from 'node:assert';
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// Returns a function that wraps func() that must be called exact times
-// before tracker.verify().
-const callsfunc = tracker.calls(func, 2);
-
-callsfunc();
-
-// Will throw an error since callsfunc() was only called once.
-tracker.verify();
-```
-
-```cjs
-const assert = require('node:assert');
-
-// Creates call tracker.
-const tracker = new assert.CallTracker();
-
-function func() {}
-
-// Returns a function that wraps func() that must be called exact times
-// before tracker.verify().
-const callsfunc = tracker.calls(func, 2);
-
-callsfunc();
-
-// Will throw an error since callsfunc() was only called once.
-tracker.verify();
-```
+当解构时，方法会失去对实例的 `this` 上下文的访问，并恢复为默认的断言行为（diff: 'simple'，非严格模式）。要在使用解构方法时保持自定义选项，请避免解构，并直接在实例上调用方法。
 
 ## `assert(value[, message])`
 
@@ -630,16 +282,23 @@ tracker.verify();
 added: v0.5.9
 -->
 
-* `value` {any} The input that is checked for being truthy.
+* `value` {any} 被检查为真值的输入。
 * `message` {string|Error}
 
-An alias of [`assert.ok()`][].
+[`assert.ok()`][] 的别名。
 
 ## `assert.deepEqual(actual, expected[, message])`
 
 <!-- YAML
 added: v0.1.21
 changes:
+  - version: v25.0.0
+    pr-url: https://github.com/nodejs/node/pull/59448
+    description: Promises are not considered equal anymore if they are not of
+                 the same instance.
+  - version: v25.0.0
+    pr-url: https://github.com/nodejs/node/pull/57627
+    description: Invalid dates are now considered equal.
   - version: v24.0.0
     pr-url: https://github.com/nodejs/node/pull/57622
     description: Recursion now stops when either side encounters a circular
@@ -693,62 +352,50 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-**Strict assertion mode**
+**严格断言模式**
 
-An alias of [`assert.deepStrictEqual()`][].
+[`assert.deepStrictEqual()`][] 的别名。
 
-**Legacy assertion mode**
+**传统断言模式**
 
-> Stability: 3 - Legacy: Use [`assert.deepStrictEqual()`][] instead.
+> Stability: 3 - Legacy: 请改用 [`assert.deepStrictEqual()`][]。
 
-Tests for deep equality between the `actual` and `expected` parameters. Consider
-using [`assert.deepStrictEqual()`][] instead. [`assert.deepEqual()`][] can have
-surprising results.
+测试 `actual` 和 `expected` 参数之间的深度相等性。请考虑使用 [`assert.deepStrictEqual()`][] 代替。[`assert.deepEqual()`][] 可能会产生令人惊讶的结果。
 
-_Deep equality_ means that the enumerable "own" properties of child objects
-are also recursively evaluated by the following rules.
+_深度相等_ 意味着子对象的可枚举"自有"属性也通过以下规则递归评估。
 
-### Comparison details
+### 比较细节
 
-* Primitive values are compared with the [`==` operator][],
-  with the exception of {NaN}. It is treated as being identical in case
-  both sides are {NaN}.
-* [Type tags][Object.prototype.toString()] of objects should be the same.
-* Only [enumerable "own" properties][] are considered.
-* {Error} names, messages, causes, and errors are always compared,
-  even if these are not enumerable properties.
-* [Object wrappers][] are compared both as objects and unwrapped values.
-* `Object` properties are compared unordered.
-* {Map} keys and {Set} items are compared unordered.
-* Recursion stops when both sides differ or either side encounters a circular
-  reference.
-* Implementation does not test the [`[[Prototype]]`][prototype-spec] of
-  objects.
-* {Symbol} properties are not compared.
-* {WeakMap} and {WeakSet} comparison does not rely on their values
-  but only on their instances.
-* {RegExp} lastIndex, flags, and source are always compared, even if these
-  are not enumerable properties.
+* 原始值使用 [`==` 运算符][] 进行比较，但 {NaN} 除外。如果两边都是 {NaN}，则被视为相同。
+* 对象的[类型标签][Object.prototype.toString()] 应该相同。
+* 只考虑[可枚举的"自有"属性][]。
+* {Error} 的名称、消息、原因和错误总是被比较，即使这些不是可枚举属性。
+* [对象包装器][] 既作为对象也作为解包后的值进行比较。
+* `Object` 属性是无序比较的。
+* {Map} 键和 {Set} 项是无序比较的。
+* 当双方不同或任一方遇到循环引用时，递归停止。
+* 实现不会测试对象的 [`[[Prototype]]`][prototype-spec]。
+* {Symbol} 属性不会被比较。
+* {WeakMap}、{WeakSet} 和 {Promise} 实例不会进行结构比较。只有当它们引用同一个对象时才相等。任何不同 `WeakMap`、`WeakSet` 或 `Promise` 实例之间的比较都将导致不相等，即使它们包含相同的内容。
+* {RegExp} 的 lastIndex、flags 和 source 总是被比较，即使这些不是可枚举属性。
 
-The following example does not throw an [`AssertionError`][] because the
-primitives are compared using the [`==` operator][].
+以下示例不会抛出 [`AssertionError`][]，因为原始值是使用 [`==` 运算符][] 进行比较的。
 
 ```mjs
 import assert from 'node:assert';
-// WARNING: This does not throw an AssertionError!
+// 警告：这不会抛出 AssertionError！
 
 assert.deepEqual('+00000000', false);
 ```
 
 ```cjs
 const assert = require('node:assert');
-// WARNING: This does not throw an AssertionError!
+// 警告：这不会抛出 AssertionError！
 
 assert.deepEqual('+00000000', false);
 ```
 
-"Deep" equality means that the enumerable "own" properties of child objects
-are evaluated also:
+"深度"相等意味着子对象的可枚举"自有"属性也会被评估：
 
 ```mjs
 import assert from 'node:assert';
@@ -773,14 +420,14 @@ const obj4 = { __proto__: obj1 };
 assert.deepEqual(obj1, obj1);
 // OK
 
-// Values of b are different:
+// b 的值不同：
 assert.deepEqual(obj1, obj2);
 // AssertionError: { a: { b: 1 } } deepEqual { a: { b: 2 } }
 
 assert.deepEqual(obj1, obj3);
 // OK
 
-// Prototypes are ignored:
+// 原型被忽略：
 assert.deepEqual(obj1, obj4);
 // AssertionError: { a: { b: 1 } } deepEqual {}
 ```
@@ -808,29 +455,32 @@ const obj4 = { __proto__: obj1 };
 assert.deepEqual(obj1, obj1);
 // OK
 
-// Values of b are different:
+// b 的值不同：
 assert.deepEqual(obj1, obj2);
 // AssertionError: { a: { b: 1 } } deepEqual { a: { b: 2 } }
 
 assert.deepEqual(obj1, obj3);
 // OK
 
-// Prototypes are ignored:
+// 原型被忽略：
 assert.deepEqual(obj1, obj4);
 // AssertionError: { a: { b: 1 } } deepEqual {}
 ```
 
-If the values are not equal, an [`AssertionError`][] is thrown with a `message`
-property set equal to the value of the `message` parameter. If the `message`
-parameter is undefined, a default error message is assigned. If the `message`
-parameter is an instance of {Error} then it will be thrown instead of the
-[`AssertionError`][].
+如果值不相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 [`AssertionError`][]。
 
 ## `assert.deepStrictEqual(actual, expected[, message])`
 
 <!-- YAML
 added: v1.2.0
 changes:
+  - version: v25.0.0
+    pr-url: https://github.com/nodejs/node/pull/59448
+    description: Promises are not considered equal anymore if they are not of
+                 the same instance.
+  - version: v25.0.0
+    pr-url: https://github.com/nodejs/node/pull/57627
+    description: Invalid dates are now considered equal.
   - version: v24.0.0
     pr-url: https://github.com/nodejs/node/pull/57622
     description: Recursion now stops when either side encounters a circular
@@ -876,37 +526,27 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-Tests for deep equality between the `actual` and `expected` parameters.
-"Deep" equality means that the enumerable "own" properties of child objects
-are recursively evaluated also by the following rules.
+测试 `actual` 和 `expected` 参数之间的深度严格相等性。"深度"相等意味着子对象的可枚举"自有"属性也通过以下规则递归评估。
 
-### Comparison details
+### 比较细节
 
-* Primitive values are compared using [`Object.is()`][].
-* [Type tags][Object.prototype.toString()] of objects should be the same.
-* [`[[Prototype]]`][prototype-spec] of objects are compared using
-  the [`===` operator][].
-* Only [enumerable "own" properties][] are considered.
-* {Error} names, messages, causes, and errors are always compared,
-  even if these are not enumerable properties.
-  `errors` is also compared.
-* Enumerable own {Symbol} properties are compared as well.
-* [Object wrappers][] are compared both as objects and unwrapped values.
-* `Object` properties are compared unordered.
-* {Map} keys and {Set} items are compared unordered.
-* Recursion stops when both sides differ or either side encounters a circular
-  reference.
-* {WeakMap} and {WeakSet} instances are **not** compared structurally.
-  They are only equal if they reference the same object. Any comparison between
-  different `WeakMap` or `WeakSet` instances will result in inequality,
-  even if they contain the same entries.
-* {RegExp} lastIndex, flags, and source are always compared, even if these
-  are not enumerable properties.
+* 原始值使用 [`Object.is()`][] 进行比较。
+* 对象的[类型标签][Object.prototype.toString()] 应该相同。
+* 对象的 [`[[Prototype]]`][prototype-spec] 使用 [`===` 运算符][] 进行比较。
+* 只考虑[可枚举的"自有"属性][]。
+* {Error} 的名称、消息、原因和错误总是被比较，即使这些不是可枚举属性。`errors` 也会被比较。
+* 可枚举的自有 {Symbol} 属性也会被比较。
+* [对象包装器][] 既作为对象也作为解包后的值进行比较。
+* `Object` 属性是无序比较的。
+* {Map} 键和 {Set} 项是无序比较的。
+* 当双方不同或任一方遇到循环引用时，递归停止。
+* {WeakMap}、{WeakSet} 和 {Promise} 实例不会进行结构比较。只有当它们引用同一个对象时才相等。任何不同 `WeakMap`、`WeakSet` 或 `Promise` 实例之间的比较都将导致不相等，即使它们包含相同的内容。
+* {RegExp} 的 lastIndex、flags 和 source 总是被比较，即使这些不是可枚举属性。
 
 ```mjs
 import assert from 'node:assert/strict';
 
-// This fails because 1 !== '1'.
+// 这失败是因为 1 !== '1'。
 assert.deepStrictEqual({ a: 1 }, { a: '1' });
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -916,13 +556,13 @@ assert.deepStrictEqual({ a: 1 }, { a: '1' });
 // -   a: '1'
 //   }
 
-// The following objects don't have own properties
+// 以下对象没有自有属性
 const date = new Date();
 const object = {};
 const fakeDate = {};
 Object.setPrototypeOf(fakeDate, Date.prototype);
 
-// Different [[Prototype]]:
+// 不同的 [[Prototype]]：
 assert.deepStrictEqual(object, fakeDate);
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -930,7 +570,7 @@ assert.deepStrictEqual(object, fakeDate);
 // + {}
 // - Date {}
 
-// Different type tags:
+// 不同的类型标签：
 assert.deepStrictEqual(date, fakeDate);
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -939,9 +579,9 @@ assert.deepStrictEqual(date, fakeDate);
 // - Date {}
 
 assert.deepStrictEqual(NaN, NaN);
-// OK because Object.is(NaN, NaN) is true.
+// OK，因为 Object.is(NaN, NaN) 是 true。
 
-// Different unwrapped numbers:
+// 不同的解包数字：
 assert.deepStrictEqual(new Number(1), new Number(2));
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -950,12 +590,12 @@ assert.deepStrictEqual(new Number(1), new Number(2));
 // - [Number: 2]
 
 assert.deepStrictEqual(new String('foo'), Object('foo'));
-// OK because the object and the string are identical when unwrapped.
+// OK，因为对象和字符串在解包后是相同的。
 
 assert.deepStrictEqual(-0, -0);
 // OK
 
-// Different zeros:
+// 不同的零：
 assert.deepStrictEqual(0, -0);
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -966,7 +606,7 @@ assert.deepStrictEqual(0, -0);
 const symbol1 = Symbol();
 const symbol2 = Symbol();
 assert.deepStrictEqual({ [symbol1]: 1 }, { [symbol1]: 1 });
-// OK, because it is the same symbol on both objects.
+// OK，因为两个对象上的是同一个符号。
 
 assert.deepStrictEqual({ [symbol1]: 1 }, { [symbol2]: 1 });
 // AssertionError [ERR_ASSERTION]: Inputs identical but not reference equal:
@@ -982,7 +622,7 @@ const obj = {};
 weakMap1.set(obj, 'value');
 weakMap2.set(obj, 'value');
 
-// Comparing different instances fails, even with same contents
+// 比较不同的实例失败，即使内容相同
 assert.deepStrictEqual(weakMap1, weakMap2);
 // AssertionError: Values have same structure but are not reference-equal:
 //
@@ -990,7 +630,7 @@ assert.deepStrictEqual(weakMap1, weakMap2);
 //   <items unknown>
 // }
 
-// Comparing the same instance to itself succeeds
+// 比较同一个实例自身成功
 assert.deepStrictEqual(weakMap1, weakMap1);
 // OK
 
@@ -999,7 +639,7 @@ const weakSet2 = new WeakSet();
 weakSet1.add(obj);
 weakSet2.add(obj);
 
-// Comparing different instances fails, even with same contents
+// 比较不同的实例失败，即使内容相同
 assert.deepStrictEqual(weakSet1, weakSet2);
 // AssertionError: Values have same structure but are not reference-equal:
 // + actual - expected
@@ -1008,7 +648,7 @@ assert.deepStrictEqual(weakSet1, weakSet2);
 //   <items unknown>
 // }
 
-// Comparing the same instance to itself succeeds
+// 比较同一个实例自身成功
 assert.deepStrictEqual(weakSet1, weakSet1);
 // OK
 ```
@@ -1016,7 +656,7 @@ assert.deepStrictEqual(weakSet1, weakSet1);
 ```cjs
 const assert = require('node:assert/strict');
 
-// This fails because 1 !== '1'.
+// 这失败是因为 1 !== '1'。
 assert.deepStrictEqual({ a: 1 }, { a: '1' });
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -1026,13 +666,13 @@ assert.deepStrictEqual({ a: 1 }, { a: '1' });
 // -   a: '1'
 //   }
 
-// The following objects don't have own properties
+// 以下对象没有自有属性
 const date = new Date();
 const object = {};
 const fakeDate = {};
 Object.setPrototypeOf(fakeDate, Date.prototype);
 
-// Different [[Prototype]]:
+// 不同的 [[Prototype]]：
 assert.deepStrictEqual(object, fakeDate);
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -1040,7 +680,7 @@ assert.deepStrictEqual(object, fakeDate);
 // + {}
 // - Date {}
 
-// Different type tags:
+// 不同的类型标签：
 assert.deepStrictEqual(date, fakeDate);
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -1049,9 +689,9 @@ assert.deepStrictEqual(date, fakeDate);
 // - Date {}
 
 assert.deepStrictEqual(NaN, NaN);
-// OK because Object.is(NaN, NaN) is true.
+// OK，因为 Object.is(NaN, NaN) 是 true。
 
-// Different unwrapped numbers:
+// 不同的解包数字：
 assert.deepStrictEqual(new Number(1), new Number(2));
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -1060,12 +700,12 @@ assert.deepStrictEqual(new Number(1), new Number(2));
 // - [Number: 2]
 
 assert.deepStrictEqual(new String('foo'), Object('foo'));
-// OK because the object and the string are identical when unwrapped.
+// OK，因为对象和字符串在解包后是相同的。
 
 assert.deepStrictEqual(-0, -0);
 // OK
 
-// Different zeros:
+// 不同的零：
 assert.deepStrictEqual(0, -0);
 // AssertionError: Expected inputs to be strictly deep-equal:
 // + actual - expected
@@ -1076,7 +716,7 @@ assert.deepStrictEqual(0, -0);
 const symbol1 = Symbol();
 const symbol2 = Symbol();
 assert.deepStrictEqual({ [symbol1]: 1 }, { [symbol1]: 1 });
-// OK, because it is the same symbol on both objects.
+// OK，因为两个对象上的是同一个符号。
 
 assert.deepStrictEqual({ [symbol1]: 1 }, { [symbol2]: 1 });
 // AssertionError [ERR_ASSERTION]: Inputs identical but not reference equal:
@@ -1092,7 +732,7 @@ const obj = {};
 weakMap1.set(obj, 'value');
 weakMap2.set(obj, 'value');
 
-// Comparing different instances fails, even with same contents
+// 比较不同的实例失败，即使内容相同
 assert.deepStrictEqual(weakMap1, weakMap2);
 // AssertionError: Values have same structure but are not reference-equal:
 //
@@ -1100,7 +740,7 @@ assert.deepStrictEqual(weakMap1, weakMap2);
 //   <items unknown>
 // }
 
-// Comparing the same instance to itself succeeds
+// 比较同一个实例自身成功
 assert.deepStrictEqual(weakMap1, weakMap1);
 // OK
 
@@ -1109,7 +749,7 @@ const weakSet2 = new WeakSet();
 weakSet1.add(obj);
 weakSet2.add(obj);
 
-// Comparing different instances fails, even with same contents
+// 比较不同的实例失败，即使内容相同
 assert.deepStrictEqual(weakSet1, weakSet2);
 // AssertionError: Values have same structure but are not reference-equal:
 // + actual - expected
@@ -1118,16 +758,12 @@ assert.deepStrictEqual(weakSet1, weakSet2);
 //   <items unknown>
 // }
 
-// Comparing the same instance to itself succeeds
+// 比较同一个实例自身成功
 assert.deepStrictEqual(weakSet1, weakSet1);
 // OK
 ```
 
-If the values are not equal, an [`AssertionError`][] is thrown with a `message`
-property set equal to the value of the `message` parameter. If the `message`
-parameter is undefined, a default error message is assigned. If the `message`
-parameter is an instance of {Error} then it will be thrown instead of the
-`AssertionError`.
+如果值不相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 `AssertionError`。
 
 ## `assert.doesNotMatch(string, regexp[, message])`
 
@@ -1145,7 +781,7 @@ changes:
 * `regexp` {RegExp}
 * `message` {string|Error}
 
-Expects the `string` input not to match the regular expression.
+期望 `string` 输入不匹配正则表达式。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1173,12 +809,7 @@ assert.doesNotMatch('I will pass', /different/);
 // OK
 ```
 
-If the values do match, or if the `string` argument is of another type than
-`string`, an [`AssertionError`][] is thrown with a `message` property set equal
-to the value of the `message` parameter. If the `message` parameter is
-undefined, a default error message is assigned. If the `message` parameter is an
-instance of {Error} then it will be thrown instead of the
-[`AssertionError`][].
+如果值匹配，或者 `string` 参数是除 `string` 以外的其他类型，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 [`AssertionError`][]。
 
 ## `assert.doesNotReject(asyncFn[, error][, message])`
 
@@ -1189,28 +820,17 @@ added: v10.0.0
 * `asyncFn` {Function|Promise}
 * `error` {RegExp|Function}
 * `message` {string}
-* Returns: {Promise}
+* 返回：{Promise}
 
-Awaits the `asyncFn` promise or, if `asyncFn` is a function, immediately
-calls the function and awaits the returned promise to complete. It will then
-check that the promise is not rejected.
+等待 `asyncFn` 承诺完成，或者如果 `asyncFn` 是一个函数，则立即调用该函数并等待返回的承诺完成。然后检查承诺是否未被拒绝。
 
-If `asyncFn` is a function and it throws an error synchronously,
-`assert.doesNotReject()` will return a rejected `Promise` with that error. If
-the function does not return a promise, `assert.doesNotReject()` will return a
-rejected `Promise` with an [`ERR_INVALID_RETURN_VALUE`][] error. In both cases
-the error handler is skipped.
+如果 `asyncFn` 是一个函数并且它同步抛出错误，`assert.doesNotReject()` 将返回一个被拒绝的 `Promise`，并带有该错误。如果该函数不返回承诺，`assert.doesNotReject()` 将返回一个被拒绝的 `Promise`，并带有 [`ERR_INVALID_RETURN_VALUE`][] 错误。在这两种情况下，错误处理程序都会被跳过。
 
-Using `assert.doesNotReject()` is actually not useful because there is little
-benefit in catching a rejection and then rejecting it again. Instead, consider
-adding a comment next to the specific code path that should not reject and keep
-error messages as expressive as possible.
+使用 `assert.doesNotReject()` 实际上并不有用，因为捕获拒绝然后再次拒绝它没有什么好处。相反，考虑在不应拒绝的特定代码路径旁边添加注释，并保持错误消息尽可能具有表现力。
 
-If specified, `error` can be a [`Class`][], {RegExp} or a validation
-function. See [`assert.throws()`][] for more details.
+如果指定，`error` 可以是 [`Class`][]、{RegExp} 或验证函数。有关更多详细信息，请参阅 [`assert.throws()`][]。
 
-Besides the async nature to await the completion behaves identically to
-[`assert.doesNotThrow()`][].
+除了等待完成的异步性质外，其行为与 [`assert.doesNotThrow()`][] 相同。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1273,26 +893,17 @@ changes:
 * `error` {RegExp|Function}
 * `message` {string}
 
-Asserts that the function `fn` does not throw an error.
+断言函数 `fn` 不会抛出错误。
 
-Using `assert.doesNotThrow()` is actually not useful because there
-is no benefit in catching an error and then rethrowing it. Instead, consider
-adding a comment next to the specific code path that should not throw and keep
-error messages as expressive as possible.
+使用 `assert.doesNotThrow()` 实际上并不有用，因为捕获错误然后重新抛出它没有什么好处。相反，考虑在不应抛出的特定代码路径旁边添加注释，并保持错误消息尽可能具有表现力。
 
-When `assert.doesNotThrow()` is called, it will immediately call the `fn`
-function.
+当调用 `assert.doesNotThrow()` 时，它会立即调用 `fn` 函数。
 
-If an error is thrown and it is the same type as that specified by the `error`
-parameter, then an [`AssertionError`][] is thrown. If the error is of a
-different type, or if the `error` parameter is undefined, the error is
-propagated back to the caller.
+如果抛出错误并且它与 `error` 参数指定的类型相同，则抛出 [`AssertionError`][]。如果错误是不同类型，或者 `error` 参数未定义，则错误将传播回调用者。
 
-If specified, `error` can be a [`Class`][], {RegExp}, or a validation
-function. See [`assert.throws()`][] for more details.
+如果指定，`error` 可以是 [`Class`][]、{RegExp} 或验证函数。有关更多详细信息，请参阅 [`assert.throws()`][]。
 
-The following, for instance, will throw the {TypeError} because there is no
-matching error type in the assertion:
+例如，以下将抛出 {TypeError}，因为断言中没有匹配的错误类型：
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1316,8 +927,7 @@ assert.doesNotThrow(
 );
 ```
 
-However, the following will result in an [`AssertionError`][] with the message
-'Got unwanted exception...':
+但是，以下将导致带有消息“Got unwanted exception...”的 [`AssertionError`][]：
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1341,9 +951,7 @@ assert.doesNotThrow(
 );
 ```
 
-If an [`AssertionError`][] is thrown and a value is provided for the `message`
-parameter, the value of `message` will be appended to the [`AssertionError`][]
-message:
+如果抛出 [`AssertionError`][] 并且为 `message` 参数提供了值，则 `message` 的值将附加到 [`AssertionError`][] 消息：
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1392,17 +1000,15 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-**Strict assertion mode**
+**严格断言模式**
 
-An alias of [`assert.strictEqual()`][].
+[`assert.strictEqual()`][] 的别名。
 
-**Legacy assertion mode**
+**传统断言模式**
 
-> Stability: 3 - Legacy: Use [`assert.strictEqual()`][] instead.
+> Stability: 3 - Legacy: 请改用 [`assert.strictEqual()`][]。
 
-Tests shallow, coercive equality between the `actual` and `expected` parameters
-using the [`==` operator][]. `NaN` is specially handled
-and treated as being identical if both sides are `NaN`.
+使用 [`==` 运算符][] 测试 `actual` 和 `expected` 参数之间的浅层强制相等性。`NaN` 被特殊处理，如果两边都是 `NaN`，则被视为相同。
 
 ```mjs
 import assert from 'node:assert';
@@ -1436,11 +1042,7 @@ assert.equal({ a: { b: 1 } }, { a: { b: 1 } });
 // AssertionError: { a: { b: 1 } } == { a: { b: 1 } }
 ```
 
-If the values are not equal, an [`AssertionError`][] is thrown with a `message`
-property set equal to the value of the `message` parameter. If the `message`
-parameter is undefined, a default error message is assigned. If the `message`
-parameter is an instance of {Error} then it will be thrown instead of the
-`AssertionError`.
+如果值不相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 `AssertionError`。
 
 ## `assert.fail([message])`
 
@@ -1448,11 +1050,9 @@ parameter is an instance of {Error} then it will be thrown instead of the
 added: v0.1.21
 -->
 
-* `message` {string|Error} **Default:** `'Failed'`
+* `message` {string|Error} **默认值：** `'Failed'`
 
-Throws an [`AssertionError`][] with the provided error message or a default
-error message. If the `message` parameter is an instance of {Error} then
-it will be thrown instead of the [`AssertionError`][].
+抛出带有提供的错误消息或默认错误消息的 [`AssertionError`][]。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 [`AssertionError`][]。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1478,107 +1078,6 @@ assert.fail('boom');
 
 assert.fail(new TypeError('need array'));
 // TypeError: need array
-```
-
-Using `assert.fail()` with more than two arguments is possible but deprecated.
-See below for further details.
-
-## `assert.fail(actual, expected[, message[, operator[, stackStartFn]]])`
-
-<!-- YAML
-added: v0.1.21
-changes:
-  - version: v10.0.0
-    pr-url: https://github.com/nodejs/node/pull/18418
-    description: Calling `assert.fail()` with more than one argument is
-                 deprecated and emits a warning.
--->
-
-> Stability: 0 - Deprecated: Use `assert.fail([message])` or other assert
-> functions instead.
-
-* `actual` {any}
-* `expected` {any}
-* `message` {string|Error}
-* `operator` {string} **Default:** `'!='`
-* `stackStartFn` {Function} **Default:** `assert.fail`
-
-If `message` is falsy, the error message is set as the values of `actual` and
-`expected` separated by the provided `operator`. If just the two `actual` and
-`expected` arguments are provided, `operator` will default to `'!='`. If
-`message` is provided as third argument it will be used as the error message and
-the other arguments will be stored as properties on the thrown object. If
-`stackStartFn` is provided, all stack frames above that function will be
-removed from stacktrace (see [`Error.captureStackTrace`][]). If no arguments are
-given, the default message `Failed` will be used.
-
-```mjs
-import assert from 'node:assert/strict';
-
-assert.fail('a', 'b');
-// AssertionError [ERR_ASSERTION]: 'a' != 'b'
-
-assert.fail(1, 2, undefined, '>');
-// AssertionError [ERR_ASSERTION]: 1 > 2
-
-assert.fail(1, 2, 'fail');
-// AssertionError [ERR_ASSERTION]: fail
-
-assert.fail(1, 2, 'whoops', '>');
-// AssertionError [ERR_ASSERTION]: whoops
-
-assert.fail(1, 2, new TypeError('need array'));
-// TypeError: need array
-```
-
-```cjs
-const assert = require('node:assert/strict');
-
-assert.fail('a', 'b');
-// AssertionError [ERR_ASSERTION]: 'a' != 'b'
-
-assert.fail(1, 2, undefined, '>');
-// AssertionError [ERR_ASSERTION]: 1 > 2
-
-assert.fail(1, 2, 'fail');
-// AssertionError [ERR_ASSERTION]: fail
-
-assert.fail(1, 2, 'whoops', '>');
-// AssertionError [ERR_ASSERTION]: whoops
-
-assert.fail(1, 2, new TypeError('need array'));
-// TypeError: need array
-```
-
-In the last three cases `actual`, `expected`, and `operator` have no
-influence on the error message.
-
-Example use of `stackStartFn` for truncating the exception's stacktrace:
-
-```mjs
-import assert from 'node:assert/strict';
-
-function suppressFrame() {
-  assert.fail('a', 'b', undefined, '!==', suppressFrame);
-}
-suppressFrame();
-// AssertionError [ERR_ASSERTION]: 'a' !== 'b'
-//     at repl:1:1
-//     at ContextifyScript.Script.runInThisContext (vm.js:44:33)
-//     ...
-```
-
-```cjs
-const assert = require('node:assert/strict');
-
-function suppressFrame() {
-  assert.fail('a', 'b', undefined, '!==', suppressFrame);
-}
-suppressFrame();
-// AssertionError [ERR_ASSERTION]: 'a' !== 'b'
-//     at repl:1:1
-//     at ContextifyScript.Script.runInThisContext (vm.js:44:33)
-//     ...
 ```
 
 ## `assert.ifError(value)`
@@ -1598,10 +1097,7 @@ changes:
 
 * `value` {any}
 
-Throws `value` if `value` is not `undefined` or `null`. This is useful when
-testing the `error` argument in callbacks. The stack trace contains all frames
-from the error passed to `ifError()` including the potential new frames for
-`ifError()` itself.
+如果 `value` 不是 `undefined` 或 `null`，则抛出 `value`。这在测试回调中的 `error` 参数时很有用。堆栈跟踪包含从传递给 `ifError()` 的错误的所有帧，包括 `ifError()` 本身的潜在新帧。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1615,7 +1111,7 @@ assert.ifError('error');
 assert.ifError(new Error());
 // AssertionError [ERR_ASSERTION]: ifError got unwanted exception: Error
 
-// Create some random error frames.
+// 创建一些随机错误帧。
 let err;
 (function errorFrame() {
   err = new Error('test error');
@@ -1641,7 +1137,7 @@ assert.ifError('error');
 assert.ifError(new Error());
 // AssertionError [ERR_ASSERTION]: ifError got unwanted exception: Error
 
-// Create some random error frames.
+// 创建一些随机错误帧。
 let err;
 (function errorFrame() {
   err = new Error('test error');
@@ -1671,7 +1167,7 @@ changes:
 * `regexp` {RegExp}
 * `message` {string|Error}
 
-Expects the `string` input to match the regular expression.
+期望 `string` 输入匹配正则表达式。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1699,12 +1195,7 @@ assert.match('I will pass', /pass/);
 // OK
 ```
 
-If the values do not match, or if the `string` argument is of another type than
-`string`, an [`AssertionError`][] is thrown with a `message` property set equal
-to the value of the `message` parameter. If the `message` parameter is
-undefined, a default error message is assigned. If the `message` parameter is an
-instance of {Error} then it will be thrown instead of the
-[`AssertionError`][].
+如果值不匹配，或者 `string` 参数是除 `string` 以外的其他类型，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 [`AssertionError`][]。
 
 ## `assert.notDeepEqual(actual, expected[, message])`
 
@@ -1748,15 +1239,15 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-**Strict assertion mode**
+**严格断言模式**
 
-An alias of [`assert.notDeepStrictEqual()`][].
+[`assert.notDeepStrictEqual()`][] 的别名。
 
-**Legacy assertion mode**
+**传统断言模式**
 
-> Stability: 3 - Legacy: Use [`assert.notDeepStrictEqual()`][] instead.
+> Stability: 3 - Legacy: 请改用 [`assert.notDeepStrictEqual()`][]。
 
-Tests for any deep inequality. Opposite of [`assert.deepEqual()`][].
+测试任何深度不相等。与 [`assert.deepEqual()`][] 相反。
 
 ```mjs
 import assert from 'node:assert';
@@ -1824,11 +1315,7 @@ assert.notDeepEqual(obj1, obj4);
 // OK
 ```
 
-If the values are deeply equal, an [`AssertionError`][] is thrown with a
-`message` property set equal to the value of the `message` parameter. If the
-`message` parameter is undefined, a default error message is assigned. If the
-`message` parameter is an instance of {Error} then it will be thrown
-instead of the `AssertionError`.
+如果值深度相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 `AssertionError`。
 
 ## `assert.notDeepStrictEqual(actual, expected[, message])`
 
@@ -1868,7 +1355,7 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-Tests for deep strict inequality. Opposite of [`assert.deepStrictEqual()`][].
+测试深度严格不相等。与 [`assert.deepStrictEqual()`][] 相反。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -1884,11 +1371,7 @@ assert.notDeepStrictEqual({ a: 1 }, { a: '1' });
 // OK
 ```
 
-If the values are deeply and strictly equal, an [`AssertionError`][] is thrown
-with a `message` property set equal to the value of the `message` parameter. If
-the `message` parameter is undefined, a default error message is assigned. If
-the `message` parameter is an instance of {Error} then it will be thrown
-instead of the [`AssertionError`][].
+如果值深度严格相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 [`AssertionError`][]。
 
 ## `assert.notEqual(actual, expected[, message])`
 
@@ -1911,16 +1394,15 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-**Strict assertion mode**
+**严格断言模式**
 
-An alias of [`assert.notStrictEqual()`][].
+[`assert.notStrictEqual()`][] 的别名。
 
-**Legacy assertion mode**
+**传统断言模式**
 
-> Stability: 3 - Legacy: Use [`assert.notStrictEqual()`][] instead.
+> Stability: 3 - Legacy: 请改用 [`assert.notStrictEqual()`][]。
 
-Tests shallow, coercive inequality with the [`!=` operator][]. `NaN` is
-specially handled and treated as being identical if both sides are `NaN`.
+使用 [`!=` 运算符][] 测试浅层强制不相等。`NaN` 被特殊处理，如果两边都是 `NaN`，则被视为相同。
 
 ```mjs
 import assert from 'node:assert';
@@ -1948,11 +1430,7 @@ assert.notEqual(1, '1');
 // AssertionError: 1 != '1'
 ```
 
-If the values are equal, an [`AssertionError`][] is thrown with a `message`
-property set equal to the value of the `message` parameter. If the `message`
-parameter is undefined, a default error message is assigned. If the `message`
-parameter is an instance of {Error} then it will be thrown instead of the
-`AssertionError`.
+如果值相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 `AssertionError`。
 
 ## `assert.notStrictEqual(actual, expected[, message])`
 
@@ -1968,8 +1446,7 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-Tests strict inequality between the `actual` and `expected` parameters as
-determined by [`Object.is()`][].
+测试 `actual` 和 `expected` 参数之间的严格不相等性，由 [`Object.is()`][] 确定。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2001,11 +1478,7 @@ assert.notStrictEqual(1, '1');
 // OK
 ```
 
-If the values are strictly equal, an [`AssertionError`][] is thrown with a
-`message` property set equal to the value of the `message` parameter. If the
-`message` parameter is undefined, a default error message is assigned. If the
-`message` parameter is an instance of {Error} then it will be thrown
-instead of the `AssertionError`.
+如果值严格相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 `AssertionError`。
 
 ## `assert.ok(value[, message])`
 
@@ -2021,19 +1494,12 @@ changes:
 * `value` {any}
 * `message` {string|Error}
 
-Tests if `value` is truthy. It is equivalent to
-`assert.equal(!!value, true, message)`.
+测试 `value` 是否为真值。它等效于 `assert.equal(!!value, true, message)`。
 
-If `value` is not truthy, an [`AssertionError`][] is thrown with a `message`
-property set equal to the value of the `message` parameter. If the `message`
-parameter is `undefined`, a default error message is assigned. If the `message`
-parameter is an instance of {Error} then it will be thrown instead of the
-`AssertionError`.
-If no arguments are passed in at all `message` will be set to the string:
-``'No value argument passed to `assert.ok()`'``.
+如果 `value` 不是真值，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数是 `undefined`，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 `AssertionError`。
+如果根本没有传递任何参数，`message` 将被设置为字符串：``'No value argument passed to `assert.ok()`'``。
 
-Be aware that in the `repl` the error message will be different to the one
-thrown in a file! See below for further details.
+请注意，在 `repl` 中，错误消息将与文件中抛出的错误消息不同！有关更多详细信息，请参见下文。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2049,11 +1515,11 @@ assert.ok();
 assert.ok(false, 'it\'s false');
 // AssertionError: it's false
 
-// In the repl:
+// 在 repl 中：
 assert.ok(typeof 123 === 'string');
 // AssertionError: false == true
 
-// In a file (e.g. test.js):
+// 在文件中（例如 test.js）：
 assert.ok(typeof 123 === 'string');
 // AssertionError: The expression evaluated to a falsy value:
 //
@@ -2084,11 +1550,11 @@ assert.ok();
 assert.ok(false, 'it\'s false');
 // AssertionError: it's false
 
-// In the repl:
+// 在 repl 中：
 assert.ok(typeof 123 === 'string');
 // AssertionError: false == true
 
-// In a file (e.g. test.js):
+// 在文件中（例如 test.js）：
 assert.ok(typeof 123 === 'string');
 // AssertionError: The expression evaluated to a falsy value:
 //
@@ -2108,7 +1574,7 @@ assert.ok(0);
 ```mjs
 import assert from 'node:assert/strict';
 
-// Using `assert()` works the same:
+// 使用 `assert()` 效果相同：
 assert(0);
 // AssertionError: The expression evaluated to a falsy value:
 //
@@ -2118,7 +1584,7 @@ assert(0);
 ```cjs
 const assert = require('node:assert');
 
-// Using `assert()` works the same:
+// 使用 `assert()` 效果相同：
 assert(0);
 // AssertionError: The expression evaluated to a falsy value:
 //
@@ -2134,28 +1600,17 @@ added: v10.0.0
 * `asyncFn` {Function|Promise}
 * `error` {RegExp|Function|Object|Error}
 * `message` {string}
-* Returns: {Promise}
+* 返回：{Promise}
 
-Awaits the `asyncFn` promise or, if `asyncFn` is a function, immediately
-calls the function and awaits the returned promise to complete. It will then
-check that the promise is rejected.
+等待 `asyncFn` 承诺完成，或者如果 `asyncFn` 是一个函数，则立即调用该函数并等待返回的承诺完成。然后检查承诺是否被拒绝。
 
-If `asyncFn` is a function and it throws an error synchronously,
-`assert.rejects()` will return a rejected `Promise` with that error. If the
-function does not return a promise, `assert.rejects()` will return a rejected
-`Promise` with an [`ERR_INVALID_RETURN_VALUE`][] error. In both cases the error
-handler is skipped.
+如果 `asyncFn` 是一个函数并且它同步抛出错误，`assert.rejects()` 将返回一个被拒绝的 `Promise`，并带有该错误。如果该函数不返回承诺，`assert.rejects()` 将返回一个被拒绝的 `Promise`，并带有 [`ERR_INVALID_RETURN_VALUE`][] 错误。在这两种情况下，错误处理程序都会被跳过。
 
-Besides the async nature to await the completion behaves identically to
-[`assert.throws()`][].
+除了等待完成的异步性质外，其行为与 [`assert.throws()`][] 相同。
 
-If specified, `error` can be a [`Class`][], {RegExp}, a validation function,
-an object where each property will be tested for, or an instance of error where
-each property will be tested for including the non-enumerable `message` and
-`name` properties.
+如果指定，`error` 可以是 [`Class`][]、{RegExp}、验证函数、将测试每个属性的对象，或错误实例，其中将测试每个属性，包括不可枚举的 `message` 和 `name` 属性。
 
-If specified, `message` will be the message provided by the [`AssertionError`][]
-if the `asyncFn` fails to reject.
+如果指定，`message` 将是 [`AssertionError`][] 提供的消息，如果 `asyncFn` 未能拒绝。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2241,11 +1696,7 @@ assert.rejects(
 });
 ```
 
-`error` cannot be a string. If a string is provided as the second
-argument, then `error` is assumed to be omitted and the string will be used for
-`message` instead. This can lead to easy-to-miss mistakes. Please read the
-example in [`assert.throws()`][] carefully if using a string as the second
-argument gets considered.
+`error` 不能是字符串。如果提供字符串作为第二个参数，则假定 `error` 被省略，该字符串将用于 `message`。这可能导致容易遗漏的错误。如果考虑使用字符串作为第二个参数，请仔细阅读 [`assert.throws()`][] 中的示例。
 
 ## `assert.strictEqual(actual, expected[, message])`
 
@@ -2261,8 +1712,7 @@ changes:
 * `expected` {any}
 * `message` {string|Error}
 
-Tests strict equality between the `actual` and `expected` parameters as
-determined by [`Object.is()`][].
+测试 `actual` 和 `expected` 参数之间的严格相等性，由 [`Object.is()`][] 确定。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2320,11 +1770,7 @@ assert.strictEqual(1, '1', new TypeError('Inputs are not identical'));
 // TypeError: Inputs are not identical
 ```
 
-If the values are not strictly equal, an [`AssertionError`][] is thrown with a
-`message` property set equal to the value of the `message` parameter. If the
-`message` parameter is undefined, a default error message is assigned. If the
-`message` parameter is an instance of {Error} then it will be thrown
-instead of the [`AssertionError`][].
+如果值不严格相等，将抛出 [`AssertionError`][]，其 `message` 属性设置为 `message` 参数的值。如果 `message` 参数未定义，则分配默认错误消息。如果 `message` 参数是 {Error} 的实例，则将抛出该错误而不是 [`AssertionError`][]。
 
 ## `assert.throws(fn[, error][, message])`
 
@@ -2347,20 +1793,13 @@ changes:
 * `error` {RegExp|Function|Object|Error}
 * `message` {string}
 
-Expects the function `fn` to throw an error.
+期望函数 `fn` 抛出错误。
 
-If specified, `error` can be a [`Class`][], {RegExp}, a validation function,
-a validation object where each property will be tested for strict deep equality,
-or an instance of error where each property will be tested for strict deep
-equality including the non-enumerable `message` and `name` properties. When
-using an object, it is also possible to use a regular expression, when
-validating against a string property. See below for examples.
+如果指定，`error` 可以是 [`Class`][]、{RegExp}、验证函数、将测试每个属性以进行严格深度相等的验证对象，或错误实例，其中将测试每个属性以进行严格深度相等，包括不可枚举的 `message` 和 `name` 属性。使用对象时，也可以使用正则表达式，当针对字符串属性进行验证时。参见以下示例。
 
-If specified, `message` will be appended to the message provided by the
-`AssertionError` if the `fn` call fails to throw or in case the error validation
-fails.
+如果指定，`message` 将附加到 `AssertionError` 提供的消息中，如果 `fn` 调用未能抛出或错误验证失败。
 
-Custom validation object/error instance:
+自定义验证对象/错误实例：
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2385,48 +1824,42 @@ assert.throws(
       nested: true,
       baz: 'text',
     },
-    // Only properties on the validation object will be tested for.
-    // Using nested objects requires all properties to be present. Otherwise
-    // the validation is going to fail.
+    // 只有验证对象上的属性将被测试。
+    // 使用嵌套对象要求所有属性都存在。否则验证将失败。
   },
 );
 
-// Using regular expressions to validate error properties:
+// 使用正则表达式验证错误属性：
 assert.throws(
   () => {
     throw err;
   },
   {
-    // The `name` and `message` properties are strings and using regular
-    // expressions on those will match against the string. If they fail, an
-    // error is thrown.
+    // `name` 和 `message` 属性是字符串，对它们使用正则表达式将匹配字符串。如果失败，将抛出错误。
     name: /^TypeError$/,
     message: /Wrong/,
     foo: 'bar',
     info: {
       nested: true,
-      // It is not possible to use regular expressions for nested properties!
+      // 不能对嵌套属性使用正则表达式！
       baz: 'text',
     },
-    // The `reg` property contains a regular expression and only if the
-    // validation object contains an identical regular expression, it is going
-    // to pass.
+    // `reg` 属性包含一个正则表达式，只有当验证对象包含相同的正则表达式时，才会通过。
     reg: /abc/i,
   },
 );
 
-// Fails due to the different `message` and `name` properties:
+// 由于不同的 `message` 和 `name` 属性而失败：
 assert.throws(
   () => {
     const otherErr = new Error('Not found');
-    // Copy all enumerable properties from `err` to `otherErr`.
+    // 从 `err` 复制所有可枚举属性到 `otherErr`。
     for (const [key, value] of Object.entries(err)) {
       otherErr[key] = value;
     }
     throw otherErr;
   },
-  // The error's `message` and `name` properties will also be checked when using
-  // an error as validation object.
+  // 当使用错误作为验证对象时，错误的 `message` 和 `name` 属性也将被检查。
   err,
 );
 ```
@@ -2454,53 +1887,47 @@ assert.throws(
       nested: true,
       baz: 'text',
     },
-    // Only properties on the validation object will be tested for.
-    // Using nested objects requires all properties to be present. Otherwise
-    // the validation is going to fail.
+    // 只有验证对象上的属性将被测试。
+    // 使用嵌套对象要求所有属性都存在。否则验证将失败。
   },
 );
 
-// Using regular expressions to validate error properties:
+// 使用正则表达式验证错误属性：
 assert.throws(
   () => {
     throw err;
   },
   {
-    // The `name` and `message` properties are strings and using regular
-    // expressions on those will match against the string. If they fail, an
-    // error is thrown.
+    // `name` 和 `message` 属性是字符串，对它们使用正则表达式将匹配字符串。如果失败，将抛出错误。
     name: /^TypeError$/,
     message: /Wrong/,
     foo: 'bar',
     info: {
       nested: true,
-      // It is not possible to use regular expressions for nested properties!
+      // 不能对嵌套属性使用正则表达式！
       baz: 'text',
     },
-    // The `reg` property contains a regular expression and only if the
-    // validation object contains an identical regular expression, it is going
-    // to pass.
+    // `reg` 属性包含一个正则表达式，只有当验证对象包含相同的正则表达式时，才会通过。
     reg: /abc/i,
   },
 );
 
-// Fails due to the different `message` and `name` properties:
+// 由于不同的 `message` 和 `name` 属性而失败：
 assert.throws(
   () => {
     const otherErr = new Error('Not found');
-    // Copy all enumerable properties from `err` to `otherErr`.
+    // 从 `err` 复制所有可枚举属性到 `otherErr`。
     for (const [key, value] of Object.entries(err)) {
       otherErr[key] = value;
     }
     throw otherErr;
   },
-  // The error's `message` and `name` properties will also be checked when using
-  // an error as validation object.
+  // 当使用错误作为验证对象时，错误的 `message` 和 `name` 属性也将被检查。
   err,
 );
 ```
 
-Validate instanceof using constructor:
+使用构造函数验证 instanceof：
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2524,10 +1951,9 @@ assert.throws(
 );
 ```
 
-Validate error message using {RegExp}:
+使用 {RegExp} 验证错误消息：
 
-Using a regular expression runs `.toString` on the error object, and will
-therefore also include the error name.
+使用正则表达式会对错误对象运行 `.toString`，因此也会包括错误名称。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2551,10 +1977,9 @@ assert.throws(
 );
 ```
 
-Custom error validation:
+自定义错误验证：
 
-The function must return `true` to indicate all internal validations passed.
-It will otherwise fail with an [`AssertionError`][].
+该函数必须返回 `true` 以指示所有内部验证通过。否则它将失败并抛出 [`AssertionError`][]。
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2566,11 +1991,8 @@ assert.throws(
   (err) => {
     assert(err instanceof Error);
     assert(/value/.test(err));
-    // Avoid returning anything from validation functions besides `true`.
-    // Otherwise, it's not clear what part of the validation failed. Instead,
-    // throw an error about the specific validation that failed (as done in this
-    // example) and add as much helpful debugging information to that error as
-    // possible.
+    // 避免从验证函数返回除 `true` 以外的任何内容。
+    // 否则，不清楚验证的哪部分失败。相反，抛出关于特定验证失败的错误（如本示例所示），并向该错误添加尽可能多的有帮助的调试信息。
     return true;
   },
   'unexpected error',
@@ -2587,23 +2009,15 @@ assert.throws(
   (err) => {
     assert(err instanceof Error);
     assert(/value/.test(err));
-    // Avoid returning anything from validation functions besides `true`.
-    // Otherwise, it's not clear what part of the validation failed. Instead,
-    // throw an error about the specific validation that failed (as done in this
-    // example) and add as much helpful debugging information to that error as
-    // possible.
+    // 避免从验证函数返回除 `true` 以外的任何内容。
+    // 否则，不清楚验证的哪部分失败。相反，抛出关于特定验证失败的错误（如本示例所示），并向该错误添加尽可能多的有帮助的调试信息。
     return true;
   },
   'unexpected error',
 );
 ```
 
-`error` cannot be a string. If a string is provided as the second
-argument, then `error` is assumed to be omitted and the string will be used for
-`message` instead. This can lead to easy-to-miss mistakes. Using the same
-message as the thrown error message is going to result in an
-`ERR_AMBIGUOUS_ARGUMENT` error. Please read the example below carefully if using
-a string as the second argument gets considered:
+`error` 不能是字符串。如果提供字符串作为第二个参数，则假定 `error` 被省略，该字符串将用于 `message`。这可能导致容易遗漏的错误。使用相同的消息作为抛出的错误消息将导致 `ERR_AMBIGUOUS_ARGUMENT` 错误。如果考虑使用字符串作为第二个参数，请仔细阅读以下示例：
 
 ```mjs
 import assert from 'node:assert/strict';
@@ -2618,25 +2032,22 @@ function throwingSecond() {
 
 function notThrowing() {}
 
-// The second argument is a string and the input function threw an Error.
-// The first case will not throw as it does not match for the error message
-// thrown by the input function!
+// 第二个参数是字符串，输入函数抛出了 Error。
+// 第一种情况不会抛出，因为它与输入函数抛出的错误消息不匹配！
 assert.throws(throwingFirst, 'Second');
-// In the next example the message has no benefit over the message from the
-// error and since it is not clear if the user intended to actually match
-// against the error message, Node.js throws an `ERR_AMBIGUOUS_ARGUMENT` error.
+// 在下一个示例中，消息与错误的消息相比没有好处，并且由于不清楚用户是否确实打算匹配错误消息，Node.js 抛出 `ERR_AMBIGUOUS_ARGUMENT` 错误。
 assert.throws(throwingSecond, 'Second');
 // TypeError [ERR_AMBIGUOUS_ARGUMENT]
 
-// The string is only used (as message) in case the function does not throw:
+// 字符串仅在函数未抛出时使用（作为消息）：
 assert.throws(notThrowing, 'Second');
 // AssertionError [ERR_ASSERTION]: Missing expected exception: Second
 
-// If it was intended to match for the error message do this instead:
-// It does not throw because the error messages match.
+// 如果打算匹配错误消息，请改为执行此操作：
+// 因为错误消息匹配，所以不会抛出。
 assert.throws(throwingSecond, /Second$/);
 
-// If the error message does not match, an AssertionError is thrown.
+// 如果错误消息不匹配，则抛出 AssertionError。
 assert.throws(throwingFirst, /Second$/);
 // AssertionError [ERR_ASSERTION]
 ```
@@ -2654,31 +2065,27 @@ function throwingSecond() {
 
 function notThrowing() {}
 
-// The second argument is a string and the input function threw an Error.
-// The first case will not throw as it does not match for the error message
-// thrown by the input function!
+// 第二个参数是字符串，输入函数抛出了 Error。
+// 第一种情况不会抛出，因为它与输入函数抛出的错误消息不匹配！
 assert.throws(throwingFirst, 'Second');
-// In the next example the message has no benefit over the message from the
-// error and since it is not clear if the user intended to actually match
-// against the error message, Node.js throws an `ERR_AMBIGUOUS_ARGUMENT` error.
+// 在下一个示例中，消息与错误的消息相比没有好处，并且由于不清楚用户是否确实打算匹配错误消息，Node.js 抛出 `ERR_AMBIGUOUS_ARGUMENT` 错误。
 assert.throws(throwingSecond, 'Second');
 // TypeError [ERR_AMBIGUOUS_ARGUMENT]
 
-// The string is only used (as message) in case the function does not throw:
+// 字符串仅在函数未抛出时使用（作为消息）：
 assert.throws(notThrowing, 'Second');
 // AssertionError [ERR_ASSERTION]: Missing expected exception: Second
 
-// If it was intended to match for the error message do this instead:
-// It does not throw because the error messages match.
+// 如果打算匹配错误消息，请改为执行此操作：
+// 因为错误消息匹配，所以不会抛出。
 assert.throws(throwingSecond, /Second$/);
 
-// If the error message does not match, an AssertionError is thrown.
+// 如果错误消息不匹配，则抛出 AssertionError。
 assert.throws(throwingFirst, /Second$/);
 // AssertionError [ERR_ASSERTION]
 ```
 
-Due to the confusing error-prone notation, avoid a string as the second
-argument.
+由于容易混淆且容易出错的表示法，避免使用字符串作为第二个参数。
 
 ## `assert.partialDeepStrictEqual(actual, expected[, message])`
 
@@ -2687,46 +2094,43 @@ added:
   - v23.4.0
   - v22.13.0
 changes:
- - version: v24.0.0
-   pr-url: https://github.com/nodejs/node/pull/57370
-   description: partialDeepStrictEqual is now Stable. Previously, it had been Experimental.
+  - version: v25.0.0
+    pr-url: https://github.com/nodejs/node/pull/59448
+    description: Promises are not considered equal anymore if they are not of
+                 the same instance.
+  - version: v25.0.0
+    pr-url: https://github.com/nodejs/node/pull/57627
+    description: Invalid dates are now considered equal.
+  - version:
+      - v24.0.0
+      - v22.17.0
+    pr-url: https://github.com/nodejs/node/pull/57370
+    description: partialDeepStrictEqual is now Stable. Previously, it had been Experimental.
 -->
 
 * `actual` {any}
 * `expected` {any}
 * `message` {string|Error}
 
-Tests for partial deep equality between the `actual` and `expected` parameters.
-"Deep" equality means that the enumerable "own" properties of child objects
-are recursively evaluated also by the following rules. "Partial" equality means
-that only properties that exist on the `expected` parameter are going to be
-compared.
+测试 `actual` 和 `expected` 参数之间的部分深度相等性。"深度"相等意味着子对象的可枚举"自有"属性也通过以下规则递归评估。"部分"相等意味着只比较存在于 `expected` 参数上的属性。
 
-This method always passes the same test cases as [`assert.deepStrictEqual()`][],
-behaving as a super set of it.
+此方法始终通过与 [`assert.deepStrictEqual()`][] 相同的测试用例，表现为其超集。
 
-### Comparison details
+### 比较细节
 
-* Primitive values are compared using [`Object.is()`][].
-* [Type tags][Object.prototype.toString()] of objects should be the same.
-* [`[[Prototype]]`][prototype-spec] of objects are not compared.
-* Only [enumerable "own" properties][] are considered.
-* {Error} names, messages, causes, and errors are always compared,
-  even if these are not enumerable properties.
-  `errors` is also compared.
-* Enumerable own {Symbol} properties are compared as well.
-* [Object wrappers][] are compared both as objects and unwrapped values.
-* `Object` properties are compared unordered.
-* {Map} keys and {Set} items are compared unordered.
-* Recursion stops when both sides differ or both sides encounter a circular
-  reference.
-* {WeakMap} and {WeakSet} instances are **not** compared structurally.
-  They are only equal if they reference the same object. Any comparison between
-  different `WeakMap` or `WeakSet` instances will result in inequality,
-  even if they contain the same entries.
-* {RegExp} lastIndex, flags, and source are always compared, even if these
-  are not enumerable properties.
-* Holes in sparse arrays are ignored.
+* 原始值使用 [`Object.is()`][] 进行比较。
+* 对象的[类型标签][Object.prototype.toString()] 应该相同。
+* 对象的 [`[[Prototype]]`][prototype-spec] 不会被比较。
+* 只考虑[可枚举的"自有"属性][]。
+* {Error} 的名称、消息、原因和错误总是被比较，即使这些不是可枚举属性。`errors` 也会被比较。
+* 可枚举的自有 {Symbol} 属性也会被比较。
+* [对象包装器][] 既作为对象也作为解包后的值进行比较。
+* `Object` 属性是无序比较的。
+* {Map} 键和 {Set} 项是无序比较的。
+* 当双方不同或双方都遇到循环引用时，递归停止。
+* {WeakMap}、{WeakSet} 和 {Promise} 实例不会进行结构比较。只有当它们引用同一个对象时才相等。任何不同 `WeakMap`、`WeakSet` 或 `Promise` 实例之间的比较都将导致不相等，即使它们包含相同的内容。
+* {RegExp} 的 lastIndex、flags 和 source 总是被比较，即使这些不是可枚举属性。
+* 稀疏数组中的空洞被忽略。
 
 ```mjs
 import assert from 'node:assert';
@@ -2838,16 +2242,14 @@ assert.partialDeepStrictEqual(
 // AssertionError
 ```
 
-[Object wrappers]: https://developer.mozilla.org/en-US/docs/Glossary/Primitive#Primitive_wrapper_objects_in_JavaScript
+<!-- [Object wrappers]: https://developer.mozilla.org/en-US/docs/Glossary/Primitive#Primitive_wrapper_objects_in_JavaScript
 [Object.prototype.toString()]: https://tc39.github.io/ecma262/#sec-object.prototype.tostring
 [`!=` operator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Inequality
 [`===` operator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality
 [`==` operator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality
 [`AssertionError`]: #class-assertassertionerror
-[`CallTracker`]: #class-assertcalltracker
 [`Class`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 [`ERR_INVALID_RETURN_VALUE`]: errors.md#err_invalid_return_value
-[`Error.captureStackTrace`]: errors.md#errorcapturestacktracetargetobject-constructoropt
 [`Object.is()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
 [`assert.deepEqual()`]: #assertdeepequalactual-expected-message
 [`assert.deepStrictEqual()`]: #assertdeepstrictequalactual-expected-message
@@ -2861,9 +2263,5 @@ assert.partialDeepStrictEqual(
 [`assert.strictEqual()`]: #assertstrictequalactual-expected-message
 [`assert.throws()`]: #assertthrowsfn-error-message
 [`getColorDepth()`]: tty.md#writestreamgetcolordepthenv
-[`mock`]: test.md#mocking
-[`process.on('exit')`]: process.md#event-exit
-[`tracker.calls()`]: #trackercallsfn-exact
-[`tracker.verify()`]: #trackerverify
 [enumerable "own" properties]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
-[prototype-spec]: https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots
+[prototype-spec]: https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots -->
