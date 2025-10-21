@@ -8,7 +8,7 @@
 
 <!-- source_link=lib/dgram.js -->
 
-The `node:dgram` module provides an implementation of UDP datagram sockets.
+`node:dgram` 模块提供了 UDP 数据报套接字的实现。
 
 ```mjs
 import dgram from 'node:dgram';
@@ -55,38 +55,35 @@ server.bind(41234);
 // Prints: server listening 0.0.0.0:41234
 ```
 
-## Class: `dgram.Socket`
+## 类：`dgram.Socket`
 
 <!-- YAML
 added: v0.1.99
 -->
 
-* Extends: {EventEmitter}
+* 继承：{EventEmitter}
 
-Encapsulates the datagram functionality.
+封装了数据报功能。
 
-New instances of `dgram.Socket` are created using [`dgram.createSocket()`][].
-The `new` keyword is not to be used to create `dgram.Socket` instances.
+使用 [`dgram.createSocket()`][] 创建 `dgram.Socket` 的新实例。不应使用 `new` 关键字来创建 `dgram.Socket` 实例。
 
-### Event: `'close'`
+### 事件：`'close'`
 
 <!-- YAML
 added: v0.1.99
 -->
 
-The `'close'` event is emitted after a socket is closed with [`close()`][].
-Once triggered, no new `'message'` events will be emitted on this socket.
+在使用 [`close()`][] 关闭套接字后，会发出 `'close'` 事件。一旦触发，此套接字上不会再发出新的 `'message'` 事件。
 
-### Event: `'connect'`
+### 事件：`'connect'`
 
 <!-- YAML
 added: v12.0.0
 -->
 
-The `'connect'` event is emitted after a socket is associated to a remote
-address as a result of a successful [`connect()`][] call.
+当套接字因成功调用 [`connect()`][] 而与远程地址关联后，会发出 `'connect'` 事件。
 
-### Event: `'error'`
+### 事件：`'error'`
 
 <!-- YAML
 added: v0.1.99
@@ -94,22 +91,17 @@ added: v0.1.99
 
 * `exception` {Error}
 
-The `'error'` event is emitted whenever any error occurs. The event handler
-function is passed a single `Error` object.
+每当发生任何错误时，都会发出 `'error'` 事件。事件处理函数会传入一个 `Error` 对象。
 
-### Event: `'listening'`
+### 事件：`'listening'`
 
 <!-- YAML
 added: v0.1.99
 -->
 
-The `'listening'` event is emitted once the `dgram.Socket` is addressable and
-can receive data. This happens either explicitly with `socket.bind()` or
-implicitly the first time data is sent using `socket.send()`.
-Until the `dgram.Socket` is listening, the underlying system resources do not
-exist and calls such as `socket.address()` and `socket.setTTL()` will fail.
+一旦 `dgram.Socket` 可寻址并能接收数据，就会发出 `'listening'` 事件。这可以通过显式调用 `socket.bind()` 或隐式地在首次使用 `socket.send()` 发送数据时发生。在 `dgram.Socket` 开始监听之前，底层系统资源不存在，并且调用诸如 `socket.address()` 和 `socket.setTTL()` 等方法将会失败。
 
-### Event: `'message'`
+### 事件：`'message'`
 
 <!-- YAML
 added: v0.1.99
@@ -122,21 +114,16 @@ changes:
     description: The `family` property now returns a number instead of a string.
 -->
 
-The `'message'` event is emitted when a new datagram is available on a socket.
-The event handler function is passed two arguments: `msg` and `rinfo`.
+当套接字上有新的数据报可用时，会发出 `'message'` 事件。事件处理函数会传入两个参数：`msg` 和 `rinfo`。
 
-* `msg` {Buffer} The message.
-* `rinfo` {Object} Remote address information.
-  * `address` {string} The sender address.
-  * `family` {string} The address family (`'IPv4'` or `'IPv6'`).
-  * `port` {number} The sender port.
-  * `size` {number} The message size.
+* `msg` {Buffer} 消息。
+* `rinfo` {Object} 远程地址信息。
+  * `address` {string} 发送方地址。
+  * `family` {string} 地址族（`'IPv4'` 或 `'IPv6'`）。
+  * `port` {number} 发送方端口。
+  * `size` {number} 消息大小。
 
-If the source address of the incoming packet is an IPv6 link-local
-address, the interface name is added to the `address`. For
-example, a packet received on the `en0` interface might have the
-address field set to `'fe80::2618:1234:ab11:3b9c%en0'`, where `'%en0'`
-is the interface name as a zone ID suffix.
+如果传入数据包的源地址是 IPv6 链路本地地址，则接口名称会添加到 `address` 中。例如，在 `en0` 接口上接收的数据包可能将地址字段设置为 `'fe80::2618:1234:ab11:3b9c%en0'`，其中 `'%en0'` 是作为区域 ID 后缀的接口名称。
 
 ### `socket.addMembership(multicastAddress[, multicastInterface])`
 
@@ -147,26 +134,19 @@ added: v0.6.9
 * `multicastAddress` {string}
 * `multicastInterface` {string}
 
-Tells the kernel to join a multicast group at the given `multicastAddress` and
-`multicastInterface` using the `IP_ADD_MEMBERSHIP` socket option. If the
-`multicastInterface` argument is not specified, the operating system will choose
-one interface and will add membership to it. To add membership to every
-available interface, call `addMembership` multiple times, once per interface.
+告诉内核使用 `IP_ADD_MEMBERSHIP` 套接字选项在给定的 `multicastAddress` 和 `multicastInterface` 上加入多播组。如果未指定 `multicastInterface` 参数，操作系统将选择一个接口并加入其成员资格。要加入每个可用接口的成员资格，请多次调用 `addMembership`，每个接口一次。
 
-When called on an unbound socket, this method will implicitly bind to a random
-port, listening on all interfaces.
+在未绑定的套接字上调用此方法时，该方法将隐式绑定到随机端口，监听所有接口。
 
-When sharing a UDP socket across multiple `cluster` workers, the
-`socket.addMembership()` function must be called only once or an
-`EADDRINUSE` error will occur:
+在多个 `cluster` 工作进程之间共享 UDP 套接字时，必须仅调用一次 `socket.addMembership()` 函数，否则将发生 `EADDRINUSE` 错误：
 
 ```mjs
 import cluster from 'node:cluster';
 import dgram from 'node:dgram';
 
 if (cluster.isPrimary) {
-  cluster.fork(); // Works ok.
-  cluster.fork(); // Fails with EADDRINUSE.
+  cluster.fork(); // 工作正常。
+  cluster.fork(); // 因 EADDRINUSE 失败。
 } else {
   const s = dgram.createSocket('udp4');
   s.bind(1234, () => {
@@ -180,8 +160,8 @@ const cluster = require('node:cluster');
 const dgram = require('node:dgram');
 
 if (cluster.isPrimary) {
-  cluster.fork(); // Works ok.
-  cluster.fork(); // Fails with EADDRINUSE.
+  cluster.fork(); // 工作正常。
+  cluster.fork(); // 因 EADDRINUSE 失败。
 } else {
   const s = dgram.createSocket('udp4');
   s.bind(1234, () => {
@@ -202,15 +182,9 @@ added:
 * `groupAddress` {string}
 * `multicastInterface` {string}
 
-Tells the kernel to join a source-specific multicast channel at the given
-`sourceAddress` and `groupAddress`, using the `multicastInterface` with the
-`IP_ADD_SOURCE_MEMBERSHIP` socket option. If the `multicastInterface` argument
-is not specified, the operating system will choose one interface and will add
-membership to it. To add membership to every available interface, call
-`socket.addSourceSpecificMembership()` multiple times, once per interface.
+告诉内核使用 `IP_ADD_SOURCE_MEMBERSHIP` 套接字选项，在给定的 `sourceAddress` 和 `groupAddress` 上加入特定源多播通道，并使用 `multicastInterface`。如果未指定 `multicastInterface` 参数，操作系统将选择一个接口并加入其成员资格。要加入每个可用接口的成员资格，请多次调用 `socket.addSourceSpecificMembership()`，每个接口一次。
 
-When called on an unbound socket, this method will implicitly bind to a random
-port, listening on all interfaces.
+在未绑定的套接字上调用此方法时，该方法将隐式绑定到随机端口，监听所有接口。
 
 ### `socket.address()`
 
@@ -218,13 +192,11 @@ port, listening on all interfaces.
 added: v0.1.99
 -->
 
-* Returns: {Object}
+* 返回：{Object}
 
-Returns an object containing the address information for a socket.
-For UDP sockets, this object will contain `address`, `family`, and `port`
-properties.
+返回一个包含套接字地址信息的对象。对于 UDP 套接字，此对象将包含 `address`、`family` 和 `port` 属性。
 
-This method throws `EBADF` if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 `EBADF`。
 
 ### `socket.bind([port][, address][, callback])`
 
@@ -240,27 +212,17 @@ changes:
 
 * `port` {integer}
 * `address` {string}
-* `callback` {Function} with no parameters. Called when binding is complete.
+* `callback` {Function} 无参数。绑定完成时调用。
 
-For UDP sockets, causes the `dgram.Socket` to listen for datagram
-messages on a named `port` and optional `address`. If `port` is not
-specified or is `0`, the operating system will attempt to bind to a
-random port. If `address` is not specified, the operating system will
-attempt to listen on all addresses. Once binding is complete, a
-`'listening'` event is emitted and the optional `callback` function is
-called.
+对于 UDP 套接字，使 `dgram.Socket` 在指定的 `port` 和可选的 `address` 上监听数据报消息。如果未指定 `port` 或为 `0`，操作系统将尝试绑定到随机端口。如果未指定 `address`，操作系统将尝试在所有地址上监听。一旦绑定完成，将发出 `'listening'` 事件，并调用可选的 `callback` 函数。
 
-Specifying both a `'listening'` event listener and passing a
-`callback` to the `socket.bind()` method is not harmful but not very
-useful.
+同时指定 `'listening'` 事件监听器并将 `callback` 传递给 `socket.bind()` 方法并无害处，但不是很实用。
 
-A bound datagram socket keeps the Node.js process running to receive
-datagram messages.
+绑定的数据报套接字会保持 Node.js 进程运行以接收数据报消息。
 
-If binding fails, an `'error'` event is generated. In rare case (e.g.
-attempting to bind with a closed socket), an [`Error`][] may be thrown.
+如果绑定失败，会生成 `'error'` 事件。在极少数情况下（例如尝试使用已关闭的套接字进行绑定），可能会抛出 [`Error`][]。
 
-Example of a UDP server listening on port 41234:
+监听端口 41234 的 UDP 服务器示例：
 
 ```mjs
 import dgram from 'node:dgram';
@@ -313,47 +275,26 @@ server.bind(41234);
 added: v0.11.14
 -->
 
-* `options` {Object} Required. Supports the following properties:
+* `options` {Object} 必需。支持以下属性：
   * `port` {integer}
   * `address` {string}
   * `exclusive` {boolean}
   * `fd` {integer}
 * `callback` {Function}
 
-For UDP sockets, causes the `dgram.Socket` to listen for datagram
-messages on a named `port` and optional `address` that are passed as
-properties of an `options` object passed as the first argument. If
-`port` is not specified or is `0`, the operating system will attempt
-to bind to a random port. If `address` is not specified, the operating
-system will attempt to listen on all addresses. Once binding is
-complete, a `'listening'` event is emitted and the optional `callback`
-function is called.
+对于 UDP 套接字，使 `dgram.Socket` 在作为第一个参数传递的 `options` 对象的属性中指定的命名 `port` 和可选 `address` 上监听数据报消息。如果未指定 `port` 或为 `0`，操作系统将尝试绑定到随机端口。如果未指定 `address`，操作系统将尝试在所有地址上监听。一旦绑定完成，将发出 `'listening'` 事件，并调用可选的 `callback` 函数。
 
-The `options` object may contain a `fd` property. When a `fd` greater
-than `0` is set, it will wrap around an existing socket with the given
-file descriptor. In this case, the properties of `port` and `address`
-will be ignored.
+`options` 对象可能包含 `fd` 属性。当设置了大于 `0` 的 `fd` 时，它将包装具有给定文件描述符的现有套接字。在这种情况下，将忽略 `port` 和 `address` 的属性。
 
-Specifying both a `'listening'` event listener and passing a
-`callback` to the `socket.bind()` method is not harmful but not very
-useful.
+同时指定 `'listening'` 事件监听器并将 `callback` 传递给 `socket.bind()` 方法并无害处，但不是很实用。
 
-The `options` object may contain an additional `exclusive` property that is
-used when using `dgram.Socket` objects with the [`cluster`][] module. When
-`exclusive` is set to `false` (the default), cluster workers will use the same
-underlying socket handle allowing connection handling duties to be shared.
-When `exclusive` is `true`, however, the handle is not shared and attempted
-port sharing results in an error. Creating a `dgram.Socket` with the `reusePort`
-option set to `true` causes `exclusive` to always be `true` when `socket.bind()`
-is called.
+`options` 对象可能包含一个额外的 `exclusive` 属性，该属性在与 [`cluster`][] 模块一起使用 `dgram.Socket` 对象时使用。当 `exclusive` 设置为 `false`（默认值）时，集群工作进程将使用相同的底层套接字句柄，允许共享连接处理职责。然而，当 `exclusive` 为 `true` 时，句柄不共享，尝试共享端口会导致错误。创建 `dgram.Socket` 时将 `reusePort` 选项设置为 `true` 会导致在调用 `socket.bind()` 时 `exclusive` 始终为 `true`。
 
-A bound datagram socket keeps the Node.js process running to receive
-datagram messages.
+绑定的数据报套接字会保持 Node.js 进程运行以接收数据报消息。
 
-If binding fails, an `'error'` event is generated. In rare case (e.g.
-attempting to bind with a closed socket), an [`Error`][] may be thrown.
+如果绑定失败，会生成 `'error'` 事件。在极少数情况下（例如尝试使用已关闭的套接字进行绑定），可能会抛出 [`Error`][]。
 
-An example socket listening on an exclusive port is shown below.
+下面显示了一个监听独占端口的套接字示例。
 
 ```js
 socket.bind({
@@ -369,10 +310,9 @@ socket.bind({
 added: v0.1.99
 -->
 
-* `callback` {Function} Called when the socket has been closed.
+* `callback` {Function} 当套接字关闭时调用。
 
-Close the underlying socket and stop listening for data on it. If a callback is
-provided, it is added as a listener for the [`'close'`][] event.
+关闭底层套接字并停止在其上监听数据。如果提供了回调函数，它会被添加为 [`'close'`][] 事件的监听器。
 
 ### `socket[Symbol.asyncDispose]()`
 
@@ -386,8 +326,7 @@ changes:
    description: No longer experimental.
 -->
 
-Calls [`socket.close()`][] and returns a promise that fulfills when the
-socket has closed.
+调用 [`socket.close()`][] 并返回一个在套接字关闭时完成的 promise。
 
 ### `socket.connect(port[, address][, callback])`
 
@@ -397,17 +336,9 @@ added: v12.0.0
 
 * `port` {integer}
 * `address` {string}
-* `callback` {Function} Called when the connection is completed or on error.
+* `callback` {Function} 当连接完成或出错时调用。
 
-Associates the `dgram.Socket` to a remote address and port. Every
-message sent by this handle is automatically sent to that destination. Also,
-the socket will only receive messages from that remote peer.
-Trying to call `connect()` on an already connected socket will result
-in an [`ERR_SOCKET_DGRAM_IS_CONNECTED`][] exception. If `address` is not
-provided, `'127.0.0.1'` (for `udp4` sockets) or `'::1'` (for `udp6` sockets)
-will be used by default. Once the connection is complete, a `'connect'` event
-is emitted and the optional `callback` function is called. In case of failure,
-the `callback` is called or, failing this, an `'error'` event is emitted.
+将 `dgram.Socket` 与远程地址和端口关联。此句柄发送的每条消息都会自动发送到该目的地。此外，套接字将仅接收来自该远程对等方的消息。尝试在已连接的套接字上调用 `connect()` 将导致 [`ERR_SOCKET_DGRAM_IS_CONNECTED`][] 异常。如果未提供 `address`，将默认使用 `'127.0.0.1'`（对于 `udp4` 套接字）或 `'::1'`（对于 `udp6` 套接字）。连接完成后，会发出 `'connect'` 事件，并调用可选的 `callback` 函数。如果失败，将调用 `callback`，或者，如果失败，将发出 `'error'` 事件。
 
 ### `socket.disconnect()`
 
@@ -415,10 +346,7 @@ the `callback` is called or, failing this, an `'error'` event is emitted.
 added: v12.0.0
 -->
 
-A synchronous function that disassociates a connected `dgram.Socket` from
-its remote address. Trying to call `disconnect()` on an unbound or already
-disconnected socket will result in an [`ERR_SOCKET_DGRAM_NOT_CONNECTED`][]
-exception.
+一个同步函数，用于将已连接的 `dgram.Socket` 与其远程地址解除关联。尝试在未绑定或已断开连接的套接字上调用 `disconnect()` 将导致 [`ERR_SOCKET_DGRAM_NOT_CONNECTED`][] 异常。
 
 ### `socket.dropMembership(multicastAddress[, multicastInterface])`
 
@@ -429,13 +357,9 @@ added: v0.6.9
 * `multicastAddress` {string}
 * `multicastInterface` {string}
 
-Instructs the kernel to leave a multicast group at `multicastAddress` using the
-`IP_DROP_MEMBERSHIP` socket option. This method is automatically called by the
-kernel when the socket is closed or the process terminates, so most apps will
-never have reason to call this.
+指示内核使用 `IP_DROP_MEMBERSHIP` 套接字选项在 `multicastAddress` 上离开多播组。当套接字关闭或进程终止时，内核会自动调用此方法，因此大多数应用程序永远没有理由调用此方法。
 
-If `multicastInterface` is not specified, the operating system will attempt to
-drop membership on all valid interfaces.
+如果未指定 `multicastInterface`，操作系统将尝试在所有有效接口上删除成员资格。
 
 ### `socket.dropSourceSpecificMembership(sourceAddress, groupAddress[, multicastInterface])`
 
@@ -449,14 +373,9 @@ added:
 * `groupAddress` {string}
 * `multicastInterface` {string}
 
-Instructs the kernel to leave a source-specific multicast channel at the given
-`sourceAddress` and `groupAddress` using the `IP_DROP_SOURCE_MEMBERSHIP`
-socket option. This method is automatically called by the kernel when the
-socket is closed or the process terminates, so most apps will never have
-reason to call this.
+指示内核使用 `IP_DROP_SOURCE_MEMBERSHIP` 套接字选项在给定的 `sourceAddress` 和 `groupAddress` 上离开特定源多播通道。当套接字关闭或进程终止时，内核会自动调用此方法，因此大多数应用程序永远没有理由调用此方法。
 
-If `multicastInterface` is not specified, the operating system will attempt to
-drop membership on all valid interfaces.
+如果未指定 `multicastInterface`，操作系统将尝试在所有有效接口上删除成员资格。
 
 ### `socket.getRecvBufferSize()`
 
@@ -464,9 +383,9 @@ drop membership on all valid interfaces.
 added: v8.7.0
 -->
 
-* Returns: {number} the `SO_RCVBUF` socket receive buffer size in bytes.
+* 返回：{number} `SO_RCVBUF` 套接字接收缓冲区大小（以字节为单位）。
 
-This method throws [`ERR_SOCKET_BUFFER_SIZE`][] if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 [`ERR_SOCKET_BUFFER_SIZE`][]。
 
 ### `socket.getSendBufferSize()`
 
@@ -474,9 +393,9 @@ This method throws [`ERR_SOCKET_BUFFER_SIZE`][] if called on an unbound socket.
 added: v8.7.0
 -->
 
-* Returns: {number} the `SO_SNDBUF` socket send buffer size in bytes.
+* 返回：{number} `SO_SNDBUF` 套接字发送缓冲区大小（以字节为单位）。
 
-This method throws [`ERR_SOCKET_BUFFER_SIZE`][] if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 [`ERR_SOCKET_BUFFER_SIZE`][]。
 
 ### `socket.getSendQueueSize()`
 
@@ -486,7 +405,7 @@ added:
   - v16.19.0
 -->
 
-* Returns: {number} Number of bytes queued for sending.
+* 返回：{number} 排队等待发送的字节数。
 
 ### `socket.getSendQueueCount()`
 
@@ -496,8 +415,7 @@ added:
   - v16.19.0
 -->
 
-* Returns: {number} Number of send requests currently in the queue awaiting
-  to be processed.
+* 返回：{number} 当前队列中等待处理的发送请求数。
 
 ### `socket.ref()`
 
@@ -505,18 +423,13 @@ added:
 added: v0.9.1
 -->
 
-* Returns: {dgram.Socket}
+* 返回：{dgram.Socket}
 
-By default, binding a socket will cause it to block the Node.js process from
-exiting as long as the socket is open. The `socket.unref()` method can be used
-to exclude the socket from the reference counting that keeps the Node.js
-process active. The `socket.ref()` method adds the socket back to the reference
-counting and restores the default behavior.
+默认情况下，绑定套接字将导致 Node.js 进程在套接字打开时保持运行。`socket.unref()` 方法可用于将套接字从保持 Node.js 进程活动的引用计数中排除。`socket.ref()` 方法将套接字添加回引用计数并恢复默认行为。
 
-Calling `socket.ref()` multiples times will have no additional effect.
+多次调用 `socket.ref()` 不会有额外效果。
 
-The `socket.ref()` method returns a reference to the socket so calls can be
-chained.
+`socket.ref()` 方法返回对套接字的引用，因此可以链式调用。
 
 ### `socket.remoteAddress()`
 
@@ -524,11 +437,9 @@ chained.
 added: v12.0.0
 -->
 
-* Returns: {Object}
+* 返回：{Object}
 
-Returns an object containing the `address`, `family`, and `port` of the remote
-endpoint. This method throws an [`ERR_SOCKET_DGRAM_NOT_CONNECTED`][] exception
-if the socket is not connected.
+返回一个包含远程端点的 `address`、`family` 和 `port` 的对象。如果套接字未连接，此方法将抛出 [`ERR_SOCKET_DGRAM_NOT_CONNECTED`][] 异常。
 
 ### `socket.send(msg[, offset, length][, port][, address][, callback])`
 
@@ -563,55 +474,30 @@ changes:
                  and `length` parameters are optional now.
 -->
 
-* `msg` {Buffer|TypedArray|DataView|string|Array} Message to be sent.
-* `offset` {integer} Offset in the buffer where the message starts.
-* `length` {integer} Number of bytes in the message.
-* `port` {integer} Destination port.
-* `address` {string} Destination host name or IP address.
-* `callback` {Function} Called when the message has been sent.
+* `msg` {Buffer|TypedArray|DataView|string|Array} 要发送的消息。
+* `offset` {integer} 缓冲区中消息开始的位置。
+* `length` {integer} 消息中的字节数。
+* `port` {integer} 目标端口。
+* `address` {string} 目标主机名或 IP 地址。
+* `callback` {Function} 当消息已发送时调用。
 
-Broadcasts a datagram on the socket.
-For connectionless sockets, the destination `port` and `address` must be
-specified. Connected sockets, on the other hand, will use their associated
-remote endpoint, so the `port` and `address` arguments must not be set.
+在套接字上广播数据报。对于无连接套接字，必须指定目标 `port` 和 `address`。相反，已连接的套接字将使用其关联的远程端点，因此不得设置 `port` 和 `address` 参数。
 
-The `msg` argument contains the message to be sent.
-Depending on its type, different behavior can apply. If `msg` is a `Buffer`,
-any `TypedArray` or a `DataView`,
-the `offset` and `length` specify the offset within the `Buffer` where the
-message begins and the number of bytes in the message, respectively.
-If `msg` is a `String`, then it is automatically converted to a `Buffer`
-with `'utf8'` encoding. With messages that
-contain multi-byte characters, `offset` and `length` will be calculated with
-respect to [byte length][] and not the character position.
-If `msg` is an array, `offset` and `length` must not be specified.
+`msg` 参数包含要发送的消息。根据其类型，可能适用不同的行为。如果 `msg` 是 `Buffer`、任何 `TypedArray` 或 `DataView`，则 `offset` 和 `length` 分别指定 `Buffer` 中消息开始的偏移量和消息中的字节数。如果 `msg` 是 `String`，则它会自动转换为使用 `'utf8'` 编码的 `Buffer`。对于包含多字节字符的消息，`offset` 和 `length` 将根据[字节长度][byte length]计算，而不是字符位置。如果 `msg` 是数组，则不得指定 `offset` 和 `length`。
 
-The `address` argument is a string. If the value of `address` is a host name,
-DNS will be used to resolve the address of the host. If `address` is not
-provided or otherwise nullish, `'127.0.0.1'` (for `udp4` sockets) or `'::1'`
-(for `udp6` sockets) will be used by default.
+`address` 参数是一个字符串。如果 `address` 的值是主机名，则将使用 DNS 来解析主机的地址。如果未提供 `address` 或为 nullish，将默认使用 `'127.0.0.1'`（对于 `udp4` 套接字）或 `'::1'`（对于 `udp6` 套接字）。
 
-If the socket has not been previously bound with a call to `bind`, the socket
-is assigned a random port number and is bound to the "all interfaces" address
-(`'0.0.0.0'` for `udp4` sockets, `'::0'` for `udp6` sockets.)
+如果套接字之前未通过调用 `bind` 进行绑定，则将为套接字分配一个随机端口号，并绑定到“所有接口”地址（对于 `udp4` 套接字为 `'0.0.0.0'`，对于 `udp6` 套接字为 `'::0'`）。
 
-An optional `callback` function may be specified to as a way of reporting
-DNS errors or for determining when it is safe to reuse the `buf` object.
-DNS lookups delay the time to send for at least one tick of the
-Node.js event loop.
+可以指定可选的 `callback` 函数作为报告 DNS 错误或确定何时可以安全重用 `buf` 对象的一种方式。DNS 查找会延迟发送时间至少一个 Node.js 事件循环滴答。
 
-The only way to know for sure that the datagram has been sent is by using a
-`callback`. If an error occurs and a `callback` is given, the error will be
-passed as the first argument to the `callback`. If a `callback` is not given,
-the error is emitted as an `'error'` event on the `socket` object.
+确定数据报已发送的唯一方法是使用 `callback`。如果发生错误并且提供了 `callback`，则错误将作为第一个参数传递给 `callback`。如果未提供 `callback`，则错误将作为 `'error'` 事件在 `socket` 对象上发出。
 
-Offset and length are optional but both _must_ be set if either are used.
-They are supported only when the first argument is a `Buffer`, a `TypedArray`,
-or a `DataView`.
+偏移量和长度是可选的，但如果使用了其中一个，则两者_必须_都设置。仅当第一个参数是 `Buffer`、`TypedArray` 或 `DataView` 时才支持它们。
 
-This method throws [`ERR_SOCKET_BAD_PORT`][] if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 [`ERR_SOCKET_BAD_PORT`][]。
 
-Example of sending a UDP packet to a port on `localhost`;
+向 `localhost` 上的端口发送 UDP 数据包的示例；
 
 ```mjs
 import dgram from 'node:dgram';
@@ -635,8 +521,7 @@ client.send(message, 41234, 'localhost', (err) => {
 });
 ```
 
-Example of sending a UDP packet composed of multiple buffers to a port on
-`127.0.0.1`;
+向 `127.0.0.1` 上的端口发送由多个缓冲区组成的 UDP 数据包的示例；
 
 ```mjs
 import dgram from 'node:dgram';
@@ -662,13 +547,9 @@ client.send([buf1, buf2], 41234, (err) => {
 });
 ```
 
-Sending multiple buffers might be faster or slower depending on the
-application and operating system. Run benchmarks to
-determine the optimal strategy on a case-by-case basis. Generally speaking,
-however, sending multiple buffers is faster.
+发送多个缓冲区可能会更快或更慢，具体取决于应用程序和操作系统。运行基准测试以根据具体情况确定最佳策略。然而，一般来说，发送多个缓冲区更快。
 
-Example of sending a UDP packet using a socket connected to a port on
-`localhost`:
+使用连接到 `localhost` 上端口的套接字发送 UDP 数据包的示例：
 
 ```mjs
 import dgram from 'node:dgram';
@@ -696,32 +577,17 @@ client.connect(41234, 'localhost', (err) => {
 });
 ```
 
-#### Note about UDP datagram size
+#### 关于 UDP 数据报大小的说明
 
-The maximum size of an IPv4/v6 datagram depends on the `MTU`
-(Maximum Transmission Unit) and on the `Payload Length` field size.
+IPv4/v6 数据报的最大大小取决于 `MTU`（最大传输单元）和 `Payload Length` 字段大小。
 
-* The `Payload Length` field is 16 bits wide, which means that a normal
-  payload cannot exceed 64K octets including the internet header and data
-  (65,507 bytes = 65,535 − 8 bytes UDP header − 20 bytes IP header);
-  this is generally true for loopback interfaces, but such long datagram
-  messages are impractical for most hosts and networks.
+* `Payload Length` 字段为 16 位宽，这意味着正常有效载荷不能超过 64K 八位字节，包括互联网头和数据（65,507 字节 = 65,535 − 8 字节 UDP 头 − 20 字节 IP 头）；这对于环回接口通常成立，但如此长的数据报消息对于大多数主机和网络来说不切实际。
 
-* The `MTU` is the largest size a given link layer technology can support for
-  datagram messages. For any link, IPv4 mandates a minimum `MTU` of 68
-  octets, while the recommended `MTU` for IPv4 is 576 (typically recommended
-  as the `MTU` for dial-up type applications), whether they arrive whole or in
-  fragments.
+* `MTU` 是给定链路层技术可以支持的数据报消息的最大大小。对于任何链路，IPv4 强制要求最小 `MTU` 为 68 个八位字节，而 IPv4 的推荐 `MTU` 为 576（通常推荐作为拨号类型应用程序的 `MTU`），无论它们是完整到达还是分段到达。
 
-  For IPv6, the minimum `MTU` is 1280 octets. However, the mandatory minimum
-  fragment reassembly buffer size is 1500 octets. The value of 68 octets is
-  very small, since most current link layer technologies, like Ethernet, have a
-  minimum `MTU` of 1500.
+  对于 IPv6，最小 `MTU` 为 1280 个八位字节。但是，强制的最小分段重组缓冲区大小为 1500 个八位字节。68 个八位字节的值非常小，因为大多数当前的链路层技术（如以太网）的最小 `MTU` 为 1500。
 
-It is impossible to know in advance the MTU of each link through which
-a packet might travel. Sending a datagram greater than the receiver `MTU` will
-not work because the packet will get silently dropped without informing the
-source that the data did not reach its intended recipient.
+无法预先知道数据包可能经过的每个链路的 MTU。发送大于接收方 `MTU` 的数据报将不起作用，因为数据包将被静默丢弃，而不会通知源数据未到达其预期的接收者。
 
 ### `socket.setBroadcast(flag)`
 
@@ -731,10 +597,9 @@ added: v0.6.9
 
 * `flag` {boolean}
 
-Sets or clears the `SO_BROADCAST` socket option. When set to `true`, UDP
-packets may be sent to a local interface's broadcast address.
+设置或清除 `SO_BROADCAST` 套接字选项。当设置为 `true` 时，UDP 数据包可以发送到本地接口的广播地址。
 
-This method throws `EBADF` if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 `EBADF`。
 
 ### `socket.setMulticastInterface(multicastInterface)`
 
@@ -744,30 +609,19 @@ added: v8.6.0
 
 * `multicastInterface` {string}
 
-_All references to scope in this section are referring to
-[IPv6 Zone Indexes][], which are defined by [RFC 4007][]. In string form, an IP
-with a scope index is written as `'IP%scope'` where scope is an interface name
-or interface number._
+_本节中所有对范围的引用都是指 [IPv6 区域索引][]，这些索引由 [RFC 4007][] 定义。在字符串形式中，带有范围索引的 IP 写为 `'IP%scope'`，其中 scope 是接口名称或接口编号。_
 
-Sets the default outgoing multicast interface of the socket to a chosen
-interface or back to system interface selection. The `multicastInterface` must
-be a valid string representation of an IP from the socket's family.
+将套接字的默认传出多播接口设置为选择的接口或恢复为系统接口选择。`multicastInterface` 必须是套接字族 IP 的有效字符串表示形式。
 
-For IPv4 sockets, this should be the IP configured for the desired physical
-interface. All packets sent to multicast on the socket will be sent on the
-interface determined by the most recent successful use of this call.
+对于 IPv4 套接字，这应该是为所需物理接口配置的 IP。发送到套接字上多播的所有数据包将在最近一次成功使用此调用确定的接口上发送。
 
-For IPv6 sockets, `multicastInterface` should include a scope to indicate the
-interface as in the examples that follow. In IPv6, individual `send` calls can
-also use explicit scope in addresses, so only packets sent to a multicast
-address without specifying an explicit scope are affected by the most recent
-successful use of this call.
+对于 IPv6 套接字，`multicastInterface` 应包含一个范围以指示接口，如下例所示。在 IPv6 中，各个 `send` 调用也可以在地址中使用显式范围，因此只有发送到未指定显式范围的多播地址的数据包才会受到最近一次成功使用此调用的影响。
 
-This method throws `EBADF` if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 `EBADF`。
 
-#### Example: IPv6 outgoing multicast interface
+#### 示例：IPv6 传出多播接口
 
-On most systems, where scope format uses the interface name:
+在大多数系统上，范围格式使用接口名称：
 
 ```js
 const socket = dgram.createSocket('udp6');
@@ -777,7 +631,7 @@ socket.bind(1234, () => {
 });
 ```
 
-On Windows, where scope format uses an interface number:
+在 Windows 上，范围格式使用接口编号：
 
 ```js
 const socket = dgram.createSocket('udp6');
@@ -787,9 +641,9 @@ socket.bind(1234, () => {
 });
 ```
 
-#### Example: IPv4 outgoing multicast interface
+#### 示例：IPv4 传出多播接口
 
-All systems use an IP of the host on the desired physical interface:
+所有系统都使用所需物理接口上的主机 IP：
 
 ```js
 const socket = dgram.createSocket('udp4');
@@ -799,24 +653,17 @@ socket.bind(1234, () => {
 });
 ```
 
-#### Call results
+#### 调用结果
 
-A call on a socket that is not ready to send or no longer open may throw a _Not
-running_ [`Error`][].
+在未准备好发送或不再打开的套接字上调用可能会抛出 _Not running_ [`Error`][]。
 
-If `multicastInterface` can not be parsed into an IP then an _EINVAL_
-[`System Error`][] is thrown.
+如果 `multicastInterface` 无法解析为 IP，则会抛出 _EINVAL_ [`System Error`][]。
 
-On IPv4, if `multicastInterface` is a valid address but does not match any
-interface, or if the address does not match the family then
-a [`System Error`][] such as `EADDRNOTAVAIL` or `EPROTONOSUP` is thrown.
+在 IPv4 上，如果 `multicastInterface` 是有效地址但与任何接口不匹配，或者地址与族不匹配，则会抛出 [`System Error`][]，例如 `EADDRNOTAVAIL` 或 `EPROTONOSUP`。
 
-On IPv6, most errors with specifying or omitting scope will result in the socket
-continuing to use (or returning to) the system's default interface selection.
+在 IPv6 上，指定或省略范围的大多数错误将导致套接字继续使用（或恢复为）系统的默认接口选择。
 
-A socket's address family's ANY address (IPv4 `'0.0.0.0'` or IPv6 `'::'`) can be
-used to return control of the sockets default outgoing interface to the system
-for future multicast packets.
+套接字地址族的 ANY 地址（IPv4 `'0.0.0.0'` 或 IPv6 `'::'`）可用于将套接字的默认传出接口的控制权返回给系统，以供将来的多播数据包使用。
 
 ### `socket.setMulticastLoopback(flag)`
 
@@ -826,10 +673,9 @@ added: v0.3.8
 
 * `flag` {boolean}
 
-Sets or clears the `IP_MULTICAST_LOOP` socket option. When set to `true`,
-multicast packets will also be received on the local interface.
+设置或清除 `IP_MULTICAST_LOOP` 套接字选项。当设置为 `true` 时，多播数据包也将在本地接口上接收。
 
-This method throws `EBADF` if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 `EBADF`。
 
 ### `socket.setMulticastTTL(ttl)`
 
@@ -839,15 +685,11 @@ added: v0.3.8
 
 * `ttl` {integer}
 
-Sets the `IP_MULTICAST_TTL` socket option. While TTL generally stands for
-"Time to Live", in this context it specifies the number of IP hops that a
-packet is allowed to travel through, specifically for multicast traffic. Each
-router or gateway that forwards a packet decrements the TTL. If the TTL is
-decremented to 0 by a router, it will not be forwarded.
+设置 `IP_MULTICAST_TTL` 套接字选项。虽然 TTL 通常代表“生存时间”，但在此上下文中，它指定数据包允许经过的 IP 跳数，特别是多播流量。转发数据包的每个路由器或网关都会递减 TTL。如果路由器将 TTL 递减到 0，则不会转发。
 
-The `ttl` argument may be between 0 and 255. The default on most systems is `1`.
+`ttl` 参数可能在 0 到 255 之间。大多数系统上的默认值为 `1`。
 
-This method throws `EBADF` if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 `EBADF`。
 
 ### `socket.setRecvBufferSize(size)`
 
@@ -857,10 +699,9 @@ added: v8.7.0
 
 * `size` {integer}
 
-Sets the `SO_RCVBUF` socket option. Sets the maximum socket receive buffer
-in bytes.
+设置 `SO_RCVBUF` 套接字选项。设置最大套接字接收缓冲区（以字节为单位）。
 
-This method throws [`ERR_SOCKET_BUFFER_SIZE`][] if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 [`ERR_SOCKET_BUFFER_SIZE`][]。
 
 ### `socket.setSendBufferSize(size)`
 
@@ -870,10 +711,9 @@ added: v8.7.0
 
 * `size` {integer}
 
-Sets the `SO_SNDBUF` socket option. Sets the maximum socket send buffer
-in bytes.
+设置 `SO_SNDBUF` 套接字选项。设置最大套接字发送缓冲区（以字节为单位）。
 
-This method throws [`ERR_SOCKET_BUFFER_SIZE`][] if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 [`ERR_SOCKET_BUFFER_SIZE`][]。
 
 ### `socket.setTTL(ttl)`
 
@@ -883,16 +723,11 @@ added: v0.1.101
 
 * `ttl` {integer}
 
-Sets the `IP_TTL` socket option. While TTL generally stands for "Time to Live",
-in this context it specifies the number of IP hops that a packet is allowed to
-travel through. Each router or gateway that forwards a packet decrements the
-TTL. If the TTL is decremented to 0 by a router, it will not be forwarded.
-Changing TTL values is typically done for network probes or when multicasting.
+设置 `IP_TTL` 套接字选项。虽然 TTL 通常代表“生存时间”，但在此上下文中，它指定数据包允许经过的 IP 跳数。转发数据包的每个路由器或网关都会递减 TTL。如果路由器将 TTL 递减到 0，则不会转发。更改 TTL 值通常用于网络探测或多播。
 
-The `ttl` argument may be between 1 and 255. The default on most systems
-is 64.
+`ttl` 参数可能在 1 到 255 之间。大多数系统上的默认值为 64。
 
-This method throws `EBADF` if called on an unbound socket.
+如果在未绑定的套接字上调用此方法，则会抛出 `EBADF`。
 
 ### `socket.unref()`
 
@@ -900,20 +735,15 @@ This method throws `EBADF` if called on an unbound socket.
 added: v0.9.1
 -->
 
-* Returns: {dgram.Socket}
+* 返回：{dgram.Socket}
 
-By default, binding a socket will cause it to block the Node.js process from
-exiting as long as the socket is open. The `socket.unref()` method can be used
-to exclude the socket from the reference counting that keeps the Node.js
-process active, allowing the process to exit even if the socket is still
-listening.
+默认情况下，绑定套接字将导致 Node.js 进程在套接字打开时保持运行。`socket.unref()` 方法可用于将套接字从保持 Node.js 进程活动的引用计数中排除，允许进程退出，即使套接字仍在监听。
 
-Calling `socket.unref()` multiple times will have no additional effect.
+多次调用 `socket.unref()` 不会有额外效果。
 
-The `socket.unref()` method returns a reference to the socket so calls can be
-chained.
+`socket.unref()` 方法返回对套接字的引用，因此可以链式调用。
 
-## `node:dgram` module functions
+## `node:dgram` 模块函数
 
 ### `dgram.createSocket(options[, callback])`
 
@@ -940,47 +770,23 @@ changes:
     description: The `lookup` option is supported.
 -->
 
-* `options` {Object} Available options are:
-  * `type` {string} The family of socket. Must be either `'udp4'` or `'udp6'`.
-    Required.
-  * `reuseAddr` {boolean} When `true` [`socket.bind()`][] will reuse the
-    address, even if another process has already bound a socket on it, but
-    only one socket can receive the data.
-    **Default:** `false`.
-  * `reusePort` {boolean} When `true` [`socket.bind()`][] will reuse the
-    port, even if another process has already bound a socket on it. Incoming
-    datagrams are distributed to listening sockets. The option is available
-    only on some platforms, such as Linux 3.9+, DragonFlyBSD 3.6+, FreeBSD 12.0+,
-    Solaris 11.4, and AIX 7.2.5+. On unsupported platforms this option raises an
-    an error when the socket is bound.
-    **Default:** `false`.
-  * `ipv6Only` {boolean} Setting `ipv6Only` to `true` will
-    disable dual-stack support, i.e., binding to address `::` won't make
-    `0.0.0.0` be bound. **Default:** `false`.
-  * `recvBufferSize` {number} Sets the `SO_RCVBUF` socket value.
-  * `sendBufferSize` {number} Sets the `SO_SNDBUF` socket value.
-  * `lookup` {Function} Custom lookup function. **Default:** [`dns.lookup()`][].
-  * `signal` {AbortSignal} An AbortSignal that may be used to close a socket.
-  * `receiveBlockList` {net.BlockList} `receiveBlockList` can be used for discarding
-    inbound datagram to specific IP addresses, IP ranges, or IP subnets. This does not
-    work if the server is behind a reverse proxy, NAT, etc. because the address
-    checked against the blocklist is the address of the proxy, or the one
-    specified by the NAT.
-  * `sendBlockList` {net.BlockList} `sendBlockList` can be used for disabling outbound
-    access to specific IP addresses, IP ranges, or IP subnets.
-* `callback` {Function} Attached as a listener for `'message'` events. Optional.
-* Returns: {dgram.Socket}
+* `options` {Object} 可用选项有：
+  * `type` {string} 套接字的族。必须是 `'udp4'` 或 `'udp6'`。必需。
+  * `reuseAddr` {boolean} 当为 `true` 时，[`socket.bind()`][] 将重用地址，即使另一个进程已经在其上绑定了套接字，但只有一个套接字可以接收数据。**默认值：** `false`。
+  * `reusePort` {boolean} 当为 `true` 时，[`socket.bind()`][] 将重用端口，即使另一个进程已经在其上绑定了套接字。传入的数据报会分发给监听的套接字。此选项仅在部分平台上可用，例如 Linux 3.9+、DragonFlyBSD 3.6+、FreeBSD 12.0+、Solaris 11.4 和 AIX 7.2.5+。在不支持的平台上，此选项在绑定套接字时会引发错误。**默认值：** `false`。
+  * `ipv6Only` {boolean} 将 `ipv6Only` 设置为 `true` 将禁用双栈支持，即绑定到地址 `::` 不会绑定 `0.0.0.0`。**默认值：** `false`。
+  * `recvBufferSize` {number} 设置 `SO_RCVBUF` 套接字值。
+  * `sendBufferSize` {number} 设置 `SO_SNDBUF` 套接字值。
+  * `lookup` {Function} 自定义查找函数。**默认值：** [`dns.lookup()`][]。
+  * `signal` {AbortSignal} 可用于关闭套接字的 AbortSignal。
+  * `receiveBlockList` {net.BlockList} `receiveBlockList` 可用于丢弃到特定 IP 地址、IP 范围或 IP 子网的入站数据报。如果服务器在反向代理、NAT 等后面，则此方法不起作用，因为检查阻止列表的地址是代理的地址或 NAT 指定的地址。
+  * `sendBlockList` {net.BlockList} `sendBlockList` 可用于禁用对特定 IP 地址、IP 范围或 IP 子网的出站访问。
+* `callback` {Function} 作为 `'message'` 事件的监听器附加。可选。
+* 返回：{dgram.Socket}
 
-Creates a `dgram.Socket` object. Once the socket is created, calling
-[`socket.bind()`][] will instruct the socket to begin listening for datagram
-messages. When `address` and `port` are not passed to [`socket.bind()`][] the
-method will bind the socket to the "all interfaces" address on a random port
-(it does the right thing for both `udp4` and `udp6` sockets). The bound address
-and port can be retrieved using [`socket.address().address`][] and
-[`socket.address().port`][].
+创建一个 `dgram.Socket` 对象。一旦创建了套接字，调用 [`socket.bind()`][] 将指示套接字开始监听数据报消息。当 `address` 和 `port` 未传递给 [`socket.bind()`][] 时，该方法会将套接字绑定到随机端口上的“所有接口”地址（它对 `udp4` 和 `udp6` 套接字都执行正确的操作）。绑定的地址和端口可以使用 [`socket.address().address`][] 和 [`socket.address().port`][] 检索。
 
-If the `signal` option is enabled, calling `.abort()` on the corresponding
-`AbortController` is similar to calling `.close()` on the socket:
+如果启用了 `signal` 选项，在相应的 `AbortController` 上调用 `.abort()` 类似于在套接字上调用 `.close()`：
 
 ```js
 const controller = new AbortController();
@@ -989,7 +795,7 @@ const server = dgram.createSocket({ type: 'udp4', signal });
 server.on('message', (msg, rinfo) => {
   console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
 });
-// Later, when you want to close the server.
+// 稍后，当您想关闭服务器时。
 controller.abort();
 ```
 
@@ -999,20 +805,15 @@ controller.abort();
 added: v0.1.99
 -->
 
-* `type` {string} Either `'udp4'` or `'udp6'`.
-* `callback` {Function} Attached as a listener to `'message'` events.
-* Returns: {dgram.Socket}
+* `type` {string} `'udp4'` 或 `'udp6'`。
+* `callback` {Function} 作为 `'message'` 事件的监听器附加。
+* 返回：{dgram.Socket}
 
-Creates a `dgram.Socket` object of the specified `type`.
+创建指定 `type` 的 `dgram.Socket` 对象。
 
-Once the socket is created, calling [`socket.bind()`][] will instruct the
-socket to begin listening for datagram messages. When `address` and `port` are
-not passed to [`socket.bind()`][] the method will bind the socket to the "all
-interfaces" address on a random port (it does the right thing for both `udp4`
-and `udp6` sockets). The bound address and port can be retrieved using
-[`socket.address().address`][] and [`socket.address().port`][].
+一旦创建了套接字，调用 [`socket.bind()`][] 将指示套接字开始监听数据报消息。当 `address` 和 `port` 未传递给 [`socket.bind()`][] 时，该方法会将套接字绑定到随机端口上的“所有接口”地址（它对 `udp4` 和 `udp6` 套接字都执行正确的操作）。绑定的地址和端口可以使用 [`socket.address().address`][] 和 [`socket.address().port`][] 检索。
 
-[IPv6 Zone Indexes]: https://en.wikipedia.org/wiki/IPv6_address#Scoped_literal_IPv6_addresses
+[IPv6 区域索引]: https://en.wikipedia.org/wiki/IPv6_address#Scoped_literal_IPv6_addresses
 [RFC 4007]: https://tools.ietf.org/html/rfc4007
 [`'close'`]: #event-close
 [`ERR_SOCKET_BAD_PORT`]: errors.md#err_socket_bad_port
@@ -1030,4 +831,4 @@ and `udp6` sockets). The bound address and port can be retrieved using
 [`socket.address().port`]: #socketaddress
 [`socket.bind()`]: #socketbindport-address-callback
 [`socket.close()`]: #socketclosecallback
-[byte length]: buffer.md#static-method-bufferbytelengthstring-encoding
+[字节长度]: buffer.md#static-method-bufferbytelengthstring-encoding

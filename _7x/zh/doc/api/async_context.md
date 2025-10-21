@@ -1,4 +1,4 @@
-# Asynchronous context tracking
+# 异步上下文追踪
 
 <!--introduced_in=v16.4.0-->
 
@@ -6,16 +6,13 @@
 
 <!-- source_link=lib/async_hooks.js -->
 
-## Introduction
+## 简介
 
-These classes are used to associate state and propagate it throughout
-callbacks and promise chains.
-They allow storing data throughout the lifetime of a web request
-or any other asynchronous duration. It is similar to thread-local storage
-in other languages.
+这些类用于关联状态并在回调和 Promise 链中传播它。
+它们允许在整个 Web 请求或任何其他异步持续时间的内存周期内存储数据。
+这类似于其他语言中的线程本地存储。
 
-The `AsyncLocalStorage` and `AsyncResource` classes are part of the
-`node:async_hooks` module:
+`AsyncLocalStorage` 和 `AsyncResource` 类是 `node:async_hooks` 模块的一部分：
 
 ```mjs
 import { AsyncLocalStorage, AsyncResource } from 'node:async_hooks';
@@ -25,7 +22,7 @@ import { AsyncLocalStorage, AsyncResource } from 'node:async_hooks';
 const { AsyncLocalStorage, AsyncResource } = require('node:async_hooks');
 ```
 
-## Class: `AsyncLocalStorage`
+## 类：`AsyncLocalStorage`
 
 <!-- YAML
 added:
@@ -34,19 +31,14 @@ added:
 changes:
  - version: v16.4.0
    pr-url: https://github.com/nodejs/node/pull/37675
-   description: AsyncLocalStorage is now Stable. Previously, it had been Experimental.
+   description: AsyncLocalStorage 现已稳定。之前它是实验性的。
 -->
 
-This class creates stores that stay coherent through asynchronous operations.
+该类创建的存储空间在异步操作期间保持一致性。
 
-While you can create your own implementation on top of the `node:async_hooks`
-module, `AsyncLocalStorage` should be preferred as it is a performant and memory
-safe implementation that involves significant optimizations that are non-obvious
-to implement.
+虽然你可以在 `node:async_hooks` 模块之上创建自己的实现，但应优先使用 `AsyncLocalStorage`，因为它是一个高性能且内存安全的实现，包含了许多非显而易见的重大优化。
 
-The following example uses `AsyncLocalStorage` to build a simple logger
-that assigns IDs to incoming HTTP requests and includes them in messages
-logged within each request.
+以下示例使用 `AsyncLocalStorage` 构建一个简单的日志记录器，该记录器为传入的 HTTP 请求分配 ID，并在每个请求内记录的消息中包含这些 ID。
 
 ```mjs
 import http from 'node:http';
@@ -63,7 +55,7 @@ let idSeq = 0;
 http.createServer((req, res) => {
   asyncLocalStorage.run(idSeq++, () => {
     logWithId('start');
-    // Imagine any chain of async operations here
+    // 想象这里有任何异步操作链
     setImmediate(() => {
       logWithId('finish');
       res.end();
@@ -73,7 +65,7 @@ http.createServer((req, res) => {
 
 http.get('http://localhost:8080');
 http.get('http://localhost:8080');
-// Prints:
+// 打印：
 //   0: start
 //   0: finish
 //   1: start
@@ -95,7 +87,7 @@ let idSeq = 0;
 http.createServer((req, res) => {
   asyncLocalStorage.run(idSeq++, () => {
     logWithId('start');
-    // Imagine any chain of async operations here
+    // 想象这里有任何异步操作链
     setImmediate(() => {
       logWithId('finish');
       res.end();
@@ -105,16 +97,15 @@ http.createServer((req, res) => {
 
 http.get('http://localhost:8080');
 http.get('http://localhost:8080');
-// Prints:
+// 打印：
 //   0: start
 //   0: finish
 //   1: start
 //   1: finish
 ```
 
-Each instance of `AsyncLocalStorage` maintains an independent storage context.
-Multiple instances can safely exist simultaneously without risk of interfering
-with each other's data.
+每个 `AsyncLocalStorage` 实例维护一个独立的存储上下文。
+多个实例可以安全地同时存在，而不会相互干扰数据的风险。
 
 ### `new AsyncLocalStorage([options])`
 
@@ -125,47 +116,26 @@ added:
 changes:
  - version: v24.0.0
    pr-url: https://github.com/nodejs/node/pull/57766
-   description: Add `defaultValue` and `name` options.
+   description: 添加了 `defaultValue` 和 `name` 选项。
  - version:
     - v19.7.0
     - v18.16.0
    pr-url: https://github.com/nodejs/node/pull/46386
-   description: Removed experimental onPropagate option.
+   description: 移除了实验性的 onPropagate 选项。
  - version:
     - v19.2.0
     - v18.13.0
    pr-url: https://github.com/nodejs/node/pull/45386
-   description: Add option onPropagate.
+   description: 添加了 onPropagate 选项。
 -->
 
 * `options` {Object}
-  * `defaultValue` {any} The default value to be used when no store is provided.
-  * `name` {string} A name for the `AsyncLocalStorage` value.
+  * `defaultValue` {any} 当没有提供存储时使用的默认值。
+  * `name` {string} `AsyncLocalStorage` 值的名称。
 
-Creates a new instance of `AsyncLocalStorage`. Store is only provided within a
-`run()` call or after an `enterWith()` call.
+创建一个新的 `AsyncLocalStorage` 实例。存储仅在 `run()` 调用内或 `enterWith()` 调用之后提供。
 
-### Static method: `AsyncLocalStorage.bind(fn)`
-
-<!-- YAML
-added:
- - v19.8.0
- - v18.16.0
-changes:
- - version:
-    - v23.11.0
-    - v22.15.0
-   pr-url: https://github.com/nodejs/node/pull/57510
-   description: Marking the API stable.
--->
-
-* `fn` {Function} The function to bind to the current execution context.
-* Returns: {Function} A new function that calls `fn` within the captured
-  execution context.
-
-Binds the given function to the current execution context.
-
-### Static method: `AsyncLocalStorage.snapshot()`
+### 静态方法：`AsyncLocalStorage.bind(fn)`
 
 <!-- YAML
 added:
@@ -176,25 +146,40 @@ changes:
     - v23.11.0
     - v22.15.0
    pr-url: https://github.com/nodejs/node/pull/57510
-   description: Marking the API stable.
+   description: 标记该 API 为稳定。
 -->
 
-* Returns: {Function} A new function with the signature
-  `(fn: (...args) : R, ...args) : R`.
+* `fn` {Function} 要绑定到当前执行上下文的函数。
+* 返回: {Function} 一个在捕获的执行上下文中调用 `fn` 的新函数。
 
-Captures the current execution context and returns a function that accepts a
-function as an argument. Whenever the returned function is called, it
-calls the function passed to it within the captured context.
+将给定函数绑定到当前执行上下文。
+
+### 静态方法：`AsyncLocalStorage.snapshot()`
+
+<!-- YAML
+added:
+ - v19.8.0
+ - v18.16.0
+changes:
+ - version:
+    - v23.11.0
+    - v22.15.0
+   pr-url: https://github.com/nodejs/node/pull/57510
+   description: 标记该 API 为稳定。
+-->
+
+* 返回: {Function} 一个具有签名 `(fn: (...args) : R, ...args) : R` 的新函数。
+
+捕获当前执行上下文并返回一个接受函数作为参数的函数。每当调用返回的函数时，它会在捕获的上下文中调用传递给它的函数。
 
 ```js
 const asyncLocalStorage = new AsyncLocalStorage();
 const runInAsyncScope = asyncLocalStorage.run(123, () => AsyncLocalStorage.snapshot());
 const result = asyncLocalStorage.run(321, () => runInAsyncScope(() => asyncLocalStorage.getStore()));
-console.log(result);  // returns 123
+console.log(result);  // 返回 123
 ```
 
-AsyncLocalStorage.snapshot() can replace the use of AsyncResource for simple
-async context tracking purposes, for example:
+对于简单的异步上下文追踪目的，`AsyncLocalStorage.snapshot()` 可以替代 `AsyncResource` 的使用，例如：
 
 ```js
 class Foo {
@@ -204,7 +189,7 @@ class Foo {
 }
 
 const foo = asyncLocalStorage.run(123, () => new Foo());
-console.log(asyncLocalStorage.run(321, () => foo.get())); // returns 123
+console.log(asyncLocalStorage.run(321, () => foo.get())); // 返回 123
 ```
 
 ### `asyncLocalStorage.disable()`
@@ -217,20 +202,13 @@ added:
 
 > Stability: 1 - Experimental
 
-Disables the instance of `AsyncLocalStorage`. All subsequent calls
-to `asyncLocalStorage.getStore()` will return `undefined` until
-`asyncLocalStorage.run()` or `asyncLocalStorage.enterWith()` is called again.
+禁用 `AsyncLocalStorage` 实例。所有后续对 `asyncLocalStorage.getStore()` 的调用将返回 `undefined`，直到再次调用 `asyncLocalStorage.run()` 或 `asyncLocalStorage.enterWith()`。
 
-When calling `asyncLocalStorage.disable()`, all current contexts linked to the
-instance will be exited.
+当调用 `asyncLocalStorage.disable()` 时，所有链接到该实例的当前上下文都将被退出。
 
-Calling `asyncLocalStorage.disable()` is required before the
-`asyncLocalStorage` can be garbage collected. This does not apply to stores
-provided by the `asyncLocalStorage`, as those objects are garbage collected
-along with the corresponding async resources.
+在 `asyncLocalStorage` 可以被垃圾回收之前，需要调用 `asyncLocalStorage.disable()`。这不适用于由 `asyncLocalStorage` 提供的存储，因为这些对象会随着相应的异步资源一起被垃圾回收。
 
-Use this method when the `asyncLocalStorage` is not in use anymore
-in the current process.
+当 `asyncLocalStorage` 在当前进程中不再使用时，请使用此方法。
 
 ### `asyncLocalStorage.getStore()`
 
@@ -240,12 +218,10 @@ added:
  - v12.17.0
 -->
 
-* Returns: {any}
+* 返回: {any}
 
-Returns the current store.
-If called outside of an asynchronous context initialized by
-calling `asyncLocalStorage.run()` or `asyncLocalStorage.enterWith()`, it
-returns `undefined`.
+返回当前存储。
+如果在通过调用 `asyncLocalStorage.run()` 或 `asyncLocalStorage.enterWith()` 初始化的异步上下文之外调用，则返回 `undefined`。
 
 ### `asyncLocalStorage.enterWith(store)`
 
@@ -259,28 +235,22 @@ added:
 
 * `store` {any}
 
-Transitions into the context for the remainder of the current
-synchronous execution and then persists the store through any following
-asynchronous calls.
+在剩余的当前同步执行期间进入上下文，然后通过任何后续的异步调用持久化存储。
 
-Example:
+示例：
 
 ```js
 const store = { id: 1 };
-// Replaces previous store with the given store object
+// 用给定的存储对象替换之前的存储
 asyncLocalStorage.enterWith(store);
-asyncLocalStorage.getStore(); // Returns the store object
+asyncLocalStorage.getStore(); // 返回存储对象
 someAsyncOperation(() => {
-  asyncLocalStorage.getStore(); // Returns the same object
+  asyncLocalStorage.getStore(); // 返回相同的对象
 });
 ```
 
-This transition will continue for the _entire_ synchronous execution.
-This means that if, for example, the context is entered within an event
-handler subsequent event handlers will also run within that context unless
-specifically bound to another context with an `AsyncResource`. That is why
-`run()` should be preferred over `enterWith()` unless there are strong reasons
-to use the latter method.
+此转换将持续整个_同步_执行。
+这意味着，例如，如果在事件处理程序中进入上下文，则后续的事件处理程序也将在该上下文中运行，除非使用 `AsyncResource` 显式绑定到另一个上下文。这就是为什么除非有强烈理由使用后者方法，否则应优先使用 `run()` 而不是 `enterWith()`。
 
 ```js
 const store = { id: 1 };
@@ -289,12 +259,12 @@ emitter.on('my-event', () => {
   asyncLocalStorage.enterWith(store);
 });
 emitter.on('my-event', () => {
-  asyncLocalStorage.getStore(); // Returns the same object
+  asyncLocalStorage.getStore(); // 返回相同的对象
 });
 
-asyncLocalStorage.getStore(); // Returns undefined
+asyncLocalStorage.getStore(); // 返回 undefined
 emitter.emit('my-event');
-asyncLocalStorage.getStore(); // Returns the same object
+asyncLocalStorage.getStore(); // 返回相同的对象
 ```
 
 ### `asyncLocalStorage.name`
@@ -303,9 +273,9 @@ asyncLocalStorage.getStore(); // Returns the same object
 added: v24.0.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-The name of the `AsyncLocalStorage` instance if provided.
+如果提供了，则为 `AsyncLocalStorage` 实例的名称。
 
 ### `asyncLocalStorage.run(store, callback[, ...args])`
 
@@ -319,31 +289,27 @@ added:
 * `callback` {Function}
 * `...args` {any}
 
-Runs a function synchronously within a context and returns its
-return value. The store is not accessible outside of the callback function.
-The store is accessible to any asynchronous operations created within the
-callback.
+在上下文中同步运行一个函数并返回其返回值。存储在该回调函数外部不可访问。存储对该回调函数内创建的任何异步操作都是可访问的。
 
-The optional `args` are passed to the callback function.
+可选的 `args` 会传递给回调函数。
 
-If the callback function throws an error, the error is thrown by `run()` too.
-The stacktrace is not impacted by this call and the context is exited.
+如果回调函数抛出错误，该错误也会被 `run()` 抛出。堆栈跟踪不受此调用的影响，并且上下文会退出。
 
-Example:
+示例：
 
 ```js
 const store = { id: 2 };
 try {
   asyncLocalStorage.run(store, () => {
-    asyncLocalStorage.getStore(); // Returns the store object
+    asyncLocalStorage.getStore(); // 返回存储对象
     setTimeout(() => {
-      asyncLocalStorage.getStore(); // Returns the store object
+      asyncLocalStorage.getStore(); // 返回存储对象
     }, 200);
     throw new Error();
   });
 } catch (e) {
-  asyncLocalStorage.getStore(); // Returns undefined
-  // The error will be caught here
+  asyncLocalStorage.getStore(); // 返回 undefined
+  // 错误将在这里被捕获
 }
 ```
 
@@ -360,154 +326,126 @@ added:
 * `callback` {Function}
 * `...args` {any}
 
-Runs a function synchronously outside of a context and returns its
-return value. The store is not accessible within the callback function or
-the asynchronous operations created within the callback. Any `getStore()`
-call done within the callback function will always return `undefined`.
+在上下文外部同步运行一个函数并返回其返回值。存储在该回调函数内部或该回调函数内创建的异步操作中不可访问。在回调函数内进行的任何 `getStore()` 调用都将始终返回 `undefined`。
 
-The optional `args` are passed to the callback function.
+可选的 `args` 会传递给回调函数。
 
-If the callback function throws an error, the error is thrown by `exit()` too.
-The stacktrace is not impacted by this call and the context is re-entered.
+如果回调函数抛出错误，该错误也会被 `exit()` 抛出。堆栈跟踪不受此调用的影响，并且上下文会重新进入。
 
-Example:
+示例：
 
 ```js
-// Within a call to run
+// 在 run 调用内部
 try {
-  asyncLocalStorage.getStore(); // Returns the store object or value
+  asyncLocalStorage.getStore(); // 返回存储对象或值
   asyncLocalStorage.exit(() => {
-    asyncLocalStorage.getStore(); // Returns undefined
+    asyncLocalStorage.getStore(); // 返回 undefined
     throw new Error();
   });
 } catch (e) {
-  asyncLocalStorage.getStore(); // Returns the same object or value
-  // The error will be caught here
+  asyncLocalStorage.getStore(); // 返回相同的对象或值
+  // 错误将在这里被捕获
 }
 ```
 
-### Usage with `async/await`
+### 与 `async/await` 一起使用
 
-If, within an async function, only one `await` call is to run within a context,
-the following pattern should be used:
+如果在异步函数中，只有一个 `await` 调用需要在上下文中运行，则应使用以下模式：
 
 ```js
 async function fn() {
   await asyncLocalStorage.run(new Map(), () => {
     asyncLocalStorage.getStore().set('key', value);
-    return foo(); // The return value of foo will be awaited
+    return foo(); // foo 的返回值将被 await
   });
 }
 ```
 
-In this example, the store is only available in the callback function and the
-functions called by `foo`. Outside of `run`, calling `getStore` will return
-`undefined`.
+在此示例中，存储仅在回调函数和 `foo` 调用的函数中可用。在 `run` 外部，调用 `getStore` 将返回 `undefined`。
 
-### Troubleshooting: Context loss
+### 故障排除：上下文丢失
 
-In most cases, `AsyncLocalStorage` works without issues. In rare situations, the
-current store is lost in one of the asynchronous operations.
+在大多数情况下，`AsyncLocalStorage` 工作无误。在极少数情况下，当前存储在某个异步操作中丢失。
 
-If your code is callback-based, it is enough to promisify it with
-[`util.promisify()`][] so it starts working with native promises.
+如果你的代码是基于回调的，使用 [`util.promisify()`][] 将其 Promise 化就足以使其开始与原生 Promise 一起工作。
 
-If you need to use a callback-based API or your code assumes
-a custom thenable implementation, use the [`AsyncResource`][] class
-to associate the asynchronous operation with the correct execution context.
-Find the function call responsible for the context loss by logging the content
-of `asyncLocalStorage.getStore()` after the calls you suspect are responsible
-for the loss. When the code logs `undefined`, the last callback called is
-probably responsible for the context loss.
+如果你需要使用基于回调的 API 或者你的代码假设自定义的 thenable 实现，请使用 [`AsyncResource`][] 类将异步操作与正确的执行上下文关联起来。通过在你怀疑导致丢失的调用之后记录 `asyncLocalStorage.getStore()` 的内容来找到导致上下文丢失的函数调用。当代码记录 `undefined` 时，最后调用的回调可能是导致上下文丢失的原因。
 
-## Class: `AsyncResource`
+## 类：`AsyncResource`
 
 <!-- YAML
 changes:
  - version: v16.4.0
    pr-url: https://github.com/nodejs/node/pull/37675
-   description: AsyncResource is now Stable. Previously, it had been Experimental.
+   description: AsyncResource 现已稳定。之前它是实验性的。
 -->
 
-The class `AsyncResource` is designed to be extended by the embedder's async
-resources. Using this, users can easily trigger the lifetime events of their
-own resources.
+`AsyncResource` 类旨在由嵌入器的异步资源扩展。使用它，用户可以轻松触发自己资源的生命周期事件。
 
-The `init` hook will trigger when an `AsyncResource` is instantiated.
+当实例化 `AsyncResource` 时，将触发 `init` 钩子。
 
-The following is an overview of the `AsyncResource` API.
+以下是 `AsyncResource` API 的概述。
 
 ```mjs
 import { AsyncResource, executionAsyncId } from 'node:async_hooks';
 
-// AsyncResource() is meant to be extended. Instantiating a
-// new AsyncResource() also triggers init. If triggerAsyncId is omitted then
-// async_hook.executionAsyncId() is used.
+// AsyncResource() 旨在被扩展。实例化一个新的 AsyncResource() 也会触发 init。如果省略 triggerAsyncId，则使用 async_hook.executionAsyncId()。
 const asyncResource = new AsyncResource(
   type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false },
 );
 
-// Run a function in the execution context of the resource. This will
-// * establish the context of the resource
-// * trigger the AsyncHooks before callbacks
-// * call the provided function `fn` with the supplied arguments
-// * trigger the AsyncHooks after callbacks
-// * restore the original execution context
+// 在资源的执行上下文中运行一个函数。这将：
+// * 建立资源的上下文
+// * 触发 AsyncHooks before 回调
+// * 使用提供的参数调用提供的函数 `fn`
+// * 触发 AsyncHooks after 回调
+// * 恢复原始的执行上下文
 asyncResource.runInAsyncScope(fn, thisArg, ...args);
 
-// Call AsyncHooks destroy callbacks.
+// 调用 AsyncHooks destroy 回调。
 asyncResource.emitDestroy();
 
-// Return the unique ID assigned to the AsyncResource instance.
+// 返回分配给 AsyncResource 实例的唯一 ID。
 asyncResource.asyncId();
 
-// Return the trigger ID for the AsyncResource instance.
+// 返回 AsyncResource 实例的触发器 ID。
 asyncResource.triggerAsyncId();
 ```
 
 ```cjs
 const { AsyncResource, executionAsyncId } = require('node:async_hooks');
 
-// AsyncResource() is meant to be extended. Instantiating a
-// new AsyncResource() also triggers init. If triggerAsyncId is omitted then
-// async_hook.executionAsyncId() is used.
+// AsyncResource() 旨在被扩展。实例化一个新的 AsyncResource() 也会触发 init。如果省略 triggerAsyncId，则使用 async_hook.executionAsyncId()。
 const asyncResource = new AsyncResource(
   type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false },
 );
 
-// Run a function in the execution context of the resource. This will
-// * establish the context of the resource
-// * trigger the AsyncHooks before callbacks
-// * call the provided function `fn` with the supplied arguments
-// * trigger the AsyncHooks after callbacks
-// * restore the original execution context
+// 在资源的执行上下文中运行一个函数。这将：
+// * 建立资源的上下文
+// * 触发 AsyncHooks before 回调
+// * 使用提供的参数调用提供的函数 `fn`
+// * 触发 AsyncHooks after 回调
+// * 恢复原始的执行上下文
 asyncResource.runInAsyncScope(fn, thisArg, ...args);
 
-// Call AsyncHooks destroy callbacks.
+// 调用 AsyncHooks destroy 回调。
 asyncResource.emitDestroy();
 
-// Return the unique ID assigned to the AsyncResource instance.
+// 返回分配给 AsyncResource 实例的唯一 ID。
 asyncResource.asyncId();
 
-// Return the trigger ID for the AsyncResource instance.
+// 返回 AsyncResource 实例的触发器 ID。
 asyncResource.triggerAsyncId();
 ```
 
 ### `new AsyncResource(type[, options])`
 
-* `type` {string} The type of async event.
+* `type` {string} 异步事件的类型。
 * `options` {Object}
-  * `triggerAsyncId` {number} The ID of the execution context that created this
-    async event. **Default:** `executionAsyncId()`.
-  * `requireManualDestroy` {boolean} If set to `true`, disables `emitDestroy`
-    when the object is garbage collected. This usually does not need to be set
-    (even if `emitDestroy` is called manually), unless the resource's `asyncId`
-    is retrieved and the sensitive API's `emitDestroy` is called with it.
-    When set to `false`, the `emitDestroy` call on garbage collection
-    will only take place if there is at least one active `destroy` hook.
-    **Default:** `false`.
+  * `triggerAsyncId` {number} 创建此异步事件的执行上下文的 ID。**默认值:** `executionAsyncId()`。
+  * `requireManualDestroy` {boolean} 如果设置为 `true`，则在对象被垃圾回收时禁用 `emitDestroy`。这通常不需要设置（即使手动调用 `emitDestroy`），除非获取了资源的 `asyncId` 并使用敏感的 API 的 `emitDestroy` 调用它。当设置为 `false` 时，垃圾回收时的 `emitDestroy` 调用仅在有至少一个活跃的 `destroy` 钩子时发生。**默认值:** `false`。
 
-Example usage:
+用法示例：
 
 ```js
 class DBQuery extends AsyncResource {
@@ -529,7 +467,7 @@ class DBQuery extends AsyncResource {
 }
 ```
 
-### Static method: `AsyncResource.bind(fn[, type[, thisArg]])`
+### 静态方法：`AsyncResource.bind(fn[, type[, thisArg]])`
 
 <!-- YAML
 added:
@@ -538,26 +476,22 @@ added:
 changes:
   - version: v20.0.0
     pr-url: https://github.com/nodejs/node/pull/46432
-    description: The `asyncResource` property added to the bound function
-                 has been deprecated and will be removed in a future
-                 version.
+    description: 添加到绑定函数的 `asyncResource` 属性已被弃用，并将在未来版本中移除。
   - version:
     - v17.8.0
     - v16.15.0
     pr-url: https://github.com/nodejs/node/pull/42177
-    description: Changed the default when `thisArg` is undefined to use `this`
-                 from the caller.
+    description: 当 `thisArg` 未定义时，默认改为使用调用者的 `this`。
   - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/36782
-    description: Added optional thisArg.
+    description: 添加了可选的 thisArg。
 -->
 
-* `fn` {Function} The function to bind to the current execution context.
-* `type` {string} An optional name to associate with the underlying
-  `AsyncResource`.
+* `fn` {Function} 要绑定到当前执行上下文的函数。
+* `type` {string} 与底层 `AsyncResource` 关联的可选名称。
 * `thisArg` {any}
 
-Binds the given function to the current execution context.
+将给定函数绑定到当前执行上下文。
 
 ### `asyncResource.bind(fn[, thisArg])`
 
@@ -568,24 +502,21 @@ added:
 changes:
   - version: v20.0.0
     pr-url: https://github.com/nodejs/node/pull/46432
-    description: The `asyncResource` property added to the bound function
-                 has been deprecated and will be removed in a future
-                 version.
+    description: 添加到绑定函数的 `asyncResource` 属性已被弃用，并将在未来版本中移除。
   - version:
     - v17.8.0
     - v16.15.0
     pr-url: https://github.com/nodejs/node/pull/42177
-    description: Changed the default when `thisArg` is undefined to use `this`
-                 from the caller.
+    description: 当 `thisArg` 未定义时，默认改为使用调用者的 `this`。
   - version: v16.0.0
     pr-url: https://github.com/nodejs/node/pull/36782
-    description: Added optional thisArg.
+    description: 添加了可选的 thisArg。
 -->
 
-* `fn` {Function} The function to bind to the current `AsyncResource`.
+* `fn` {Function} 要绑定到当前 `AsyncResource` 的函数。
 * `thisArg` {any}
 
-Binds the given function to execute to this `AsyncResource`'s scope.
+将给定函数绑定到此 `AsyncResource` 的作用域中执行。
 
 ### `asyncResource.runInAsyncScope(fn[, thisArg, ...args])`
 
@@ -593,44 +524,33 @@ Binds the given function to execute to this `AsyncResource`'s scope.
 added: v9.6.0
 -->
 
-* `fn` {Function} The function to call in the execution context of this async
-  resource.
-* `thisArg` {any} The receiver to be used for the function call.
-* `...args` {any} Optional arguments to pass to the function.
+* `fn` {Function} 要在此异步资源的执行上下文中调用的函数。
+* `thisArg` {any} 用于函数调用的接收器。
+* `...args` {any} 传递给函数的可选参数。
 
-Call the provided function with the provided arguments in the execution context
-of the async resource. This will establish the context, trigger the AsyncHooks
-before callbacks, call the function, trigger the AsyncHooks after callbacks, and
-then restore the original execution context.
+在异步资源的执行上下文中使用提供的参数调用提供的函数。这将建立上下文，触发 AsyncHooks before 回调，调用函数，触发 AsyncHooks after 回调，然后恢复原始的执行上下文。
 
 ### `asyncResource.emitDestroy()`
 
-* Returns: {AsyncResource} A reference to `asyncResource`.
+* 返回: {AsyncResource} 对 `asyncResource` 的引用。
 
-Call all `destroy` hooks. This should only ever be called once. An error will
-be thrown if it is called more than once. This **must** be manually called. If
-the resource is left to be collected by the GC then the `destroy` hooks will
-never be called.
+调用所有 `destroy` 钩子。这应该只调用一次。如果调用超过一次，将抛出错误。这**必须**手动调用。如果资源留给 GC 回收，则 `destroy` 钩子将永远不会被调用。
 
 ### `asyncResource.asyncId()`
 
-* Returns: {number} The unique `asyncId` assigned to the resource.
+* 返回: {number} 分配给资源的唯一 `asyncId`。
 
 ### `asyncResource.triggerAsyncId()`
 
-* Returns: {number} The same `triggerAsyncId` that is passed to the
-  `AsyncResource` constructor.
+* 返回: {number} 传递给 `AsyncResource` 构造函数的相同 `triggerAsyncId`。
 
 <a id="async-resource-worker-pool"></a>
 
-### Using `AsyncResource` for a `Worker` thread pool
+### 使用 `AsyncResource` 实现 `Worker` 线程池
 
-The following example shows how to use the `AsyncResource` class to properly
-provide async tracking for a [`Worker`][] pool. Other resource pools, such as
-database connection pools, can follow a similar model.
+以下示例展示了如何使用 `AsyncResource` 类为 [`Worker`][] 池正确提供异步追踪。其他资源池，例如数据库连接池，可以遵循类似的模型。
 
-Assuming that the task is adding two numbers, using a file named
-`task_processor.js` with the following content:
+假设任务是两个数字相加，使用名为 `task_processor.js` 的文件，内容如下：
 
 ```mjs
 import { parentPort } from 'node:worker_threads';
@@ -646,7 +566,7 @@ parentPort.on('message', (task) => {
 });
 ```
 
-a Worker pool around it could use the following structure:
+围绕它的 Worker 池可以使用以下结构：
 
 ```mjs
 import { AsyncResource } from 'node:async_hooks';
@@ -664,7 +584,7 @@ class WorkerPoolTaskInfo extends AsyncResource {
 
   done(err, result) {
     this.runInAsyncScope(this.callback, null, err, result);
-    this.emitDestroy();  // `TaskInfo`s are used only once.
+    this.emitDestroy();  // `TaskInfo` 仅使用一次。
   }
 }
 
@@ -679,8 +599,7 @@ export default class WorkerPool extends EventEmitter {
     for (let i = 0; i < numThreads; i++)
       this.addNewWorker();
 
-    // Any time the kWorkerFreedEvent is emitted, dispatch
-    // the next task pending in the queue, if any.
+    // 每当发出 kWorkerFreedEvent 时，调度队列中挂起的下一个任务（如果有）。
     this.on(kWorkerFreedEvent, () => {
       if (this.tasks.length > 0) {
         const { task, callback } = this.tasks.shift();
@@ -692,23 +611,19 @@ export default class WorkerPool extends EventEmitter {
   addNewWorker() {
     const worker = new Worker(new URL('task_processor.js', import.meta.url));
     worker.on('message', (result) => {
-      // In case of success: Call the callback that was passed to `runTask`,
-      // remove the `TaskInfo` associated with the Worker, and mark it as free
-      // again.
+      // 成功情况下：调用传递给 `runTask` 的回调，移除与 Worker 关联的 `TaskInfo`，并将其标记为空闲。
       worker[kTaskInfo].done(null, result);
       worker[kTaskInfo] = null;
       this.freeWorkers.push(worker);
       this.emit(kWorkerFreedEvent);
     });
     worker.on('error', (err) => {
-      // In case of an uncaught exception: Call the callback that was passed to
-      // `runTask` with the error.
+      // 在未捕获异常的情况下：使用错误调用传递给 `runTask` 的回调。
       if (worker[kTaskInfo])
         worker[kTaskInfo].done(err, null);
       else
         this.emit('error', err);
-      // Remove the worker from the list and start a new Worker to replace the
-      // current one.
+      // 从列表中移除该 worker 并启动一个新的 Worker 来替换当前 worker。
       this.workers.splice(this.workers.indexOf(worker), 1);
       this.addNewWorker();
     });
@@ -719,7 +634,7 @@ export default class WorkerPool extends EventEmitter {
 
   runTask(task, callback) {
     if (this.freeWorkers.length === 0) {
-      // No free threads, wait until a worker thread becomes free.
+      // 没有空闲线程，等待一个工作线程空闲。
       this.tasks.push({ task, callback });
       return;
     }
@@ -752,7 +667,7 @@ class WorkerPoolTaskInfo extends AsyncResource {
 
   done(err, result) {
     this.runInAsyncScope(this.callback, null, err, result);
-    this.emitDestroy();  // `TaskInfo`s are used only once.
+    this.emitDestroy();  // `TaskInfo` 仅使用一次。
   }
 }
 
@@ -767,8 +682,7 @@ class WorkerPool extends EventEmitter {
     for (let i = 0; i < numThreads; i++)
       this.addNewWorker();
 
-    // Any time the kWorkerFreedEvent is emitted, dispatch
-    // the next task pending in the queue, if any.
+    // 每当发出 kWorkerFreedEvent 时，调度队列中挂起的下一个任务（如果有）。
     this.on(kWorkerFreedEvent, () => {
       if (this.tasks.length > 0) {
         const { task, callback } = this.tasks.shift();
@@ -780,23 +694,19 @@ class WorkerPool extends EventEmitter {
   addNewWorker() {
     const worker = new Worker(path.resolve(__dirname, 'task_processor.js'));
     worker.on('message', (result) => {
-      // In case of success: Call the callback that was passed to `runTask`,
-      // remove the `TaskInfo` associated with the Worker, and mark it as free
-      // again.
+      // 成功情况下：调用传递给 `runTask` 的回调，移除与 Worker 关联的 `TaskInfo`，并将其标记为空闲。
       worker[kTaskInfo].done(null, result);
       worker[kTaskInfo] = null;
       this.freeWorkers.push(worker);
       this.emit(kWorkerFreedEvent);
     });
     worker.on('error', (err) => {
-      // In case of an uncaught exception: Call the callback that was passed to
-      // `runTask` with the error.
+      // 在未捕获异常的情况下：使用错误调用传递给 `runTask` 的回调。
       if (worker[kTaskInfo])
         worker[kTaskInfo].done(err, null);
       else
         this.emit('error', err);
-      // Remove the worker from the list and start a new Worker to replace the
-      // current one.
+      // 从列表中移除该 worker 并启动一个新的 Worker 来替换当前 worker。
       this.workers.splice(this.workers.indexOf(worker), 1);
       this.addNewWorker();
     });
@@ -807,7 +717,7 @@ class WorkerPool extends EventEmitter {
 
   runTask(task, callback) {
     if (this.freeWorkers.length === 0) {
-      // No free threads, wait until a worker thread becomes free.
+      // 没有空闲线程，等待一个工作线程空闲。
       this.tasks.push({ task, callback });
       return;
     }
@@ -825,13 +735,9 @@ class WorkerPool extends EventEmitter {
 module.exports = WorkerPool;
 ```
 
-Without the explicit tracking added by the `WorkerPoolTaskInfo` objects,
-it would appear that the callbacks are associated with the individual `Worker`
-objects. However, the creation of the `Worker`s is not associated with the
-creation of the tasks and does not provide information about when tasks
-were scheduled.
+如果没有由 `WorkerPoolTaskInfo` 对象添加的显式追踪，回调看起来似乎与单个 `Worker` 对象关联。然而，`Worker` 的创建与任务的创建无关，并且不提供有关任务何时调度的信息。
 
-This pool could be used as follows:
+该池的使用方式如下：
 
 ```mjs
 import WorkerPool from './worker_pool.js';
@@ -865,15 +771,11 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-### Integrating `AsyncResource` with `EventEmitter`
+### 将 `AsyncResource` 与 `EventEmitter` 集成
 
-Event listeners triggered by an [`EventEmitter`][] may be run in a different
-execution context than the one that was active when `eventEmitter.on()` was
-called.
+由 [`EventEmitter`][] 触发的事件监听器可能在不同于调用 `eventEmitter.on()` 时的执行上下文中运行。
 
-The following example shows how to use the `AsyncResource` class to properly
-associate an event listener with the correct execution context. The same
-approach can be applied to a [`Stream`][] or a similar event-driven class.
+以下示例展示了如何使用 `AsyncResource` 类正确地将事件监听器与正确的执行上下文关联。相同的方法可以应用于 [`Stream`][] 或类似的事件驱动类。
 
 ```mjs
 import { createServer } from 'node:http';
@@ -881,10 +783,10 @@ import { AsyncResource, executionAsyncId } from 'node:async_hooks';
 
 const server = createServer((req, res) => {
   req.on('close', AsyncResource.bind(() => {
-    // Execution context is bound to the current outer scope.
+    // 执行上下文绑定到当前外部作用域。
   }));
   req.on('close', () => {
-    // Execution context is bound to the scope that caused 'close' to emit.
+    // 执行上下文绑定到触发 'close' 发射的作用域。
   });
   res.end();
 }).listen(3000);
@@ -896,10 +798,10 @@ const { AsyncResource, executionAsyncId } = require('node:async_hooks');
 
 const server = createServer((req, res) => {
   req.on('close', AsyncResource.bind(() => {
-    // Execution context is bound to the current outer scope.
+    // 执行上下文绑定到当前外部作用域。
   }));
   req.on('close', () => {
-    // Execution context is bound to the scope that caused 'close' to emit.
+    // 执行上下文绑定到触发 'close' 发射的作用域。
   });
   res.end();
 }).listen(3000);

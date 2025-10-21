@@ -1,37 +1,27 @@
-# C++ embedder API
+# C++ 嵌入器 API
 
 <!--introduced_in=v12.19.0-->
 
-Node.js provides a number of C++ APIs that can be used to execute JavaScript
-in a Node.js environment from other C++ software.
+Node.js 提供了一系列 C++ API，其他 C++ 软件可以使用这些 API 在 Node.js 环境中执行 JavaScript。
 
-The documentation for these APIs can be found in [src/node.h][] in the Node.js
-source tree. In addition to the APIs exposed by Node.js, some required concepts
-are provided by the V8 embedder API.
+这些 API 的文档可以在 Node.js 源码树的 [src/node.h][] 中找到。除了 Node.js 暴露的 API 之外，一些必需的概念由 V8 嵌入器 API 提供。
 
-Because using Node.js as an embedded library is different from writing code
-that is executed by Node.js, breaking changes do not follow typical Node.js
-[deprecation policy][] and may occur on each semver-major release without prior
-warning.
+由于将 Node.js 用作嵌入式库与编写由 Node.js 执行的代码不同，破坏性变更不遵循典型的 Node.js [弃用策略][deprecation policy]，并且可能在每个 semver-major 版本中发生，而不会事先警告。
 
-## Example embedding application
+## 嵌入式应用示例
 
-The following sections will provide an overview over how to use these APIs
-to create an application from scratch that will perform the equivalent of
-`node -e <code>`, i.e. that will take a piece of JavaScript and run it in
-a Node.js-specific environment.
+以下部分将概述如何使用这些 API 从头创建一个应用程序，该应用程序将执行等同于 `node -e <code>` 的操作，即接收一段 JavaScript 代码并在 Node.js 特定环境中运行它。
 
-The full code can be found [in the Node.js source tree][embedtest.cc].
+完整代码可以在 [Node.js 源码树][embedtest.cc] 中找到。
 
-### Setting up a per-process state
+### 设置每个进程的状态
 
-Node.js requires some per-process state management in order to run:
+Node.js 需要一些每个进程的状态管理才能运行：
 
-* Arguments parsing for Node.js [CLI options][],
-* V8 per-process requirements, such as a `v8::Platform` instance.
+* 解析 Node.js [CLI 选项][CLI options] 的参数，
+* V8 每个进程的要求，例如一个 `v8::Platform` 实例。
 
-The following example shows how these can be set up. Some class names are from
-the `node` and `v8` C++ namespaces, respectively.
+以下示例展示了如何设置这些内容。一些类名分别来自 `node` 和 `v8` C++ 命名空间。
 
 ```cpp
 int main(int argc, char** argv) {
@@ -72,7 +62,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-### Setting up a per-instance state
+### 设置每个实例的状态
 
 <!-- YAML
 changes:
@@ -82,32 +72,18 @@ changes:
       The `CommonEnvironmentSetup` and `SpinEventLoop` utilities were added.
 -->
 
-Node.js has a concept of a “Node.js instance”, that is commonly being referred
-to as `node::Environment`. Each `node::Environment` is associated with:
+Node.js 有一个 "Node.js 实例" 的概念，通常被称为 `node::Environment`。每个 `node::Environment` 都与以下内容关联：
 
-* Exactly one `v8::Isolate`, i.e. one JS Engine instance,
-* Exactly one `uv_loop_t`, i.e. one event loop,
-* A number of `v8::Context`s, but exactly one main `v8::Context`, and
-* One `node::IsolateData` instance that contains information that could be
-  shared by multiple `node::Environment`s. The embedder should make sure
-  that `node::IsolateData` is shared only among `node::Environment`s that
-  use the same `v8::Isolate`, Node.js does not perform this check.
+* 恰好一个 `v8::Isolate`，即一个 JS 引擎实例，
+* 恰好一个 `uv_loop_t`，即一个事件循环，
+* 多个 `v8::Context`，但恰好一个主 `v8::Context`，以及
+* 一个 `node::IsolateData` 实例，其中包含可以被多个 `node::Environment` 共享的信息。嵌入器应确保 `node::IsolateData` 仅在共享相同 `v8::Isolate` 的 `node::Environment` 之间共享，Node.js 不会执行此检查。
 
-In order to set up a `v8::Isolate`, an `v8::ArrayBuffer::Allocator` needs
-to be provided. One possible choice is the default Node.js allocator, which
-can be created through `node::ArrayBufferAllocator::Create()`. Using the Node.js
-allocator allows minor performance optimizations when addons use the Node.js
-C++ `Buffer` API, and is required in order to track `ArrayBuffer` memory in
-[`process.memoryUsage()`][].
+为了设置一个 `v8::Isolate`，需要提供一个 `v8::ArrayBuffer::Allocator`。一个可能的选择是默认的 Node.js 分配器，可以通过 `node::ArrayBufferAllocator::Create()` 创建。当插件使用 Node.js C++ `Buffer` API 时，使用 Node.js 分配器允许微小的性能优化，并且是为了在 [`process.memoryUsage()`][] 中跟踪 `ArrayBuffer` 内存所必需的。
 
-Additionally, each `v8::Isolate` that is used for a Node.js instance needs to
-be registered and unregistered with the `MultiIsolatePlatform` instance, if one
-is being used, in order for the platform to know which event loop to use
-for tasks scheduled by the `v8::Isolate`.
+此外，每个用于 Node.js 实例的 `v8::Isolate` 都需要在使用 `MultiIsolatePlatform` 实例（如果正在使用的话）时进行注册和注销，以便平台知道该使用哪个事件循环来执行由该 `v8::Isolate` 调度的任务。
 
-The `node::NewIsolate()` helper function creates a `v8::Isolate`,
-sets it up with some Node.js-specific hooks (e.g. the Node.js error handler),
-and registers it with the platform automatically.
+`node::NewIsolate()` 辅助函数会创建一个 `v8::Isolate`，使用一些 Node.js 特定的钩子（例如 Node.js 错误处理程序）对其进行设置，并自动将其注册到平台。
 
 ```cpp
 int RunNodeInstance(MultiIsolatePlatform* platform,

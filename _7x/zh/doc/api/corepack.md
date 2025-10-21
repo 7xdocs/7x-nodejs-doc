@@ -10,11 +10,10 @@ added:
   - v14.19.0
 -->
 
-> Stability: 1 - Experimental
+> Stability: 1 - 实验性
 
-**Corepack will no longer be distributed starting with Node.js v25.**
+**从Node.js v25开始，Corepack将不再随附分发。**
 
-Users currently depending on the bundled `corepack` executable from Node.js
-can switch to using the userland-provided [corepack][] module.
+目前依赖Node.js中捆绑的`corepack`可执行文件的用户，可以切换到使用用户区提供的[corepack][]模块。
 
 [corepack]: https://github.com/nodejs/corepack

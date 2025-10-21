@@ -1,28 +1,27 @@
-# Async hooks
+# 异步钩子
 
 <!--introduced_in=v8.1.0-->
 
-> Stability: 1 - Experimental. Please migrate away from this API, if you can.
-> We do not recommend using the [`createHook`][], [`AsyncHook`][], and
-> [`executionAsyncResource`][] APIs as they have usability issues, safety risks,
-> and performance implications. Async context tracking use cases are better
-> served by the stable [`AsyncLocalStorage`][] API. If you have a use case for
-> `createHook`, `AsyncHook`, or `executionAsyncResource` beyond the context
-> tracking need solved by [`AsyncLocalStorage`][] or diagnostics data currently
-> provided by [Diagnostics Channel][], please open an issue at
-> <https://github.com/nodejs/node/issues> describing your use case so we can
-> create a more purpose-focused API.
+> Stability: 1 - 实验性。如果可能，请迁移远离此 API。
+> 我们不建议使用 [`createHook`][]、[`AsyncHook`][] 和
+> [`executionAsyncResource`][] API，因为它们存在可用性问题、安全风险
+> 和性能影响。异步上下文跟踪用例更适合使用
+> 稳定的 [`AsyncLocalStorage`][] API。如果你有超出 [`AsyncLocalStorage`][]
+> 解决的上下文跟踪需求或 [Diagnostics Channel][] 当前提供的诊断数据
+> 之外的 `createHook`、`AsyncHook` 或 `executionAsyncResource` 用例，
+> 请在 <https://github.com/nodejs/node/issues> 描述你的用例，
+> 以便我们可以创建更专注的 API。
 
 <!-- source_link=lib/async_hooks.js -->
 
-We strongly discourage the use of the `async_hooks` API.
-Other APIs that can cover most of its use cases include:
+我们强烈反对使用 `async_hooks` API。
+可以覆盖其大部分用例的其他 API 包括：
 
-* [`AsyncLocalStorage`][] tracks async context
-* [`process.getActiveResourcesInfo()`][] tracks active resources
+* [`AsyncLocalStorage`][] 跟踪异步上下文
+* [`process.getActiveResourcesInfo()`][] 跟踪活动资源
 
-The `node:async_hooks` module provides an API to track asynchronous resources.
-It can be accessed using:
+`node:async_hooks` 模块提供了一个用于跟踪异步资源的 API。
+可以通过以下方式访问：
 
 ```mjs
 import async_hooks from 'node:async_hooks';
@@ -32,115 +31,105 @@ import async_hooks from 'node:async_hooks';
 const async_hooks = require('node:async_hooks');
 ```
 
-## Terminology
+## 术语
 
-An asynchronous resource represents an object with an associated callback.
-This callback may be called multiple times, such as the `'connection'`
-event in `net.createServer()`, or just a single time like in `fs.open()`.
-A resource can also be closed before the callback is called. `AsyncHook` does
-not explicitly distinguish between these different cases but will represent them
-as the abstract concept that is a resource.
+异步资源表示一个具有关联回调的对象。
+此回调可能被多次调用，例如 `net.createServer()` 中的 `'connection'` 事件，
+或者仅调用一次，如 `fs.open()`。资源也可能在回调调用之前关闭。
+`AsyncHook` 不会明确区分这些不同情况，而是将它们表示为资源这一抽象概念。
 
-If [`Worker`][]s are used, each thread has an independent `async_hooks`
-interface, and each thread will use a new set of async IDs.
+如果使用了 [`Worker`][]，每个线程都有独立的 `async_hooks` 接口，
+并且每个线程将使用一组新的异步 ID。
 
-## Overview
+## 概述
 
-Following is a simple overview of the public API.
+以下是公共 API 的简单概述。
 
 ```mjs
 import async_hooks from 'node:async_hooks';
 
-// Return the ID of the current execution context.
+// 返回当前执行上下文的 ID。
 const eid = async_hooks.executionAsyncId();
 
-// Return the ID of the handle responsible for triggering the callback of the
-// current execution scope to call.
+// 返回负责触发当前执行范围回调调用的句柄的 ID。
 const tid = async_hooks.triggerAsyncId();
 
-// Create a new AsyncHook instance. All of these callbacks are optional.
+// 创建一个新的 AsyncHook 实例。所有这些回调都是可选的。
 const asyncHook =
     async_hooks.createHook({ init, before, after, destroy, promiseResolve });
 
-// Allow callbacks of this AsyncHook instance to call. This is not an implicit
-// action after running the constructor, and must be explicitly run to begin
-// executing callbacks.
+// 允许此 AsyncHook 实例的回调调用。这不是运行构造函数后的隐式
+// 操作，必须显式运行以开始执行回调。
 asyncHook.enable();
 
-// Disable listening for new asynchronous events.
+// 禁用监听新的异步事件。
 asyncHook.disable();
 
 //
-// The following are the callbacks that can be passed to createHook().
+// 以下是可以传递给 createHook() 的回调。
 //
 
-// init() is called during object construction. The resource may not have
-// completed construction when this callback runs. Therefore, all fields of the
-// resource referenced by "asyncId" may not have been populated.
+// init() 在对象构造期间调用。此回调运行时，资源可能尚未
+// 完成构造。因此，由 "asyncId" 引用的资源的所有字段可能尚未填充。
 function init(asyncId, type, triggerAsyncId, resource) { }
 
-// before() is called just before the resource's callback is called. It can be
-// called 0-N times for handles (such as TCPWrap), and will be called exactly 1
-// time for requests (such as FSReqCallback).
+// before() 在资源回调即将调用之前调用。对于句柄（如 TCPWrap），
+// 它可以被调用 0-N 次，对于请求（如 FSReqCallback），它将恰好被调用 1 次。
 function before(asyncId) { }
 
-// after() is called just after the resource's callback has finished.
+// after() 在资源回调刚刚完成后调用。
 function after(asyncId) { }
 
-// destroy() is called when the resource is destroyed.
+// destroy() 在资源被销毁时调用。
 function destroy(asyncId) { }
 
-// promiseResolve() is called only for promise resources, when the
-// resolve() function passed to the Promise constructor is invoked
-// (either directly or through other means of resolving a promise).
+// promiseResolve() 仅针对 promise 资源调用，当
+// 传递给 Promise 构造函数的 resolve() 函数被调用时
+//（直接或通过其他解析 promise 的方式）。
 function promiseResolve(asyncId) { }
 ```
 
 ```cjs
 const async_hooks = require('node:async_hooks');
 
-// Return the ID of the current execution context.
+// 返回当前执行上下文的 ID。
 const eid = async_hooks.executionAsyncId();
 
-// Return the ID of the handle responsible for triggering the callback of the
-// current execution scope to call.
+// 返回负责触发当前执行范围回调调用的句柄的 ID。
 const tid = async_hooks.triggerAsyncId();
 
-// Create a new AsyncHook instance. All of these callbacks are optional.
+// 创建一个新的 AsyncHook 实例。所有这些回调都是可选的。
 const asyncHook =
     async_hooks.createHook({ init, before, after, destroy, promiseResolve });
 
-// Allow callbacks of this AsyncHook instance to call. This is not an implicit
-// action after running the constructor, and must be explicitly run to begin
-// executing callbacks.
+// 允许此 AsyncHook 实例的回调调用。这不是运行构造函数后的隐式
+// 操作，必须显式运行以开始执行回调。
 asyncHook.enable();
 
-// Disable listening for new asynchronous events.
+// 禁用监听新的异步事件。
 asyncHook.disable();
 
 //
-// The following are the callbacks that can be passed to createHook().
+// 以下是可以传递给 createHook() 的回调。
 //
 
-// init() is called during object construction. The resource may not have
-// completed construction when this callback runs. Therefore, all fields of the
-// resource referenced by "asyncId" may not have been populated.
+// init() 在对象构造期间调用。此回调运行时，资源可能尚未
+// 完成构造。因此，由 "asyncId" 引用的资源的所有字段可能尚未填充。
 function init(asyncId, type, triggerAsyncId, resource) { }
 
-// before() is called just before the resource's callback is called. It can be
-// called 0-N times for handles (such as TCPWrap), and will be called exactly 1
-// time for requests (such as FSReqCallback).
+// before() 在资源回调即将调用之前调用。对于句柄（如 TCPWrap），
+// 它可以被调用 0-N 次，对于请求（如 FSReqCallback），它将恰好被调用 1 次。
 function before(asyncId) { }
 
-// after() is called just after the resource's callback has finished.
+// after() 在资源回调刚刚完成后调用。
 function after(asyncId) { }
 
-// destroy() is called when the resource is destroyed.
+// destroy() 在资源被销毁时调用。
 function destroy(asyncId) { }
 
-// promiseResolve() is called only for promise resources, when the
-// resolve() function passed to the Promise constructor is invoked
-// (either directly or through other means of resolving a promise).
+// promiseResolve() 仅针对 promise 资源调用，当
+// 传递给 Promise 构造函数的 resolve() 函数被调用时
+//（直接或通过其他解析 promise 的方式）。
 function promiseResolve(asyncId) { }
 ```
 
@@ -150,24 +139,19 @@ function promiseResolve(asyncId) { }
 added: v8.1.0
 -->
 
-* `callbacks` {Object} The [Hook Callbacks][] to register
-  * `init` {Function} The [`init` callback][].
-  * `before` {Function} The [`before` callback][].
-  * `after` {Function} The [`after` callback][].
-  * `destroy` {Function} The [`destroy` callback][].
-  * `promiseResolve` {Function} The [`promiseResolve` callback][].
-* Returns: {AsyncHook} Instance used for disabling and enabling hooks
+* `callbacks` {Object} 要注册的 [Hook 回调][Hook Callbacks]
+  * `init` {Function} [`init` 回调][`init` callback]。
+  * `before` {Function} [`before` 回调][`before` callback]。
+  * `after` {Function} [`after` 回调][`after` callback]。
+  * `destroy` {Function} [`destroy` 回调][`destroy` callback]。
+  * `promiseResolve` {Function} [`promiseResolve` 回调][`promiseResolve` callback]。
+* 返回：{AsyncHook} 用于禁用和启用钩子的实例
 
-Registers functions to be called for different lifetime events of each async
-operation.
+注册函数以在每个异步操作的不同生命周期事件中调用。
 
-The callbacks `init()`/`before()`/`after()`/`destroy()` are called for the
-respective asynchronous event during a resource's lifetime.
+回调 `init()`/`before()`/`after()`/`destroy()` 在资源生命周期中相应的异步事件期间被调用。
 
-All callbacks are optional. For example, if only resource cleanup needs to
-be tracked, then only the `destroy` callback needs to be passed. The
-specifics of all functions that can be passed to `callbacks` is in the
-[Hook Callbacks][] section.
+所有回调都是可选的。例如，如果只需要跟踪资源清理，则只需传递 `destroy` 回调。可以传递给 `callbacks` 的所有函数的详细信息在 [Hook 回调][Hook Callbacks] 部分。
 
 ```mjs
 import { createHook } from 'node:async_hooks';
@@ -187,7 +171,7 @@ const asyncHook = async_hooks.createHook({
 });
 ```
 
-The callbacks will be inherited via the prototype chain:
+回调将通过原型链继承：
 
 ```js
 class MyAsyncCallbacks {
@@ -203,43 +187,25 @@ class MyAddedCallbacks extends MyAsyncCallbacks {
 const asyncHook = async_hooks.createHook(new MyAddedCallbacks());
 ```
 
-Because promises are asynchronous resources whose lifecycle is tracked
-via the async hooks mechanism, the `init()`, `before()`, `after()`, and
-`destroy()` callbacks _must not_ be async functions that return promises.
+因为 promise 是通过 async hooks 机制跟踪其生命周期的异步资源，
+所以 `init()`、`before()`、`after()` 和 `destroy()` 回调 _不得_ 是返回 promise 的异步函数。
 
-### Error handling
+### 错误处理
 
-If any `AsyncHook` callbacks throw, the application will print the stack trace
-and exit. The exit path does follow that of an uncaught exception, but
-all `'uncaughtException'` listeners are removed, thus forcing the process to
-exit. The `'exit'` callbacks will still be called unless the application is run
-with `--abort-on-uncaught-exception`, in which case a stack trace will be
-printed and the application exits, leaving a core file.
+如果任何 `AsyncHook` 回调抛出错误，应用程序将打印堆栈跟踪并退出。退出路径遵循未捕获异常的处理方式，但所有 `'uncaughtException'` 监听器都会被移除，从而强制进程退出。除非应用程序使用 `--abort-on-uncaught-exception` 运行，否则 `'exit'` 回调仍将被调用，在这种情况下，将打印堆栈跟踪并且应用程序退出，留下核心文件。
 
-The reason for this error handling behavior is that these callbacks are running
-at potentially volatile points in an object's lifetime, for example during
-class construction and destruction. Because of this, it is deemed necessary to
-bring down the process quickly in order to prevent an unintentional abort in the
-future. This is subject to change in the future if a comprehensive analysis is
-performed to ensure an exception can follow the normal control flow without
-unintentional side effects.
+这种错误处理行为的原因在于这些回调在对象生命周期的潜在不稳定点运行，例如在类构造和销毁期间。因此，认为有必要快速终止进程以防止将来出现意外中止。如果执行了全面分析以确保异常可以遵循正常的控制流而不会产生意外的副作用，这一点在未来可能会改变。
 
-### Printing in `AsyncHook` callbacks
+### 在 `AsyncHook` 回调中打印
 
-Because printing to the console is an asynchronous operation, `console.log()`
-will cause `AsyncHook` callbacks to be called. Using `console.log()` or
-similar asynchronous operations inside an `AsyncHook` callback function will
-cause an infinite recursion. An easy solution to this when debugging is to use a
-synchronous logging operation such as `fs.writeFileSync(file, msg, flag)`.
-This will print to the file and will not invoke `AsyncHook` recursively because
-it is synchronous.
+因为打印到控制台是异步操作，`console.log()` 会导致 `AsyncHook` 回调被调用。在 `AsyncHook` 回调函数内部使用 `console.log()` 或类似的异步操作将导致无限递归。在调试时，一个简单的解决方法是使用同步日志操作，例如 `fs.writeFileSync(file, msg, flag)`。这将打印到文件，并且不会递归调用 `AsyncHook`，因为它是同步的。
 
 ```mjs
 import { writeFileSync } from 'node:fs';
 import { format } from 'node:util';
 
 function debug(...args) {
-  // Use a function like this one when debugging inside an AsyncHook callback
+  // 在 AsyncHook 回调内部调试时使用类似此函数的函数
   writeFileSync('log.out', `${format(...args)}\n`, { flag: 'a' });
 }
 ```
@@ -249,31 +215,24 @@ const fs = require('node:fs');
 const util = require('node:util');
 
 function debug(...args) {
-  // Use a function like this one when debugging inside an AsyncHook callback
+  // 在 AsyncHook 回调内部调试时使用类似此函数的函数
   fs.writeFileSync('log.out', `${util.format(...args)}\n`, { flag: 'a' });
 }
 ```
 
-If an asynchronous operation is needed for logging, it is possible to keep
-track of what caused the asynchronous operation using the information
-provided by `AsyncHook` itself. The logging should then be skipped when
-it was the logging itself that caused the `AsyncHook` callback to be called. By
-doing this, the otherwise infinite recursion is broken.
+如果日志记录需要异步操作，可以使用 `AsyncHook` 本身提供的信息来跟踪是什么导致了异步操作。然后，当日志记录本身导致调用 `AsyncHook` 回调时，应跳过日志记录。通过这样做，打破了原本的无限递归。
 
-## Class: `AsyncHook`
+## 类：`AsyncHook`
 
-The class `AsyncHook` exposes an interface for tracking lifetime events
-of asynchronous operations.
+`AsyncHook` 类公开了一个用于跟踪异步操作生命周期事件的接口。
 
 ### `asyncHook.enable()`
 
-* Returns: {AsyncHook} A reference to `asyncHook`.
+* 返回：{AsyncHook} 对 `asyncHook` 的引用
 
-Enable the callbacks for a given `AsyncHook` instance. If no callbacks are
-provided, enabling is a no-op.
+启用给定 `AsyncHook` 实例的回调。如果未提供回调，则启用是无操作。
 
-The `AsyncHook` instance is disabled by default. If the `AsyncHook` instance
-should be enabled immediately after creation, the following pattern can be used.
+`AsyncHook` 实例默认是禁用的。如果 `AsyncHook` 实例应在创建后立即启用，可以使用以下模式。
 
 ```mjs
 import { createHook } from 'node:async_hooks';
@@ -289,87 +248,62 @@ const hook = async_hooks.createHook(callbacks).enable();
 
 ### `asyncHook.disable()`
 
-* Returns: {AsyncHook} A reference to `asyncHook`.
+* 返回：{AsyncHook} 对 `asyncHook` 的引用
 
-Disable the callbacks for a given `AsyncHook` instance from the global pool of
-`AsyncHook` callbacks to be executed. Once a hook has been disabled it will not
-be called again until enabled.
+从要执行的全局 `AsyncHook` 回调池中禁用给定 `AsyncHook` 实例的回调。一旦钩子被禁用，除非重新启用，否则不会再次调用。
 
-For API consistency `disable()` also returns the `AsyncHook` instance.
+为了 API 一致性，`disable()` 也返回 `AsyncHook` 实例。
 
-### Hook callbacks
+### 钩子回调
 
-Key events in the lifetime of asynchronous events have been categorized into
-four areas: instantiation, before/after the callback is called, and when the
-instance is destroyed.
+异步事件生命周期中的关键事件已分为四个领域：实例化、回调调用之前/之后以及实例销毁时。
 
 #### `init(asyncId, type, triggerAsyncId, resource)`
 
-* `asyncId` {number} A unique ID for the async resource.
-* `type` {string} The type of the async resource.
-* `triggerAsyncId` {number} The unique ID of the async resource in whose
-  execution context this async resource was created.
-* `resource` {Object} Reference to the resource representing the async
-  operation, needs to be released during _destroy_.
+* `asyncId` {number} 异步资源的唯一 ID。
+* `type` {string} 异步资源的类型。
+* `triggerAsyncId` {number} 在其执行上下文中创建此异步资源的异步资源的唯一 ID。
+* `resource` {Object} 代表异步操作的资源的引用，需要在 _destroy_ 期间释放。
 
-Called when a class is constructed that has the _possibility_ to emit an
-asynchronous event. This _does not_ mean the instance must call
-`before`/`after` before `destroy` is called, only that the possibility
-exists.
+当构造一个有可能发出异步事件的类时调用。这 _并不_ 意味着实例必须在 `destroy` 调用之前调用 `before`/`after`，只表示存在这种可能性。
 
-This behavior can be observed by doing something like opening a resource then
-closing it before the resource can be used. The following snippet demonstrates
-this.
+可以通过执行诸如打开资源然后在资源可以使用之前关闭它来观察此行为。以下代码片段演示了这一点。
 
 ```mjs
 import { createServer } from 'node:net';
 
 createServer().listen(function() { this.close(); });
-// OR
+// 或
 clearTimeout(setTimeout(() => {}, 10));
 ```
 
 ```cjs
 require('node:net').createServer().listen(function() { this.close(); });
-// OR
+// 或
 clearTimeout(setTimeout(() => {}, 10));
 ```
 
-Every new resource is assigned an ID that is unique within the scope of the
-current Node.js instance.
+每个新资源都被分配一个在当前 Node.js 实例范围内唯一的 ID。
 
 ##### `type`
 
-The `type` is a string identifying the type of resource that caused
-`init` to be called. Generally, it will correspond to the name of the
-resource's constructor.
+`type` 是一个字符串，标识导致调用 `init` 的资源类型。通常，它对应于资源构造函数的名称。
 
-The `type` of resources created by Node.js itself can change in any Node.js
-release. Valid values include `TLSWRAP`,
-`TCPWRAP`, `TCPSERVERWRAP`, `GETADDRINFOREQWRAP`, `FSREQCALLBACK`,
-`Microtask`, and `Timeout`. Inspect the source code of the Node.js version used
-to get the full list.
+由 Node.js 本身创建的资源的 `type` 在任何 Node.js 版本中都可能更改。有效值包括 `TLSWRAP`、`TCPWRAP`、`TCPSERVERWRAP`、`GETADDRINFOREQWRAP`、`FSREQCALLBACK`、`Microtask` 和 `Timeout`。检查使用的 Node.js 版本的源代码以获取完整列表。
 
-Furthermore users of [`AsyncResource`][] create async resources independent
-of Node.js itself.
+此外，[`AsyncResource`][] 的用户创建独立于 Node.js 本身的异步资源。
 
-There is also the `PROMISE` resource type, which is used to track `Promise`
-instances and asynchronous work scheduled by them.
+还有 `PROMISE` 资源类型，用于跟踪 `Promise` 实例和由它们调度的异步工作。
 
-Users are able to define their own `type` when using the public embedder API.
+用户在使用公共嵌入器 API 时能够定义自己的 `type`。
 
-It is possible to have type name collisions. Embedders are encouraged to use
-unique prefixes, such as the npm package name, to prevent collisions when
-listening to the hooks.
+类型名称可能发生冲突。鼓励嵌入器使用唯一前缀，例如 npm 包名称，以防止在监听钩子时发生冲突。
 
 ##### `triggerAsyncId`
 
-`triggerAsyncId` is the `asyncId` of the resource that caused (or "triggered")
-the new resource to initialize and that caused `init` to call. This is different
-from `async_hooks.executionAsyncId()` that only shows _when_ a resource was
-created, while `triggerAsyncId` shows _why_ a resource was created.
+`triggerAsyncId` 是导致（或“触发”）新资源初始化并导致 `init` 调用的资源的 `asyncId`。这与 `async_hooks.executionAsyncId()` 不同，后者仅显示资源 _何时_ 创建，而 `triggerAsyncId` 显示资源 _为什么_ 创建。
 
-The following is a simple demonstration of `triggerAsyncId`:
+以下是 `triggerAsyncId` 的简单演示：
 
 ```mjs
 import { createHook, executionAsyncId } from 'node:async_hooks';
@@ -407,43 +341,28 @@ createHook({
 net.createServer((conn) => {}).listen(8080);
 ```
 
-Output when hitting the server with `nc localhost 8080`:
+使用 `nc localhost 8080` 访问服务器时的输出：
 
 ```console
 TCPSERVERWRAP(5): trigger: 1 execution: 1
 TCPWRAP(7): trigger: 5 execution: 0
 ```
 
-The `TCPSERVERWRAP` is the server which receives the connections.
+`TCPSERVERWRAP` 是接收连接的服务器。
 
-The `TCPWRAP` is the new connection from the client. When a new
-connection is made, the `TCPWrap` instance is immediately constructed. This
-happens outside of any JavaScript stack. (An `executionAsyncId()` of `0` means
-that it is being executed from C++ with no JavaScript stack above it.) With only
-that information, it would be impossible to link resources together in
-terms of what caused them to be created, so `triggerAsyncId` is given the task
-of propagating what resource is responsible for the new resource's existence.
+`TCPWRAP` 是来自客户端的新连接。当建立新连接时，立即构造 `TCPWrap` 实例。这发生在任何 JavaScript 堆栈之外。（`executionAsyncId()` 为 `0` 意味着它正在从 C++ 执行，上方没有 JavaScript 堆栈。）仅凭这些信息，不可能在导致它们创建的原因方面将资源链接在一起，因此 `triggerAsyncId` 被赋予传播负责新资源存在的资源的任务。
 
 ##### `resource`
 
-`resource` is an object that represents the actual async resource that has
-been initialized. The API to access the object may be specified by the
-creator of the resource. Resources created by Node.js itself are internal
-and may change at any time. Therefore no API is specified for these.
+`resource` 是一个对象，代表已初始化的实际异步资源。访问该对象的 API 可能由资源的创建者指定。由 Node.js 本身创建的资源是内部的，可能随时更改。因此没有为这些资源指定 API。
 
-In some cases the resource object is reused for performance reasons, it is
-thus not safe to use it as a key in a `WeakMap` or add properties to it.
+在某些情况下，为了性能原因，资源对象会被重用，因此将其用作 `WeakMap` 中的键或向其添加属性是不安全的。
 
-##### Asynchronous context example
+##### 异步上下文示例
 
-The context tracking use case is covered by the stable API [`AsyncLocalStorage`][].
-This example only illustrates async hooks operation but [`AsyncLocalStorage`][]
-fits better to this use case.
+上下文跟踪用例由稳定的 API [`AsyncLocalStorage`][] 覆盖。此示例仅说明 async hooks 的操作，但 [`AsyncLocalStorage`][] 更适合此用例。
 
-The following is an example with additional information about the calls to
-`init` between the `before` and `after` calls, specifically what the
-callback to `listen()` will look like. The output formatting is slightly more
-elaborate to make calling context easier to see.
+以下是一个示例，提供了关于在 `before` 和 `after` 调用之间对 `init` 调用的附加信息，特别是 `listen()` 回调的样子。输出格式稍微复杂一些，以便更容易查看调用上下文。
 
 ```mjs
 import async_hooks from 'node:async_hooks';
@@ -479,7 +398,7 @@ async_hooks.createHook({
 }).enable();
 
 net.createServer(() => {}).listen(8080, () => {
-  // Let's wait 10ms before logging the server started.
+  // 在记录服务器启动之前等待 10 毫秒。
   setTimeout(() => {
     console.log('>>>', async_hooks.executionAsyncId());
   }, 10);
@@ -519,14 +438,14 @@ async_hooks.createHook({
 }).enable();
 
 net.createServer(() => {}).listen(8080, () => {
-  // Let's wait 10ms before logging the server started.
+  // 在记录服务器启动之前等待 10 毫秒。
   setTimeout(() => {
     console.log('>>>', async_hooks.executionAsyncId());
   }, 10);
 });
 ```
 
-Output from only starting the server:
+仅启动服务器时的输出：
 
 ```console
 TCPSERVERWRAP(5): trigger: 1 execution: 1
@@ -543,11 +462,9 @@ before:  8
 after:   8
 ```
 
-As illustrated in the example, `executionAsyncId()` and `execution` each specify
-the value of the current execution context; which is delineated by calls to
-`before` and `after`.
+如示例所示，`executionAsyncId()` 和 `execution` 分别指定当前执行上下文的值；该值由对 `before` 和 `after` 的调用划定。
 
-Only using `execution` to graph resource allocation results in the following:
+仅使用 `execution` 来图形化资源分配结果如下：
 
 ```console
   root(1)
@@ -559,16 +476,9 @@ TickObject(6)
  Timeout(7)
 ```
 
-The `TCPSERVERWRAP` is not part of this graph, even though it was the reason for
-`console.log()` being called. This is because binding to a port without a host
-name is a _synchronous_ operation, but to maintain a completely asynchronous
-API the user's callback is placed in a `process.nextTick()`. Which is why
-`TickObject` is present in the output and is a 'parent' for `.listen()`
-callback.
+`TCPSERVERWRAP` 不是此图的一部分，即使它是调用 `console.log()` 的原因。这是因为在没有主机名的情况下绑定到端口是 _同步_ 操作，但为了维护完全异步的 API，用户的回调被放置在 `process.nextTick()` 中。这就是为什么 `TickObject` 出现在输出中并且是 `.listen()` 回调的“父级”。
 
-The graph only shows _when_ a resource was created, not _why_, so to track
-the _why_ use `triggerAsyncId`. Which can be represented with the following
-graph:
+该图仅显示资源 _何时_ 创建，而不是 _为什么_，因此要跟踪 _为什么_，请使用 `triggerAsyncId`。这可以用以下图表示：
 
 ```console
  bootstrap(1)
@@ -587,43 +497,27 @@ TCPSERVERWRAP(5)
 
 * `asyncId` {number}
 
-When an asynchronous operation is initiated (such as a TCP server receiving a
-new connection) or completes (such as writing data to disk) a callback is
-called to notify the user. The `before` callback is called just before said
-callback is executed. `asyncId` is the unique identifier assigned to the
-resource about to execute the callback.
+当异步操作启动（例如 TCP 服务器接收新连接）或完成（例如将数据写入磁盘）时，会调用回调以通知用户。`before` 回调就在所述回调执行之前调用。`asyncId` 是分配给即将执行回调的资源的唯一标识符。
 
-The `before` callback will be called 0 to N times. The `before` callback
-will typically be called 0 times if the asynchronous operation was cancelled
-or, for example, if no connections are received by a TCP server. Persistent
-asynchronous resources like a TCP server will typically call the `before`
-callback multiple times, while other operations like `fs.open()` will call
-it only once.
+`before` 回调将被调用 0 到 N 次。如果异步操作被取消，或者例如 TCP 服务器没有接收到连接，`before` 回调通常会被调用 0 次。持久的异步资源（如 TCP 服务器）通常会多次调用 `before` 回调，而其他操作如 `fs.open()` 只会调用一次。
 
 #### `after(asyncId)`
 
 * `asyncId` {number}
 
-Called immediately after the callback specified in `before` is completed.
+在 `before` 中指定的回调完成后立即调用。
 
-If an uncaught exception occurs during execution of the callback, then `after`
-will run _after_ the `'uncaughtException'` event is emitted or a `domain`'s
-handler runs.
+如果在回调执行期间发生未捕获的异常，则 `after` 将在 `'uncaughtException'` 事件发出或 `domain` 的处理程序运行 _之后_ 运行。
 
 #### `destroy(asyncId)`
 
 * `asyncId` {number}
 
-Called after the resource corresponding to `asyncId` is destroyed. It is also
-called asynchronously from the embedder API `emitDestroy()`.
+在与 `asyncId` 对应的资源被销毁后调用。它也从嵌入器 API `emitDestroy()` 异步调用。
 
-Some resources depend on garbage collection for cleanup, so if a reference is
-made to the `resource` object passed to `init` it is possible that `destroy`
-will never be called, causing a memory leak in the application. If the resource
-does not depend on garbage collection, then this will not be an issue.
+某些资源依赖垃圾收集进行清理，因此如果对传递给 `init` 的 `resource` 对象进行了引用，则 `destroy` 可能永远不会被调用，导致应用程序中的内存泄漏。如果资源不依赖垃圾收集，则这将不是问题。
 
-Using the destroy hook results in additional overhead because it enables
-tracking of `Promise` instances via the garbage collector.
+使用 destroy 钩子会导致额外的开销，因为它通过垃圾收集器启用对 `Promise` 实例的跟踪。
 
 #### `promiseResolve(asyncId)`
 
@@ -633,26 +527,24 @@ added: v8.6.0
 
 * `asyncId` {number}
 
-Called when the `resolve` function passed to the `Promise` constructor is
-invoked (either directly or through other means of resolving a promise).
+当传递给 `Promise` 构造函数的 `resolve` 函数被调用时调用（直接或通过其他解析 promise 的方式）。
 
-`resolve()` does not do any observable synchronous work.
+`resolve()` 不会执行任何可观察的同步工作。
 
-The `Promise` is not necessarily fulfilled or rejected at this point if the
-`Promise` was resolved by assuming the state of another `Promise`.
+此时 `Promise` 不一定已兑现或拒绝，如果 `Promise` 是通过假设另一个 `Promise` 的状态来解析的。
 
 ```js
 new Promise((resolve) => resolve(true)).then((a) => {});
 ```
 
-calls the following callbacks:
+调用以下回调：
 
 ```text
 init for PROMISE with id 5, trigger id: 1
-  promise resolve 5      # corresponds to resolve(true)
-init for PROMISE with id 6, trigger id: 5  # the Promise returned by then()
-  before 6               # the then() callback is entered
-  promise resolve 6      # the then() callback resolves the promise by returning
+  promise resolve 5      # 对应于 resolve(true)
+init for PROMISE with id 6, trigger id: 5  # then() 返回的 Promise
+  before 6               # 进入 then() 回调
+  promise resolve 6      # then() 回调通过返回解析 promise
   after 6
 ```
 
@@ -664,16 +556,11 @@ added:
  - v12.17.0
 -->
 
-* Returns: {Object} The resource representing the current execution.
-  Useful to store data within the resource.
+* 返回：{Object} 代表当前执行的资源。用于在资源内存储数据。
 
-Resource objects returned by `executionAsyncResource()` are most often internal
-Node.js handle objects with undocumented APIs. Using any functions or properties
-on the object is likely to crash your application and should be avoided.
+由 `executionAsyncResource()` 返回的资源对象通常是具有未文档化 API 的内部 Node.js 句柄对象。使用对象上的任何函数或属性很可能导致应用程序崩溃，应避免。
 
-Using `executionAsyncResource()` in the top-level execution context will
-return an empty object as there is no handle or request object to use,
-but having an object representing the top-level can be helpful.
+在顶级执行上下文中使用 `executionAsyncResource()` 将返回一个空对象，因为没有句柄或请求对象可用，但拥有一个代表顶级的对象可能会有所帮助。
 
 ```mjs
 import { open } from 'node:fs';
@@ -695,8 +582,7 @@ open(__filename, 'r', (err, fd) => {
 });
 ```
 
-This can be used to implement continuation local storage without the
-use of a tracking `Map` to store the metadata:
+这可用于实现连续本地存储，而无需使用跟踪 `Map` 来存储元数据：
 
 ```mjs
 import { createServer } from 'node:http';
@@ -705,7 +591,7 @@ import {
   executionAsyncResource,
   createHook,
 } from 'node:async_hooks';
-const sym = Symbol('state'); // Private symbol to avoid pollution
+const sym = Symbol('state'); // 私有符号以避免污染
 
 createHook({
   init(asyncId, type, triggerAsyncId, resource) {
@@ -731,7 +617,7 @@ const {
   executionAsyncResource,
   createHook,
 } = require('node:async_hooks');
-const sym = Symbol('state'); // Private symbol to avoid pollution
+const sym = Symbol('state'); // 私有符号以避免污染
 
 createHook({
   init(asyncId, type, triggerAsyncId, resource) {
@@ -760,14 +646,13 @@ changes:
     description: Renamed from `currentId`.
 -->
 
-* Returns: {number} The `asyncId` of the current execution context. Useful to
-  track when something calls.
+* 返回：{number} 当前执行上下文的 `asyncId`。用于跟踪何时调用某些内容。
 
 ```mjs
 import { executionAsyncId } from 'node:async_hooks';
 import fs from 'node:fs';
 
-console.log(executionAsyncId());  // 1 - bootstrap
+console.log(executionAsyncId());  // 1 - 引导
 const path = '.';
 fs.open(path, 'r', (err, fd) => {
   console.log(executionAsyncId());  // 6 - open()
@@ -778,54 +663,50 @@ fs.open(path, 'r', (err, fd) => {
 const async_hooks = require('node:async_hooks');
 const fs = require('node:fs');
 
-console.log(async_hooks.executionAsyncId());  // 1 - bootstrap
+console.log(async_hooks.executionAsyncId());  // 1 - 引导
 const path = '.';
 fs.open(path, 'r', (err, fd) => {
   console.log(async_hooks.executionAsyncId());  // 6 - open()
 });
 ```
 
-The ID returned from `executionAsyncId()` is related to execution timing, not
-causality (which is covered by `triggerAsyncId()`):
+从 `executionAsyncId()` 返回的 ID 与执行时序相关，而不是因果关系（由 `triggerAsyncId()` 覆盖）：
 
 ```js
 const server = net.createServer((conn) => {
-  // Returns the ID of the server, not of the new connection, because the
-  // callback runs in the execution scope of the server's MakeCallback().
+  // 返回服务器的 ID，而不是新连接的 ID，因为
+  // 回调在服务器的 MakeCallback() 执行范围内运行。
   async_hooks.executionAsyncId();
 
 }).listen(port, () => {
-  // Returns the ID of a TickObject (process.nextTick()) because all
-  // callbacks passed to .listen() are wrapped in a nextTick().
+  // 返回 TickObject (process.nextTick()) 的 ID，因为所有
+  // 传递给 .listen() 的回调都包装在 nextTick() 中。
   async_hooks.executionAsyncId();
 });
 ```
 
-Promise contexts may not get precise `executionAsyncIds` by default.
-See the section on [promise execution tracking][].
+Promise 上下文默认可能无法获得精确的 `executionAsyncId`。请参阅 [promise 执行跟踪][promise execution tracking] 部分。
 
 ### `async_hooks.triggerAsyncId()`
 
-* Returns: {number} The ID of the resource responsible for calling the callback
-  that is currently being executed.
+* 返回：{number} 负责调用当前正在执行的回调的资源的 ID。
 
 ```js
 const server = net.createServer((conn) => {
-  // The resource that caused (or triggered) this callback to be called
-  // was that of the new connection. Thus the return value of triggerAsyncId()
-  // is the asyncId of "conn".
+  // 导致（或触发）此回调被调用的资源
+  // 是新连接的资源。因此 triggerAsyncId() 的返回值
+  // 是 "conn" 的 asyncId。
   async_hooks.triggerAsyncId();
 
 }).listen(port, () => {
-  // Even though all callbacks passed to .listen() are wrapped in a nextTick()
-  // the callback itself exists because the call to the server's .listen()
-  // was made. So the return value would be the ID of the server.
+  // 即使所有传递给 .listen() 的回调都包装在 nextTick() 中
+  // 回调本身存在是因为对服务器的 .listen() 调用
+  // 被发出。所以返回值将是服务器的 ID。
   async_hooks.triggerAsyncId();
 });
 ```
 
-Promise contexts may not get valid `triggerAsyncId`s by default. See
-the section on [promise execution tracking][].
+Promise 上下文默认可能无法获得有效的 `triggerAsyncId`。请参阅 [promise 执行跟踪][promise execution tracking] 部分。
 
 ### `async_hooks.asyncWrapProviders`
 
@@ -835,18 +716,13 @@ added:
   - v16.14.0
 -->
 
-* Returns: A map of provider types to the corresponding numeric id.
-  This map contains all the event types that might be emitted by the `async_hooks.init()` event.
+* 返回：提供程序类型到相应数字 id 的映射。此映射包含 `async_hooks.init()` 事件可能发出的所有事件类型。
 
-This feature suppresses the deprecated usage of `process.binding('async_wrap').Providers`.
-See: [DEP0111][]
+此特性抑制了已弃用的 `process.binding('async_wrap').Providers` 的使用。参见：[DEP0111][]
 
-## Promise execution tracking
+## Promise 执行跟踪
 
-By default, promise executions are not assigned `asyncId`s due to the relatively
-expensive nature of the [promise introspection API][PromiseHooks] provided by
-V8. This means that programs using promises or `async`/`await` will not get
-correct execution and trigger ids for promise callback contexts by default.
+默认情况下，由于 V8 提供的 [promise 内省 API][PromiseHooks] 相对昂贵，不会为 promise 执行分配 `asyncId`。这意味着使用 promise 或 `async`/`await` 的程序默认不会为 promise 回调上下文获得正确的执行和触发 id。
 
 ```mjs
 import { executionAsyncId, triggerAsyncId } from 'node:async_hooks';
@@ -854,7 +730,7 @@ import { executionAsyncId, triggerAsyncId } from 'node:async_hooks';
 Promise.resolve(1729).then(() => {
   console.log(`eid ${executionAsyncId()} tid ${triggerAsyncId()}`);
 });
-// produces:
+// 产生：
 // eid 1 tid 0
 ```
 
@@ -864,65 +740,50 @@ const { executionAsyncId, triggerAsyncId } = require('node:async_hooks');
 Promise.resolve(1729).then(() => {
   console.log(`eid ${executionAsyncId()} tid ${triggerAsyncId()}`);
 });
-// produces:
+// 产生：
 // eid 1 tid 0
 ```
 
-Observe that the `then()` callback claims to have executed in the context of the
-outer scope even though there was an asynchronous hop involved. Also,
-the `triggerAsyncId` value is `0`, which means that we are missing context about
-the resource that caused (triggered) the `then()` callback to be executed.
+观察到 `then()` 回调声称在外部范围的上下文中执行，即使涉及异步跳转。此外，`triggerAsyncId` 值为 `0`，这意味着我们缺少关于导致（触发）`then()` 回调执行的资源的上下文。
 
-Installing async hooks via `async_hooks.createHook` enables promise execution
-tracking:
+通过 `async_hooks.createHook` 安装 async hooks 可以启用 promise 执行跟踪：
 
 ```mjs
 import { createHook, executionAsyncId, triggerAsyncId } from 'node:async_hooks';
-createHook({ init() {} }).enable(); // forces PromiseHooks to be enabled.
+createHook({ init() {} }).enable(); // 强制启用 PromiseHooks。
 Promise.resolve(1729).then(() => {
   console.log(`eid ${executionAsyncId()} tid ${triggerAsyncId()}`);
 });
-// produces:
+// 产生：
 // eid 7 tid 6
 ```
 
 ```cjs
 const { createHook, executionAsyncId, triggerAsyncId } = require('node:async_hooks');
 
-createHook({ init() {} }).enable(); // forces PromiseHooks to be enabled.
+createHook({ init() {} }).enable(); // 强制启用 PromiseHooks。
 Promise.resolve(1729).then(() => {
   console.log(`eid ${executionAsyncId()} tid ${triggerAsyncId()}`);
 });
-// produces:
+// 产生：
 // eid 7 tid 6
 ```
 
-In this example, adding any actual hook function enabled the tracking of
-promises. There are two promises in the example above; the promise created by
-`Promise.resolve()` and the promise returned by the call to `then()`. In the
-example above, the first promise got the `asyncId` `6` and the latter got
-`asyncId` `7`. During the execution of the `then()` callback, we are executing
-in the context of promise with `asyncId` `7`. This promise was triggered by
-async resource `6`.
+在此示例中，添加任何实际的钩子函数启用了对 promise 的跟踪。上面示例中有两个 promise；由 `Promise.resolve()` 创建的 promise 和调用 `then()` 返回的 promise。在上面的示例中，第一个 promise 获得了 `asyncId` `6`，后者获得了 `asyncId` `7`。在执行 `then()` 回调期间，我们正在 `asyncId` 为 `7` 的 promise 的上下文中执行。此 promise 由异步资源 `6` 触发。
 
-Another subtlety with promises is that `before` and `after` callbacks are run
-only on chained promises. That means promises not created by `then()`/`catch()`
-will not have the `before` and `after` callbacks fired on them. For more details
-see the details of the V8 [PromiseHooks][] API.
+关于 promise 的另一个微妙之处是，`before` 和 `after` 回调仅在链式 promise 上运行。这意味着不是由 `then()`/`catch()` 创建的 promise 不会在其上触发 `before` 和 `after` 回调。有关更多详细信息，请参阅 V8 [PromiseHooks][] API 的详细信息。
 
-## JavaScript embedder API
+## JavaScript 嵌入器 API
 
-Library developers that handle their own asynchronous resources performing tasks
-like I/O, connection pooling, or managing callback queues may use the
-`AsyncResource` JavaScript API so that all the appropriate callbacks are called.
+处理自己的异步资源执行 I/O、连接池或管理回调队列等任务的库开发人员可以使用 `AsyncResource` JavaScript API，以便调用所有适当的回调。
 
-### Class: `AsyncResource`
+### 类：`AsyncResource`
 
-The documentation for this class has moved [`AsyncResource`][].
+此类的文档已移至 [`AsyncResource`][]。
 
-## Class: `AsyncLocalStorage`
+## 类：`AsyncLocalStorage`
 
-The documentation for this class has moved [`AsyncLocalStorage`][].
+此类的文档已移至 [`AsyncLocalStorage`][]。
 
 [DEP0111]: deprecations.md#dep0111-processbinding
 [Diagnostics Channel]: diagnostics_channel.md

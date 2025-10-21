@@ -1,15 +1,14 @@
-# Command-line API
+# 命令行 API
 
 <!--introduced_in=v5.9.1-->
 
 <!--type=misc-->
 
-Node.js comes with a variety of CLI options. These options expose built-in
-debugging, multiple ways to execute scripts, and other helpful runtime options.
+Node.js 提供了多种 CLI 选项。这些选项暴露了内置的调试功能、多种执行脚本的方式以及其他有用的运行时选项。
 
-To view this documentation as a manual page in a terminal, run `man node`.
+要在终端中作为手册页查看此文档，请运行 `man node`。
 
-## Synopsis
+## 概要
 
 `node [options] [V8 options] [<program-entry-point> | -e "script" | -] [--] [arguments]`
 
@@ -17,40 +16,29 @@ To view this documentation as a manual page in a terminal, run `man node`.
 
 `node --v8-options`
 
-Execute without arguments to start the [REPL][].
+不带参数执行以启动 [REPL][]。
 
-For more info about `node inspect`, see the [debugger][] documentation.
+有关 `node inspect` 的更多信息，请参阅 [调试器][] 文档。
 
-## Program entry point
+## 程序入口点
 
-The program entry point is a specifier-like string. If the string is not an
-absolute path, it's resolved as a relative path from the current working
-directory. That path is then resolved by [CommonJS][] module loader. If no
-corresponding file is found, an error is thrown.
+程序入口点是一个类似于说明符的字符串。如果该字符串不是绝对路径，则会从当前工作目录解析为相对路径。然后该路径由 [CommonJS][] 模块加载器解析。如果未找到相应的文件，则会抛出错误。
 
-If a file is found, its path will be passed to the
-[ES module loader][Modules loaders] under any of the following conditions:
+如果找到文件，则在以下任何条件下，其路径将传递给 [ES 模块加载器][Modules loaders]：
 
-* The program was started with a command-line flag that forces the entry
-  point to be loaded with ECMAScript module loader, such as `--import`.
-* The file has an `.mjs` or `.wasm` extension.
-* The file does not have a `.cjs` extension, and the nearest parent
-  `package.json` file contains a top-level [`"type"`][] field with a value of
-  `"module"`.
+* 程序启动时使用了强制入口点使用 ECMAScript 模块加载器加载的命令行标志，例如 `--import`。
+* 文件具有 `.mjs` 或 `.wasm` 扩展名。
+* 文件没有 `.cjs` 扩展名，并且最近的父级 `package.json` 文件包含一个值为 `"module"` 的顶层 [`"type"`][] 字段。
 
-Otherwise, the file is loaded using the CommonJS module loader. See
-[Modules loaders][] for more details.
+否则，文件将使用 CommonJS 模块加载器加载。有关更多详细信息，请参阅 [模块加载器][Modules loaders]。
 
-### ECMAScript modules loader entry point caveat
+### ECMAScript 模块加载器入口点注意事项
 
-When loading, the [ES module loader][Modules loaders] loads the program
-entry point, the `node` command will accept as input only files with `.js`,
-`.mjs`, or `.cjs` extensions. With the following flags, additional file
-extensions are enabled:
+加载时，[ES 模块加载器][Modules loaders] 会加载程序入口点，`node` 命令仅接受具有 `.js`、`.mjs` 或 `.cjs` 扩展名的文件作为输入。使用以下标志时，将启用其他文件扩展名：
 
-* [`--experimental-addon-modules`][] for files with `.node` extension.
+* [`--experimental-addon-modules`][] 用于具有 `.node` 扩展名的文件。
 
-## Options
+## 选项
 
 <!-- YAML
 changes:
@@ -62,14 +50,9 @@ changes:
 
 > Stability: 2 - Stable
 
-All options, including V8 options, allow words to be separated by both
-dashes (`-`) or underscores (`_`). For example, `--pending-deprecation` is
-equivalent to `--pending_deprecation`.
+所有选项，包括 V8 选项，都允许单词之间用破折号（`-`）或下划线（`_`）分隔。例如，`--pending-deprecation` 等同于 `--pending_deprecation`。
 
-If an option that takes a single value (such as `--max-http-header-size`) is
-passed more than once, then the last passed value is used. Options from the
-command line take precedence over options passed through the [`NODE_OPTIONS`][]
-environment variable.
+如果传递了接受单个值的选项（例如 `--max-http-header-size`）多次，则使用最后传递的值。来自命令行的选项优先于通过 [`NODE_OPTIONS`][] 环境变量传递的选项。
 
 ### `-`
 
@@ -77,9 +60,7 @@ environment variable.
 added: v8.0.0
 -->
 
-Alias for stdin. Analogous to the use of `-` in other command-line utilities,
-meaning that the script is read from stdin, and the rest of the options
-are passed to that script.
+标准输入的别名。类似于其他命令行实用程序中 `-` 的用法，表示从标准输入读取脚本，其余选项传递给该脚本。
 
 ### `--`
 
@@ -87,9 +68,7 @@ are passed to that script.
 added: v6.11.0
 -->
 
-Indicate the end of node options. Pass the rest of the arguments to the script.
-If no script filename or eval/print script is supplied prior to this, then
-the next argument is used as a script filename.
+表示节点选项的结束。将剩余的参数传递给脚本。如果在此之前没有提供脚本文件名或 eval/print 脚本，则下一个参数将用作脚本文件名。
 
 ### `--abort-on-uncaught-exception`
 
@@ -97,12 +76,9 @@ the next argument is used as a script filename.
 added: v0.10.8
 -->
 
-Aborting instead of exiting causes a core file to be generated for post-mortem
-analysis using a debugger (such as `lldb`, `gdb`, and `mdb`).
+中止而不是退出会生成一个核心文件，用于使用调试器（如 `lldb`、`gdb` 和 `mdb`）进行事后分析。
 
-If this flag is passed, the behavior can still be set to not abort through
-[`process.setUncaughtExceptionCaptureCallback()`][] (and through usage of the
-`node:domain` module that uses it).
+如果传递了此标志，仍然可以通过 [`process.setUncaughtExceptionCaptureCallback()`][]（以及通过使用它的 `node:domain` 模块）将行为设置为不中止。
 
 ### `--allow-addons`
 
@@ -114,15 +90,13 @@ added:
 
 > Stability: 1.1 - Active development
 
-When using the [Permission Model][], the process will not be able to use
-native addons by default.
-Attempts to do so will throw an `ERR_DLOPEN_DISABLED` unless the
-user explicitly passes the `--allow-addons` flag when starting Node.js.
+使用 [权限模型][Permission Model] 时，进程默认将无法使用原生插件。
+除非用户在启动 Node.js 时显式传递 `--allow-addons` 标志，否则尝试这样做将抛出 `ERR_DLOPEN_DISABLED`。
 
-Example:
+示例：
 
 ```cjs
-// Attempt to require an native addon
+// 尝试 require 一个原生插件
 require('nodejs-addon-example');
 ```
 
@@ -161,16 +135,14 @@ changes:
 
 > Stability: 1.1 - Active development
 
-When using the [Permission Model][], the process will not be able to spawn any
-child process by default.
-Attempts to do so will throw an `ERR_ACCESS_DENIED` unless the
-user explicitly passes the `--allow-child-process` flag when starting Node.js.
+使用 [权限模型][Permission Model] 时，进程默认将无法生成任何子进程。
+除非用户在启动 Node.js 时显式传递 `--allow-child-process` 标志，否则尝试这样做将抛出 `ERR_ACCESS_DENIED`。
 
-Example:
+示例：
 
 ```js
 const childProcess = require('node:child_process');
-// Attempt to bypass the permission
+// 尝试绕过权限
 childProcess.spawn('node', ['-e', 'require("fs").writeFileSync("/new-file", "example")']);
 ```
 
@@ -179,6 +151,7 @@ $ node --permission --allow-fs-read=* index.js
 node:internal/child_process:388
   const err = this._handle.spawn(options);
                            ^
+
 Error: Access to this API has been restricted
     at ChildProcess.spawn (node:internal/child_process:388:28)
     at node:internal/main/run_main_module:17:47 {
@@ -187,15 +160,9 @@ Error: Access to this API has been restricted
 }
 ```
 
-The `child_process.fork()` API inherits the execution arguments from the
-parent process. This means that if Node.js is started with the Permission
-Model enabled and the `--allow-child-process` flag is set, any child process
-created using `child_process.fork()` will automatically receive all relevant
-Permission Model flags.
+`child_process.fork()` API 从父进程继承执行参数。这意味着如果 Node.js 在启用权限模型的情况下启动并且设置了 `--allow-child-process` 标志，则使用 `child_process.fork()` 创建的任何子进程将自动接收所有相关的权限模型标志。
 
-This behavior also applies to `child_process.spawn()`, but in that case, the
-flags are propagated via the `NODE_OPTIONS` environment variable rather than
-directly through the process arguments.
+此行为也适用于 `child_process.spawn()`，但在那种情况下，标志是通过 `NODE_OPTIONS` 环境变量传播的，而不是直接通过进程参数。
 
 ### `--allow-fs-read`
 
@@ -215,31 +182,28 @@ changes:
     description: Paths delimited by comma (`,`) are no longer allowed.
 -->
 
-This flag configures file system read permissions using
-the [Permission Model][].
+此标志使用 [权限模型][Permission Model] 配置文件系统读取权限。
 
-The valid arguments for the `--allow-fs-read` flag are:
+`--allow-fs-read` 标志的有效参数是：
 
-* `*` - To allow all `FileSystemRead` operations.
-* Multiple paths can be allowed using multiple `--allow-fs-read` flags.
-  Example `--allow-fs-read=/folder1/ --allow-fs-read=/folder1/`
+* `*` - 允许所有 `FileSystemRead` 操作。
+* 可以使用多个 `--allow-fs-read` 标志允许多个路径。
+  示例 `--allow-fs-read=/folder1/ --allow-fs-read=/folder1/`
 
-Examples can be found in the [File System Permissions][] documentation.
+示例可以在 [文件系统权限][File System Permissions] 文档中找到。
 
-The initializer module and custom `--require` modules has a implicit
-read permission.
+初始化器模块和自定义的 `--require` 模块具有隐式的读取权限。
 
 ```console
 $ node --permission -r custom-require.js -r custom-require-2.js index.js
 ```
 
-* The `custom-require.js`, `custom-require-2.js`, and `index.js` will be
-  by default in the allowed read list.
+* `custom-require.js`、`custom-require-2.js` 和 `index.js` 将默认在允许读取的列表中。
 
 ```js
-process.has('fs.read', 'index.js'); // true
-process.has('fs.read', 'custom-require.js'); // true
-process.has('fs.read', 'custom-require-2.js'); // true
+process.permission.has('fs.read', 'index.js'); // true
+process.permission.has('fs.read', 'custom-require.js'); // true
+process.permission.has('fs.read', 'custom-require-2.js'); // true
 ```
 
 ### `--allow-fs-write`
@@ -257,19 +221,18 @@ changes:
     description: Paths delimited by comma (`,`) are no longer allowed.
 -->
 
-This flag configures file system write permissions using
-the [Permission Model][].
+此标志使用 [权限模型][Permission Model] 配置文件系统写入权限。
 
-The valid arguments for the `--allow-fs-write` flag are:
+`--allow-fs-write` 标志的有效参数是：
 
-* `*` - To allow all `FileSystemWrite` operations.
-* Multiple paths can be allowed using multiple `--allow-fs-write` flags.
-  Example `--allow-fs-write=/folder1/ --allow-fs-write=/folder1/`
+* `*` - 允许所有 `FileSystemWrite` 操作。
+* 可以使用多个 `--allow-fs-write` 标志允许多个路径。
+  示例 `--allow-fs-write=/folder1/ --allow-fs-write=/folder1/`
 
-Paths delimited by comma (`,`) are no longer allowed.
-When passing a single flag with a comma a warning will be displayed.
+不再允许使用逗号（`,`）分隔的路径。
+当传递带有逗号的单个标志时，将显示警告。
 
-Examples can be found in the [File System Permissions][] documentation.
+示例可以在 [文件系统权限][File System Permissions] 文档中找到。
 
 ### `--allow-wasi`
 
@@ -281,19 +244,17 @@ added:
 
 > Stability: 1.1 - Active development
 
-When using the [Permission Model][], the process will not be capable of creating
-any WASI instances by default.
-For security reasons, the call will throw an `ERR_ACCESS_DENIED` unless the
-user explicitly passes the flag `--allow-wasi` in the main Node.js process.
+使用 [权限模型][Permission Model] 时，进程默认将无法创建任何 WASI 实例。
+出于安全原因，除非用户在主 Node.js 进程中显式传递 `--allow-wasi` 标志，否则调用将抛出 `ERR_ACCESS_DENIED`。
 
-Example:
+示例：
 
 ```js
 const { WASI } = require('node:wasi');
-// Attempt to bypass the permission
+// 尝试绕过权限
 new WASI({
   version: 'preview1',
-  // Attempt to mount the whole filesystem
+  // 尝试挂载整个文件系统
   preopens: {
     '/': '/',
   },
@@ -318,16 +279,14 @@ added: v20.0.0
 
 > Stability: 1.1 - Active development
 
-When using the [Permission Model][], the process will not be able to create any
-worker threads by default.
-For security reasons, the call will throw an `ERR_ACCESS_DENIED` unless the
-user explicitly pass the flag `--allow-worker` in the main Node.js process.
+使用 [权限模型][Permission Model] 时，进程默认将无法创建任何工作线程。
+出于安全原因，除非用户在主 Node.js 进程中显式传递 `--allow-worker` 标志，否则调用将抛出 `ERR_ACCESS_DENIED`。
 
-Example:
+示例：
 
 ```js
 const { Worker } = require('node:worker_threads');
-// Attempt to bypass the permission
+// 尝试绕过权限
 new Worker(__filename);
 ```
 
@@ -349,31 +308,24 @@ added: v18.8.0
 
 > Stability: 1 - Experimental
 
-Generates a snapshot blob when the process exits and writes it to
-disk, which can be loaded later with `--snapshot-blob`.
+在进程退出时生成快照 blob 并将其写入磁盘，稍后可以使用 `--snapshot-blob` 加载。
 
-When building the snapshot, if `--snapshot-blob` is not specified,
-the generated blob will be written, by default, to `snapshot.blob`
-in the current working directory. Otherwise it will be written to
-the path specified by `--snapshot-blob`.
+构建快照时，如果未指定 `--snapshot-blob`，则默认情况下生成的 blob 将写入当前工作目录中的 `snapshot.blob`。否则，它将写入 `--snapshot-blob` 指定的路径。
 
 ```console
 $ echo "globalThis.foo = 'I am from the snapshot'" > snapshot.js
 
-# Run snapshot.js to initialize the application and snapshot the
-# state of it into snapshot.blob.
+# 运行 snapshot.js 来初始化应用程序并将其状态快照到 snapshot.blob。
 $ node --snapshot-blob snapshot.blob --build-snapshot snapshot.js
 
 $ echo "console.log(globalThis.foo)" > index.js
 
-# Load the generated snapshot and start the application from index.js.
+# 加载生成的快照并从 index.js 启动应用程序。
 $ node --snapshot-blob snapshot.blob index.js
 I am from the snapshot
 ```
 
-The [`v8.startupSnapshot` API][] can be used to specify an entry point at
-snapshot building time, thus avoiding the need of an additional entry
-script at deserialization time:
+[`v8.startupSnapshot` API][] 可用于在快照构建时指定入口点，从而避免在反序列化时需要额外的入口脚本：
 
 ```console
 $ echo "require('v8').startupSnapshot.setDeserializeMainFunction(() => console.log('I am from the snapshot'))" > snapshot.js
@@ -382,20 +334,12 @@ $ node --snapshot-blob snapshot.blob
 I am from the snapshot
 ```
 
-For more information, check out the [`v8.startupSnapshot` API][] documentation.
+有关更多信息，请查看 [`v8.startupSnapshot` API][] 文档。
 
-Currently the support for run-time snapshot is experimental in that:
+目前对运行时快照的支持是实验性的，因为：
 
-1. User-land modules are not yet supported in the snapshot, so only
-   one single file can be snapshotted. Users can bundle their applications
-   into a single script with their bundler of choice before building
-   a snapshot, however.
-2. Only a subset of the built-in modules work in the snapshot, though the
-   Node.js core test suite checks that a few fairly complex applications
-   can be snapshotted. Support for more modules are being added. If any
-   crashes or buggy behaviors occur when building a snapshot, please file
-   a report in the [Node.js issue tracker][] and link to it in the
-   [tracking issue for user-land snapshots][].
+1. 快照中尚不支持用户态模块，因此只能快照一个单个文件。然而，用户可以在构建快照之前使用他们选择的打包工具将他们的应用程序打包成单个脚本。
+2. 只有一部分内置模块在快照中工作，尽管 Node.js 核心测试套件检查了一些相当复杂的应用程序可以被快照。正在添加对更多模块的支持。如果在构建快照时发生任何崩溃或错误行为，请在 [Node.js 问题跟踪器][Node.js issue tracker] 中提交报告，并在 [用户态快照的跟踪问题][tracking issue for user-land snapshots] 中链接到它。
 
 ### `--build-snapshot-config`
 
@@ -407,21 +351,14 @@ added:
 
 > Stability: 1 - Experimental
 
-Specifies the path to a JSON configuration file which configures snapshot
-creation behavior.
+指定一个 JSON 配置文件的路径，该文件配置快照创建行为。
 
-The following options are currently supported:
+目前支持以下选项：
 
-* `builder` {string} Required. Provides the name to the script that is executed
-  before building the snapshot, as if [`--build-snapshot`][] had been passed
-  with `builder` as the main script name.
-* `withoutCodeCache` {boolean} Optional. Including the code cache reduces the
-  time spent on compiling functions included in the snapshot at the expense
-  of a bigger snapshot size and potentially breaking portability of the
-  snapshot.
+* `builder` {string} 必需。提供在构建快照之前执行的脚本的名称，就像已使用 `builder` 作为主脚本名称传递了 [`--build-snapshot`][] 一样。
+* `withoutCodeCache` {boolean} 可选。包含代码缓存会减少在快照中包含的函数在编译上花费的时间，但代价是更大的快照大小并可能破坏快照的可移植性。
 
-When using this flag, additional script files provided on the command line will
-not be executed and instead be interpreted as regular command line arguments.
+使用此标志时，在命令行上提供的其他脚本文件将不会被执行，而是被解释为常规命令行参数。
 
 ### `-c`, `--check`
 
@@ -435,7 +372,7 @@ changes:
     description: The `--require` option is now supported when checking a file.
 -->
 
-Syntax check the script without executing.
+语法检查脚本而不执行。
 
 ### `--completion-bash`
 
@@ -443,7 +380,7 @@ Syntax check the script without executing.
 added: v10.12.0
 -->
 
-Print source-able bash completion script for Node.js.
+打印可源的 bash 补全脚本。
 
 ```bash
 node --completion-bash > node_bash_completion
@@ -464,14 +401,13 @@ changes:
     description: The flag is no longer experimental.
 -->
 
-Provide custom [conditional exports][] resolution conditions.
+提供自定义的 [条件导出][conditional exports] 解析条件。
 
-Any number of custom string condition names are permitted.
+允许任意数量的自定义字符串条件名称。
 
-The default Node.js conditions of `"node"`, `"default"`, `"import"`, and
-`"require"` will always apply as defined.
+Node.js 的默认条件 `"node"`、`"default"`、`"import"` 和 `"require"` 将始终按定义应用。
 
-For example, to run a module with "development" resolutions:
+例如，使用 "development" 解析运行模块：
 
 ```bash
 node -C development app.js
@@ -489,14 +425,11 @@ changes:
     description: The `--cpu-prof` flags are now stable.
 -->
 
-Starts the V8 CPU profiler on start up, and writes the CPU profile to disk
-before exit.
+在启动时启动 V8 CPU 分析器，并在退出前将 CPU 分析文件写入磁盘。
 
-If `--cpu-prof-dir` is not specified, the generated profile is placed
-in the current working directory.
+如果未指定 `--cpu-prof-dir`，则生成的分析文件将放在当前工作目录中。
 
-If `--cpu-prof-name` is not specified, the generated profile is
-named `CPU.${yyyymmdd}.${hhmmss}.${pid}.${tid}.${seq}.cpuprofile`.
+如果未指定 `--cpu-prof-name`，则生成的分析文件命名为 `CPU.${yyyymmdd}.${hhmmss}.${pid}.${tid}.${seq}.cpuprofile`。
 
 ```console
 $ node --cpu-prof index.js
@@ -504,11 +437,9 @@ $ ls *.cpuprofile
 CPU.20190409.202950.15293.0.0.cpuprofile
 ```
 
-If `--cpu-prof-name` is specified, the provided value is used as a template
-for the file name. The following placeholder is supported and will be
-substituted at runtime:
+如果指定了 `--cpu-prof-name`，则提供的值将用作文件名的模板。支持以下占位符，并在运行时被替换：
 
-* `${pid}` — the current process ID
+* `${pid}` — 当前进程 ID
 
 ```console
 $ node --cpu-prof --cpu-prof-name 'CPU.${pid}.cpuprofile' index.js
@@ -528,11 +459,9 @@ changes:
     description: The `--cpu-prof` flags are now stable.
 -->
 
-Specify the directory where the CPU profiles generated by `--cpu-prof` will
-be placed.
+指定由 `--cpu-prof` 生成的 CPU 分析文件将被放置的目录。
 
-The default value is controlled by the
-[`--diagnostic-dir`][] command-line option.
+默认值由 [`--diagnostic-dir`][] 命令行选项控制。
 
 ### `--cpu-prof-interval`
 
@@ -546,8 +475,7 @@ changes:
     description: The `--cpu-prof` flags are now stable.
 -->
 
-Specify the sampling interval in microseconds for the CPU profiles generated
-by `--cpu-prof`. The default is 1000 microseconds.
+指定由 `--cpu-prof` 生成的 CPU 分析文件的采样间隔（以微秒为单位）。默认为 1000 微秒。
 
 ### `--cpu-prof-name`
 
@@ -561,14 +489,13 @@ changes:
     description: The `--cpu-prof` flags are now stable.
 -->
 
-Specify the file name of the CPU profile generated by `--cpu-prof`.
+指定由 `--cpu-prof` 生成的 CPU 分析文件的文件名。
 
 ### `--diagnostic-dir=directory`
 
-Set the directory to which all diagnostic output files are written.
-Defaults to current working directory.
+设置所有诊断输出文件写入的目录。默认为当前工作目录。
 
-Affects the default output directory of:
+影响以下内容的默认输出目录：
 
 * [`--cpu-prof-dir`][]
 * [`--heap-prof-dir`][]
@@ -582,9 +509,7 @@ added:
  - v12.17.0
 -->
 
-Disable the `Object.prototype.__proto__` property. If `mode` is `delete`, the
-property is removed entirely. If `mode` is `throw`, accesses to the
-property throw an exception with the code `ERR_PROTO_ACCESS`.
+禁用 `Object.prototype.__proto__` 属性。如果 `mode` 是 `delete`，则该属性将被完全移除。如果 `mode` 是 `throw`，则访问该属性将抛出带有代码 `ERR_PROTO_ACCESS` 的异常。
 
 ### `--disable-sigusr1`
 
@@ -598,8 +523,7 @@ changes:
     description: The option is no longer experimental.
 -->
 
-Disable the ability of starting a debugging session by sending a
-`SIGUSR1` signal to the process.
+禁用通过向进程发送 `SIGUSR1` 信号来启动调试会话的能力。
 
 ### `--disable-warning=code-or-type`
 
@@ -611,20 +535,15 @@ added:
 
 > Stability: 1.1 - Active development
 
-Disable specific process warnings by `code` or `type`.
+通过 `code` 或 `type` 禁用特定的进程警告。
 
-Warnings emitted from [`process.emitWarning()`][emit_warning] may contain a
-`code` and a `type`. This option will not-emit warnings that have a matching
-`code` or `type`.
+从 [`process.emitWarning()`][emit_warning] 发出的警告可能包含 `code` 和 `type`。此选项将不发出具有匹配 `code` 或 `type` 的警告。
 
-List of [deprecation warnings][].
+[弃用警告列表][deprecation warnings]。
 
-The Node.js core warning types are: `DeprecationWarning` and
-`ExperimentalWarning`
+Node.js 核心警告类型有：`DeprecationWarning` 和 `ExperimentalWarning`
 
-For example, the following script will not emit
-[DEP0025 `require('node:sys')`][DEP0025 warning] when executed with
-`node --disable-warning=DEP0025`:
+例如，当使用 `node --disable-warning=DEP0025` 执行时，以下脚本将不会发出 [DEP0025 `require('node:sys')`][DEP0025 warning]：
 
 ```mjs
 import sys from 'node:sys';
@@ -634,11 +553,7 @@ import sys from 'node:sys';
 const sys = require('node:sys');
 ```
 
-For example, the following script will emit the
-[DEP0025 `require('node:sys')`][DEP0025 warning], but not any Experimental
-Warnings (such as
-[ExperimentalWarning: `vm.measureMemory` is an experimental feature][]
-in <=v21) when executed with `node --disable-warning=ExperimentalWarning`:
+例如，当使用 `node --disable-warning=ExperimentalWarning` 执行时，以下脚本将发出 [DEP0025 `require('node:sys')`][DEP0025 warning]，但不会发出任何实验性警告（例如在 <=v21 中的 [ExperimentalWarning: `vm.measureMemory` is an experimental feature][]）：
 
 ```mjs
 import sys from 'node:sys';
@@ -662,15 +577,7 @@ added:
 - v20.15.0
 -->
 
-By default, Node.js enables trap-handler-based WebAssembly bound
-checks. As a result, V8 does not need to insert inline bound checks
-int the code compiled from WebAssembly which may speedup WebAssembly
-execution significantly, but this optimization requires allocating
-a big virtual memory cage (currently 10GB). If the Node.js process
-does not have access to a large enough virtual memory address space
-due to system configurations or hardware limitations, users won't
-be able to run any WebAssembly that involves allocation in this
-virtual memory cage and will see an out-of-memory error.
+默认情况下，Node.js 启用基于陷阱处理程序的 WebAssembly 边界检查。因此，V8 不需要在从 WebAssembly 编译的代码中插入内联边界检查，这可能会显著加速 WebAssembly 执行，但这种优化需要分配一个大的虚拟内存笼（目前是 10GB）。如果由于系统配置或硬件限制，Node.js 进程无法访问足够大的虚拟内存地址空间，用户将无法运行任何涉及在此虚拟内存笼中分配的 WebAssembly，并将看到内存不足错误。
 
 ```console
 $ ulimit -v 5000000
@@ -690,10 +597,7 @@ RangeError: WebAssembly.Memory(): could not allocate memory
 
 ```
 
-`--disable-wasm-trap-handler` disables this optimization so that
-users can at least run WebAssembly (with less optimal performance)
-when the virtual memory address space available to their Node.js
-process is lower than what the V8 WebAssembly memory cage needs.
+`--disable-wasm-trap-handler` 禁用此优化，以便当 Node.js 进程可用的虚拟内存地址空间低于 V8 WebAssembly 内存笼所需时，用户至少可以运行 WebAssembly（性能较差）。
 
 ### `--disallow-code-generation-from-strings`
 
@@ -701,9 +605,7 @@ process is lower than what the V8 WebAssembly memory cage needs.
 added: v9.8.0
 -->
 
-Make built-in language features like `eval` and `new Function` that generate
-code from strings throw an exception instead. This does not affect the Node.js
-`node:vm` module.
+使从字符串生成代码的内置语言特性（如 `eval` 和 `new Function`）抛出异常。这不影响 Node.js `node:vm` 模块。
 
 ### `--dns-result-order=order`
 
@@ -722,15 +624,13 @@ changes:
     description: Changed default value to `verbatim`.
 -->
 
-Set the default value of `order` in [`dns.lookup()`][] and
-[`dnsPromises.lookup()`][]. The value could be:
+设置 [`dns.lookup()`][] 和 [`dnsPromises.lookup()`][] 中 `order` 的默认值。值可以是：
 
-* `ipv4first`: sets default `order` to `ipv4first`.
-* `ipv6first`: sets default `order` to `ipv6first`.
-* `verbatim`: sets default `order` to `verbatim`.
+* `ipv4first`：将默认 `order` 设置为 `ipv4first`。
+* `ipv6first`：将默认 `order` 设置为 `ipv6first`。
+* `verbatim`：将默认 `order` 设置为 `verbatim`。
 
-The default is `verbatim` and [`dns.setDefaultResultOrder()`][] have higher
-priority than `--dns-result-order`.
+默认为 `verbatim`，并且 [`dns.setDefaultResultOrder()`][] 的优先级高于 `--dns-result-order`。
 
 ### `--enable-fips`
 
@@ -738,8 +638,7 @@ priority than `--dns-result-order`.
 added: v6.0.0
 -->
 
-Enable FIPS-compliant crypto at startup. (Requires Node.js to be built
-against FIPS-compatible OpenSSL.)
+在启动时启用符合 FIPS 的加密。（要求 Node.js 针对 FIPS 兼容的 OpenSSL 构建。）
 
 ### `--enable-network-family-autoselection`
 
@@ -747,8 +646,7 @@ against FIPS-compatible OpenSSL.)
 added: v18.18.0
 -->
 
-Enables the family autoselection algorithm unless connection options explicitly
-disables it.
+启用族自动选择算法，除非连接选项显式禁用它。
 
 ### `--enable-source-maps`
 
@@ -762,31 +660,21 @@ changes:
     description: This API is no longer experimental.
 -->
 
-Enable [Source Map][] support for stack traces.
+为堆栈跟踪启用 [Source Map][] 支持。
 
-When using a transpiler, such as TypeScript, stack traces thrown by an
-application reference the transpiled code, not the original source position.
-`--enable-source-maps` enables caching of Source Maps and makes a best
-effort to report stack traces relative to the original source file.
+当使用转译器（如 TypeScript）时，应用程序抛出的堆栈跟踪引用的是转译后的代码，而不是原始源代码位置。`--enable-source-maps` 启用 Source Maps 的缓存，并尽力报告相对于原始源文件的堆栈跟踪。
 
-Overriding `Error.prepareStackTrace` may prevent `--enable-source-maps` from
-modifying the stack trace. Call and return the results of the original
-`Error.prepareStackTrace` in the overriding function to modify the stack trace
-with source maps.
+覆盖 `Error.prepareStackTrace` 可能会阻止 `--enable-source-maps` 修改堆栈跟踪。在覆盖函数中调用并返回原始 `Error.prepareStackTrace` 的结果，以使用 source maps 修改堆栈跟踪。
 
 ```js
 const originalPrepareStackTrace = Error.prepareStackTrace;
 Error.prepareStackTrace = (error, trace) => {
-  // Modify error and trace and format stack trace with
-  // original Error.prepareStackTrace.
+  // 修改 error 和 trace 并使用原始的 Error.prepareStackTrace 格式化堆栈跟踪。
   return originalPrepareStackTrace(error, trace);
 };
 ```
 
-Note, enabling source maps can introduce latency to your application
-when `Error.stack` is accessed. If you access `Error.stack` frequently
-in your application, take into account the performance implications
-of `--enable-source-maps`.
+注意，启用 source maps 可能会在访问 `Error.stack` 时给应用程序带来延迟。如果在应用程序中频繁访问 `Error.stack`，请考虑 `--enable-source-maps` 的性能影响。
 
 ### `--entry-url`
 
@@ -798,12 +686,11 @@ added:
 
 > Stability: 1 - Experimental
 
-When present, Node.js will interpret the entry point as a URL, rather than a
-path.
+当存在时，Node.js 会将入口点解释为 URL，而不是路径。
 
-Follows [ECMAScript module][] resolution rules.
+遵循 [ECMAScript 模块][ECMAScript module] 解析规则。
 
-Any query parameter or hash in the URL will be accessible via [`import.meta.url`][].
+URL 中的任何查询参数或哈希将通过 [`import.meta.url`][] 访问。
 
 ```bash
 node --entry-url 'file:///path/to/file.js?queryparams=work#and-hashes-too'
@@ -821,8 +708,7 @@ changes:
     description: The `--env-file-if-exists` flag is no longer experimental.
 -->
 
-Behavior is the same as [`--env-file`][], but an error is not thrown if the file
-does not exist.
+行为与 [`--env-file`][] 相同，但如果文件不存在则不会抛出错误。
 
 ### `--env-file=file`
 
@@ -839,58 +725,50 @@ changes:
     description: Add support to multi-line values.
 -->
 
-Loads environment variables from a file relative to the current directory,
-making them available to applications on `process.env`. The [environment
-variables which configure Node.js][environment_variables], such as `NODE_OPTIONS`,
-are parsed and applied. If the same variable is defined in the environment and
-in the file, the value from the environment takes precedence.
+从相对于当前目录的文件加载环境变量，使其在 `process.env` 上对应用程序可用。配置 Node.js 的 [环境变量][environment_variables]，例如 `NODE_OPTIONS`，会被解析并应用。如果同一个变量在环境和文件中都有定义，则环境中的值优先。
 
-You can pass multiple `--env-file` arguments. Subsequent files override
-pre-existing variables defined in previous files.
+您可以传递多个 `--env-file` 参数。后续文件会覆盖先前文件中定义的变量。
 
-An error is thrown if the file does not exist.
+如果文件不存在，则会抛出错误。
 
 ```bash
 node --env-file=.env --env-file=.development.env index.js
 ```
 
-The format of the file should be one line per key-value pair of environment
-variable name and value separated by `=`:
+文件的格式应为每行一个环境变量名称和值的键值对，用 `=` 分隔：
 
 ```text
 PORT=3000
 ```
 
-Any text after a `#` is treated as a comment:
+`#` 之后的任何文本都被视为注释：
 
 ```text
-# This is a comment
-PORT=3000 # This is also a comment
+# 这是一个注释
+PORT=3000 # 这也是一个注释
 ```
 
-Values can start and end with the following quotes: `` ` ``, `"` or `'`.
-They are omitted from the values.
+值可以用以下引号开头和结尾：`` ` ``、`"` 或 `'`。它们会从值中省略。
 
 ```text
-USERNAME="nodejs" # will result in `nodejs` as the value.
+USERNAME="nodejs" # 将得到 `nodejs` 作为值。
 ```
 
-Multi-line values are supported:
+支持多行值：
 
 ```text
 MULTI_LINE="THIS IS
 A MULTILINE"
-# will result in `THIS IS\nA MULTILINE` as the value.
+# 将得到 `THIS IS\nA MULTILINE` 作为值。
 ```
 
-Export keyword before a key is ignored:
+键前的 export 关键字被忽略：
 
 ```text
-export USERNAME="nodejs" # will result in `nodejs` as the value.
+export USERNAME="nodejs" # 将得到 `nodejs` 作为值。
 ```
 
-If you want to load environment variables from a file that may not exist, you
-can use the [`--env-file-if-exists`][] flag instead.
+如果您想从可能不存在的文件加载环境变量，可以使用 [`--env-file-if-exists`][] 标志代替。
 
 ### `-e`, `--eval "script"`
 
@@ -905,15 +783,11 @@ changes:
     description: Built-in libraries are now available as predefined variables.
 -->
 
-Evaluate the following argument as JavaScript. The modules which are
-predefined in the REPL can also be used in `script`.
+将后续参数作为 JavaScript 求值。REPL 中预定义的模块也可以在 `script` 中使用。
 
-On Windows, using `cmd.exe` a single quote will not work correctly because it
-only recognizes double `"` for quoting. In Powershell or Git bash, both `'`
-and `"` are usable.
+在 Windows 上，使用 `cmd.exe` 时单引号无法正常工作，因为它只识别双引号 `"` 用于引用。在 Powershell 或 Git bash 中，`'` 和 `"` 都可使用。
 
-It is possible to run code containing inline types unless the
-[`--no-experimental-strip-types`][] flag is provided.
+可以运行包含内联类型的代码，除非提供了 [`--no-experimental-strip-types`][] 标志。
 
 ### `--experimental-addon-modules`
 
@@ -923,7 +797,7 @@ added: v23.6.0
 
 > Stability: 1.0 - Early development
 
-Enable experimental import support for `.node` addons.
+启用对 `.node` 插件的实验性导入支持。
 
 ### `--experimental-config-file=config`
 
@@ -933,10 +807,7 @@ added: v23.10.0
 
 > Stability: 1.0 - Early development
 
-If present, Node.js will look for a configuration file at the specified path.
-Node.js will read the configuration file and apply the settings. The
-configuration file should be a JSON file with the following structure. `vX.Y.Z`
-in the `$schema` must be replaced with the version of Node.js you are using.
+如果存在，Node.js 将在指定路径查找配置文件。Node.js 将读取配置文件并应用设置。配置文件应是一个具有以下结构的 JSON 文件。`$schema` 中的 `vX.Y.Z` 必须替换为您使用的 Node.js 版本。
 
 ```json
 {
@@ -954,45 +825,36 @@ in the `$schema` must be replaced with the version of Node.js you are using.
 }
 ```
 
-The configuration file supports namespace-specific options:
+配置文件支持特定命名空间的选项：
 
-* The `nodeOptions` field contains CLI flags that are allowed in [`NODE_OPTIONS`][].
+* `nodeOptions` 字段包含在 [`NODE_OPTIONS`][] 中允许的 CLI 标志。
 
-* Namespace fields like `testRunner` contain configuration specific to that subsystem.
+* 像 `testRunner` 这样的命名空间字段包含特定于该子系统的配置。
 
-No-op flags are not supported.
-Not all V8 flags are currently supported.
+不支持无操作标志。
+目前并非所有 V8 标志都受支持。
 
-It is possible to use the [official JSON schema](../node-config-schema.json)
-to validate the configuration file, which may vary depending on the Node.js version.
-Each key in the configuration file corresponds to a flag that can be passed
-as a command-line argument. The value of the key is the value that would be
-passed to the flag.
+可以使用 [官方 JSON 模式](../node-config-schema.json) 来验证配置文件，这可能因 Node.js 版本而异。配置文件中的每个键对应于可以作为命令行参数传递的标志。键的值是传递给标志的值。
 
-For example, the configuration file above is equivalent to
-the following command-line arguments:
+例如，上面的配置文件等效于以下命令行参数：
 
 ```bash
 node --import amaro/strip --watch-path=src --watch-preserve-output --test-isolation=process
 ```
 
-The priority in configuration is as follows:
+配置的优先级如下：
 
-1. NODE\_OPTIONS and command-line options
-2. Configuration file
-3. Dotenv NODE\_OPTIONS
+1. NODE_OPTIONS 和命令行选项
+2. 配置文件
+3. Dotenv NODE_OPTIONS
 
-Values in the configuration file will not override the values in the environment
-variables and command-line options, but will override the values in the `NODE_OPTIONS`
-env file parsed by the `--env-file` flag.
+配置文件中的值不会覆盖环境变量和命令行选项中的值，但会覆盖由 `--env-file` 标志解析的 `NODE_OPTIONS` 环境文件中的值。
 
-Keys cannot be duplicated within the same or different namespaces.
+在同一或不同命名空间中不能重复键。
 
-The configuration parser will throw an error if the configuration file contains
-unknown keys or keys that cannot be used in a namespace.
+如果配置文件包含未知键或不能在命名空间中使用的键，配置解析器将抛出错误。
 
-Node.js will not sanitize or perform validation on the user-provided configuration,
-so **NEVER** use untrusted configuration files.
+Node.js 不会对用户提供的配置进行清理或验证，因此 **绝不** 使用不受信任的配置文件。
 
 ### `--experimental-default-config-file`
 
@@ -1002,9 +864,7 @@ added: v23.10.0
 
 > Stability: 1.0 - Early development
 
-If the `--experimental-default-config-file` flag is present, Node.js will look for a
-`node.config.json` file in the current working directory and load it as a
-as configuration file.
+如果存在 `--experimental-default-config-file` 标志，Node.js 将在当前工作目录中查找 `node.config.json` 文件并将其作为配置文件加载。
 
 ### `--experimental-eventsource`
 
@@ -1014,7 +874,7 @@ added:
   - v20.18.0
 -->
 
-Enable exposition of [EventSource Web API][] on the global scope.
+在全局作用域上启用 [EventSource Web API][] 的暴露。
 
 ### `--experimental-import-meta-resolve`
 
@@ -1032,10 +892,9 @@ changes:
                  as previously supported.
 -->
 
-Enable experimental `import.meta.resolve()` parent URL support, which allows
-passing a second `parentURL` argument for contextual resolution.
+启用实验性的 `import.meta.resolve()` 父 URL 支持，允许传递第二个 `parentURL` 参数用于上下文解析。
 
-Previously gated the entire `import.meta.resolve` feature.
+以前控制整个 `import.meta.resolve` 功能。
 
 ### `--experimental-inspector-network-resource`
 
@@ -1046,7 +905,7 @@ added:
 
 > Stability: 1.1 - Active Development
 
-Enable experimental support for inspector network resources.
+启用对检查器网络资源的实验性支持。
 
 ### `--experimental-loader=module`
 
@@ -1066,14 +925,12 @@ changes:
                  `--experimental-loader`.
 -->
 
-> This flag is discouraged and may be removed in a future version of Node.js.
-> Please use
-> [`--import` with `register()`][module customization hooks: enabling] instead.
+> 不鼓励使用此标志，并可能在未来的 Node.js 版本中移除。请改用
+> [带有 `register()` 的 `--import`][module customization hooks: enabling]。
 
-Specify the `module` containing exported [module customization hooks][].
-`module` may be any string accepted as an [`import` specifier][].
+指定包含导出的 [模块自定义钩子][module customization hooks] 的 `module`。`module` 可以是任何被接受为 [`import` 说明符][`import` specifier] 的字符串。
 
-This feature requires `--allow-worker` if used with the [Permission Model][].
+如果与 [权限模型][Permission Model] 一起使用，此功能需要传递 `--allow-worker`。
 
 ### `--experimental-network-inspection`
 
@@ -1085,7 +942,7 @@ added:
 
 > Stability: 1 - Experimental
 
-Enable experimental support for the network inspection with Chrome DevTools.
+启用与 Chrome DevTools 进行网络检查的实验性支持。
 
 ### `--experimental-print-required-tla`
 
@@ -1095,9 +952,7 @@ added:
   - v20.17.0
 -->
 
-If the ES module being `require()`'d contains top-level `await`, this flag
-allows Node.js to evaluate the module, try to locate the
-top-level awaits, and print their location to help users find them.
+如果被 `require()` 的 ES 模块包含顶层 `await`，此标志允许 Node.js 评估该模块，尝试定位顶层 await，并打印它们的位置以帮助用户找到它们。
 
 ### `--experimental-require-module`
 
@@ -1116,9 +971,9 @@ changes:
 
 > Stability: 1.1 - Active Development
 
-Supports loading a synchronous ES module graph in `require()`.
+支持在 `require()` 中加载同步的 ES 模块图。
 
-See [Loading ECMAScript modules using `require()`][].
+参见 [使用 `require()` 加载 ECMAScript 模块][Loading ECMAScript modules using `require()`]。
 
 ### `--experimental-sea-config`
 
@@ -1128,9 +983,7 @@ added: v20.0.0
 
 > Stability: 1 - Experimental
 
-Use this flag to generate a blob that can be injected into the Node.js
-binary to produce a [single executable application][]. See the documentation
-about [this configuration][`--experimental-sea-config`] for details.
+使用此标志生成可以注入到 Node.js 二进制文件中的 blob，以生成 [单一可执行应用程序][]。有关详细信息，请参阅关于 [此配置][`--experimental-sea-config`] 的文档。
 
 ### `--experimental-shadow-realm`
 
@@ -1140,7 +993,7 @@ added:
   - v18.13.0
 -->
 
-Use this flag to enable [ShadowRealm][] support.
+使用此标志启用 [ShadowRealm][] 支持。
 
 ### `--experimental-test-coverage`
 
@@ -1156,10 +1009,7 @@ changes:
     description: This option can be used with `--test`.
 -->
 
-When used in conjunction with the `node:test` module, a code coverage report is
-generated as part of the test runner output. If no tests are run, a coverage
-report is not generated. See the documentation on
-[collecting code coverage from tests][] for more details.
+与 `node:test` 模块一起使用时，会生成代码覆盖率报告作为测试运行器输出的一部分。如果没有运行测试，则不会生成覆盖率报告。有关更多详细信息，请参阅关于 [从测试收集代码覆盖率][collecting code coverage from tests] 的文档。
 
 ### `--experimental-test-module-mocks`
 
@@ -1179,9 +1029,9 @@ changes:
 
 > Stability: 1.0 - Early development
 
-Enable module mocking in the test runner.
+在测试运行器中启用模块模拟。
 
-This feature requires `--allow-worker` if used with the [Permission Model][].
+如果与 [权限模型][Permission Model] 一起使用，此功能需要传递 `--allow-worker`。
 
 ### `--experimental-transform-types`
 
@@ -1191,8 +1041,7 @@ added: v22.7.0
 
 > Stability: 1.2 - Release candidate
 
-Enables the transformation of TypeScript-only syntax into JavaScript code.
-Implies `--enable-source-maps`.
+启用将仅限 TypeScript 的语法转换为 JavaScript 代码。隐含 `--enable-source-maps`。
 
 ### `--experimental-vm-modules`
 
@@ -1200,7 +1049,7 @@ Implies `--enable-source-maps`.
 added: v9.6.0
 -->
 
-Enable experimental ES Module support in the `node:vm` module.
+在 `node:vm` 模块中启用实验性的 ES 模块支持。
 
 ### `--experimental-wasi-unstable-preview1`
 
@@ -1221,7 +1070,7 @@ changes:
                  `--experimental-wasi-unstable-preview1`.
 -->
 
-Enable experimental WebAssembly System Interface (WASI) support.
+启用实验性的 WebAssembly 系统接口 (WASI) 支持。
 
 ### `--experimental-webstorage`
 
@@ -1229,7 +1078,7 @@ Enable experimental WebAssembly System Interface (WASI) support.
 added: v22.4.0
 -->
 
-Enable experimental [`Web Storage`][] support.
+启用实验性的 [`Web Storage`][] 支持。
 
 ### `--experimental-worker-inspection`
 
@@ -1240,7 +1089,7 @@ added:
 
 > Stability: 1.1 - Active Development
 
-Enable experimental support for the worker inspection with Chrome DevTools.
+启用与 Chrome DevTools 进行工作线程检查的实验性支持。
 
 ### `--expose-gc`
 
@@ -1253,7 +1102,7 @@ added:
 > Stability: 1 - Experimental. This flag is inherited from V8 and is subject to
 > change upstream.
 
-This flag will expose the gc extension from V8.
+此标志将暴露 V8 的 gc 扩展。
 
 ```js
 if (globalThis.gc) {
@@ -1267,7 +1116,7 @@ if (globalThis.gc) {
 added: v12.12.0
 -->
 
-Disable loading native addons that are not [context-aware][].
+禁止加载非 [上下文感知][context-aware] 的原生插件。
 
 ### `--force-fips`
 
@@ -1275,8 +1124,7 @@ Disable loading native addons that are not [context-aware][].
 added: v6.0.0
 -->
 
-Force FIPS-compliant crypto on startup. (Cannot be disabled from script code.)
-(Same requirements as `--enable-fips`.)
+在启动时强制启用符合 FIPS 的加密。（无法从脚本代码中禁用。）（与 `--enable-fips` 的要求相同。）
 
 ### `--force-node-api-uncaught-exceptions-policy`
 
@@ -1286,11 +1134,9 @@ added:
   - v16.17.0
 -->
 
-Enforces `uncaughtException` event on Node-API asynchronous callbacks.
+在 Node-API 异步回调上强制执行 `uncaughtException` 事件。
 
-To prevent from an existing add-on from crashing the process, this flag is not
-enabled by default. In the future, this flag will be enabled by default to
-enforce the correct behavior.
+为了防止现有的插件崩溃进程，此标志默认未启用。将来，此标志将默认启用以强制执行正确的行为。
 
 ### `--frozen-intrinsics`
 
@@ -1300,14 +1146,11 @@ added: v11.12.0
 
 > Stability: 1 - Experimental
 
-Enable experimental frozen intrinsics like `Array` and `Object`.
+启用实验性的冻结内置对象，如 `Array` 和 `Object`。
 
-Only the root context is supported. There is no guarantee that
-`globalThis.Array` is indeed the default intrinsic reference. Code may break
-under this flag.
+仅支持根上下文。不保证 `globalThis.Array` 确实是默认的内置对象引用。在此标志下代码可能会中断。
 
-To allow polyfills to be added,
-[`--require`][] and [`--import`][] both run before freezing intrinsics.
+为了允许添加 polyfill，[`--require`][] 和 [`--import`][] 都在冻结内置对象之前运行。
 
 ### `--heap-prof`
 
@@ -1321,14 +1164,11 @@ changes:
     description: The `--heap-prof` flags are now stable.
 -->
 
-Starts the V8 heap profiler on start up, and writes the heap profile to disk
-before exit.
+在启动时启动 V8 堆分析器，并在退出前将堆分析文件写入磁盘。
 
-If `--heap-prof-dir` is not specified, the generated profile is placed
-in the current working directory.
+如果未指定 `--heap-prof-dir`，则生成的分析文件将放在当前工作目录中。
 
-If `--heap-prof-name` is not specified, the generated profile is
-named `Heap.${yyyymmdd}.${hhmmss}.${pid}.${tid}.${seq}.heapprofile`.
+如果未指定 `--heap-prof-name`，则生成的分析文件命名为 `Heap.${yyyymmdd}.${hhmmss}.${pid}.${tid}.${seq}.heapprofile`。
 
 ```console
 $ node --heap-prof index.js
@@ -1348,11 +1188,9 @@ changes:
     description: The `--heap-prof` flags are now stable.
 -->
 
-Specify the directory where the heap profiles generated by `--heap-prof` will
-be placed.
+指定由 `--heap-prof` 生成的堆分析文件将被放置的目录。
 
-The default value is controlled by the
-[`--diagnostic-dir`][] command-line option.
+默认值由 [`--diagnostic-dir`][] 命令行选项控制。
 
 ### `--heap-prof-interval`
 
@@ -1366,8 +1204,7 @@ changes:
     description: The `--heap-prof` flags are now stable.
 -->
 
-Specify the average sampling interval in bytes for the heap profiles generated
-by `--heap-prof`. The default is 512 \* 1024 bytes.
+指定由 `--heap-prof` 生成的堆分析文件的平均采样间隔（以字节为单位）。默认为 512 \* 1024 字节。
 
 ### `--heap-prof-name`
 
@@ -1381,7 +1218,7 @@ changes:
     description: The `--heap-prof` flags are now stable.
 -->
 
-Specify the file name of the heap profile generated by `--heap-prof`.
+指定由 `--heap-prof` 生成的堆分析文件的文件名。
 
 ### `--heapsnapshot-near-heap-limit=max_count`
 
@@ -1393,26 +1230,11 @@ added:
 
 > Stability: 1 - Experimental
 
-Writes a V8 heap snapshot to disk when the V8 heap usage is approaching the
-heap limit. `count` should be a non-negative integer (in which case
-Node.js will write no more than `max_count` snapshots to disk).
+当 V8 堆使用量接近堆限制时，将 V8 堆快照写入磁盘。`count` 应该是一个非负整数（在这种情况下，Node.js 将向磁盘写入不超过 `max_count` 个快照）。
 
-When generating snapshots, garbage collection may be triggered and bring
-the heap usage down. Therefore multiple snapshots may be written to disk
-before the Node.js instance finally runs out of memory. These heap snapshots
-can be compared to determine what objects are being allocated during the
-time consecutive snapshots are taken. It's not guaranteed that Node.js will
-write exactly `max_count` snapshots to disk, but it will try
-its best to generate at least one and up to `max_count` snapshots before the
-Node.js instance runs out of memory when `max_count` is greater than `0`.
+生成快照时，可能会触发垃圾回收并降低堆使用量。因此，在 Node.js 实例最终耗尽内存之前，可能会将多个快照写入磁盘。这些堆快照可以进行比较，以确定在连续拍摄快照的时间段内分配了哪些对象。不保证 Node.js 会向磁盘写入恰好 `max_count` 个快照，但当 `max_count` 大于 `0` 时，它会尽力在 Node.js 实例耗尽内存之前生成至少一个且最多 `max_count` 个快照。
 
-Generating V8 snapshots takes time and memory (both memory managed by the
-V8 heap and native memory outside the V8 heap). The bigger the heap is,
-the more resources it needs. Node.js will adjust the V8 heap to accommodate
-the additional V8 heap memory overhead, and try its best to avoid using up
-all the memory available to the process. When the process uses
-more memory than the system deems appropriate, the process may be terminated
-abruptly by the system, depending on the system configuration.
+生成 V8 快照需要时间和内存（V8 堆管理的内存和 V8 堆外部的原生内存）。堆越大，需要的资源就越多。Node.js 将调整 V8 堆以适应额外的 V8 堆内存开销，并尽力避免使用进程可用的所有内存。当进程使用的内存超过系统认为合适的值时，根据系统配置，进程可能会被系统突然终止。
 
 ```console
 $ node --max-old-space-size=100 --heapsnapshot-near-heap-limit=3 index.js
@@ -1438,9 +1260,7 @@ FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaS
 added: v12.0.0
 -->
 
-Enables a signal handler that causes the Node.js process to write a heap dump
-when the specified signal is received. `signal` must be a valid signal name.
-Disabled by default.
+启用一个信号处理程序，当收到指定信号时，导致 Node.js 进程写入堆转储。`signal` 必须是一个有效的信号名称。默认禁用。
 
 ```console
 $ node --heapsnapshot-signal=SIGUSR2 index.js &
@@ -1458,8 +1278,7 @@ Heap.20190718.133405.15554.0.001.heapsnapshot
 added: v0.1.3
 -->
 
-Print node command-line options.
-The output of this option is less detailed than this document.
+打印节点命令行选项。此选项的输出比本文档更简略。
 
 ### `--icu-data-dir=file`
 
@@ -1467,7 +1286,7 @@ The output of this option is less detailed than this document.
 added: v0.11.15
 -->
 
-Specify ICU data load path. (Overrides `NODE_ICU_DATA`.)
+指定 ICU 数据加载路径。（覆盖 `NODE_ICU_DATA`。）
 
 ### `--import=module`
 
@@ -1479,16 +1298,13 @@ added:
 
 > Stability: 1 - Experimental
 
-Preload the specified module at startup. If the flag is provided several times,
-each module will be executed sequentially in the order they appear, starting
-with the ones provided in [`NODE_OPTIONS`][].
+在启动时预加载指定的模块。如果多次提供该标志，每个模块将按它们出现的顺序依次执行，从 [`NODE_OPTIONS`][] 中提供的模块开始。
 
-Follows [ECMAScript module][] resolution rules.
-Use [`--require`][] to load a [CommonJS module][].
-Modules preloaded with `--require` will run before modules preloaded with `--import`.
+遵循 [ECMAScript 模块][ECMAScript module] 解析规则。
+使用 [`--require`][] 加载 [CommonJS 模块][CommonJS module]。
+使用 `--require` 预加载的模块将在使用 `--import` 预加载的模块之前运行。
 
-Modules are preloaded into the main thread as well as any worker threads,
-forked processes, or clustered processes.
+模块被预加载到主线程以及任何工作线程、分叉进程或集群进程中。
 
 ### `--input-type=type`
 
@@ -1505,29 +1321,19 @@ changes:
     description: ESM syntax detection is enabled by default.
 -->
 
-This configures Node.js to interpret `--eval` or `STDIN` input as CommonJS or
-as an ES module. Valid values are `"commonjs"`, `"module"`, `"module-typescript"` and `"commonjs-typescript"`.
-The `"-typescript"` values are not available with the flag `--no-experimental-strip-types`.
-The default is no value, or `"commonjs"` if `--no-experimental-detect-module` is passed.
+这将配置 Node.js 将 `--eval` 或 `STDIN` 输入解释为 CommonJS 或作为 ES 模块。有效值为 `"commonjs"`、`"module"`、`"module-typescript"` 和 `"commonjs-typescript"`。`"-typescript"` 值在使用 `--no-experimental-strip-types` 标志时不可用。默认无值，或者如果传递了 `--no-experimental-detect-module` 则为 `"commonjs"`。
 
-If `--input-type` is not provided,
-Node.js will try to detect the syntax with the following steps:
+如果未提供 `--input-type`，Node.js 将尝试通过以下步骤检测语法：
 
-1. Run the input as CommonJS.
-2. If step 1 fails, run the input as an ES module.
-3. If step 2 fails with a SyntaxError, strip the types.
-4. If step 3 fails with an error code [`ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`][]
-   or [`ERR_INVALID_TYPESCRIPT_SYNTAX`][],
-   throw the error from step 2, including the TypeScript error in the message,
-   else run as CommonJS.
-5. If step 4 fails, run the input as an ES module.
+1. 将输入作为 CommonJS 运行。
+2. 如果步骤 1 失败，将输入作为 ES 模块运行。
+3. 如果步骤 2 因 SyntaxError 失败，则剥离类型。
+4. 如果步骤 3 因错误代码 [`ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`][] 或 [`ERR_INVALID_TYPESCRIPT_SYNTAX`][] 失败，则抛出步骤 2 的错误，包括 TypeScript 错误在消息中，否则作为 CommonJS 运行。
+5. 如果步骤 4 失败，将输入作为 ES 模块运行。
 
-To avoid the delay of multiple syntax detection passes, the `--input-type=type` flag can be used to specify
-how the `--eval` input should be interpreted.
+为了避免多次语法检测的延迟，可以使用 `--input-type=type` 标志来指定应如何解释 `--eval` 输入。
 
-The REPL does not support this option. Usage of `--input-type=module` with
-[`--print`][] will throw an error, as `--print` does not support ES module
-syntax.
+REPL 不支持此选项。将 `--input-type=module` 与 [`--print`][] 一起使用将抛出错误，因为 `--print` 不支持 ES 模块语法。
 
 ### `--insecure-http-parser`
 
@@ -1538,43 +1344,37 @@ added:
  - v10.19.0
 -->
 
-Enable leniency flags on the HTTP parser. This may allow
-interoperability with non-conformant HTTP implementations.
+在 HTTP 解析器上启用宽松标志。这可能允许与不符合规范的 HTTP 实现进行互操作。
 
-When enabled, the parser will accept the following:
+启用后，解析器将接受以下内容：
 
-* Invalid HTTP headers values.
-* Invalid HTTP versions.
-* Allow message containing both `Transfer-Encoding`
-  and `Content-Length` headers.
-* Allow extra data after message when `Connection: close` is present.
-* Allow extra transfer encodings after `chunked` has been provided.
-* Allow `\n` to be used as token separator instead of `\r\n`.
-* Allow `\r\n` not to be provided after a chunk.
-* Allow spaces to be present after a chunk size and before `\r\n`.
+* 无效的 HTTP 标头值。
+* 无效的 HTTP 版本。
+* 允许消息同时包含 `Transfer-Encoding` 和 `Content-Length` 标头。
+* 当存在 `Connection: close` 时，允许消息后有额外数据。
+* 在提供 `chunked` 后允许额外的传输编码。
+* 允许使用 `\n` 作为令牌分隔符而不是 `\r\n`。
+* 允许在块后不提供 `\r\n`。
+* 允许在块大小和 `\r\n` 之间存在空格。
 
-All the above will expose your application to request smuggling
-or poisoning attack. Avoid using this option.
+以上所有内容都会使您的应用程序面临请求走私或投毒攻击。避免使用此选项。
 
 <!-- Anchor to make sure old links find a target -->
 
 <a id="inspector_security"></a>
 
-#### Warning: binding inspector to a public IP:port combination is insecure
+#### 警告：将检查器绑定到公共 IP:端口组合是不安全的
 
-Binding the inspector to a public IP (including `0.0.0.0`) with an open port is
-insecure, as it allows external hosts to connect to the inspector and perform
-a [remote code execution][] attack.
+将检查器绑定到具有开放端口的公共 IP（包括 `0.0.0.0`）是不安全的，因为它允许外部主机连接到检查器并执行 [远程代码执行][remote code execution] 攻击。
 
-If specifying a host, make sure that either:
+如果指定了主机，请确保：
 
-* The host is not accessible from public networks.
-* A firewall disallows unwanted connections on the port.
+* 主机无法从公共网络访问。
+* 防火墙不允许在端口上进行不需要的连接。
 
-**More specifically, `--inspect=0.0.0.0` is insecure if the port (`9229` by
-default) is not firewall-protected.**
+**更具体地说，如果端口（默认为 `9229`）没有防火墙保护，`--inspect=0.0.0.0` 是不安全的。**
 
-See the [debugging security implications][] section for more information.
+有关更多信息，请参阅 [调试安全影响][debugging security implications] 部分。
 
 ### `--inspect-brk[=[host:]port]`
 
@@ -1582,11 +1382,9 @@ See the [debugging security implications][] section for more information.
 added: v7.6.0
 -->
 
-Activate inspector on `host:port` and break at start of user script.
-Default `host:port` is `127.0.0.1:9229`. If port `0` is specified,
-a random available port will be used.
+在 `host:port` 上激活检查器并在用户脚本开始时中断。默认 `host:port` 是 `127.0.0.1:9229`。如果指定了端口 `0`，将使用随机可用端口。
 
-See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
+有关 Node.js 调试器的进一步说明，请参阅 [Node.js 的 V8 检查器集成][V8 Inspector integration for Node.js]。
 
 ### `--inspect-port=[host:]port`
 
@@ -1594,22 +1392,17 @@ See [V8 Inspector integration for Node.js][] for further explanation on Node.js 
 added: v7.6.0
 -->
 
-Set the `host:port` to be used when the inspector is activated.
-Useful when activating the inspector by sending the `SIGUSR1` signal.
-Except when [`--disable-sigusr1`][] is passed.
+设置检查器激活时使用的 `host:port`。在通过发送 `SIGUSR1` 信号激活检查器时很有用。除非传递了 [`--disable-sigusr1`][]。
 
-Default host is `127.0.0.1`. If port `0` is specified,
-a random available port will be used.
+默认主机是 `127.0.0.1`。如果指定了端口 `0`，将使用随机可用端口。
 
-See the [security warning][] below regarding the `host`
-parameter usage.
+请参阅下面关于 `host` 参数使用的 [安全警告][security warning]。
 
 ### `--inspect-publish-uid=stderr,http`
 
-Specify ways of the inspector web socket url exposure.
+指定检查器 Web Socket URL 的暴露方式。
 
-By default inspector websocket url is available in stderr and under `/json/list`
-endpoint on `http://host:port/json/list`.
+默认情况下，检查器 websocket URL 在 stderr 中可用，并在 `http://host:port/json/list` 端点下可用。
 
 ### `--inspect-wait[=[host:]port]`
 
@@ -1619,11 +1412,9 @@ added:
   - v20.15.0
 -->
 
-Activate inspector on `host:port` and wait for debugger to be attached.
-Default `host:port` is `127.0.0.1:9229`. If port `0` is specified,
-a random available port will be used.
+在 `host:port` 上激活检查器并等待调试器附加。默认 `host:port` 是 `127.0.0.1:9229`。如果指定了端口 `0`，将使用随机可用端口。
 
-See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
+有关 Node.js 调试器的进一步说明，请参阅 [Node.js 的 V8 检查器集成][V8 Inspector integration for Node.js]。
 
 ### `--inspect[=[host:]port]`
 
@@ -1631,13 +1422,9 @@ See [V8 Inspector integration for Node.js][] for further explanation on Node.js 
 added: v6.3.0
 -->
 
-Activate inspector on `host:port`. Default is `127.0.0.1:9229`. If port `0` is
-specified, a random available port will be used.
+在 `host:port` 上激活检查器。默认为 `127.0.0.1:9229`。如果指定了端口 `0`，将使用随机可用端口。
 
-V8 inspector integration allows tools such as Chrome DevTools and IDEs to debug
-and profile Node.js instances. The tools attach to Node.js instances via a
-tcp port and communicate using the [Chrome DevTools Protocol][].
-See [V8 Inspector integration for Node.js][] for further explanation on Node.js debugger.
+V8 检查器集成允许工具（如 Chrome DevTools 和 IDE）调试和分析 Node.js 实例。这些工具通过 tcp 端口附加到 Node.js 实例，并使用 [Chrome DevTools 协议][Chrome DevTools Protocol] 进行通信。有关 Node.js 调试器的进一步说明，请参阅 [Node.js 的 V8 检查器集成][V8 Inspector integration for Node.js]。
 
 ### `-i`, `--interactive`
 
@@ -1645,7 +1432,7 @@ See [V8 Inspector integration for Node.js][] for further explanation on Node.js 
 added: v0.7.7
 -->
 
-Opens the REPL even if stdin does not appear to be a terminal.
+即使标准输入似乎不是终端，也会打开 REPL。
 
 ### `--jitless`
 
@@ -1656,9 +1443,7 @@ added: v12.0.0
 > Stability: 1 - Experimental. This flag is inherited from V8 and is subject to
 > change upstream.
 
-Disable [runtime allocation of executable memory][jitless]. This may be
-required on some platforms for security reasons. It can also reduce attack
-surface on other platforms, but the performance impact may be severe.
+禁用 [运行时分配可执行内存][jitless]。出于安全原因，在某些平台上可能需要这样做。它也可以减少其他平台上的攻击面，但性能影响可能很严重。
 
 ### `--localstorage-file=file`
 
@@ -1666,10 +1451,7 @@ surface on other platforms, but the performance impact may be severe.
 added: v22.4.0
 -->
 
-The file used to store `localStorage` data. If the file does not exist, it is
-created the first time `localStorage` is accessed. The same file may be shared
-between multiple Node.js processes concurrently. This flag is a no-op unless
-Node.js is started with the `--experimental-webstorage` flag.
+用于存储 `localStorage` 数据的文件。如果文件不存在，则在首次访问 `localStorage` 时创建。同一文件可能由多个 Node.js 进程并发共享。除非 Node.js 使用 `--experimental-webstorage` 标志启动，否则此标志无效。
 
 ### `--max-http-header-size=size`
 
@@ -1683,21 +1465,19 @@ changes:
     description: Change maximum default size of HTTP headers from 8 KiB to 16 KiB.
 -->
 
-Specify the maximum size, in bytes, of HTTP headers. Defaults to 16 KiB.
+指定 HTTP 标头的最大大小（以字节为单位）。默认为 16 KiB。
 
 ### `--max-old-space-size-percentage=PERCENTAGE`
 
-Sets the max memory size of V8's old memory section as a percentage of available system memory.
-This flag takes precedence over `--max-old-space-size` when both are specified.
+将 V8 旧内存部分的最大内存大小设置为可用系统内存的百分比。当同时指定此标志和 `--max-old-space-size` 时，此标志优先。
 
-The `PERCENTAGE` parameter must be a number greater than 0 and up to 100. representing the percentage
-of available system memory to allocate to the V8 heap.
+`PERCENTAGE` 参数必须是一个大于 0 且最多为 100 的数字，表示分配给 V8 堆的可用系统内存的百分比。
 
 ```bash
-# Using 50% of available system memory
+# 使用 50% 的可用系统内存
 node --max-old-space-size-percentage=50 index.js
 
-# Using 75% of available system memory
+# 使用 75% 的可用系统内存
 node --max-old-space-size-percentage=75 index.js
 ```
 
@@ -1707,7 +1487,7 @@ node --max-old-space-size-percentage=75 index.js
 added: v7.10.0
 -->
 
-This option is a no-op. It is kept for compatibility.
+此选项无效。为了兼容性而保留。
 
 ### `--network-family-autoselection-attempt-timeout`
 
@@ -1717,8 +1497,7 @@ added:
   - v20.13.0
 -->
 
-Sets the default value for the network family autoselection attempt timeout.
-For more information, see [`net.getDefaultAutoSelectFamilyAttemptTimeout()`][].
+设置网络族自动选择尝试超时的默认值。有关更多信息，请参阅 [`net.getDefaultAutoSelectFamilyAttemptTimeout()`][]。
 
 ### `--no-addons`
 
@@ -1728,9 +1507,7 @@ added:
   - v14.19.0
 -->
 
-Disable the `node-addons` exports condition as well as disable loading
-native addons. When `--no-addons` is specified, calling `process.dlopen` or
-requiring a native C++ addon will fail and throw an exception.
+禁用 `node-addons` 导出条件以及禁用加载原生插件。当指定 `--no-addons` 时，调用 `process.dlopen` 或 require 原生 C++ 插件将失败并抛出异常。
 
 ### `--no-async-context-frame`
 
@@ -1738,10 +1515,7 @@ requiring a native C++ addon will fail and throw an exception.
 added: v24.0.0
 -->
 
-Disables the use of [`AsyncLocalStorage`][] backed by `AsyncContextFrame` and
-uses the prior implementation which relied on async\_hooks. The previous model
-is retained for compatibility with Electron and for cases where the context
-flow may differ. However, if a difference in flow is found please report it.
+禁用由 `AsyncContextFrame` 支持的 [`AsyncLocalStorage`][] 的使用，并使用依赖 async_hooks 的先前实现。先前的模型被保留以与 Electron 兼容，并用于上下文流可能不同的情况。但是，如果发现流有差异，请报告。
 
 ### `--no-deprecation`
 
@@ -1749,7 +1523,7 @@ flow may differ. However, if a difference in flow is found please report it.
 added: v0.8.0
 -->
 
-Silence deprecation warnings.
+静默弃用警告。
 
 ### `--no-experimental-detect-module`
 
@@ -1765,7 +1539,7 @@ changes:
     description: Syntax detection is enabled by default.
 -->
 
-Disable using [syntax detection][] to determine module type.
+禁用使用 [语法检测][syntax detection] 来确定模块类型。
 
 ### `--no-experimental-global-navigator`
 
@@ -1775,7 +1549,7 @@ added: v21.2.0
 
 > Stability: 1 - Experimental
 
-Disable exposition of [Navigator API][] on the global scope.
+禁止在全局作用域上暴露 [Navigator API][]。
 
 ### `--no-experimental-repl-await`
 
@@ -1783,7 +1557,7 @@ Disable exposition of [Navigator API][] on the global scope.
 added: v16.6.0
 -->
 
-Use this flag to disable top-level await in REPL.
+使用此标志禁用 REPL 中的顶层 await。
 
 ### `--no-experimental-require-module`
 
@@ -1802,9 +1576,9 @@ changes:
 
 > Stability: 1.1 - Active Development
 
-Disable support for loading a synchronous ES module graph in `require()`.
+禁用支持在 `require()` 中加载同步 ES 模块图。
 
-See [Loading ECMAScript modules using `require()`][].
+参见 [使用 `require()` 加载 ECMAScript 模块][Loading ECMAScript modules using `require()`]。
 
 ### `--no-experimental-sqlite`
 
@@ -1818,7 +1592,7 @@ changes:
     description: SQLite is unflagged but still experimental.
 -->
 
-Disable the experimental [`node:sqlite`][] module.
+禁用实验性的 [`node:sqlite`][] 模块。
 
 ### `--no-experimental-strip-types`
 
@@ -1832,8 +1606,7 @@ changes:
 
 > Stability: 1.2 - Release candidate
 
-Disable experimental type-stripping for TypeScript files.
-For more information, see the [TypeScript type-stripping][] documentation.
+禁用对 TypeScript 文件的实验性类型剥离。有关更多信息，请参阅 [TypeScript 类型剥离][TypeScript type-stripping] 文档。
 
 ### `--no-experimental-websocket`
 
@@ -1841,7 +1614,7 @@ For more information, see the [TypeScript type-stripping][] documentation.
 added: v22.0.0
 -->
 
-Disable exposition of {WebSocket} on the global scope.
+禁止在全局作用域上暴露 {WebSocket}。
 
 ### `--no-extra-info-on-fatal-exception`
 
@@ -1849,7 +1622,7 @@ Disable exposition of {WebSocket} on the global scope.
 added: v17.0.0
 -->
 
-Hide extra information on fatal exception that causes exit.
+隐藏导致退出的致命异常的额外信息。
 
 ### `--no-force-async-hooks-checks`
 
@@ -1857,8 +1630,7 @@ Hide extra information on fatal exception that causes exit.
 added: v9.0.0
 -->
 
-Disables runtime checks for `async_hooks`. These will still be enabled
-dynamically when `async_hooks` is enabled.
+禁用对 `async_hooks` 的运行时检查。当 `async_hooks` 启用时，这些仍将动态启用。
 
 ### `--no-global-search-paths`
 
@@ -1866,8 +1638,7 @@ dynamically when `async_hooks` is enabled.
 added: v16.10.0
 -->
 
-Do not search modules from global paths like `$HOME/.node_modules` and
-`$NODE_PATH`.
+不从全局路径（如 `$HOME/.node_modules` 和 `$NODE_PATH`）搜索模块。
 
 ### `--no-network-family-autoselection`
 
@@ -1881,8 +1652,7 @@ changes:
                  an alias.
 -->
 
-Disables the family autoselection algorithm unless connection options explicitly
-enables it.
+禁用族自动选择算法，除非连接选项显式启用它。
 
 ### `--no-warnings`
 
@@ -1890,7 +1660,7 @@ enables it.
 added: v6.0.0
 -->
 
-Silence all process warnings (including deprecations).
+静默所有进程警告（包括弃用警告）。
 
 ### `--node-memory-debug`
 
@@ -1900,8 +1670,7 @@ added:
   - v14.18.0
 -->
 
-Enable extra debug checks for memory leaks in Node.js internals. This is
-usually only useful for developers debugging Node.js itself.
+启用对 Node.js 内部内存泄漏的额外调试检查。这通常仅对调试 Node.js 本身的开发人员有用。
 
 ### `--openssl-config=file`
 
@@ -1909,9 +1678,7 @@ usually only useful for developers debugging Node.js itself.
 added: v6.9.0
 -->
 
-Load an OpenSSL configuration file on startup. Among other uses, this can be
-used to enable FIPS-compliant crypto if Node.js is built
-against FIPS-enabled OpenSSL.
+在启动时加载 OpenSSL 配置文件。除其他用途外，如果 Node.js 针对启用 FIPS 的 OpenSSL 构建，这可用于启用符合 FIPS 的加密。
 
 ### `--openssl-legacy-provider`
 
@@ -1921,8 +1688,7 @@ added:
   - v16.17.0
 -->
 
-Enable OpenSSL 3.0 legacy provider. For more information please see
-[OSSL\_PROVIDER-legacy][OSSL_PROVIDER-legacy].
+启用 OpenSSL 3.0 传统提供程序。有关更多信息，请参阅 [OSSL_PROVIDER-legacy][OSSL_PROVIDER-legacy]。
 
 ### `--openssl-shared-config`
 
@@ -1933,14 +1699,7 @@ added:
   - v14.21.0
 -->
 
-Enable OpenSSL default configuration section, `openssl_conf` to be read from
-the OpenSSL configuration file. The default configuration file is named
-`openssl.cnf` but this can be changed using the environment variable
-`OPENSSL_CONF`, or by using the command line option `--openssl-config`.
-The location of the default OpenSSL configuration file depends on how OpenSSL
-is being linked to Node.js. Sharing the OpenSSL configuration may have unwanted
-implications and it is recommended to use a configuration section specific to
-Node.js which is `nodejs_conf` and is default when this option is not used.
+启用从 OpenSSL 配置文件中读取默认配置部分 `openssl_conf`。默认配置文件名为 `openssl.cnf`，但可以使用环境变量 `OPENSSL_CONF` 或使用命令行选项 `--openssl-config` 来更改。默认 OpenSSL 配置文件的位置取决于 OpenSSL 如何链接到 Node.js。共享 OpenSSL 配置可能会有不必要的后果，建议使用特定于 Node.js 的配置部分，即 `nodejs_conf`，当不使用此选项时，这是默认的。
 
 ### `--pending-deprecation`
 
@@ -1948,14 +1707,9 @@ Node.js which is `nodejs_conf` and is default when this option is not used.
 added: v8.0.0
 -->
 
-Emit pending deprecation warnings.
+发出待弃用警告。
 
-Pending deprecations are generally identical to a runtime deprecation with the
-notable exception that they are turned _off_ by default and will not be emitted
-unless either the `--pending-deprecation` command-line flag, or the
-`NODE_PENDING_DEPRECATION=1` environment variable, is set. Pending deprecations
-are used to provide a kind of selective "early warning" mechanism that
-developers may leverage to detect deprecated API usage.
+待弃用通常与运行时弃用相同，但显著的区别是它们默认是关闭的，除非设置了 `--pending-deprecation` 命令行标志或 `NODE_PENDING_DEPRECATION=1` 环境变量，否则不会发出。待弃用用于提供一种选择性的“早期警告”机制，开发人员可以利用它来检测已弃用的 API 使用情况。
 
 ### `--permission`
 
@@ -1969,15 +1723,13 @@ changes:
     description: Permission Model is now stable.
 -->
 
-Enable the Permission Model for current process. When enabled, the
-following permissions are restricted:
+为当前进程启用权限模型。启用后，以下权限受到限制：
 
-* File System - manageable through
-  [`--allow-fs-read`][], [`--allow-fs-write`][] flags
-* Child Process - manageable through [`--allow-child-process`][] flag
-* Worker Threads - manageable through [`--allow-worker`][] flag
-* WASI - manageable through [`--allow-wasi`][] flag
-* Addons - manageable through [`--allow-addons`][] flag
+* 文件系统 - 可通过 [`--allow-fs-read`][]、[`--allow-fs-write`][] 标志管理
+* 子进程 - 可通过 [`--allow-child-process`][] 标志管理
+* 工作线程 - 可通过 [`--allow-worker`][] 标志管理
+* WASI - 可通过 [`--allow-wasi`][] 标志管理
+* 插件 - 可通过 [`--allow-addons`][] 标志管理
 
 ### `--preserve-symlinks`
 
@@ -1985,16 +1737,9 @@ following permissions are restricted:
 added: v6.3.0
 -->
 
-Instructs the module loader to preserve symbolic links when resolving and
-caching modules.
+指示模块加载器在解析和缓存模块时保留符号链接。
 
-By default, when Node.js loads a module from a path that is symbolically linked
-to a different on-disk location, Node.js will dereference the link and use the
-actual on-disk "real path" of the module as both an identifier and as a root
-path to locate other dependency modules. In most cases, this default behavior
-is acceptable. However, when using symbolically linked peer dependencies, as
-illustrated in the example below, the default behavior causes an exception to
-be thrown if `moduleA` attempts to require `moduleB` as a peer dependency:
+默认情况下，当 Node.js 从符号链接到不同磁盘位置的路径加载模块时，Node.js 将解引用该链接，并使用模块的实际磁盘“真实路径”作为标识符和作为定位其他依赖模块的根路径。在大多数情况下，此默认行为是可接受的。但是，当使用符号链接的对等依赖项时，如下例所示，如果 `moduleA` 尝试将 `moduleB` 作为对等依赖项 require，则默认行为会导致抛出异常：
 
 ```text
 {appDir}
@@ -2010,19 +1755,11 @@ be thrown if `moduleA` attempts to require `moduleB` as a peer dependency:
      └── package.json
 ```
 
-The `--preserve-symlinks` command-line flag instructs Node.js to use the
-symlink path for modules as opposed to the real path, allowing symbolically
-linked peer dependencies to be found.
+`--preserve-symlinks` 命令行标志指示 Node.js 对模块使用符号链接路径而不是真实路径，从而可以找到符号链接的对等依赖项。
 
-Note, however, that using `--preserve-symlinks` can have other side effects.
-Specifically, symbolically linked _native_ modules can fail to load if those
-are linked from more than one location in the dependency tree (Node.js would
-see those as two separate modules and would attempt to load the module multiple
-times, causing an exception to be thrown).
+但是，请注意，使用 `--preserve-symlinks` 可能会有其他副作用。具体来说，如果从依赖树中的多个位置链接符号链接的 _原生_ 模块，则这些模块可能无法加载（Node.js 会将它们视为两个单独的模块，并尝试多次加载该模块，导致抛出异常）。
 
-The `--preserve-symlinks` flag does not apply to the main module, which allows
-`node --preserve-symlinks node_module/.bin/<foo>` to work. To apply the same
-behavior for the main module, also use `--preserve-symlinks-main`.
+`--preserve-symlinks` 标志不适用于主模块，这允许 `node --preserve-symlinks node_module/.bin/<foo>` 工作。要对主模块应用相同的行为，请同时使用 `--preserve-symlinks-main`。
 
 ### `--preserve-symlinks-main`
 
@@ -2030,19 +1767,13 @@ behavior for the main module, also use `--preserve-symlinks-main`.
 added: v10.2.0
 -->
 
-Instructs the module loader to preserve symbolic links when resolving and
-caching the main module (`require.main`).
+指示模块加载器在解析和缓存主模块（`require.main`）时保留符号链接。
 
-This flag exists so that the main module can be opted-in to the same behavior
-that `--preserve-symlinks` gives to all other imports; they are separate flags,
-however, for backward compatibility with older Node.js versions.
+此标志的存在是为了使主模块可以选择加入与 `--preserve-symlinks` 给予所有其他导入相同的行为；然而，它们是单独的标志，以便与旧版本的 Node.js 向后兼容。
 
-`--preserve-symlinks-main` does not imply `--preserve-symlinks`; use
-`--preserve-symlinks-main` in addition to
-`--preserve-symlinks` when it is not desirable to follow symlinks before
-resolving relative paths.
+`--preserve-symlinks-main` 不意味着 `--preserve-symlinks`；当不希望解析相对路径之前遵循符号链接时，除了 `--preserve-symlinks` 之外，请使用 `--preserve-symlinks-main`。
 
-See [`--preserve-symlinks`][] for more information.
+有关更多信息，请参阅 [`--preserve-symlinks`][]。
 
 ### `-p`, `--print "script"`
 
@@ -2054,7 +1785,7 @@ changes:
     description: Built-in libraries are now available as predefined variables.
 -->
 
-Identical to `-e` but prints the result.
+与 `-e` 相同，但打印结果。
 
 ### `--prof`
 
@@ -2062,7 +1793,7 @@ Identical to `-e` but prints the result.
 added: v2.0.0
 -->
 
-Generate V8 profiler output.
+生成 V8 分析器输出。
 
 ### `--prof-process`
 
@@ -2070,7 +1801,7 @@ Generate V8 profiler output.
 added: v5.2.0
 -->
 
-Process V8 profiler output generated using the V8 option `--prof`.
+处理使用 V8 选项 `--prof` 生成的 V8 分析器输出。
 
 ### `--redirect-warnings=file`
 
@@ -2078,14 +1809,9 @@ Process V8 profiler output generated using the V8 option `--prof`.
 added: v8.0.0
 -->
 
-Write process warnings to the given file instead of printing to stderr. The
-file will be created if it does not exist, and will be appended to if it does.
-If an error occurs while attempting to write the warning to the file, the
-warning will be written to stderr instead.
+将进程警告写入给定文件而不是打印到 stderr。如果文件不存在，将被创建；如果存在，将被追加。如果尝试将警告写入文件时发生错误，则警告将改为写入 stderr。
 
-The `file` name may be an absolute path. If it is not, the default directory it
-will be written to is controlled by the
-[`--diagnostic-dir`][] command-line option.
+`file` 名称可以是绝对路径。如果不是，它将写入的默认目录由 [`--diagnostic-dir`][] 命令行选项控制。
 
 ### `--report-compact`
 
@@ -2095,9 +1821,7 @@ added:
  - v12.17.0
 -->
 
-Write reports in a compact format, single-line JSON, more easily consumable
-by log processing systems than the default multi-line format designed for
-human consumption.
+以紧凑格式、单行 JSON 写入报告，比旨在供人类阅读的默认多行格式更容易被日志处理系统使用。
 
 ### `--report-dir=directory`, `report-directory=directory`
 
@@ -2115,7 +1839,7 @@ changes:
                  `--report-directory`.
 -->
 
-Location at which the report will be generated.
+生成报告的位置。
 
 ### `--report-exclude-env`
 
@@ -2125,8 +1849,7 @@ added:
   - v22.13.0
 -->
 
-When `--report-exclude-env` is passed the diagnostic report generated will not
-contain the `environmentVariables` data.
+当传递 `--report-exclude-env` 时，生成的诊断报告将不包含 `environmentVariables` 数据。
 
 ### `--report-exclude-network`
 
@@ -2136,8 +1859,7 @@ added:
   - v20.13.0
 -->
 
-Exclude `header.networkInterfaces` from the diagnostic report. By default
-this is not set and the network interfaces are included.
+从诊断报告中排除 `header.networkInterfaces`。默认情况下未设置此选项，并且网络接口被包括在内。
 
 ### `--report-filename=filename`
 
@@ -2155,10 +1877,9 @@ changes:
                  `--report-filename`.
 -->
 
-Name of the file to which the report will be written.
+报告将写入的文件名。
 
-If the filename is set to `'stdout'` or `'stderr'`, the report is written to
-the stdout or stderr of the process respectively.
+如果文件名设置为 `'stdout'` 或 `'stderr'`，则报告将分别写入进程的 stdout 或 stderr。
 
 ### `--report-on-fatalerror`
 
@@ -2177,11 +1898,7 @@ changes:
                  `--report-on-fatalerror`.
 -->
 
-Enables the report to be triggered on fatal errors (internal errors within
-the Node.js runtime such as out of memory) that lead to termination of the
-application. Useful to inspect various diagnostic data elements such as heap,
-stack, event loop state, resource consumption etc. to reason about the fatal
-error.
+在致命错误（Node.js 运行时内部错误，如内存不足）导致应用程序终止时触发报告。用于检查各种诊断数据元素（如堆、栈、事件循环状态、资源消耗等）以推理致命错误。
 
 ### `--report-on-signal`
 
@@ -2199,9 +1916,7 @@ changes:
                  `--report-on-signal`.
 -->
 
-Enables report to be generated upon receiving the specified (or predefined)
-signal to the running Node.js process. The signal to trigger the report is
-specified through `--report-signal`.
+在接收到指定（或预定义）信号给运行的 Node.js 进程时生成报告。触发报告的信号通过 `--report-signal` 指定。
 
 ### `--report-signal=signal`
 
@@ -2219,8 +1934,7 @@ changes:
                  `--report-signal`.
 -->
 
-Sets or resets the signal for report generation (not supported on Windows).
-Default signal is `SIGUSR2`.
+设置或重置用于报告生成的信号（Windows 上不支持）。默认信号是 `SIGUSR2`。
 
 ### `--report-uncaught-exception`
 
@@ -2243,9 +1957,7 @@ changes:
                  `--report-uncaught-exception`.
 -->
 
-Enables report to be generated when the process exits due to an uncaught
-exception. Useful when inspecting the JavaScript stack in conjunction with
-native stack and other runtime environment data.
+当进程由于未捕获的异常退出时启用报告生成。在与原生栈和其他运行时环境数据结合检查 JavaScript 栈时非常有用。
 
 ### `-r`, `--require module`
 
@@ -2260,15 +1972,13 @@ changes:
     description: This option also supports ECMAScript module.
 -->
 
-Preload the specified module at startup.
+在启动时预加载指定的模块。
 
-Follows `require()`'s module resolution
-rules. `module` may be either a path to a file, or a node module name.
+遵循 `require()` 的模块解析规则。`module` 可以是文件路径，也可以是节点模块名称。
 
-Modules preloaded with `--require` will run before modules preloaded with `--import`.
+使用 `--require` 预加载的模块将在使用 `--import` 预加载的模块之前运行。
 
-Modules are preloaded into the main thread as well as any worker threads,
-forked processes, or clustered processes.
+模块被预加载到主线程以及任何工作线程、分叉进程或集群进程中。
 
 ### `--run`
 
@@ -2288,53 +1998,40 @@ changes:
                  `PATH` environment variable accordingly.
 -->
 
-This runs a specified command from a package.json's `"scripts"` object.
-If a missing `"command"` is provided, it will list the available scripts.
+这从 package.json 的 `"scripts"` 对象运行指定的命令。如果提供了不存在的 `"command"`，它将列出可用的脚本。
 
-`--run` will traverse up to the root directory and finds a `package.json`
-file to run the command from.
+`--run` 将遍历到根目录并找到一个 `package.json` 文件来运行命令。
 
-`--run` prepends `./node_modules/.bin` for each ancestor of
-the current directory, to the `PATH` in order to execute the binaries from
-different folders where multiple `node_modules` directories are present, if
-`ancestor-folder/node_modules/.bin` is a directory.
+`--run` 为当前目录的每个祖先将 `./node_modules/.bin` 添加到 `PATH`，以便在存在多个 `node_modules` 目录的不同文件夹中执行二进制文件，如果 `ancestor-folder/node_modules/.bin` 是一个目录。
 
-`--run` executes the command in the directory containing the related `package.json`.
+`--run` 在包含相关 `package.json` 的目录中执行命令。
 
-For example, the following command will run the `test` script of
-the `package.json` in the current folder:
+例如，以下命令将运行当前文件夹中 `package.json` 的 `test` 脚本：
 
 ```console
 $ node --run test
 ```
 
-You can also pass arguments to the command. Any argument after `--` will
-be appended to the script:
+您还可以向命令传递参数。`--` 之后的任何参数将附加到脚本：
 
 ```console
 $ node --run test -- --verbose
 ```
 
-#### Intentional limitations
+#### 有意限制
 
-`node --run` is not meant to match the behaviors of `npm run` or of the `run`
-commands of other package managers. The Node.js implementation is intentionally
-more limited, in order to focus on top performance for the most common use
-cases.
-Some features of other `run` implementations that are intentionally excluded
-are:
+`node --run` 并不意味着匹配 `npm run` 或其他包管理器的 `run` 命令的行为。Node.js 的实现有意更有限，以便专注于最常见用例的顶级性能。
+其他 `run` 实现中故意排除的一些功能是：
 
-* Running `pre` or `post` scripts in addition to the specified script.
-* Defining package manager-specific environment variables.
+* 除了指定的脚本外，还运行 `pre` 或 `post` 脚本。
+* 定义包管理器特定的环境变量。
 
-#### Environment variables
+#### 环境变量
 
-The following environment variables are set when running a script with `--run`:
+使用 `--run` 运行脚本时会设置以下环境变量：
 
-* `NODE_RUN_SCRIPT_NAME`: The name of the script being run. For example, if
-  `--run` is used to run `test`, the value of this variable will be `test`.
-* `NODE_RUN_PACKAGE_JSON_PATH`: The path to the `package.json` that is being
-  processed.
+* `NODE_RUN_SCRIPT_NAME`：正在运行的脚本的名称。例如，如果使用 `--run` 运行 `test`，则此变量的值将为 `test`。
+* `NODE_RUN_PACKAGE_JSON_PATH`：正在处理的 `package.json` 的路径。
 
 ### `--secure-heap-min=n`
 
@@ -2342,10 +2039,7 @@ The following environment variables are set when running a script with `--run`:
 added: v15.6.0
 -->
 
-When using `--secure-heap`, the `--secure-heap-min` flag specifies the
-minimum allocation from the secure heap. The minimum value is `2`.
-The maximum value is the lesser of `--secure-heap` or `2147483647`.
-The value given must be a power of two.
+当使用 `--secure-heap` 时，`--secure-heap-min` 标志指定从安全堆分配的最小值。最小值为 `2`。最大值是 `--secure-heap` 或 `2147483647` 中的较小者。给定的值必须是 2 的幂。
 
 ### `--secure-heap=n`
 
@@ -2353,24 +2047,17 @@ The value given must be a power of two.
 added: v15.6.0
 -->
 
-Initializes an OpenSSL secure heap of `n` bytes. When initialized, the
-secure heap is used for selected types of allocations within OpenSSL
-during key generation and other operations. This is useful, for instance,
-to prevent sensitive information from leaking due to pointer overruns
-or underruns.
+初始化一个 `n` 字节的 OpenSSL 安全堆。初始化后，在密钥生成和其他操作期间，OpenSSL 会将安全堆用于选定类型的分配。例如，这有助于防止敏感信息因指针溢出或不足而泄漏。
 
-The secure heap is a fixed size and cannot be resized at runtime so,
-if used, it is important to select a large enough heap to cover all
-application uses.
+安全堆是固定大小的，无法在运行时调整大小，因此，如果使用，选择足够大的堆以覆盖所有应用程序用途非常重要。
 
-The heap size given must be a power of two. Any value less than 2
-will disable the secure heap.
+给定的堆大小必须是 2 的幂。任何小于 2 的值将禁用安全堆。
 
-The secure heap is disabled by default.
+安全堆默认禁用。
 
-The secure heap is not available on Windows.
+安全堆在 Windows 上不可用。
 
-See [`CRYPTO_secure_malloc_init`][] for more details.
+有关更多详细信息，请参阅 [`CRYPTO_secure_malloc_init`][]。
 
 ### `--snapshot-blob=path`
 
@@ -2380,22 +2067,16 @@ added: v18.8.0
 
 > Stability: 1 - Experimental
 
-When used with `--build-snapshot`, `--snapshot-blob` specifies the path
-where the generated snapshot blob is written to. If not specified, the
-generated blob is written to `snapshot.blob` in the current working directory.
+与 `--build-snapshot` 一起使用时，`--snapshot-blob` 指定生成的快照 blob 写入的路径。如果未指定，生成的 blob 将写入当前工作目录中的 `snapshot.blob`。
 
-When used without `--build-snapshot`, `--snapshot-blob` specifies the
-path to the blob that is used to restore the application state.
+不与 `--build-snapshot` 一起使用时，`--snapshot-blob` 指定用于恢复应用程序状态的 blob 的路径。
 
-When loading a snapshot, Node.js checks that:
+加载快照时，Node.js 会检查：
 
-1. The version, architecture, and platform of the running Node.js binary
-   are exactly the same as that of the binary that generates the snapshot.
-2. The V8 flags and CPU features are compatible with that of the binary
-   that generates the snapshot.
+1. 运行的 Node.js 二进制文件的版本、架构和平台与生成快照的二进制文件完全相同。
+2. V8 标志和 CPU 功能与生成快照的二进制文件兼容。
 
-If they don't match, Node.js refuses to load the snapshot and exits with
-status code 1.
+如果它们不匹配，Node.js 拒绝加载快照并以状态码 1 退出。
 
 ### `--test`
 
@@ -2414,10 +2095,7 @@ changes:
     description: Test runner now supports running in watch mode.
 -->
 
-Starts the Node.js command line test runner. This flag cannot be combined with
-`--watch-path`, `--check`, `--eval`, `--interactive`, or the inspector.
-See the documentation on [running tests from the command line][]
-for more details.
+启动 Node.js 命令行测试运行器。此标志不能与 `--watch-path`、`--check`、`--eval`、`--interactive` 或检查器结合使用。有关更多详细信息，请参阅关于 [从命令行运行测试][running tests from the command line] 的文档。
 
 ### `--test-concurrency`
 
@@ -2428,10 +2106,7 @@ added:
   - v18.19.0
 -->
 
-The maximum number of test files that the test runner CLI will execute
-concurrently. If `--test-isolation` is set to `'none'`, this flag is ignored and
-concurrency is one. Otherwise, concurrency defaults to
-`os.availableParallelism() - 1`.
+测试运行器 CLI 将并发执行的最大测试文件数。如果 `--test-isolation` 设置为 `'none'`，则忽略此标志，并发性为一。否则，并发性默认为 `os.availableParallelism() - 1`。
 
 ### `--test-coverage-branches=threshold`
 
@@ -2441,8 +2116,7 @@ added: v22.8.0
 
 > Stability: 1 - Experimental
 
-Require a minimum percent of covered branches. If code coverage does not reach
-the threshold specified, the process will exit with code `1`.
+要求覆盖分支的最小百分比。如果代码覆盖率未达到指定的阈值，进程将以代码 `1` 退出。
 
 ### `--test-coverage-exclude`
 
@@ -2453,16 +2127,13 @@ added:
 
 > Stability: 1 - Experimental
 
-Excludes specific files from code coverage using a glob pattern, which can match
-both absolute and relative file paths.
+使用 glob 模式从代码覆盖率中排除特定文件，该模式可以匹配绝对和相对文件路径。
 
-This option may be specified multiple times to exclude multiple glob patterns.
+此选项可以指定多次以排除多个 glob 模式。
 
-If both `--test-coverage-exclude` and `--test-coverage-include` are provided,
-files must meet **both** criteria to be included in the coverage report.
+如果同时提供了 `--test-coverage-exclude` 和 `--test-coverage-include`，文件必须满足 **两者** 标准才能包含在覆盖率报告中。
 
-By default all the matching test files are excluded from the coverage report.
-Specifying this option will override the default behavior.
+默认情况下，所有匹配的测试文件都从覆盖率报告中排除。指定此选项将覆盖默认行为。
 
 ### `--test-coverage-functions=threshold`
 
@@ -2472,8 +2143,7 @@ added: v22.8.0
 
 > Stability: 1 - Experimental
 
-Require a minimum percent of covered functions. If code coverage does not reach
-the threshold specified, the process will exit with code `1`.
+要求覆盖函数的最小百分比。如果代码覆盖率未达到指定的阈值，进程将以代码 `1` 退出。
 
 ### `--test-coverage-include`
 
@@ -2484,13 +2154,11 @@ added:
 
 > Stability: 1 - Experimental
 
-Includes specific files in code coverage using a glob pattern, which can match
-both absolute and relative file paths.
+使用 glob 模式在代码覆盖率中包含特定文件，该模式可以匹配绝对和相对文件路径。
 
-This option may be specified multiple times to include multiple glob patterns.
+此选项可以指定多次以包含多个 glob 模式。
 
-If both `--test-coverage-exclude` and `--test-coverage-include` are provided,
-files must meet **both** criteria to be included in the coverage report.
+如果同时提供了 `--test-coverage-exclude` 和 `--test-coverage-include`，文件必须满足 **两者** 标准才能包含在覆盖率报告中。
 
 ### `--test-coverage-lines=threshold`
 
@@ -2500,8 +2168,7 @@ added: v22.8.0
 
 > Stability: 1 - Experimental
 
-Require a minimum percent of covered lines. If code coverage does not reach
-the threshold specified, the process will exit with code `1`.
+要求覆盖行的最小百分比。如果代码覆盖率未达到指定的阈值，进程将以代码 `1` 退出。
 
 ### `--test-force-exit`
 
@@ -2511,8 +2178,7 @@ added:
   - v20.14.0
 -->
 
-Configures the test runner to exit the process once all known tests have
-finished executing even if the event loop would otherwise remain active.
+配置测试运行器在所有已知测试执行完成后退出进程，即使事件循环本应保持活动状态。
 
 ### `--test-global-setup=module`
 
@@ -2522,10 +2188,9 @@ added: v24.0.0
 
 > Stability: 1.0 - Early development
 
-Specify a module that will be evaluated before all tests are executed and
-can be used to setup global state or fixtures for tests.
+指定一个在所有测试执行之前将被评估的模块，并可用于为测试设置全局状态或固定装置。
 
-See the documentation on [global setup and teardown][] for more details.
+有关更多详细信息，请参阅关于 [全局设置和拆卸][global setup and teardown] 的文档。
 
 ### `--test-isolation=mode`
 
@@ -2538,11 +2203,7 @@ changes:
                  `--test-isolation`.
 -->
 
-Configures the type of test isolation used in the test runner. When `mode` is
-`'process'`, each test file is run in a separate child process. When `mode` is
-`'none'`, all test files run in the same process as the test runner. The default
-isolation mode is `'process'`. This flag is ignored if the `--test` flag is not
-present. See the [test runner execution model][] section for more information.
+配置测试运行器中使用的测试隔离类型。当 `mode` 为 `'process'` 时，每个测试文件在单独的子进程中运行。当 `mode` 为 `'none'` 时，所有测试文件在与测试运行器相同的进程中运行。默认的隔离模式是 `'process'`。如果不存在 `--test` 标志，则忽略此标志。有关更多信息，请参阅 [测试运行器执行模型][test runner execution model] 部分。
 
 ### `--test-name-pattern`
 
@@ -2554,12 +2215,9 @@ changes:
     description: The test runner is now stable.
 -->
 
-A regular expression that configures the test runner to only execute tests
-whose name matches the provided pattern. See the documentation on
-[filtering tests by name][] for more details.
+一个正则表达式，配置测试运行器仅执行名称与提供模式匹配的测试。有关更多详细信息，请参阅关于 [按名称过滤测试][filtering tests by name] 的文档。
 
-If both `--test-name-pattern` and `--test-skip-pattern` are supplied,
-tests must satisfy **both** requirements in order to be executed.
+如果同时提供了 `--test-name-pattern` 和 `--test-skip-pattern`，测试必须满足 **两者** 要求才能被执行。
 
 ### `--test-only`
 
@@ -2573,8 +2231,7 @@ changes:
     description: The test runner is now stable.
 -->
 
-Configures the test runner to only execute top level tests that have the `only`
-option set. This flag is not necessary when test isolation is disabled.
+配置测试运行器仅执行设置了 `only` 选项的顶层测试。当禁用测试隔离时，不需要此标志。
 
 ### `--test-reporter`
 
@@ -2588,8 +2245,7 @@ changes:
     description: The test runner is now stable.
 -->
 
-A test reporter to use when running tests. See the documentation on
-[test reporters][] for more details.
+运行测试时使用的测试报告器。有关更多详细信息，请参阅关于 [测试报告器][test reporters] 的文档。
 
 ### `--test-reporter-destination`
 
@@ -2603,8 +2259,7 @@ changes:
     description: The test runner is now stable.
 -->
 
-The destination for the corresponding test reporter. See the documentation on
-[test reporters][] for more details.
+相应测试报告器的目标。有关更多详细信息，请参阅关于 [测试报告器][test reporters] 的文档。
 
 ### `--test-rerun-failures`
 
@@ -2613,12 +2268,7 @@ added:
   - v24.7.0
 -->
 
-A path to a file allowing the test runner to persist the state of the test
-suite between runs. The test runner will use this file to determine which tests
-have already succeeded or failed, allowing for re-running of failed tests
-without having to re-run the entire test suite. The test runner will create this
-file if it does not exist.
-See the documentation on [test reruns][] for more details.
+一个文件的路径，允许测试运行器在运行之间持久化测试套件的状态。测试运行器将使用此文件来确定哪些测试已经成功或失败，允许重新运行失败的测试而无需重新运行整个测试套件。如果该文件不存在，测试运行器将创建它。有关更多详细信息，请参阅关于 [测试重新运行][test reruns] 的文档。
 
 ### `--test-shard`
 
@@ -2628,15 +2278,14 @@ added:
   - v18.19.0
 -->
 
-Test suite shard to execute in a format of `<index>/<total>`, where
+要执行的测试套件分片，格式为 `<index>/<total>`，其中
 
-* `index` is a positive integer, index of divided parts.
-* `total` is a positive integer, total of divided part.
+* `index` 是一个正整数，表示划分部分的索引。
+* `total` 是一个正整数，表示划分部分的总数。
 
-This command will divide all tests files into `total` equal parts,
-and will run only those that happen to be in an `index` part.
+此命令将把所有测试文件分成 `total` 个相等的部分，并且只运行恰好位于 `index` 部分中的那些。
 
-For example, to split your tests suite into three parts, use this:
+例如，要将测试套件分成三个部分，请使用：
 
 ```bash
 node --test --test-shard=1/3
@@ -2651,12 +2300,9 @@ added:
   - v22.1.0
 -->
 
-A regular expression that configures the test runner to skip tests
-whose name matches the provided pattern. See the documentation on
-[filtering tests by name][] for more details.
+一个正则表达式，配置测试运行器跳过名称与提供模式匹配的测试。有关更多详细信息，请参阅关于 [按名称过滤测试][filtering tests by name] 的文档。
 
-If both `--test-name-pattern` and `--test-skip-pattern` are supplied,
-tests must satisfy **both** requirements in order to be executed.
+如果同时提供了 `--test-name-pattern` 和 `--test-skip-pattern`，测试必须满足 **两者** 要求才能被执行。
 
 ### `--test-timeout`
 
@@ -2666,8 +2312,7 @@ added:
   - v20.11.0
 -->
 
-A number of milliseconds the test execution will fail after. If unspecified,
-subtests inherit this value from their parent. The default value is `Infinity`.
+测试执行将在多少毫秒后失败。如果未指定，子测试从其父级继承此值。默认值为 `Infinity`。
 
 ### `--test-update-snapshots`
 
@@ -2681,7 +2326,7 @@ changes:
     description: Snapshot testing is no longer experimental.
 -->
 
-Regenerates the snapshot files used by the test runner for [snapshot testing][].
+重新生成测试运行器用于 [快照测试][snapshot testing] 的快照文件。
 
 ### `--throw-deprecation`
 
@@ -2689,7 +2334,7 @@ Regenerates the snapshot files used by the test runner for [snapshot testing][].
 added: v0.11.14
 -->
 
-Throw errors for deprecations.
+对弃用抛出错误。
 
 ### `--title=title`
 
@@ -2697,7 +2342,7 @@ Throw errors for deprecations.
 added: v10.7.0
 -->
 
-Set `process.title` on startup.
+在启动时设置 `process.title`。
 
 ### `--tls-cipher-list=list`
 
@@ -2705,8 +2350,7 @@ Set `process.title` on startup.
 added: v4.0.0
 -->
 
-Specify an alternative default TLS cipher list. Requires Node.js to be built
-with crypto support (default).
+指定替代的默认 TLS 密码套件列表。要求 Node.js 构建时支持加密（默认）。
 
 ### `--tls-keylog=file`
 
@@ -2716,9 +2360,7 @@ added:
  - v12.16.0
 -->
 
-Log TLS key material to a file. The key material is in NSS `SSLKEYLOGFILE`
-format and can be used by software (such as Wireshark) to decrypt the TLS
-traffic.
+将 TLS 密钥材料记录到文件。密钥材料采用 NSS `SSLKEYLOGFILE` 格式，可供软件（如 Wireshark）用于解密 TLS 流量。
 
 ### `--tls-max-v1.2`
 
@@ -2728,8 +2370,7 @@ added:
  - v10.20.0
 -->
 
-Set [`tls.DEFAULT_MAX_VERSION`][] to 'TLSv1.2'. Use to disable support for
-TLSv1.3.
+将 [`tls.DEFAULT_MAX_VERSION`][] 设置为 'TLSv1.2'。用于禁用对 TLSv1.3 的支持。
 
 ### `--tls-max-v1.3`
 
@@ -2737,8 +2378,7 @@ TLSv1.3.
 added: v12.0.0
 -->
 
-Set default [`tls.DEFAULT_MAX_VERSION`][] to 'TLSv1.3'. Use to enable support
-for TLSv1.3.
+将默认 [`tls.DEFAULT_MAX_VERSION`][] 设置为 'TLSv1.3'。用于启用对 TLSv1.3 的支持。
 
 ### `--tls-min-v1.0`
 
@@ -2748,8 +2388,7 @@ added:
  - v10.20.0
 -->
 
-Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1'. Use for compatibility with
-old TLS clients or servers.
+将默认 [`tls.DEFAULT_MIN_VERSION`][] 设置为 'TLSv1'。用于与旧的 TLS 客户端或服务器兼容。
 
 ### `--tls-min-v1.1`
 
@@ -2759,8 +2398,7 @@ added:
  - v10.20.0
 -->
 
-Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1.1'. Use for compatibility
-with old TLS clients or servers.
+将默认 [`tls.DEFAULT_MIN_VERSION`][] 设置为 'TLSv1.1'。用于与旧的 TLS 客户端或服务器兼容。
 
 ### `--tls-min-v1.2`
 
@@ -2770,9 +2408,7 @@ added:
  - v10.20.0
 -->
 
-Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1.2'. This is the default for
-12.x and later, but the option is supported for compatibility with older Node.js
-versions.
+将默认 [`tls.DEFAULT_MIN_VERSION`][] 设置为 'TLSv1.2'。这是 12.x 及更高版本的默认值，但为了与旧版本的 Node.js 兼容，支持此选项。
 
 ### `--tls-min-v1.3`
 
@@ -2780,8 +2416,7 @@ versions.
 added: v12.0.0
 -->
 
-Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1.3'. Use to disable support
-for TLSv1.2, which is not as secure as TLSv1.3.
+将默认 [`tls.DEFAULT_MIN_VERSION`][] 设置为 'TLSv1.3'。用于禁用对 TLSv1.2 的支持，因为 TLSv1.3 不如 TLSv1.3 安全。
 
 ### `--trace-deprecation`
 
@@ -2789,7 +2424,7 @@ for TLSv1.2, which is not as secure as TLSv1.3.
 added: v0.8.0
 -->
 
-Print stack traces for deprecations.
+打印弃用的堆栈跟踪。
 
 ### `--trace-env`
 
@@ -2799,22 +2434,19 @@ added:
   - v22.13.0
 -->
 
-Print information about any access to environment variables done in the current Node.js
-instance to stderr, including:
+打印当前 Node.js 实例中完成的任何环境变量访问的信息到 stderr，包括：
 
-* The environment variable reads that Node.js does internally.
-* Writes in the form of `process.env.KEY = "SOME VALUE"`.
-* Reads in the form of `process.env.KEY`.
-* Definitions in the form of `Object.defineProperty(process.env, 'KEY', {...})`.
-* Queries in the form of `Object.hasOwn(process.env, 'KEY')`,
-  `process.env.hasOwnProperty('KEY')` or `'KEY' in process.env`.
-* Deletions in the form of `delete process.env.KEY`.
-* Enumerations inf the form of `...process.env` or `Object.keys(process.env)`.
+* Node.js 内部完成的环境变量读取。
+* 形式为 `process.env.KEY = "SOME VALUE"` 的写入。
+* 形式为 `process.env.KEY` 的读取。
+* 形式为 `Object.defineProperty(process.env, 'KEY', {...})` 的定义。
+* 形式为 `Object.hasOwn(process.env, 'KEY')`、`process.env.hasOwnProperty('KEY')` 或 `'KEY' in process.env` 的查询。
+* 形式为 `delete process.env.KEY` 的删除。
+* 形式为 `...process.env` 或 `Object.keys(process.env)` 的枚举。
 
-Only the names of the environment variables being accessed are printed. The values are not printed.
+仅打印被访问的环境变量的名称。不打印值。
 
-To print the stack trace of the access, use `--trace-env-js-stack` and/or
-`--trace-env-native-stack`.
+要打印访问的堆栈跟踪，请使用 `--trace-env-js-stack` 和/或 `--trace-env-native-stack`。
 
 ### `--trace-env-js-stack`
 
@@ -2824,7 +2456,7 @@ added:
   - v22.13.0
 -->
 
-In addition to what `--trace-env` does, this prints the JavaScript stack trace of the access.
+除了 `--trace-env` 的功能外，还打印访问的 JavaScript 堆栈跟踪。
 
 ### `--trace-env-native-stack`
 
@@ -2834,7 +2466,7 @@ added:
   - v22.13.0
 -->
 
-In addition to what `--trace-env` does, this prints the native stack trace of the access.
+除了 `--trace-env` 的功能外，还打印访问的原生堆栈跟踪。
 
 ### `--trace-event-categories`
 
@@ -2842,8 +2474,7 @@ In addition to what `--trace-env` does, this prints the native stack trace of th
 added: v7.7.0
 -->
 
-A comma separated list of categories that should be traced when trace event
-tracing is enabled using `--trace-events-enabled`.
+当使用 `--trace-events-enabled` 启用跟踪事件跟踪时，应跟踪的逗号分隔的类别列表。
 
 ### `--trace-event-file-pattern`
 
@@ -2851,8 +2482,7 @@ tracing is enabled using `--trace-events-enabled`.
 added: v9.8.0
 -->
 
-Template string specifying the filepath for the trace event data, it
-supports `${rotation}` and `${pid}`.
+指定跟踪事件数据的文件路径的模板字符串，它支持 `${rotation}` 和 `${pid}`。
 
 ### `--trace-events-enabled`
 
@@ -2860,7 +2490,7 @@ supports `${rotation}` and `${pid}`.
 added: v7.7.0
 -->
 
-Enables the collection of trace event tracing information.
+启用跟踪事件跟踪信息的收集。
 
 ### `--trace-exit`
 
@@ -2870,8 +2500,7 @@ added:
  - v12.16.0
 -->
 
-Prints a stack trace whenever an environment is exited proactively,
-i.e. invoking `process.exit()`.
+每当环境主动退出时打印堆栈跟踪，即调用 `process.exit()`。
 
 ### `--trace-require-module=mode`
 
@@ -2882,10 +2511,9 @@ added:
  - v20.19.0
 -->
 
-Prints information about usage of [Loading ECMAScript modules using `require()`][].
+打印有关 [使用 `require()` 加载 ECMAScript 模块][Loading ECMAScript modules using `require()`] 的使用信息。
 
-When `mode` is `all`, all usage is printed. When `mode` is `no-node-modules`, usage
-from the `node_modules` folder is excluded.
+当 `mode` 为 `all` 时，打印所有使用情况。当 `mode` 为 `no-node-modules` 时，排除来自 `node_modules` 文件夹的使用情况。
 
 ### `--trace-sigint`
 
@@ -2895,7 +2523,7 @@ added:
  - v12.17.0
 -->
 
-Prints a stack trace on SIGINT.
+在 SIGINT 上打印堆栈跟踪。
 
 ### `--trace-sync-io`
 
@@ -2903,8 +2531,7 @@ Prints a stack trace on SIGINT.
 added: v2.1.0
 -->
 
-Prints a stack trace whenever synchronous I/O is detected after the first turn
-of the event loop.
+在事件循环的第一轮之后检测到同步 I/O 时打印堆栈跟踪。
 
 ### `--trace-tls`
 
@@ -2912,8 +2539,7 @@ of the event loop.
 added: v12.2.0
 -->
 
-Prints TLS packet trace information to `stderr`. This can be used to debug TLS
-connection problems.
+将 TLS 数据包跟踪信息打印到 `stderr`。这可用于调试 TLS 连接问题。
 
 ### `--trace-uncaught`
 
@@ -2921,12 +2547,9 @@ connection problems.
 added: v13.1.0
 -->
 
-Print stack traces for uncaught exceptions; usually, the stack trace associated
-with the creation of an `Error` is printed, whereas this makes Node.js also
-print the stack trace associated with throwing the value (which does not need
-to be an `Error` instance).
+打印未捕获异常的堆栈跟踪；通常，打印与创建 `Error` 相关的堆栈跟踪，而此选项使 Node.js 也打印与抛出值相关的堆栈跟踪（该值不需要是 `Error` 实例）。
 
-Enabling this option may affect garbage collection behavior negatively.
+启用此选项可能会对垃圾回收行为产生负面影响。
 
 ### `--trace-warnings`
 
@@ -2934,7 +2557,7 @@ Enabling this option may affect garbage collection behavior negatively.
 added: v6.0.0
 -->
 
-Print stack traces for process warnings (including deprecations).
+打印进程警告（包括弃用）的堆栈跟踪。
 
 ### `--track-heap-objects`
 
@@ -2942,7 +2565,7 @@ Print stack traces for process warnings (including deprecations).
 added: v2.4.0
 -->
 
-Track heap object allocations for heap snapshots.
+跟踪堆对象分配以获取堆快照。
 
 ### `--unhandled-rejections=mode`
 
@@ -2957,21 +2580,15 @@ changes:
                  emitted.
 -->
 
-Using this flag allows to change what should happen when an unhandled rejection
-occurs. One of the following modes can be chosen:
+使用此标志可以更改发生未处理的拒绝时应发生的情况。可以选择以下模式之一：
 
-* `throw`: Emit [`unhandledRejection`][]. If this hook is not set, raise the
-  unhandled rejection as an uncaught exception. This is the default.
-* `strict`: Raise the unhandled rejection as an uncaught exception. If the
-  exception is handled, [`unhandledRejection`][] is emitted.
-* `warn`: Always trigger a warning, no matter if the [`unhandledRejection`][]
-  hook is set or not but do not print the deprecation warning.
-* `warn-with-error-code`: Emit [`unhandledRejection`][]. If this hook is not
-  set, trigger a warning, and set the process exit code to 1.
-* `none`: Silence all warnings.
+* `throw`：发出 [`unhandledRejection`][]。如果未设置此钩子，则将未处理的拒绝作为未捕获的异常抛出。这是默认值。
+* `strict`：将未处理的拒绝作为未捕获的异常抛出。如果异常被处理，则发出 [`unhandledRejection`][]。
+* `warn`：无论是否设置了 [`unhandledRejection`][] 钩子，始终触发警告，但不打印弃用警告。
+* `warn-with-error-code`：发出 [`unhandledRejection`][]。如果未设置此钩子，则触发警告，并将进程退出代码设置为 1。
+* `none`：静默所有警告。
 
-If a rejection happens during the command line entry point's ES module static
-loading phase, it will always raise it as an uncaught exception.
+如果拒绝发生在命令行入口点的 ES 模块静态加载阶段，它将始终将其作为未捕获的异常抛出。
 
 ### `--use-bundled-ca`, `--use-openssl-ca`
 
@@ -2979,20 +2596,13 @@ loading phase, it will always raise it as an uncaught exception.
 added: v6.11.0
 -->
 
-Use bundled Mozilla CA store as supplied by current Node.js version
-or use OpenSSL's default CA store. The default store is selectable
-at build-time.
+使用当前 Node.js 版本提供的捆绑的 Mozilla CA 存储或使用 OpenSSL 的默认 CA 存储。默认存储可在构建时选择。
 
-The bundled CA store, as supplied by Node.js, is a snapshot of Mozilla CA store
-that is fixed at release time. It is identical on all supported platforms.
+由 Node.js 提供的捆绑 CA 存储是 Mozilla CA 存储的快照，在发布时固定。它在所有支持的平台上都是相同的。
 
-Using OpenSSL store allows for external modifications of the store. For most
-Linux and BSD distributions, this store is maintained by the distribution
-maintainers and system administrators. OpenSSL CA store location is dependent on
-configuration of the OpenSSL library but this can be altered at runtime using
-environment variables.
+使用 OpenSSL 存储允许对存储进行外部修改。对于大多数 Linux 和 BSD 发行版，此存储由发行版维护者和系统管理员维护。OpenSSL CA 存储位置取决于 OpenSSL 库的配置，但可以在运行时使用环境变量更改。
 
-See `SSL_CERT_DIR` and `SSL_CERT_FILE`.
+参见 `SSL_CERT_DIR` 和 `SSL_CERT_FILE`。
 
 ### `--use-env-proxy`
 
@@ -3002,12 +2612,9 @@ added: v24.5.0
 
 > Stability: 1.1 - Active Development
 
-When enabled, Node.js parses the `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`
-environment variables during startup, and tunnels requests over the
-specified proxy.
+启用后，Node.js 将在启动期间解析 `HTTP_PROXY`、`HTTPS_PROXY` 和 `NO_PROXY` 环境变量，并通过指定的代理隧道请求。
 
-This is equivalent to setting the [`NODE_USE_ENV_PROXY=1`][] environment variable.
-When both are set, `--use-env-proxy` takes precedence.
+这等同于设置 [`NODE_USE_ENV_PROXY=1`][] 环境变量。当两者都设置时，`--use-env-proxy` 优先。
 
 ### `--use-largepages=mode`
 
@@ -3017,17 +2624,13 @@ added:
  - v12.17.0
 -->
 
-Re-map the Node.js static code to large memory pages at startup. If supported on
-the target system, this will cause the Node.js static code to be moved onto 2
-MiB pages instead of 4 KiB pages.
+在启动时将 Node.js 静态代码重新映射到大内存页。如果目标系统支持，这将导致 Node.js 静态代码被移动到 2 MiB 页面而不是 4 KiB 页面。
 
-The following values are valid for `mode`:
+`mode` 的有效值如下：
 
-* `off`: No mapping will be attempted. This is the default.
-* `on`: If supported by the OS, mapping will be attempted. Failure to map will
-  be ignored and a message will be printed to standard error.
-* `silent`: If supported by the OS, mapping will be attempted. Failure to map
-  will be ignored and will not be reported.
+* `off`：不会尝试映射。这是默认值。
+* `on`：如果操作系统支持，将尝试映射。映射失败将被忽略，并且消息将打印到标准错误。
+* `silent`：如果操作系统支持，将尝试映射。映射失败将被忽略，并且不会报告。
 
 ### `--use-system-ca`
 
@@ -3039,54 +2642,38 @@ changes:
     description: Added support on non-Windows and non-macOS.
 -->
 
-Node.js uses the trusted CA certificates present in the system store along with
-the `--use-bundled-ca` option and the `NODE_EXTRA_CA_CERTS` environment variable.
-On platforms other than Windows and macOS, this loads certificates from the directory
-and file trusted by OpenSSL, similar to `--use-openssl-ca`, with the difference being
-that it caches the certificates after first load.
+Node.js 使用系统存储中存在的受信任 CA 证书以及 `--use-bundled-ca` 选项和 `NODE_EXTRA_CA_CERTS` 环境变量。在 Windows 和 macOS 以外的平台上，这会从 OpenSSL 信任的目录和文件加载证书，类似于 `--use-openssl-ca`，不同之处在于它在首次加载后缓存证书。
 
-On Windows and macOS, the certificate trust policy is planned to follow
-[Chromium's policy for locally trusted certificates][]:
+在 Windows 和 macOS 上，证书信任策略计划遵循 [Chromium 的本地受信任证书策略][Chromium's policy for locally trusted certificates]：
 
-On macOS, the following settings are respected:
+在 macOS 上，尊重以下设置：
 
-* Default and System Keychains
-  * Trust:
-    * Any certificate where the “When using this certificate” flag is set to “Always Trust” or
-    * Any certificate where the “Secure Sockets Layer (SSL)” flag is set to “Always Trust.”
-  * Distrust:
-    * Any certificate where the “When using this certificate” flag is set to “Never Trust” or
-    * Any certificate where the “Secure Sockets Layer (SSL)” flag is set to “Never Trust.”
+* 默认和系统钥匙串
+  * 信任：
+    * 任何“使用此证书时”标志设置为“始终信任”的证书，或
+    * 任何“安全套接字层 (SSL)”标志设置为“始终信任”的证书。
+  * 不信任：
+    * 任何“使用此证书时”标志设置为“从不信任”的证书，或
+    * 任何“安全套接字层 (SSL)”标志设置为“从不信任”的证书。
 
-On Windows, the following settings are respected (unlike Chromium's policy, distrust
-and intermediate CA are not currently supported):
+在 Windows 上，尊重以下设置（与 Chromium 的策略不同，目前不支持不信任和中间 CA）：
 
-* Local Machine (accessed via `certlm.msc`)
-  * Trust:
-    * Trusted Root Certification Authorities
-    * Trusted People
-    * Enterprise Trust -> Enterprise -> Trusted Root Certification Authorities
-    * Enterprise Trust -> Enterprise -> Trusted People
-    * Enterprise Trust -> Group Policy -> Trusted Root Certification Authorities
-    * Enterprise Trust -> Group Policy -> Trusted People
-* Current User (accessed via `certmgr.msc`)
-  * Trust:
-    * Trusted Root Certification Authorities
-    * Enterprise Trust -> Group Policy -> Trusted Root Certification Authorities
+* 本地计算机（通过 `certlm.msc` 访问）
+  * 信任：
+    * 受信任的根证书颁发机构
+    * 受信任的人员
+    * 企业信任 -> 企业 -> 受信任的根证书颁发机构
+    * 企业信任 -> 企业 -> 受信任的人员
+    * 企业信任 -> 组策略 -> 受信任的根证书颁发机构
+    * 企业信任 -> 组策略 -> 受信任的人员
+* 当前用户（通过 `certmgr.msc` 访问）
+  * 信任：
+    * 受信任的根证书颁发机构
+    * 企业信任 -> 组策略 -> 受信任的根证书颁发机构
 
-On Windows and macOS, Node.js would check that the user settings for the certificates
-do not forbid them for TLS server authentication before using them.
+在 Windows 和 macOS 上，Node.js 将检查用户对证书的设置是否不禁止它们用于 TLS 服务器身份验证，然后再使用它们。
 
-On other systems, Node.js loads certificates from the default certificate file
-(typically `/etc/ssl/cert.pem`) and default certificate directory (typically
-`/etc/ssl/certs`) that the version of OpenSSL that Node.js links to respects.
-This typically works with the convention on major Linux distributions and other
-Unix-like systems. If the overriding OpenSSL environment variables
-(typically `SSL_CERT_FILE` and `SSL_CERT_DIR`, depending on the configuration
-of the OpenSSL that Node.js links to) are set, the specified paths will be used to load
-certificates instead. These environment variables can be used as workarounds
-if the conventional paths used by the version of OpenSSL Node.js links to are
-not consistent with the system configuration that the users have for some reason.
+在其他系统上，Node.js 从 Node.js 链接到的 OpenSSL 版本尊重的默认证书文件（通常是 `/etc/ssl/cert.pem`）和默认证书目录（通常是 `/etc/ssl/certs`）加载证书。这通常适用于主要 Linux 发行版和其他类 Unix 系统的约定。如果覆盖的 OpenSSL 环境变量（通常取决于 Node.js 链接到的 OpenSSL 的配置，是 `SSL_CERT_FILE` 和 `SSL_CERT_DIR`）已设置，则将使用指定的路径来加载证书而不是。这些环境变量可以用作变通方法，如果 Node.js 链接到的 OpenSSL 版本使用的常规路径由于某种原因与用户拥有的系统配置不一致。
 
 ### `--v8-options`
 
@@ -3094,7 +2681,7 @@ not consistent with the system configuration that the users have for some reason
 added: v0.1.3
 -->
 
-Print V8 command-line options.
+打印 V8 命令行选项。
 
 ### `--v8-pool-size=num`
 
@@ -3102,14 +2689,11 @@ Print V8 command-line options.
 added: v5.10.0
 -->
 
-Set V8's thread pool size which will be used to allocate background jobs.
+设置 V8 的线程池大小，该线程池将用于分配后台作业。
 
-If set to `0` then Node.js will choose an appropriate size of the thread pool
-based on an estimate of the amount of parallelism.
+如果设置为 `0`，则 Node.js 将基于并行量的估计选择线程池的适当大小。
 
-The amount of parallelism refers to the number of computations that can be
-carried out simultaneously in a given machine. In general, it's the same as the
-amount of CPUs, but it may diverge in environments such as VMs or containers.
+并行量是指给定机器中可以同时执行的计算数量。通常，它与 CPU 数量相同，但在虚拟机或容器等环境中可能会有所不同。
 
 ### `-v`, `--version`
 
@@ -3117,7 +2701,7 @@ amount of CPUs, but it may diverge in environments such as VMs or containers.
 added: v0.1.3
 -->
 
-Print node's version.
+打印节点的版本。
 
 ### `--watch`
 
@@ -3138,19 +2722,11 @@ changes:
     description: Test runner now supports running in watch mode.
 -->
 
-Starts Node.js in watch mode.
-When in watch mode, changes in the watched files cause the Node.js process to
-restart.
-By default, watch mode will watch the entry point
-and any required or imported module.
-Use `--watch-path` to specify what paths to watch.
+以监视模式启动 Node.js。在监视模式下，监视文件中的更改会导致 Node.js 进程重启。默认情况下，监视模式将监视入口点以及任何 required 或 imported 的模块。使用 `--watch-path` 指定要监视的路径。
 
-This flag cannot be combined with
-`--check`, `--eval`, `--interactive`, or the REPL.
+此标志不能与 `--check`、`--eval`、`--interactive` 或 REPL 结合使用。
 
-Note: The `--watch` flag requires a file path as an argument and is incompatible
-with `--run` or inline script input, as `--run` takes precedence and ignores watch
-mode. If no file is provided, Node.js will exit with status code `9`.
+注意：`--watch` 标志需要一个文件路径作为参数，并且与 `--run` 或内联脚本输入不兼容，因为 `--run` 优先并忽略监视模式。如果未提供文件，Node.js 将以状态码 `9` 退出。
 
 ```bash
 node --watch index.js
@@ -3165,7 +2741,7 @@ added:
 
 > Stability: 1.1 - Active Development
 
-Customizes the signal sent to the process on watch mode restarts.
+自定义在监视模式重启时发送给进程的信号。
 
 ```bash
 node --watch --watch-kill-signal SIGINT test.js
@@ -3185,25 +2761,17 @@ changes:
     description: Watch mode is now stable.
 -->
 
-Starts Node.js in watch mode and specifies what paths to watch.
-When in watch mode, changes in the watched paths cause the Node.js process to
-restart.
-This will turn off watching of required or imported modules, even when used in
-combination with `--watch`.
+以监视模式启动 Node.js 并指定要监视的路径。在监视模式下，监视路径中的更改会导致 Node.js 进程重启。这将关闭对 required 或 imported 模块的监视，即使与 `--watch` 结合使用也是如此。
 
-This flag cannot be combined with
-`--check`, `--eval`, `--interactive`, `--test`, or the REPL.
+此标志不能与 `--check`、`--eval`、`--interactive`、`--test` 或 REPL 结合使用。
 
-Note: Using `--watch-path` implicitly enables `--watch`, which requires a file path
-and is incompatible with `--run`, as `--run` takes precedence and ignores watch mode.
+注意：使用 `--watch-path` 隐式启用 `--watch`，这需要一个文件路径并且与 `--run` 不兼容，因为 `--run` 优先并忽略监视模式。
 
 ```bash
 node --watch-path=./src --watch-path=./tests index.js
 ```
 
-This option is only supported on macOS and Windows.
-An `ERR_FEATURE_UNAVAILABLE_ON_PLATFORM` exception will be thrown
-when the option is used on a platform that does not support it.
+此选项仅在 macOS 和 Windows 上受支持。在不支持该选项的平台上使用时会抛出 `ERR_FEATURE_UNAVAILABLE_ON_PLATFORM` 异常。
 
 ### `--watch-preserve-output`
 
@@ -3213,7 +2781,7 @@ added:
   - v18.13.0
 -->
 
-Disable the clearing of the console when watch mode restarts the process.
+在监视模式重启进程时禁用清除控制台。
 
 ```bash
 node --watch --watch-preserve-output test.js
@@ -3225,26 +2793,23 @@ node --watch --watch-preserve-output test.js
 added: v6.0.0
 -->
 
-Automatically zero-fills all newly allocated [`Buffer`][] and [`SlowBuffer`][]
-instances.
+自动零填充所有新分配的 [`Buffer`][] 和 [`SlowBuffer`][] 实例。
 
-## Environment variables
+## 环境变量
 
 > Stability: 2 - Stable
 
 ### `FORCE_COLOR=[1, 2, 3]`
 
-The `FORCE_COLOR` environment variable is used to
-enable ANSI colorized output. The value may be:
+`FORCE_COLOR` 环境变量用于启用 ANSI 彩色输出。值可以是：
 
-* `1`, `true`, or the empty string `''` indicate 16-color support,
-* `2` to indicate 256-color support, or
-* `3` to indicate 16 million-color support.
+* `1`、`true` 或空字符串 `''` 表示 16 色支持，
+* `2` 表示 256 色支持，或
+* `3` 表示 1600 万色支持。
 
-When `FORCE_COLOR` is used and set to a supported value, both the `NO_COLOR`,
-and `NODE_DISABLE_COLORS` environment variables are ignored.
+当使用 `FORCE_COLOR` 并设置为支持的值时，`NO_COLOR` 和 `NODE_DISABLE_COLORS` 环境变量都会被忽略。
 
-Any other value will result in colorized output being disabled.
+任何其他值将导致彩色输出被禁用。
 
 ### `NODE_COMPILE_CACHE=dir`
 
@@ -3254,8 +2819,7 @@ added: v22.1.0
 
 > Stability: 1.1 - Active Development
 
-Enable the [module compile cache][] for the Node.js instance. See the documentation of
-[module compile cache][] for details.
+为 Node.js 实例启用 [模块编译缓存][module compile cache]。有关详细信息，请参阅 [模块编译缓存][module compile cache] 的文档。
 
 ### `NODE_DEBUG=module[,…]`
 
@@ -3263,11 +2827,11 @@ Enable the [module compile cache][] for the Node.js instance. See the documentat
 added: v0.1.32
 -->
 
-`','`-separated list of core modules that should print debug information.
+`','` 分隔的核心模块列表，应打印调试信息。
 
 ### `NODE_DEBUG_NATIVE=module[,…]`
 
-`','`-separated list of core C++ modules that should print debug information.
+`','` 分隔的核心 C++ 模块列表，应打印调试信息。
 
 ### `NODE_DISABLE_COLORS=1`
 
@@ -3275,7 +2839,7 @@ added: v0.1.32
 added: v0.3.0
 -->
 
-When set, colors will not be used in the REPL.
+设置后，REPL 中将不使用颜色。
 
 ### `NODE_DISABLE_COMPILE_CACHE=1`
 
@@ -3285,8 +2849,7 @@ added: v22.8.0
 
 > Stability: 1.1 - Active Development
 
-Disable the [module compile cache][] for the Node.js instance. See the documentation of
-[module compile cache][] for details.
+为 Node.js 实例禁用 [模块编译缓存][module compile cache]。有关详细信息，请参阅 [模块编译缓存][module compile cache] 的文档。
 
 ### `NODE_EXTRA_CA_CERTS=file`
 
@@ -3294,21 +2857,13 @@ Disable the [module compile cache][] for the Node.js instance. See the documenta
 added: v7.3.0
 -->
 
-When set, the well known "root" CAs (like VeriSign) will be extended with the
-extra certificates in `file`. The file should consist of one or more trusted
-certificates in PEM format. A message will be emitted (once) with
-[`process.emitWarning()`][emit_warning] if the file is missing or
-malformed, but any errors are otherwise ignored.
+设置后，众所周知的“根”CA（如 VeriSign）将使用 `file` 中的额外证书进行扩展。该文件应包含一个或多个受信任的 PEM 格式证书。如果文件丢失或格式错误，将（一次）通过 [`process.emitWarning()`][emit_warning] 发出消息，但任何错误 otherwise 将被忽略。
 
-Neither the well known nor extra certificates are used when the `ca`
-options property is explicitly specified for a TLS or HTTPS client or server.
+当为 TLS 或 HTTPS 客户端或服务器显式指定 `ca` 选项属性时，既不使用众所周知的证书也不使用额外证书。
 
-This environment variable is ignored when `node` runs as setuid root or
-has Linux file capabilities set.
+当 `node` 作为 setuid root 运行或设置了 Linux 文件功能时，此环境变量将被忽略。
 
-The `NODE_EXTRA_CA_CERTS` environment variable is only read when the Node.js
-process is first launched. Changing the value at runtime using
-`process.env.NODE_EXTRA_CA_CERTS` has no effect on the current process.
+`NODE_EXTRA_CA_CERTS` 环境变量仅在 Node.js 进程首次启动时读取。在运行时使用 `process.env.NODE_EXTRA_CA_CERTS` 更改值对当前进程没有影响。
 
 ### `NODE_ICU_DATA=file`
 
@@ -3316,8 +2871,7 @@ process is first launched. Changing the value at runtime using
 added: v0.11.15
 -->
 
-Data path for ICU (`Intl` object) data. Will extend linked-in data when compiled
-with small-icu support.
+ICU（`Intl` 对象）数据的数据路径。在使用 small-icu 支持编译时将扩展链接的数据。
 
 ### `NODE_NO_WARNINGS=1`
 
@@ -3325,7 +2879,7 @@ with small-icu support.
 added: v6.11.0
 -->
 
-When set to `1`, process warnings are silenced.
+设置为 `1` 时，进程警告被静默。
 
 ### `NODE_OPTIONS=options...`
 
@@ -3333,39 +2887,30 @@ When set to `1`, process warnings are silenced.
 added: v8.0.0
 -->
 
-A space-separated list of command-line options. `options...` are interpreted
-before command-line options, so command-line options will override or
-compound after anything in `options...`. Node.js will exit with an error if
-an option that is not allowed in the environment is used, such as `-p` or a
-script file.
+一个空格分隔的命令行选项列表。`options...` 在命令行选项之前解释，因此命令行选项将覆盖或复合 `options...` 中的任何内容。如果使用了环境中不允许的选项（如 `-p` 或脚本文件），Node.js 将退出并报错。
 
-If an option value contains a space, it can be escaped using double quotes:
+如果选项值包含空格，可以使用双引号进行转义：
 
 ```bash
 NODE_OPTIONS='--require "./my path/file.js"'
 ```
 
-A singleton flag passed as a command-line option will override the same flag
-passed into `NODE_OPTIONS`:
+作为命令行选项传递的单例标志将覆盖传递给 `NODE_OPTIONS` 的相同标志：
 
 ```bash
-# The inspector will be available on port 5555
+# 检查器将在端口 5555 上可用
 NODE_OPTIONS='--inspect=localhost:4444' node --inspect=localhost:5555
 ```
 
-A flag that can be passed multiple times will be treated as if its
-`NODE_OPTIONS` instances were passed first, and then its command-line
-instances afterwards:
+可以传递多次的标志将被视为其 `NODE_OPTIONS` 实例首先传递，然后是其命令行实例：
 
 ```bash
 NODE_OPTIONS='--require "./a.js"' node --require "./b.js"
-# is equivalent to:
+# 等同于：
 node --require "./a.js" --require "./b.js"
 ```
 
-Node.js options that are allowed are in the following list. If an option
-supports both --XX and --no-XX variants, they are both supported but only
-one is included in the list below.
+允许的 Node.js 选项在以下列表中。如果一个选项同时支持 --XX 和 --no-XX 变体，则两者都支持，但下面列表中仅包含一个。
 
 <!-- node-options-node start -->
 
@@ -3523,7 +3068,7 @@ one is included in the list below.
 
 <!-- node-options-node end -->
 
-V8 options that are allowed are:
+允许的 V8 选项是：
 
 <!-- node-options-v8 start -->
 
@@ -3545,10 +3090,9 @@ V8 options that are allowed are:
 
 <!-- node-options-others start -->
 
-`--perf-basic-prof-only-functions`, `--perf-basic-prof`,
-`--perf-prof-unwinding-info`, and `--perf-prof` are only available on Linux.
+`--perf-basic-prof-only-functions`、`--perf-basic-prof`、`--perf-prof-unwinding-info` 和 `--perf-prof` 仅在 Linux 上可用。
 
-`--enable-etw-stack-walking` is only available on Windows.
+`--enable-etw-stack-walking` 仅在 Windows 上可用。
 
 <!-- node-options-others end -->
 
@@ -3558,9 +3102,9 @@ V8 options that are allowed are:
 added: v0.1.32
 -->
 
-`':'`-separated list of directories prefixed to the module search path.
+`':'` 分隔的目录列表，前缀到模块搜索路径。
 
-On Windows, this is a `';'`-separated list instead.
+在 Windows 上，这是一个 `';'` 分隔的列表。
 
 ### `NODE_PENDING_DEPRECATION=1`
 
@@ -3568,19 +3112,13 @@ On Windows, this is a `';'`-separated list instead.
 added: v8.0.0
 -->
 
-When set to `1`, emit pending deprecation warnings.
+设置为 `1` 时，发出待弃用警告。
 
-Pending deprecations are generally identical to a runtime deprecation with the
-notable exception that they are turned _off_ by default and will not be emitted
-unless either the `--pending-deprecation` command-line flag, or the
-`NODE_PENDING_DEPRECATION=1` environment variable, is set. Pending deprecations
-are used to provide a kind of selective "early warning" mechanism that
-developers may leverage to detect deprecated API usage.
+待弃用通常与运行时弃用相同，但显著的区别是它们默认是关闭的，除非设置了 `--pending-deprecation` 命令行标志或 `NODE_PENDING_DEPRECATION=1` 环境变量，否则不会发出。待弃用用于提供一种选择性的“早期警告”机制，开发人员可以利用它来检测已弃用的 API 使用情况。
 
 ### `NODE_PENDING_PIPE_INSTANCES=instances`
 
-Set the number of pending pipe instance handles when the pipe server is waiting
-for connections. This setting applies to Windows only.
+设置管道服务器等待连接时待处理管道实例句柄的数量。此设置仅适用于 Windows。
 
 ### `NODE_PRESERVE_SYMLINKS=1`
 
@@ -3588,8 +3126,7 @@ for connections. This setting applies to Windows only.
 added: v7.1.0
 -->
 
-When set to `1`, instructs the module loader to preserve symbolic links when
-resolving and caching modules.
+设置为 `1` 时，指示模块加载器在解析和缓存模块时保留符号链接。
 
 ### `NODE_REDIRECT_WARNINGS=file`
 
@@ -3597,11 +3134,7 @@ resolving and caching modules.
 added: v8.0.0
 -->
 
-When set, process warnings will be emitted to the given file instead of
-printing to stderr. The file will be created if it does not exist, and will be
-appended to if it does. If an error occurs while attempting to write the
-warning to the file, the warning will be written to stderr instead. This is
-equivalent to using the `--redirect-warnings=file` command-line flag.
+设置后，进程警告将发送到给定文件而不是打印到 stderr。如果文件不存在，将被创建；如果存在，将被追加。如果尝试将警告写入文件时发生错误，则警告将改为写入 stderr。这等同于使用 `--redirect-warnings=file` 命令行标志。
 
 ### `NODE_REPL_EXTERNAL_MODULE=file`
 
@@ -3619,8 +3152,7 @@ changes:
       kDisableNodeOptionsEnv for embedders.
 -->
 
-Path to a Node.js module which will be loaded in place of the built-in REPL.
-Overriding this value to an empty string (`''`) will use the built-in REPL.
+指向 Node.js 模块的路径，该模块将代替内置 REPL 加载。将此值覆盖为空字符串（`''`）将使用内置 REPL。
 
 ### `NODE_REPL_HISTORY=file`
 
@@ -3628,9 +3160,7 @@ Overriding this value to an empty string (`''`) will use the built-in REPL.
 added: v3.0.0
 -->
 
-Path to the file used to store the persistent REPL history. The default path is
-`~/.node_repl_history`, which is overridden by this variable. Setting the value
-to an empty string (`''` or `' '`) disables persistent REPL history.
+用于存储持久 REPL 历史记录的文件路径。默认路径是 `~/.node_repl_history`，由此变量覆盖。将值设置为空字符串（`''` 或 `' '`）将禁用持久 REPL 历史记录。
 
 ### `NODE_SKIP_PLATFORM_CHECK=value`
 
@@ -3638,21 +3168,15 @@ to an empty string (`''` or `' '`) disables persistent REPL history.
 added: v14.5.0
 -->
 
-If `value` equals `'1'`, the check for a supported platform is skipped during
-Node.js startup. Node.js might not execute correctly. Any issues encountered
-on unsupported platforms will not be fixed.
+如果 `value` 等于 `'1'`，则在 Node.js 启动期间跳过对受支持平台的检查。Node.js 可能无法正确执行。在不支持的平台上遇到的任何问题将不会修复。
 
 ### `NODE_TEST_CONTEXT=value`
 
-If `value` equals `'child'`, test reporter options will be overridden and test
-output will be sent to stdout in the TAP format. If any other value is provided,
-Node.js makes no guarantees about the reporter format used or its stability.
+如果 `value` 等于 `'child'`，测试报告器选项将被覆盖，测试输出将以 TAP 格式发送到 stdout。如果提供任何其他值，Node.js 不保证使用的报告器格式或其稳定性。
 
 ### `NODE_TLS_REJECT_UNAUTHORIZED=value`
 
-If `value` equals `'0'`, certificate validation is disabled for TLS connections.
-This makes TLS, and HTTPS by extension, insecure. The use of this environment
-variable is strongly discouraged.
+如果 `value` 等于 `'0'`，则对 TLS 连接禁用证书验证。这使得 TLS 以及扩展的 HTTPS 不安全。强烈建议不要使用此环境变量。
 
 ### `NODE_USE_ENV_PROXY=1`
 
@@ -3662,12 +3186,9 @@ added: v24.0.0
 
 > Stability: 1.1 - Active Development
 
-When enabled, Node.js parses the `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`
-environment variables during startup, and tunnels requests over the
-specified proxy.
+启用后，Node.js 将在启动期间解析 `HTTP_PROXY`、`HTTPS_PROXY` 和 `NO_PROXY` 环境变量，并通过指定的代理隧道请求。
 
-This can also be enabled using the [`--use-env-proxy`][] command-line flag.
-When both are set, `--use-env-proxy` takes precedence.
+这也可以使用 [`--use-env-proxy`][] 命令行标志启用。当两者都设置时，`--use-env-proxy` 优先。
 
 ### `NODE_USE_SYSTEM_CA=1`
 
@@ -3675,27 +3196,19 @@ When both are set, `--use-env-proxy` takes precedence.
 added: v24.6.0
 -->
 
-Node.js uses the trusted CA certificates present in the system store along with
-the `--use-bundled-ca` option and the `NODE_EXTRA_CA_CERTS` environment variable.
+Node.js 使用系统存储中存在的受信任 CA 证书以及 `--use-bundled-ca` 选项和 `NODE_EXTRA_CA_CERTS` 环境变量。
 
-This can also be enabled using the [`--use-system-ca`][] command-line flag.
-When both are set, `--use-system-ca` takes precedence.
+这也可以使用 [`--use-system-ca`][] 命令行标志启用。当两者都设置时，`--use-system-ca` 优先。
 
 ### `NODE_V8_COVERAGE=dir`
 
-When set, Node.js will begin outputting [V8 JavaScript code coverage][] and
-[Source Map][] data to the directory provided as an argument (coverage
-information is written as JSON to files with a `coverage` prefix).
+设置后，Node.js 将开始将 [V8 JavaScript 代码覆盖率][V8 JavaScript code coverage] 和 [Source Map][] 数据输出到作为参数提供的目录（覆盖率信息以 JSON 格式写入带有 `coverage` 前缀的文件）。
 
-`NODE_V8_COVERAGE` will automatically propagate to subprocesses, making it
-easier to instrument applications that call the `child_process.spawn()` family
-of functions. `NODE_V8_COVERAGE` can be set to an empty string, to prevent
-propagation.
+`NODE_V8_COVERAGE` 会自动传播到子进程，使得检测调用 `child_process.spawn()` 系列函数的应用程序更加容易。`NODE_V8_COVERAGE` 可以设置为空字符串，以防止传播。
 
-#### Coverage output
+#### 覆盖率输出
 
-Coverage is output as an array of [ScriptCoverage][] objects on the top-level
-key `result`:
+覆盖率作为 [ScriptCoverage][] 对象的数组输出在顶层键 `result` 上：
 
 ```json
 {
@@ -3709,17 +3222,13 @@ key `result`:
 }
 ```
 
-#### Source map cache
+#### Source map 缓存
 
 > Stability: 1 - Experimental
 
-If found, source map data is appended to the top-level key `source-map-cache`
-on the JSON coverage object.
+如果找到，source map 数据将附加到 JSON 覆盖率对象的顶层键 `source-map-cache` 上。
 
-`source-map-cache` is an object with keys representing the files source maps
-were extracted from, and values which include the raw source-map URL
-(in the key `url`), the parsed Source Map v3 information (in the key `data`),
-and the line lengths of the source file (in the key `lineLengths`).
+`source-map-cache` 是一个对象，其键表示从中提取 source map 的文件，值包括原始 source-map URL（在键 `url` 中）、解析的 Source Map v3 信息（在键 `data` 中）以及源文件的行长度（在键 `lineLengths` 中）。
 
 ```json
 {
@@ -3759,8 +3268,7 @@ and the line lengths of the source file (in the key `lineLengths`).
 
 ### `NO_COLOR=<any>`
 
-[`NO_COLOR`][]  is an alias for `NODE_DISABLE_COLORS`. The value of the
-environment variable is arbitrary.
+[`NO_COLOR`][] 是 `NODE_DISABLE_COLORS` 的别名。环境变量的值是任意的。
 
 ### `OPENSSL_CONF=file`
 
@@ -3768,12 +3276,9 @@ environment variable is arbitrary.
 added: v6.11.0
 -->
 
-Load an OpenSSL configuration file on startup. Among other uses, this can be
-used to enable FIPS-compliant crypto if Node.js is built with
-`./configure --openssl-fips`.
+在启动时加载 OpenSSL 配置文件。除其他用途外，如果 Node.js 使用 `./configure --openssl-fips` 构建，这可用于启用符合 FIPS 的加密。
 
-If the [`--openssl-config`][] command-line option is used, the environment
-variable is ignored.
+如果使用了 [`--openssl-config`][] 命令行选项，则忽略环境变量。
 
 ### `SSL_CERT_DIR=dir`
 
@@ -3781,13 +3286,9 @@ variable is ignored.
 added: v7.7.0
 -->
 
-If `--use-openssl-ca` is enabled, or if `--use-system-ca` is enabled on
-platforms other than macOS and Windows, this overrides and sets OpenSSL's directory
-containing trusted certificates.
+如果启用了 `--use-openssl-ca`，或者在 macOS 和 Windows 以外的平台上启用了 `--use-system-ca`，这将覆盖并设置 OpenSSL 包含受信任证书的目录。
 
-Be aware that unless the child environment is explicitly set, this environment
-variable will be inherited by any child processes, and if they use OpenSSL, it
-may cause them to trust the same CAs as node.
+请注意，除非显式设置了子环境，否则此环境变量将由任何子进程继承，如果它们使用 OpenSSL，可能会导致它们信任与 node 相同的 CA。
 
 ### `SSL_CERT_FILE=file`
 
@@ -3795,13 +3296,9 @@ may cause them to trust the same CAs as node.
 added: v7.7.0
 -->
 
-If `--use-openssl-ca` is enabled, or if `--use-system-ca` is enabled on
-platforms other than macOS and Windows, this overrides and sets OpenSSL's file
-containing trusted certificates.
+如果启用了 `--use-openssl-ca`，或者在 macOS 和 Windows 以外的平台上启用了 `--use-system-ca`，这将覆盖并设置 OpenSSL 包含受信任证书的文件。
 
-Be aware that unless the child environment is explicitly set, this environment
-variable will be inherited by any child processes, and if they use OpenSSL, it
-may cause them to trust the same CAs as node.
+请注意，除非显式设置了子环境，否则此环境变量将由任何子进程继承，如果它们使用 OpenSSL，可能会导致它们信任与 node 相同的 CA。
 
 ### `TZ`
 
@@ -3822,13 +3319,9 @@ changes:
       on POSIX systems.
 -->
 
-The `TZ` environment variable is used to specify the timezone configuration.
+`TZ` 环境变量用于指定时区配置。
 
-While Node.js does not support all of the various [ways that `TZ` is handled in
-other environments][], it does support basic [timezone IDs][] (such as
-`'Etc/UTC'`, `'Europe/Paris'`, or `'America/New_York'`).
-It may support a few other abbreviations or aliases, but these are strongly
-discouraged and not guaranteed.
+虽然 Node.js 不支持 [其他环境中处理 `TZ` 的所有各种方式][ways that `TZ` is handled in other environments]，但它确实支持基本的 [时区 ID][timezone IDs]（如 `'Etc/UTC'`、`'Europe/Paris'` 或 `'America/New_York'`）。它可能支持一些其他缩写或别名，但强烈不建议使用这些，并且不能保证。
 
 ```console
 $ TZ=Europe/Dublin node -pe "new Date().toString()"
@@ -3837,39 +3330,20 @@ Wed May 12 2021 20:30:48 GMT+0100 (Irish Standard Time)
 
 ### `UV_THREADPOOL_SIZE=size`
 
-Set the number of threads used in libuv's threadpool to `size` threads.
+将 libuv 线程池中使用的线程数设置为 `size` 个线程。
 
-Asynchronous system APIs are used by Node.js whenever possible, but where they
-do not exist, libuv's threadpool is used to create asynchronous node APIs based
-on synchronous system APIs. Node.js APIs that use the threadpool are:
+Node.js 尽可能使用异步系统 API，但在它们不存在的地方，使用 libuv 的线程池基于同步系统 API 创建异步节点 API。使用线程池的 Node.js API 有：
 
-* all `fs` APIs, other than the file watcher APIs and those that are explicitly
-  synchronous
-* asynchronous crypto APIs such as `crypto.pbkdf2()`, `crypto.scrypt()`,
-  `crypto.randomBytes()`, `crypto.randomFill()`, `crypto.generateKeyPair()`
+* 所有 `fs` API，除了文件监视器 API 和那些显式同步的 API
+* 异步加密 API，如 `crypto.pbkdf2()`、`crypto.scrypt()`、`crypto.randomBytes()`、`crypto.randomFill()`、`crypto.generateKeyPair()`
 * `dns.lookup()`
-* all `zlib` APIs, other than those that are explicitly synchronous
+* 所有 `zlib` API，除了那些显式同步的 API
 
-Because libuv's threadpool has a fixed size, it means that if for whatever
-reason any of these APIs takes a long time, other (seemingly unrelated) APIs
-that run in libuv's threadpool will experience degraded performance. In order to
-mitigate this issue, one potential solution is to increase the size of libuv's
-threadpool by setting the `'UV_THREADPOOL_SIZE'` environment variable to a value
-greater than `4` (its current default value). However, setting this from inside
-the process using `process.env.UV_THREADPOOL_SIZE=size` is not guranteed to work
-as the threadpool would have been created as part of the runtime initialisation
-much before user code is run. For more information, see the [libuv threadpool documentation][].
+因为 libuv 的线程池具有固定大小，这意味着如果出于任何原因这些 API 中的任何一个花费很长时间，其他（看似无关的）在 libuv 线程池中运行的 API 将经历性能下降。为了缓解此问题，一个潜在的解决方案是通过将 `'UV_THREADPOOL_SIZE'` 环境变量设置为大于 `4`（其当前默认值）的值来增加 libuv 线程池的大小。然而，从进程内部使用 `process.env.UV_THREADPOOL_SIZE=size` 设置此值不能保证工作，因为线程池将在运行时初始化期间创建，远在用户代码运行之前。有关更多信息，请参阅 [libuv 线程池文档][libuv threadpool documentation]。
 
-## Useful V8 options
+## 有用的 V8 选项
 
-V8 has its own set of CLI options. Any V8 CLI option that is provided to `node`
-will be passed on to V8 to handle. V8's options have _no stability guarantee_.
-The V8 team themselves don't consider them to be part of their formal API,
-and reserve the right to change them at any time. Likewise, they are not
-covered by the Node.js stability guarantees. Many of the V8
-options are of interest only to V8 developers. Despite this, there is a small
-set of V8 options that are widely applicable to Node.js, and they are
-documented here:
+V8 有自己的一组 CLI 选项。任何提供给 `node` 的 V8 CLI 选项都将传递给 V8 处理。V8 的选项 _没有稳定性保证_。V8 团队自己并不认为它们是正式 API 的一部分，并保留随时更改它们的权利。同样，它们也不在 Node.js 稳定性保证的范围内。许多 V8 选项仅对 V8 开发人员有意义。尽管如此，有一小部分 V8 选项广泛适用于 Node.js，它们在此记录：
 
 <!-- v8-options start -->
 
@@ -3893,12 +3367,9 @@ documented here:
 
 ### `--max-old-space-size=SIZE` (in MiB)
 
-Sets the max memory size of V8's old memory section. As memory
-consumption approaches the limit, V8 will spend more time on
-garbage collection in an effort to free unused memory.
+设置 V8 旧内存部分的最大内存大小。当内存消耗接近限制时，V8 将花费更多时间在垃圾回收上，以释放未使用的内存。
 
-On a machine with 2 GiB of memory, consider setting this to
-1536 (1.5 GiB) to leave some memory for other uses and avoid swapping.
+在具有 2 GiB 内存的机器上，考虑将其设置为 1536（1.5 GiB）以为其他用途留出一些内存并避免交换。
 
 ```bash
 node --max-old-space-size=1536 index.js
@@ -3910,26 +3381,15 @@ node --max-old-space-size=1536 index.js
 
 ### `--max-semi-space-size=SIZE` (in MiB)
 
-Sets the maximum [semi-space][] size for V8's [scavenge garbage collector][] in
-MiB (mebibytes).
-Increasing the max size of a semi-space may improve throughput for Node.js at
-the cost of more memory consumption.
+以 MiB（mebibytes）设置 V8 的 [清除垃圾回收器][scavenge garbage collector] 的 [半空间][semi-space] 最大大小。增加半空间的最大大小可能会提高 Node.js 的吞吐量，但代价是更多内存消耗。
 
-Since the young generation size of the V8 heap is three times (see
-[`YoungGenerationSizeFromSemiSpaceSize`][] in V8) the size of the semi-space,
-an increase of 1 MiB to semi-space applies to each of the three individual
-semi-spaces and causes the heap size to increase by 3 MiB. The throughput
-improvement depends on your workload (see [#42511][]).
+由于 V8 堆的年轻代大小是半空间大小的三倍（参见 V8 中的 [`YoungGenerationSizeFromSemiSpaceSize`][]），半空间增加 1 MiB 适用于三个独立的半空间中的每一个，并导致堆大小增加 3 MiB。吞吐量的改进取决于您的工作负载（参见 [#42511][]）。
 
-The default value depends on the memory limit. For example, on 64-bit systems
-with a memory limit of 512 MiB, the max size of a semi-space defaults to 1 MiB.
-For memory limits up to and including 2GiB, the default max size of a
-semi-space will be less than 16 MiB on 64-bit systems.
+默认值取决于内存限制。例如，在具有 512 MiB 内存限制的 64 位系统上，半空间的最大大小默认为 1 MiB。对于最多并包括 2GiB 的内存限制，在 64 位系统上半空间的最大默认大小将小于 16 MiB。
 
-To get the best configuration for your application, you should try different
-max-semi-space-size values when running benchmarks for your application.
+要为您的应用程序获得最佳配置，您应该在为应用程序运行基准测试时尝试不同的 max-semi-space-size 值。
 
-For example, benchmark on a 64-bit systems:
+例如，在 64 位系统上进行基准测试：
 
 ```bash
 for MiB in 16 32 64 128; do
@@ -3951,11 +3411,10 @@ done
 
 ### `--stack-trace-limit=limit`
 
-The maximum number of stack frames to collect in an error's stack trace.
-Setting it to 0 disables stack trace collection. The default value is 10.
+错误堆栈跟踪中收集的最大堆栈帧数。将其设置为 0 将禁用堆栈跟踪收集。默认值为 10。
 
 ```bash
-node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # prints 12
+node --stack-trace-limit=12 -p -e "Error.stackTraceLimit" # 打印 12
 ```
 
 <!-- v8-options end -->
