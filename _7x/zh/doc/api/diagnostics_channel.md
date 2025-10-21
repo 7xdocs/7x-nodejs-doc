@@ -1076,14 +1076,14 @@ TracingChannel 是几个 diagnostics_channel 的集合，代表单个可跟踪�
 ##### 事件: `'http2.client.stream.created'`
 
 * `stream` {ClientHttp2Stream}
-* `headers` {HTTP/2 头部对象}
+* `headers` {HTTP/2 Headers Object}
 
 当在客户端创建流时触发。
 
 ##### 事件: `'http2.client.stream.start'`
 
 * `stream` {ClientHttp2Stream}
-* `headers` {HTTP/2 头部对象}
+* `headers` {HTTP/2 Headers Object}
 
 当在客户端启动流时触发。
 
@@ -1097,7 +1097,7 @@ TracingChannel 是几个 diagnostics_channel 的集合，代表单个可跟踪�
 ##### 事件: `'http2.client.stream.finish'`
 
 * `stream` {ClientHttp2Stream}
-* `headers` {HTTP/2 头部对象}
+* `headers` {HTTP/2 Headers Object}
 * `flags` {number}
 
 当在客户端收到流时触发。
@@ -1111,14 +1111,14 @@ TracingChannel 是几个 diagnostics_channel 的集合，代表单个可跟踪�
 ##### 事件: `'http2.server.stream.created'`
 
 * `stream` {ServerHttp2Stream}
-* `headers` {HTTP/2 头部对象}
+* `headers` {HTTP/2 Headers Object}
 
 当在服务器创建流时触发。
 
 ##### 事件: `'http2.server.stream.start'`
 
 * `stream` {ServerHttp2Stream}
-* `headers` {HTTP/2 头部对象}
+* `headers` {HTTP/2 Headers Object}
 
 当在服务器启动流时触发。
 
@@ -1132,7 +1132,7 @@ TracingChannel 是几个 diagnostics_channel 的集合，代表单个可跟踪�
 ##### 事件: `'http2.server.stream.finish'`
 
 * `stream` {ServerHttp2Stream}
-* `headers` {HTTP/2 头部对象}
+* `headers` {HTTP/2 Headers Object}
 * `flags` {number}
 
 当在服务器发送流时触发。

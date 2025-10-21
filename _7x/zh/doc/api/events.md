@@ -8,27 +8,15 @@
 
 <!-- source_link=lib/events.js -->
 
-Much of the Node.js core API is built around an idiomatic asynchronous
-event-driven architecture in which certain kinds of objects (called "emitters")
-emit named events that cause `Function` objects ("listeners") to be called.
+Node.js 核心 API 的大部分是围绕一个惯用的异步事件驱动架构构建的，在这种架构中，某些类型的对象（称为"触发器"）会触发命名事件，导致 `Function` 对象（"监听器"）被调用。
 
-For instance: a [`net.Server`][] object emits an event each time a peer
-connects to it; a [`fs.ReadStream`][] emits an event when the file is opened;
-a [stream][] emits an event whenever data is available to be read.
+例如：一个 [`net.Server`][] 对象在每次有对等体连接到它时触发一个事件；一个 [`fs.ReadStream`][] 在文件被打开时触发一个事件；一个 [stream][] 在数据可读时触发事件。
 
-All objects that emit events are instances of the `EventEmitter` class. These
-objects expose an `eventEmitter.on()` function that allows one or more
-functions to be attached to named events emitted by the object. Typically,
-event names are camel-cased strings but any valid JavaScript property key
-can be used.
+所有触发事件的对象都是 `EventEmitter` 类的实例。这些对象暴露了一个 `eventEmitter.on()` 函数，允许一个或多个函数附加到对象触发的命名事件上。通常，事件名称是驼峰式字符串，但任何有效的 JavaScript 属性键都可以使用。
 
-When the `EventEmitter` object emits an event, all of the functions attached
-to that specific event are called _synchronously_. Any values returned by the
-called listeners are _ignored_ and discarded.
+当 `EventEmitter` 对象触发一个事件时，所有附加到该特定事件的函数都会被*同步地*调用。被调用的监听器返回的任何值都会被*忽略*并丢弃。
 
-The following example shows a simple `EventEmitter` instance with a single
-listener. The `eventEmitter.on()` method is used to register listeners, while
-the `eventEmitter.emit()` method is used to trigger the event.
+以下示例展示了一个简单的 `EventEmitter` 实例，带有一个监听器。`eventEmitter.on()` 方法用于注册监听器，而 `eventEmitter.emit()` 方法用于触发事件。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -54,13 +42,9 @@ myEmitter.on('event', () => {
 myEmitter.emit('event');
 ```
 
-## Passing arguments and `this` to listeners
+## 向监听器传递参数和 `this`
 
-The `eventEmitter.emit()` method allows an arbitrary set of arguments to be
-passed to the listener functions. Keep in mind that when
-an ordinary listener function is called, the standard `this` keyword
-is intentionally set to reference the `EventEmitter` instance to which the
-listener is attached.
+`eventEmitter.emit()` 方法允许将一组任意参数传递给监听器函数。请记住，当调用普通监听器函数时，标准 `this` 关键字被有意设置为引用监听器附加到的 `EventEmitter` 实例。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -68,7 +52,7 @@ class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 myEmitter.on('event', function(a, b) {
   console.log(a, b, this, this === myEmitter);
-  // Prints:
+  // 打印:
   //   a b MyEmitter {
   //     _events: [Object: null prototype] { event: [Function (anonymous)] },
   //     _eventsCount: 1,
@@ -86,7 +70,7 @@ class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 myEmitter.on('event', function(a, b) {
   console.log(a, b, this, this === myEmitter);
-  // Prints:
+  // 打印:
   //   a b MyEmitter {
   //     _events: [Object: null prototype] { event: [Function (anonymous)] },
   //     _eventsCount: 1,
@@ -98,8 +82,7 @@ myEmitter.on('event', function(a, b) {
 myEmitter.emit('event', 'a', 'b');
 ```
 
-It is possible to use ES6 Arrow Functions as listeners, however, when doing so,
-the `this` keyword will no longer reference the `EventEmitter` instance:
+可以使用 ES6 箭头函数作为监听器，但是，这样做时，`this` 关键字将不再引用 `EventEmitter` 实例：
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -107,7 +90,7 @@ class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 myEmitter.on('event', (a, b) => {
   console.log(a, b, this);
-  // Prints: a b undefined
+  // 打印: a b undefined
 });
 myEmitter.emit('event', 'a', 'b');
 ```
@@ -118,18 +101,14 @@ class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 myEmitter.on('event', (a, b) => {
   console.log(a, b, this);
-  // Prints: a b {}
+  // 打印: a b {}
 });
 myEmitter.emit('event', 'a', 'b');
 ```
 
-## Asynchronous vs. synchronous
+## 异步与同步
 
-The `EventEmitter` calls all listeners synchronously in the order in which
-they were registered. This ensures the proper sequencing of
-events and helps avoid race conditions and logic errors. When appropriate,
-listener functions can switch to an asynchronous mode of operation using
-the `setImmediate()` or `process.nextTick()` methods:
+`EventEmitter` 按照监听器被注册的顺序同步调用所有监听器。这确保了事件的正确排序，并有助于避免竞态条件和逻辑错误。在适当的时候，监听器函数可以使用 `setImmediate()` 或 `process.nextTick()` 方法切换到异步操作模式：
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -155,10 +134,9 @@ myEmitter.on('event', (a, b) => {
 myEmitter.emit('event', 'a', 'b');
 ```
 
-## Handling events only once
+## 仅处理事件一次
 
-When a listener is registered using the `eventEmitter.on()` method, that
-listener is invoked _every time_ the named event is emitted.
+当使用 `eventEmitter.on()` 方法注册监听器时，该监听器在每次触发命名事件时都会被调用。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -169,9 +147,9 @@ myEmitter.on('event', () => {
   console.log(++m);
 });
 myEmitter.emit('event');
-// Prints: 1
+// 打印: 1
 myEmitter.emit('event');
-// Prints: 2
+// 打印: 2
 ```
 
 ```cjs
@@ -183,14 +161,12 @@ myEmitter.on('event', () => {
   console.log(++m);
 });
 myEmitter.emit('event');
-// Prints: 1
+// 打印: 1
 myEmitter.emit('event');
-// Prints: 2
+// 打印: 2
 ```
 
-Using the `eventEmitter.once()` method, it is possible to register a listener
-that is called at most once for a particular event. Once the event is emitted,
-the listener is unregistered and _then_ called.
+使用 `eventEmitter.once()` 方法，可以注册一个对于特定事件最多被调用一次的监听器。当事件被触发时，监听器会被注销，*然后*被调用。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -201,9 +177,9 @@ myEmitter.once('event', () => {
   console.log(++m);
 });
 myEmitter.emit('event');
-// Prints: 1
+// 打印: 1
 myEmitter.emit('event');
-// Ignored
+// 忽略
 ```
 
 ```cjs
@@ -215,27 +191,23 @@ myEmitter.once('event', () => {
   console.log(++m);
 });
 myEmitter.emit('event');
-// Prints: 1
+// 打印: 1
 myEmitter.emit('event');
-// Ignored
+// 忽略
 ```
 
-## Error events
+## 错误事件
 
-When an error occurs within an `EventEmitter` instance, the typical action is
-for an `'error'` event to be emitted. These are treated as special cases
-within Node.js.
+当 `EventEmitter` 实例内部发生错误时，典型的操作是触发一个 `'error'` 事件。这些在 Node.js 中被视为特殊情况。
 
-If an `EventEmitter` does _not_ have at least one listener registered for the
-`'error'` event, and an `'error'` event is emitted, the error is thrown, a
-stack trace is printed, and the Node.js process exits.
+如果一个 `EventEmitter` 没有为 `'error'` 事件注册至少一个监听器，并且触发了 `'error'` 事件，则会抛出错误，打印堆栈跟踪，并且 Node.js 进程会退出。
 
 ```mjs
 import { EventEmitter } from 'node:events';
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 myEmitter.emit('error', new Error('whoops!'));
-// Throws and crashes Node.js
+// 抛出错误并使 Node.js 崩溃
 ```
 
 ```cjs
@@ -243,13 +215,12 @@ const EventEmitter = require('node:events');
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 myEmitter.emit('error', new Error('whoops!'));
-// Throws and crashes Node.js
+// 抛出错误并使 Node.js 崩溃
 ```
 
-To guard against crashing the Node.js process the [`domain`][] module can be
-used. (Note, however, that the `node:domain` module is deprecated.)
+为了防止 Node.js 进程崩溃，可以使用 [`domain`][] 模块。（但请注意，`node:domain` 模块已被弃用。）
 
-As a best practice, listeners should always be added for the `'error'` events.
+作为最佳实践，应始终为 `'error'` 事件添加监听器。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -259,7 +230,7 @@ myEmitter.on('error', (err) => {
   console.error('whoops! there was an error');
 });
 myEmitter.emit('error', new Error('whoops!'));
-// Prints: whoops! there was an error
+// 打印: whoops! there was an error
 ```
 
 ```cjs
@@ -270,11 +241,10 @@ myEmitter.on('error', (err) => {
   console.error('whoops! there was an error');
 });
 myEmitter.emit('error', new Error('whoops!'));
-// Prints: whoops! there was an error
+// 打印: whoops! there was an error
 ```
 
-It is possible to monitor `'error'` events without consuming the emitted error
-by installing a listener using the symbol `events.errorMonitor`.
+可以通过使用符号 `events.errorMonitor` 安装监听器来监视 `'error'` 事件，而不消耗触发的错误。
 
 ```mjs
 import { EventEmitter, errorMonitor } from 'node:events';
@@ -284,7 +254,7 @@ myEmitter.on(errorMonitor, (err) => {
   MyMonitoringTool.log(err);
 });
 myEmitter.emit('error', new Error('whoops!'));
-// Still throws and crashes Node.js
+// 仍然抛出错误并使 Node.js 崩溃
 ```
 
 ```cjs
@@ -295,13 +265,12 @@ myEmitter.on(errorMonitor, (err) => {
   MyMonitoringTool.log(err);
 });
 myEmitter.emit('error', new Error('whoops!'));
-// Still throws and crashes Node.js
+// 仍然抛出错误并使 Node.js 崩溃
 ```
 
-## Capture rejections of promises
+## 捕获 Promise 的拒绝
 
-Using `async` functions with event handlers is problematic, because it
-can lead to an unhandled rejection in case of a thrown exception:
+在事件处理程序中使用 `async` 函数是有问题的，因为在抛出异常的情况下可能导致未处理的拒绝：
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -319,11 +288,7 @@ ee.on('something', async (value) => {
 });
 ```
 
-The `captureRejections` option in the `EventEmitter` constructor or the global
-setting change this behavior, installing a `.then(undefined, handler)`
-handler on the `Promise`. This handler routes the exception
-asynchronously to the [`Symbol.for('nodejs.rejection')`][rejection] method
-if there is one, or to [`'error'`][error] event handler if there is none.
+`EventEmitter` 构造函数中的 `captureRejections` 选项或全局设置改变了这种行为，在 `Promise` 上安装了一个 `.then(undefined, handler)` 处理程序。该处理程序将异常异步地路由到 [`Symbol.for('nodejs.rejection')`][rejection] 方法（如果存在），或者路由到 [`'error'`][error] 事件处理程序（如果不存在）。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -359,8 +324,7 @@ ee2.on('something', async (value) => {
 ee2[Symbol.for('nodejs.rejection')] = console.log;
 ```
 
-Setting `events.captureRejections = true` will change the default for all
-new instances of `EventEmitter`.
+设置 `events.captureRejections = true` 将更改所有新 `EventEmitter` 实例的默认值。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -385,11 +349,9 @@ ee1.on('something', async (value) => {
 ee1.on('error', console.log);
 ```
 
-The `'error'` events that are generated by the `captureRejections` behavior
-do not have a catch handler to avoid infinite error loops: the
-recommendation is to **not use `async` functions as `'error'` event handlers**.
+由 `captureRejections` 行为生成的 `'error'` 事件没有捕获处理程序以避免无限错误循环：建议**不要使用 `async` 函数作为 `'error'` 事件处理程序**。
 
-## Class: `EventEmitter`
+## 类：`EventEmitter`
 
 <!-- YAML
 added: v0.1.26
@@ -401,7 +363,7 @@ changes:
     description: Added captureRejections option.
 -->
 
-The `EventEmitter` class is defined and exposed by the `node:events` module:
+`EventEmitter` 类由 `node:events` 模块定义和暴露：
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -411,44 +373,37 @@ import { EventEmitter } from 'node:events';
 const EventEmitter = require('node:events');
 ```
 
-All `EventEmitter`s emit the event `'newListener'` when new listeners are
-added and `'removeListener'` when existing listeners are removed.
+所有 `EventEmitter` 在添加新监听器时都会触发 `'newListener'` 事件，在移除现有监听器时都会触发 `'removeListener'` 事件。
 
-It supports the following option:
+它支持以下选项：
 
-* `captureRejections` {boolean} It enables
-  [automatic capturing of promise rejection][capturerejections].
-  **Default:** `false`.
+* `captureRejections` {boolean} 启用 [自动捕获 promise 拒绝][capturerejections]。
+  **默认值:** `false`.
 
-### Event: `'newListener'`
+### 事件：`'newListener'`
 
 <!-- YAML
 added: v0.1.26
 -->
 
-* `eventName` {string|symbol} The name of the event being listened for
-* `listener` {Function} The event handler function
+* `eventName` {string|symbol} 正在被监听的事件名称
+* `listener` {Function} 事件处理函数
 
-The `EventEmitter` instance will emit its own `'newListener'` event _before_
-a listener is added to its internal array of listeners.
+`EventEmitter` 实例会在监听器被添加到其内部监听器数组*之前*触发自身的 `'newListener'` 事件。
 
-Listeners registered for the `'newListener'` event are passed the event
-name and a reference to the listener being added.
+为 `'newListener'` 事件注册的监听器会传递事件名称和正在被添加的监听器的引用。
 
-The fact that the event is triggered before adding the listener has a subtle
-but important side effect: any _additional_ listeners registered to the same
-`name` _within_ the `'newListener'` callback are inserted _before_ the
-listener that is in the process of being added.
+在添加监听器之前触发事件这一事实有一个微妙但重要的副作用：在 `'newListener'` 回调中*内部*注册到相同 `name` 的任何*附加*监听器会被插入到*正在被添加的监听器之前*。
 
 ```mjs
 import { EventEmitter } from 'node:events';
 class MyEmitter extends EventEmitter {}
 
 const myEmitter = new MyEmitter();
-// Only do this once so we don't loop forever
+// 只做一次，以免无限循环
 myEmitter.once('newListener', (event, listener) => {
   if (event === 'event') {
-    // Insert a new listener in front
+    // 在前面插入一个新的监听器
     myEmitter.on('event', () => {
       console.log('B');
     });
@@ -458,7 +413,7 @@ myEmitter.on('event', () => {
   console.log('A');
 });
 myEmitter.emit('event');
-// Prints:
+// 打印:
 //   B
 //   A
 ```
@@ -468,10 +423,10 @@ const EventEmitter = require('node:events');
 class MyEmitter extends EventEmitter {}
 
 const myEmitter = new MyEmitter();
-// Only do this once so we don't loop forever
+// 只做一次，以免无限循环
 myEmitter.once('newListener', (event, listener) => {
   if (event === 'event') {
-    // Insert a new listener in front
+    // 在前面插入一个新的监听器
     myEmitter.on('event', () => {
       console.log('B');
     });
@@ -481,12 +436,12 @@ myEmitter.on('event', () => {
   console.log('A');
 });
 myEmitter.emit('event');
-// Prints:
+// 打印:
 //   B
 //   A
 ```
 
-### Event: `'removeListener'`
+### 事件：`'removeListener'`
 
 <!-- YAML
 added: v0.9.3
@@ -499,10 +454,10 @@ changes:
                  now yields the original listener function.
 -->
 
-* `eventName` {string|symbol} The event name
-* `listener` {Function} The event handler function
+* `eventName` {string|symbol} 事件名称
+* `listener` {Function} 事件处理函数
 
-The `'removeListener'` event is emitted _after_ the `listener` is removed.
+`'removeListener'` 事件在 `listener` 被移除*之后*触发。
 
 ### `emitter.addListener(eventName, listener)`
 
@@ -513,7 +468,7 @@ added: v0.1.26
 * `eventName` {string|symbol}
 * `listener` {Function}
 
-Alias for `emitter.on(eventName, listener)`.
+`emitter.on(eventName, listener)` 的别名。
 
 ### `emitter.emit(eventName[, ...args])`
 
@@ -523,27 +478,25 @@ added: v0.1.26
 
 * `eventName` {string|symbol}
 * `...args` {any}
-* Returns: {boolean}
+* 返回: {boolean}
 
-Synchronously calls each of the listeners registered for the event named
-`eventName`, in the order they were registered, passing the supplied arguments
-to each.
+按照监听器被注册的顺序，同步调用为名为 `eventName` 的事件注册的每个监听器，并将提供的参数传递给每个监听器。
 
-Returns `true` if the event had listeners, `false` otherwise.
+如果事件有监听器，则返回 `true`，否则返回 `false`。
 
 ```mjs
 import { EventEmitter } from 'node:events';
 const myEmitter = new EventEmitter();
 
-// First listener
+// 第一个监听器
 myEmitter.on('event', function firstListener() {
   console.log('Helloooo! first listener');
 });
-// Second listener
+// 第二个监听器
 myEmitter.on('event', function secondListener(arg1, arg2) {
   console.log(`event with parameters ${arg1}, ${arg2} in second listener`);
 });
-// Third listener
+// 第三个监听器
 myEmitter.on('event', function thirdListener(...args) {
   const parameters = args.join(', ');
   console.log(`event with parameters ${parameters} in third listener`);
@@ -553,7 +506,7 @@ console.log(myEmitter.listeners('event'));
 
 myEmitter.emit('event', 1, 2, 3, 4, 5);
 
-// Prints:
+// 打印:
 // [
 //   [Function: firstListener],
 //   [Function: secondListener],
@@ -568,15 +521,15 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 const EventEmitter = require('node:events');
 const myEmitter = new EventEmitter();
 
-// First listener
+// 第一个监听器
 myEmitter.on('event', function firstListener() {
   console.log('Helloooo! first listener');
 });
-// Second listener
+// 第二个监听器
 myEmitter.on('event', function secondListener(arg1, arg2) {
   console.log(`event with parameters ${arg1}, ${arg2} in second listener`);
 });
-// Third listener
+// 第三个监听器
 myEmitter.on('event', function thirdListener(...args) {
   const parameters = args.join(', ');
   console.log(`event with parameters ${parameters} in third listener`);
@@ -586,7 +539,7 @@ console.log(myEmitter.listeners('event'));
 
 myEmitter.emit('event', 1, 2, 3, 4, 5);
 
-// Prints:
+// 打印:
 // [
 //   [Function: firstListener],
 //   [Function: secondListener],
@@ -603,10 +556,9 @@ myEmitter.emit('event', 1, 2, 3, 4, 5);
 added: v6.0.0
 -->
 
-* Returns: {string\[]|symbol\[]}
+* 返回: {string\[]|symbol\[]}
 
-Returns an array listing the events for which the emitter has registered
-listeners.
+返回一个数组，列出触发器已注册监听器的事件。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -619,7 +571,7 @@ const sym = Symbol('symbol');
 myEE.on(sym, () => {});
 
 console.log(myEE.eventNames());
-// Prints: [ 'foo', 'bar', Symbol(symbol) ]
+// 打印: [ 'foo', 'bar', Symbol(symbol) ]
 ```
 
 ```cjs
@@ -633,7 +585,7 @@ const sym = Symbol('symbol');
 myEE.on(sym, () => {});
 
 console.log(myEE.eventNames());
-// Prints: [ 'foo', 'bar', Symbol(symbol) ]
+// 打印: [ 'foo', 'bar', Symbol(symbol) ]
 ```
 
 ### `emitter.getMaxListeners()`
@@ -642,11 +594,9 @@ console.log(myEE.eventNames());
 added: v1.0.0
 -->
 
-* Returns: {integer}
+* 返回: {integer}
 
-Returns the current max listener value for the `EventEmitter` which is either
-set by [`emitter.setMaxListeners(n)`][] or defaults to
-[`events.defaultMaxListeners`][].
+返回当前 `EventEmitter` 的最大监听器值，该值由 [`emitter.setMaxListeners(n)`][] 设置或默认为 [`events.defaultMaxListeners`][]。
 
 ### `emitter.listenerCount(eventName[, listener])`
 
@@ -660,13 +610,11 @@ changes:
     description: Added the `listener` argument.
 -->
 
-* `eventName` {string|symbol} The name of the event being listened for
-* `listener` {Function} The event handler function
-* Returns: {integer}
+* `eventName` {string|symbol} 正在被监听的事件名称
+* `listener` {Function} 事件处理函数
+* 返回: {integer}
 
-Returns the number of listeners listening for the event named `eventName`.
-If `listener` is provided, it will return how many times the listener is found
-in the list of the listeners of the event.
+返回监听名为 `eventName` 的事件的监听器数量。如果提供了 `listener`，它将返回该监听器在事件监听器列表中被找到的次数。
 
 ### `emitter.listeners(eventName)`
 
@@ -680,16 +628,16 @@ changes:
 -->
 
 * `eventName` {string|symbol}
-* Returns: {Function\[]}
+* 返回: {Function\[]}
 
-Returns a copy of the array of listeners for the event named `eventName`.
+返回名为 `eventName` 的事件的监听器数组的副本。
 
 ```js
 server.on('connection', (stream) => {
   console.log('someone connected!');
 });
 console.log(util.inspect(server.listeners('connection')));
-// Prints: [ [Function] ]
+// 打印: [ [Function] ]
 ```
 
 ### `emitter.off(eventName, listener)`
@@ -700,9 +648,9 @@ added: v10.0.0
 
 * `eventName` {string|symbol}
 * `listener` {Function}
-* Returns: {EventEmitter}
+* 返回: {EventEmitter}
 
-Alias for [`emitter.removeListener()`][].
+[`emitter.removeListener()`][] 的别名。
 
 ### `emitter.on(eventName, listener)`
 
@@ -710,15 +658,11 @@ Alias for [`emitter.removeListener()`][].
 added: v0.1.101
 -->
 
-* `eventName` {string|symbol} The name of the event.
-* `listener` {Function} The callback function
-* Returns: {EventEmitter}
+* `eventName` {string|symbol} 事件名称。
+* `listener` {Function} 回调函数
+* 返回: {EventEmitter}
 
-Adds the `listener` function to the end of the listeners array for the
-event named `eventName`. No checks are made to see if the `listener` has
-already been added. Multiple calls passing the same combination of `eventName`
-and `listener` will result in the `listener` being added, and called, multiple
-times.
+将 `listener` 函数添加到名为 `eventName` 的事件的监听器数组的末尾。不会检查 `listener` 是否已被添加。多次调用传递相同的 `eventName` 和 `listener` 组合将导致 `listener` 被多次添加和调用。
 
 ```js
 server.on('connection', (stream) => {
@@ -726,11 +670,9 @@ server.on('connection', (stream) => {
 });
 ```
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
-By default, event listeners are invoked in the order they are added. The
-`emitter.prependListener()` method can be used as an alternative to add the
-event listener to the beginning of the listeners array.
+默认情况下，事件监听器按照其添加顺序调用。`emitter.prependListener()` 方法可以用作替代方案，将事件监听器添加到监听器数组的开头。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -738,7 +680,7 @@ const myEE = new EventEmitter();
 myEE.on('foo', () => console.log('a'));
 myEE.prependListener('foo', () => console.log('b'));
 myEE.emit('foo');
-// Prints:
+// 打印:
 //   b
 //   a
 ```
@@ -749,7 +691,7 @@ const myEE = new EventEmitter();
 myEE.on('foo', () => console.log('a'));
 myEE.prependListener('foo', () => console.log('b'));
 myEE.emit('foo');
-// Prints:
+// 打印:
 //   b
 //   a
 ```
@@ -760,12 +702,11 @@ myEE.emit('foo');
 added: v0.3.0
 -->
 
-* `eventName` {string|symbol} The name of the event.
-* `listener` {Function} The callback function
-* Returns: {EventEmitter}
+* `eventName` {string|symbol} 事件名称。
+* `listener` {Function} 回调函数
+* 返回: {EventEmitter}
 
-Adds a **one-time** `listener` function for the event named `eventName`. The
-next time `eventName` is triggered, this listener is removed and then invoked.
+为名为 `eventName` 的事件添加一个**一次性**的 `listener` 函数。下次触发 `eventName` 时，此监听器会被移除，然后被调用。
 
 ```js
 server.once('connection', (stream) => {
@@ -773,11 +714,9 @@ server.once('connection', (stream) => {
 });
 ```
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
-By default, event listeners are invoked in the order they are added. The
-`emitter.prependOnceListener()` method can be used as an alternative to add the
-event listener to the beginning of the listeners array.
+默认情况下，事件监听器按照其添加顺序调用。`emitter.prependOnceListener()` 方法可以用作替代方案，将事件监听器添加到监听器数组的开头。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -785,7 +724,7 @@ const myEE = new EventEmitter();
 myEE.once('foo', () => console.log('a'));
 myEE.prependOnceListener('foo', () => console.log('b'));
 myEE.emit('foo');
-// Prints:
+// 打印:
 //   b
 //   a
 ```
@@ -796,7 +735,7 @@ const myEE = new EventEmitter();
 myEE.once('foo', () => console.log('a'));
 myEE.prependOnceListener('foo', () => console.log('b'));
 myEE.emit('foo');
-// Prints:
+// 打印:
 //   b
 //   a
 ```
@@ -807,15 +746,11 @@ myEE.emit('foo');
 added: v6.0.0
 -->
 
-* `eventName` {string|symbol} The name of the event.
-* `listener` {Function} The callback function
-* Returns: {EventEmitter}
+* `eventName` {string|symbol} 事件名称。
+* `listener` {Function} 回调函数
+* 返回: {EventEmitter}
 
-Adds the `listener` function to the _beginning_ of the listeners array for the
-event named `eventName`. No checks are made to see if the `listener` has
-already been added. Multiple calls passing the same combination of `eventName`
-and `listener` will result in the `listener` being added, and called, multiple
-times.
+将 `listener` 函数添加到名为 `eventName` 的事件的监听器数组的*开头*。不会检查 `listener` 是否已被添加。多次调用传递相同的 `eventName` 和 `listener` 组合将导致 `listener` 被多次添加和调用。
 
 ```js
 server.prependListener('connection', (stream) => {
@@ -823,7 +758,7 @@ server.prependListener('connection', (stream) => {
 });
 ```
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
 ### `emitter.prependOnceListener(eventName, listener)`
 
@@ -831,13 +766,11 @@ Returns a reference to the `EventEmitter`, so that calls can be chained.
 added: v6.0.0
 -->
 
-* `eventName` {string|symbol} The name of the event.
-* `listener` {Function} The callback function
-* Returns: {EventEmitter}
+* `eventName` {string|symbol} 事件名称。
+* `listener` {Function} 回调函数
+* 返回: {EventEmitter}
 
-Adds a **one-time** `listener` function for the event named `eventName` to the
-_beginning_ of the listeners array. The next time `eventName` is triggered, this
-listener is removed, and then invoked.
+为名为 `eventName` 的事件添加一个**一次性**的 `listener` 函数到监听器数组的*开头*。下次触发 `eventName` 时，此监听器会被移除，然后被调用。
 
 ```js
 server.prependOnceListener('connection', (stream) => {
@@ -845,7 +778,7 @@ server.prependOnceListener('connection', (stream) => {
 });
 ```
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
 ### `emitter.removeAllListeners([eventName])`
 
@@ -854,15 +787,13 @@ added: v0.1.26
 -->
 
 * `eventName` {string|symbol}
-* Returns: {EventEmitter}
+* 返回: {EventEmitter}
 
-Removes all listeners, or those of the specified `eventName`.
+移除所有监听器，或指定 `eventName` 的监听器。
 
-It is bad practice to remove listeners added elsewhere in the code,
-particularly when the `EventEmitter` instance was created by some other
-component or module (e.g. sockets or file streams).
+移除在代码其他地方添加的监听器是一种不好的做法，特别是当 `EventEmitter` 实例是由其他组件或模块（例如套接字或文件流）创建时。
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
 ### `emitter.removeListener(eventName, listener)`
 
@@ -872,10 +803,9 @@ added: v0.1.26
 
 * `eventName` {string|symbol}
 * `listener` {Function}
-* Returns: {EventEmitter}
+* 返回: {EventEmitter}
 
-Removes the specified `listener` from the listener array for the event named
-`eventName`.
+从名为 `eventName` 的事件的监听器数组中移除指定的 `listener`。
 
 ```js
 const callback = (stream) => {
@@ -886,16 +816,9 @@ server.on('connection', callback);
 server.removeListener('connection', callback);
 ```
 
-`removeListener()` will remove, at most, one instance of a listener from the
-listener array. If any single listener has been added multiple times to the
-listener array for the specified `eventName`, then `removeListener()` must be
-called multiple times to remove each instance.
+`removeListener()` 最多从监听器数组中移除一个监听器实例。如果任何单个监听器为指定的 `eventName` 被多次添加到监听器数组中，则必须多次调用 `removeListener()` 以移除每个实例。
 
-Once an event is emitted, all listeners attached to it at the
-time of emitting are called in order. This implies that any
-`removeListener()` or `removeAllListeners()` calls _after_ emitting and
-_before_ the last listener finishes execution will not remove them from
-`emit()` in progress. Subsequent events behave as expected.
+一旦事件被触发，所有在触发时附加到该事件的监听器都会按顺序被调用。这意味着在触发*之后*且在最后一个监听器完成执行*之前*的任何 `removeListener()` 或 `removeAllListeners()` 调用都不会将它们从进行中的 `emit()` 移除。后续事件的行为符合预期。
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -915,17 +838,17 @@ myEmitter.on('event', callbackA);
 
 myEmitter.on('event', callbackB);
 
-// callbackA removes listener callbackB but it will still be called.
-// Internal listener array at time of emit [callbackA, callbackB]
+// callbackA 移除了监听器 callbackB，但它仍然会被调用。
+// 触发时的内部监听器数组 [callbackA, callbackB]
 myEmitter.emit('event');
-// Prints:
+// 打印:
 //   A
 //   B
 
-// callbackB is now removed.
-// Internal listener array [callbackA]
+// callbackB 现在被移除了。
+// 内部监听器数组 [callbackA]
 myEmitter.emit('event');
-// Prints:
+// 打印:
 //   A
 ```
 
@@ -947,30 +870,23 @@ myEmitter.on('event', callbackA);
 
 myEmitter.on('event', callbackB);
 
-// callbackA removes listener callbackB but it will still be called.
-// Internal listener array at time of emit [callbackA, callbackB]
+// callbackA 移除了监听器 callbackB，但它仍然会被调用。
+// 触发时的内部监听器数组 [callbackA, callbackB]
 myEmitter.emit('event');
-// Prints:
+// 打印:
 //   A
 //   B
 
-// callbackB is now removed.
-// Internal listener array [callbackA]
+// callbackB 现在被移除了。
+// 内部监听器数组 [callbackA]
 myEmitter.emit('event');
-// Prints:
+// 打印:
 //   A
 ```
 
-Because listeners are managed using an internal array, calling this will
-change the position indexes of any listener registered _after_ the listener
-being removed. This will not impact the order in which listeners are called,
-but it means that any copies of the listener array as returned by
-the `emitter.listeners()` method will need to be recreated.
+由于监听器是使用内部数组管理的，因此调用此方法将更改在要移除的监听器*之后*注册的任何监听器的位置索引。这不会影响调用监听器的顺序，但意味着由 `emitter.listeners()` 方法返回的监听器数组的任何副本都需要重新创建。
 
-When a single function has been added as a handler multiple times for a single
-event (as in the example below), `removeListener()` will remove the most
-recently added instance. In the example the `once('ping')`
-listener is removed:
+当单个函数作为处理程序为单个事件多次添加时（如下例所示），`removeListener()` 将移除最近添加的实例。在示例中，`once('ping')` 监听器被移除：
 
 ```mjs
 import { EventEmitter } from 'node:events';
@@ -1004,7 +920,7 @@ ee.emit('ping');
 ee.emit('ping');
 ```
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
 ### `emitter.setMaxListeners(n)`
 
@@ -1013,15 +929,11 @@ added: v0.3.5
 -->
 
 * `n` {integer}
-* Returns: {EventEmitter}
+* 返回: {EventEmitter}
 
-By default `EventEmitter`s will print a warning if more than `10` listeners are
-added for a particular event. This is a useful default that helps finding
-memory leaks. The `emitter.setMaxListeners()` method allows the limit to be
-modified for this specific `EventEmitter` instance. The value can be set to
-`Infinity` (or `0`) to indicate an unlimited number of listeners.
+默认情况下，如果为特定事件添加了超过 `10` 个监听器，`EventEmitter` 会打印警告。这是一个有助于发现内存泄漏的有用默认值。`emitter.setMaxListeners()` 方法允许修改此特定 `EventEmitter` 实例的限制。该值可以设置为 `Infinity`（或 `0`）以表示无限数量的监听器。
 
-Returns a reference to the `EventEmitter`, so that calls can be chained.
+返回对 `EventEmitter` 的引用，以便可以链式调用。
 
 ### `emitter.rawListeners(eventName)`
 
@@ -1030,32 +942,31 @@ added: v9.4.0
 -->
 
 * `eventName` {string|symbol}
-* Returns: {Function\[]}
+* 返回: {Function\[]}
 
-Returns a copy of the array of listeners for the event named `eventName`,
-including any wrappers (such as those created by `.once()`).
+返回名为 `eventName` 的事件的监听器数组的副本，包括任何包装器（例如由 `.once()` 创建的包装器）。
 
 ```mjs
 import { EventEmitter } from 'node:events';
 const emitter = new EventEmitter();
 emitter.once('log', () => console.log('log once'));
 
-// Returns a new Array with a function `onceWrapper` which has a property
-// `listener` which contains the original listener bound above
+// 返回一个新的 Array，其中包含一个函数 `onceWrapper`，该函数有一个属性
+// `listener`，其中包含上面绑定的原始监听器
 const listeners = emitter.rawListeners('log');
 const logFnWrapper = listeners[0];
 
-// Logs "log once" to the console and does not unbind the `once` event
+// 打印 "log once" 到控制台，并且不解除 `once` 事件的绑定
 logFnWrapper.listener();
 
-// Logs "log once" to the console and removes the listener
+// 打印 "log once" 到控制台并移除监听器
 logFnWrapper();
 
 emitter.on('log', () => console.log('log persistently'));
-// Will return a new Array with a single function bound by `.on()` above
+// 将返回一个新的 Array，其中包含一个由上面 `.on()` 绑定的函数
 const newListeners = emitter.rawListeners('log');
 
-// Logs "log persistently" twice
+// 打印 "log persistently" 两次
 newListeners[0]();
 emitter.emit('log');
 ```
@@ -1065,22 +976,22 @@ const EventEmitter = require('node:events');
 const emitter = new EventEmitter();
 emitter.once('log', () => console.log('log once'));
 
-// Returns a new Array with a function `onceWrapper` which has a property
-// `listener` which contains the original listener bound above
+// 返回一个新的 Array，其中包含一个函数 `onceWrapper`，该函数有一个属性
+// `listener`，其中包含上面绑定的原始监听器
 const listeners = emitter.rawListeners('log');
 const logFnWrapper = listeners[0];
 
-// Logs "log once" to the console and does not unbind the `once` event
+// 打印 "log once" 到控制台，并且不解除 `once` 事件的绑定
 logFnWrapper.listener();
 
-// Logs "log once" to the console and removes the listener
+// 打印 "log once" 到控制台并移除监听器
 logFnWrapper();
 
 emitter.on('log', () => console.log('log persistently'));
-// Will return a new Array with a single function bound by `.on()` above
+// 将返回一个新的 Array，其中包含一个由上面 `.on()` 绑定的函数
 const newListeners = emitter.rawListeners('log');
 
-// Logs "log persistently" twice
+// 打印 "log persistently" 两次
 newListeners[0]();
 emitter.emit('log');
 ```
@@ -1103,11 +1014,7 @@ changes:
 * `eventName` {string|symbol}
 * `...args` {any}
 
-The `Symbol.for('nodejs.rejection')` method is called in case a
-promise rejection happens when emitting an event and
-[`captureRejections`][capturerejections] is enabled on the emitter.
-It is possible to use [`events.captureRejectionSymbol`][rejectionsymbol] in
-place of `Symbol.for('nodejs.rejection')`.
+当触发事件时发生 Promise 拒绝并且在该触发器上启用了 [`captureRejections`][capturerejections] 时，会调用 `Symbol.for('nodejs.rejection')` 方法。可以使用 [`events.captureRejectionSymbol`][rejectionsymbol] 代替 `Symbol.for('nodejs.rejection')`。
 
 ```mjs
 import { EventEmitter, captureRejectionSymbol } from 'node:events';
@@ -1123,7 +1030,7 @@ class MyClass extends EventEmitter {
   }
 
   destroy(err) {
-    // Tear the resource down here.
+    // 在此处拆除资源。
   }
 }
 ```
@@ -1142,7 +1049,7 @@ class MyClass extends EventEmitter {
   }
 
   destroy(err) {
-    // Tear the resource down here.
+    // 在此处拆除资源。
   }
 }
 ```
@@ -1153,34 +1060,20 @@ class MyClass extends EventEmitter {
 added: v0.11.2
 -->
 
-By default, a maximum of `10` listeners can be registered for any single
-event. This limit can be changed for individual `EventEmitter` instances
-using the [`emitter.setMaxListeners(n)`][] method. To change the default
-for _all_ `EventEmitter` instances, the `events.defaultMaxListeners`
-property can be used. If this value is not a positive number, a `RangeError`
-is thrown.
+默认情况下，任何单个事件最多可以注册 `10` 个监听器。可以使用 [`emitter.setMaxListeners(n)`][] 方法更改单个 `EventEmitter` 实例的限制。要更改*所有* `EventEmitter` 实例的默认值，可以使用 `events.defaultMaxListeners` 属性。如果此值不是正数，则会抛出 `RangeError`。
 
-Take caution when setting the `events.defaultMaxListeners` because the
-change affects _all_ `EventEmitter` instances, including those created before
-the change is made. However, calling [`emitter.setMaxListeners(n)`][] still has
-precedence over `events.defaultMaxListeners`.
+设置 `events.defaultMaxListeners` 时要小心，因为更改会影响*所有* `EventEmitter` 实例，包括在更改之前创建的实例。但是，调用 [`emitter.setMaxListeners(n)`][] 仍然优先于 `events.defaultMaxListeners`。
 
-This is not a hard limit. The `EventEmitter` instance will allow
-more listeners to be added but will output a trace warning to stderr indicating
-that a "possible EventEmitter memory leak" has been detected. For any single
-`EventEmitter`, the `emitter.getMaxListeners()` and `emitter.setMaxListeners()`
-methods can be used to temporarily avoid this warning:
+这不是一个硬性限制。`EventEmitter` 实例允许添加更多监听器，但会向 stderr 输出跟踪警告，表明已检测到“可能的 EventEmitter 内存泄漏”。对于任何单个 `EventEmitter`，可以使用 `emitter.getMaxListeners()` 和 `emitter.setMaxListeners()` 方法来暂时避免此警告：
 
-`defaultMaxListeners` has no effect on `AbortSignal` instances. While it is
-still possible to use [`emitter.setMaxListeners(n)`][] to set a warning limit
-for individual `AbortSignal` instances, per default `AbortSignal` instances will not warn.
+`defaultMaxListeners` 对 `AbortSignal` 实例没有影响。虽然仍然可以使用 [`emitter.setMaxListeners(n)`][] 为单个 `AbortSignal` 实例设置警告限制，但默认情况下 `AbortSignal` 实例不会发出警告。
 
 ```mjs
 import { EventEmitter } from 'node:events';
 const emitter = new EventEmitter();
 emitter.setMaxListeners(emitter.getMaxListeners() + 1);
 emitter.once('event', () => {
-  // do stuff
+  // 做些事情
   emitter.setMaxListeners(Math.max(emitter.getMaxListeners() - 1, 0));
 });
 ```
@@ -1190,19 +1083,14 @@ const EventEmitter = require('node:events');
 const emitter = new EventEmitter();
 emitter.setMaxListeners(emitter.getMaxListeners() + 1);
 emitter.once('event', () => {
-  // do stuff
+  // 做些事情
   emitter.setMaxListeners(Math.max(emitter.getMaxListeners() - 1, 0));
 });
 ```
 
-The [`--trace-warnings`][] command-line flag can be used to display the
-stack trace for such warnings.
+[`--trace-warnings`][] 命令行标志可用于显示此类警告的堆栈跟踪。
 
-The emitted warning can be inspected with [`process.on('warning')`][] and will
-have the additional `emitter`, `type`, and `count` properties, referring to
-the event emitter instance, the event's name and the number of attached
-listeners, respectively.
-Its `name` property is set to `'MaxListenersExceededWarning'`.
+发出的警告可以通过 [`process.on('warning')`][] 进行检查，并且将具有额外的 `emitter`、`type` 和 `count` 属性，分别引用事件触发器实例、事件名称和附加的监听器数量。其 `name` 属性设置为 `'MaxListenersExceededWarning'`。
 
 ## `events.errorMonitor`
 
@@ -1212,13 +1100,9 @@ added:
  - v12.17.0
 -->
 
-This symbol shall be used to install a listener for only monitoring `'error'`
-events. Listeners installed using this symbol are called before the regular
-`'error'` listeners are called.
+此符号应用于仅监视 `'error'` 事件的监听器。使用此符号安装的监听器在常规 `'error'` 监听器被调用之前被调用。
 
-Installing a listener using this symbol does not change the behavior once an
-`'error'` event is emitted. Therefore, the process will still crash if no
-regular `'error'` listener is installed.
+使用此符号安装监听器不会改变一旦发出 `'error'` 事件时的行为。因此，如果未安装常规 `'error'` 监听器，进程仍将崩溃。
 
 ## `events.getEventListeners(emitterOrTarget, eventName)`
 
@@ -1230,15 +1114,13 @@ added:
 
 * `emitterOrTarget` {EventEmitter|EventTarget}
 * `eventName` {string|symbol}
-* Returns: {Function\[]}
+* 返回: {Function\[]}
 
-Returns a copy of the array of listeners for the event named `eventName`.
+返回名为 `eventName` 的事件的监听器数组的副本。
 
-For `EventEmitter`s this behaves exactly the same as calling `.listeners` on
-the emitter.
+对于 `EventEmitter`，这与在触发器上调用 `.listeners` 的行为完全相同。
 
-For `EventTarget`s this is the only way to get the event listeners for the
-event target. This is useful for debugging and diagnostic purposes.
+对于 `EventTarget`，这是获取事件目标的事件监听器的唯一方法。这对于调试和诊断目的很有用。
 
 ```mjs
 import { getEventListeners, EventEmitter } from 'node:events';
@@ -1283,16 +1165,13 @@ added:
 -->
 
 * `emitterOrTarget` {EventEmitter|EventTarget}
-* Returns: {number}
+* 返回: {number}
 
-Returns the currently set max amount of listeners.
+返回当前设置的最大监听器数量。
 
-For `EventEmitter`s this behaves exactly the same as calling `.getMaxListeners` on
-the emitter.
+对于 `EventEmitter`，这与在触发器上调用 `.getMaxListeners` 的行为完全相同。
 
-For `EventTarget`s this is the only way to get the max event listeners for the
-event target. If the number of event handlers on a single EventTarget exceeds
-the max set, the EventTarget will print a warning.
+对于 `EventTarget`，这是获取事件目标的最大事件监听器数量的唯一方法。如果单个 EventTarget 上的事件处理程序数量超过设置的最大值，EventTarget 将打印警告。
 
 ```mjs
 import { getMaxListeners, setMaxListeners, EventEmitter } from 'node:events';
@@ -1343,17 +1222,12 @@ changes:
 * `emitter` {EventEmitter}
 * `name` {string|symbol}
 * `options` {Object}
-  * `signal` {AbortSignal} Can be used to cancel waiting for the event.
-* Returns: {Promise}
+  * `signal` {AbortSignal} 可用于取消等待事件。
+* 返回: {Promise}
 
-Creates a `Promise` that is fulfilled when the `EventEmitter` emits the given
-event or that is rejected if the `EventEmitter` emits `'error'` while waiting.
-The `Promise` will resolve with an array of all the arguments emitted to the
-given event.
+创建一个 `Promise`，当 `EventEmitter` 触发给定事件时，该 Promise 会被履行，或者如果 `EventEmitter` 在等待时触发 `'error'`，则会被拒绝。该 `Promise` 将使用触发给定事件时发出的所有参数的数组进行解析。
 
-This method is intentionally generic and works with the web platform
-[EventTarget][WHATWG-EventTarget] interface, which has no special
-`'error'` event semantics and does not listen to the `'error'` event.
+此方法有意设计为通用方法，并与 Web 平台 [EventTarget][WHATWG-EventTarget] 接口配合使用，该接口没有特殊的 `'error'` 事件语义，也不监听 `'error'` 事件。
 
 ```mjs
 import { once, EventEmitter } from 'node:events';
@@ -1408,10 +1282,7 @@ async function run() {
 run();
 ```
 
-The special handling of the `'error'` event is only used when `events.once()`
-is used to wait for another event. If `events.once()` is used to wait for the
-'`error'` event itself, then it is treated as any other kind of event without
-special handling:
+仅当使用 `events.once()` 等待另一个事件时，才会使用 `'error'` 事件的特殊处理。如果 `events.once()` 用于等待 '`error'` 事件本身，则它将被视为没有任何特殊处理的任何其他类型的事件：
 
 ```mjs
 import { EventEmitter, once } from 'node:events';
@@ -1424,7 +1295,7 @@ once(ee, 'error')
 
 ee.emit('error', new Error('boom'));
 
-// Prints: ok boom
+// 打印: ok boom
 ```
 
 ```cjs
@@ -1438,10 +1309,10 @@ once(ee, 'error')
 
 ee.emit('error', new Error('boom'));
 
-// Prints: ok boom
+// 打印: ok boom
 ```
 
-An {AbortSignal} can be used to cancel waiting for the event:
+可以使用 {AbortSignal} 来取消等待事件：
 
 ```mjs
 import { EventEmitter, once } from 'node:events';
@@ -1463,7 +1334,7 @@ async function foo(emitter, event, signal) {
 }
 
 foo(ee, 'foo', ac.signal);
-ac.abort(); // Prints: Waiting for the event was canceled!
+ac.abort(); // 打印: Waiting for the event was canceled!
 ```
 
 ```cjs
@@ -1486,17 +1357,12 @@ async function foo(emitter, event, signal) {
 }
 
 foo(ee, 'foo', ac.signal);
-ac.abort(); // Prints: Waiting for the event was canceled!
+ac.abort(); // 打印: Waiting for the event was canceled!
 ```
 
-### Awaiting multiple events emitted on `process.nextTick()`
+### 等待在 `process.nextTick()` 上触发的多个事件
 
-There is an edge case worth noting when using the `events.once()` function
-to await multiple events emitted on in the same batch of `process.nextTick()`
-operations, or whenever multiple events are emitted synchronously. Specifically,
-because the `process.nextTick()` queue is drained before the `Promise` microtask
-queue, and because `EventEmitter` emits all events synchronously, it is possible
-for `events.once()` to miss an event.
+当使用 `events.once()` 函数等待在同一批 `process.nextTick()` 操作中触发的多个事件，或者每当多个事件同步触发时，有一个边缘情况值得注意。具体来说，因为 `process.nextTick()` 队列在 `Promise` 微任务队列之前被清空，并且因为 `EventEmitter` 同步触发所有事件，所以 `events.once()` 有可能错过事件。
 
 ```mjs
 import { EventEmitter, once } from 'node:events';
@@ -1508,8 +1374,7 @@ async function foo() {
   await once(myEE, 'bar');
   console.log('bar');
 
-  // This Promise will never resolve because the 'foo' event will
-  // have already been emitted before the Promise is created.
+  // 这个 Promise 永远不会解析，因为 'foo' 事件将在 Promise 创建之前就已经触发。
   await once(myEE, 'foo');
   console.log('foo');
 }
@@ -1531,8 +1396,7 @@ async function foo() {
   await once(myEE, 'bar');
   console.log('bar');
 
-  // This Promise will never resolve because the 'foo' event will
-  // have already been emitted before the Promise is created.
+  // 这个 Promise 永远不会解析，因为 'foo' 事件将在 Promise 创建之前就已经触发。
   await once(myEE, 'foo');
   console.log('foo');
 }
@@ -1545,9 +1409,7 @@ process.nextTick(() => {
 foo().then(() => console.log('done'));
 ```
 
-To catch both events, create each of the Promises _before_ awaiting either
-of them, then it becomes possible to use `Promise.all()`, `Promise.race()`,
-or `Promise.allSettled()`:
+要捕获两个事件，请在等待任一事件*之前*创建每个 Promise，然后就可以使用 `Promise.all()`、`Promise.race()` 或 `Promise.allSettled()`：
 
 ```mjs
 import { EventEmitter, once } from 'node:events';
@@ -1600,9 +1462,9 @@ changes:
     description: No longer experimental.
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-Change the default `captureRejections` option on all new `EventEmitter` objects.
+更改所有新 `EventEmitter` 对象上的默认 `captureRejections` 选项。
 
 ## `events.captureRejectionSymbol`
 
@@ -1618,9 +1480,9 @@ changes:
     description: No longer experimental.
 -->
 
-* Type: {symbol} `Symbol.for('nodejs.rejection')`
+* 类型: {symbol} `Symbol.for('nodejs.rejection')`
 
-See how to write a custom [rejection handler][rejection].
+请参阅如何编写自定义 [拒绝处理程序][rejection]。
 
 ## `events.listenerCount(emitter, eventName)`
 
@@ -1631,11 +1493,10 @@ deprecated: v3.2.0
 
 > Stability: 0 - Deprecated: Use [`emitter.listenerCount()`][] instead.
 
-* `emitter` {EventEmitter} The emitter to query
-* `eventName` {string|symbol} The event name
+* `emitter` {EventEmitter} 要查询的触发器
+* `eventName` {string|symbol} 事件名称
 
-A class method that returns the number of listeners for the given `eventName`
-registered on the given `emitter`.
+一个类方法，返回在给定 `emitter` 上为给定 `eventName` 注册的监听器数量。
 
 ```mjs
 import { EventEmitter, listenerCount } from 'node:events';
@@ -1644,7 +1505,7 @@ const myEmitter = new EventEmitter();
 myEmitter.on('event', () => {});
 myEmitter.on('event', () => {});
 console.log(listenerCount(myEmitter, 'event'));
-// Prints: 2
+// 打印: 2
 ```
 
 ```cjs
@@ -1654,7 +1515,7 @@ const myEmitter = new EventEmitter();
 myEmitter.on('event', () => {});
 myEmitter.on('event', () => {});
 console.log(listenerCount(myEmitter, 'event'));
-// Prints: 2
+// 打印: 2
 ```
 
 ## `events.on(emitter, eventName[, options])`
@@ -1678,19 +1539,15 @@ changes:
 -->
 
 * `emitter` {EventEmitter}
-* `eventName` {string|symbol} The name of the event being listened for
+* `eventName` {string|symbol} 正在被监听的事件名称
 * `options` {Object}
-  * `signal` {AbortSignal} Can be used to cancel awaiting events.
-  * `close` {string\[]} Names of events that will end the iteration.
-  * `highWaterMark` {integer} **Default:** `Number.MAX_SAFE_INTEGER`
-    The high watermark. The emitter is paused every time the size of events
-    being buffered is higher than it. Supported only on emitters implementing
-    `pause()` and `resume()` methods.
-  * `lowWaterMark` {integer} **Default:** `1`
-    The low watermark. The emitter is resumed every time the size of events
-    being buffered is lower than it. Supported only on emitters implementing
-    `pause()` and `resume()` methods.
-* Returns: {AsyncIterator} that iterates `eventName` events emitted by the `emitter`
+  * `signal` {AbortSignal} 可用于取消等待事件。
+  * `close` {string\[]} 将结束迭代的事件名称。
+  * `highWaterMark` {integer} **默认值:** `Number.MAX_SAFE_INTEGER`
+    高水位标记。每当被缓冲的事件大小高于它时，触发器就会暂停。仅在实现了 `pause()` 和 `resume()` 方法的触发器上支持。
+  * `lowWaterMark` {integer} **默认值:** `1`
+    低水位标记。每当被缓冲的事件大小低于它时，触发器就会恢复。仅在实现了 `pause()` 和 `resume()` 方法的触发器上支持。
+* 返回: {AsyncIterator} 迭代 `emitter` 触发的 `eventName` 事件
 
 ```mjs
 import { on, EventEmitter } from 'node:events';
@@ -1698,19 +1555,18 @@ import process from 'node:process';
 
 const ee = new EventEmitter();
 
-// Emit later on
+// 稍后触发
 process.nextTick(() => {
   ee.emit('foo', 'bar');
   ee.emit('foo', 42);
 });
 
 for await (const event of on(ee, 'foo')) {
-  // The execution of this inner block is synchronous and it
-  // processes one event at a time (even with await). Do not use
-  // if concurrent execution is required.
-  console.log(event); // prints ['bar'] [42]
+  // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。
+  // 如果需要并发执行，请不要使用。
+  console.log(event); // 打印 ['bar'] [42]
 }
-// Unreachable here
+// 此处不可达
 ```
 
 ```cjs
@@ -1719,28 +1575,24 @@ const { on, EventEmitter } = require('node:events');
 (async () => {
   const ee = new EventEmitter();
 
-  // Emit later on
+  // 稍后触发
   process.nextTick(() => {
     ee.emit('foo', 'bar');
-    ee.emit('foo', 42);
   });
+  ee.emit('foo', 42);
 
   for await (const event of on(ee, 'foo')) {
-    // The execution of this inner block is synchronous and it
-    // processes one event at a time (even with await). Do not use
-    // if concurrent execution is required.
-    console.log(event); // prints ['bar'] [42]
+    // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。
+    // 如果需要并发执行，请不要使用。
+    console.log(event); // 打印 ['bar'] [42]
   }
-  // Unreachable here
+  // 此处不可达
 })();
 ```
 
-Returns an `AsyncIterator` that iterates `eventName` events. It will throw
-if the `EventEmitter` emits `'error'`. It removes all listeners when
-exiting the loop. The `value` returned by each iteration is an array
-composed of the emitted event arguments.
+返回一个迭代 `eventName` 事件的 `AsyncIterator`。如果 `EventEmitter` 触发 `'error'`，它将抛出错误。在退出循环时，它会移除所有监听器。每次迭代返回的 `value` 是由触发的事件参数组成的数组。
 
-An {AbortSignal} can be used to cancel waiting on events:
+可以使用 {AbortSignal} 来取消等待事件：
 
 ```mjs
 import { on, EventEmitter } from 'node:events';
@@ -1751,19 +1603,18 @@ const ac = new AbortController();
 (async () => {
   const ee = new EventEmitter();
 
-  // Emit later on
+  // 稍后触发
   process.nextTick(() => {
     ee.emit('foo', 'bar');
     ee.emit('foo', 42);
   });
 
   for await (const event of on(ee, 'foo', { signal: ac.signal })) {
-    // The execution of this inner block is synchronous and it
-    // processes one event at a time (even with await). Do not use
-    // if concurrent execution is required.
-    console.log(event); // prints ['bar'] [42]
+    // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。
+    // 如果需要并发执行，请不要使用。
+    console.log(event); // 打印 ['bar'] [42]
   }
-  // Unreachable here
+  // 此处不可达
 })();
 
 process.nextTick(() => ac.abort());
@@ -1777,19 +1628,18 @@ const ac = new AbortController();
 (async () => {
   const ee = new EventEmitter();
 
-  // Emit later on
+  // 稍后触发
   process.nextTick(() => {
     ee.emit('foo', 'bar');
     ee.emit('foo', 42);
   });
 
   for await (const event of on(ee, 'foo', { signal: ac.signal })) {
-    // The execution of this inner block is synchronous and it
-    // processes one event at a time (even with await). Do not use
-    // if concurrent execution is required.
-    console.log(event); // prints ['bar'] [42]
+    // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。
+    // 如果需要并发执行，请不要使用。
+    console.log(event); // 打印 ['bar'] [42]
   }
-  // Unreachable here
+  // 此处不可达
 })();
 
 process.nextTick(() => ac.abort());
@@ -1801,11 +1651,8 @@ process.nextTick(() => ac.abort());
 added: v15.4.0
 -->
 
-* `n` {number} A non-negative number. The maximum number of listeners per
-  `EventTarget` event.
-* `...eventsTargets` {EventTarget\[]|EventEmitter\[]} Zero or more {EventTarget}
-  or {EventEmitter} instances. If none are specified, `n` is set as the default
-  max for all newly created {EventTarget} and {EventEmitter} objects.
+* `n` {number} 一个非负数。每个 `EventTarget` 事件的最大监听器数量。
+* `...eventsTargets` {EventTarget\[]|EventEmitter\[]} 零个或多个 {EventTarget} 或 {EventEmitter} 实例。如果未指定任何实例，则 `n` 被设置为所有新创建的 {EventTarget} 和 {EventEmitter} 对象的默认最大值。
 
 ```mjs
 import { setMaxListeners, EventEmitter } from 'node:events';
@@ -1842,21 +1689,15 @@ changes:
 
 * `signal` {AbortSignal}
 * `listener` {Function|EventListener}
-* Returns: {Disposable} A Disposable that removes the `abort` listener.
+* 返回: {Disposable} 一个用于移除 `abort` 监听器的 Disposable。
 
-Listens once to the `abort` event on the provided `signal`.
+监听一次提供的 `signal` 上的 `abort` 事件。
 
-Listening to the `abort` event on abort signals is unsafe and may
-lead to resource leaks since another third party with the signal can
-call [`e.stopImmediatePropagation()`][]. Unfortunately Node.js cannot change
-this since it would violate the web standard. Additionally, the original
-API makes it easy to forget to remove listeners.
+监听中止信号上的 `abort` 事件是不安全的，并且可能导致资源泄漏，因为拥有信号的第三方可以调用 [`e.stopImmediatePropagation()`][]。不幸的是，Node.js 无法更改这一点，因为这会违反 Web 标准。此外，原始 API 很容易忘记移除监听器。
 
-This API allows safely using `AbortSignal`s in Node.js APIs by solving these
-two issues by listening to the event such that `stopImmediatePropagation` does
-not prevent the listener from running.
+此 API 通过监听事件使得 `stopImmediatePropagation` 不会阻止监听器运行，从而允许在 Node.js API 中安全地使用 `AbortSignal`。
 
-Returns a disposable so that it may be unsubscribed from more easily.
+返回一个 disposable，以便可以更轻松地取消订阅。
 
 ```cjs
 const { addAbortListener } = require('node:events');
@@ -1866,7 +1707,7 @@ function example(signal) {
   try {
     signal.addEventListener('abort', (e) => e.stopImmediatePropagation());
     disposable = addAbortListener(signal, (e) => {
-      // Do something when signal is aborted.
+      // 当信号中止时做些事情。
     });
   } finally {
     disposable?.[Symbol.dispose]();
@@ -1882,7 +1723,7 @@ function example(signal) {
   try {
     signal.addEventListener('abort', (e) => e.stopImmediatePropagation());
     disposable = addAbortListener(signal, (e) => {
-      // Do something when signal is aborted.
+      // 当信号中止时做些事情。
     });
   } finally {
     disposable?.[Symbol.dispose]();
@@ -1890,7 +1731,7 @@ function example(signal) {
 }
 ```
 
-## Class: `events.EventEmitterAsyncResource extends EventEmitter`
+## 类：`events.EventEmitterAsyncResource extends EventEmitter`
 
 <!-- YAML
 added:
@@ -1898,19 +1739,17 @@ added:
   - v16.14.0
 -->
 
-Integrates `EventEmitter` with {AsyncResource} for `EventEmitter`s that
-require manual async tracking. Specifically, all events emitted by instances
-of `events.EventEmitterAsyncResource` will run within its [async context][].
+将 `EventEmitter` 与 {AsyncResource} 集成，用于需要手动异步跟踪的 `EventEmitter`。具体来说，由 `events.EventEmitterAsyncResource` 实例触发的所有事件都将在其 [异步上下文][] 中运行。
 
 ```mjs
 import { EventEmitterAsyncResource, EventEmitter } from 'node:events';
 import { notStrictEqual, strictEqual } from 'node:assert';
 import { executionAsyncId, triggerAsyncId } from 'node:async_hooks';
 
-// Async tracking tooling will identify this as 'Q'.
+// 异步跟踪工具将将其标识为 'Q'。
 const ee1 = new EventEmitterAsyncResource({ name: 'Q' });
 
-// 'foo' listeners will run in the EventEmitters async context.
+// 'foo' 监听器将在 EventEmitter 的异步上下文中运行。
 ee1.on('foo', () => {
   strictEqual(executionAsyncId(), ee1.asyncId);
   strictEqual(triggerAsyncId(), ee1.triggerAsyncId);
@@ -1918,8 +1757,7 @@ ee1.on('foo', () => {
 
 const ee2 = new EventEmitter();
 
-// 'foo' listeners on ordinary EventEmitters that do not track async
-// context, however, run in the same async context as the emit().
+// 然而，不跟踪异步上下文的普通 EventEmitter 上的 'foo' 监听器在与 emit() 相同的异步上下文中运行。
 ee2.on('foo', () => {
   notStrictEqual(executionAsyncId(), ee2.asyncId);
   notStrictEqual(triggerAsyncId(), ee2.triggerAsyncId);
@@ -1936,10 +1774,10 @@ const { EventEmitterAsyncResource, EventEmitter } = require('node:events');
 const { notStrictEqual, strictEqual } = require('node:assert');
 const { executionAsyncId, triggerAsyncId } = require('node:async_hooks');
 
-// Async tracking tooling will identify this as 'Q'.
+// 异步跟踪工具将将其标识为 'Q'。
 const ee1 = new EventEmitterAsyncResource({ name: 'Q' });
 
-// 'foo' listeners will run in the EventEmitters async context.
+// 'foo' 监听器将在 EventEmitter 的异步上下文中运行。
 ee1.on('foo', () => {
   strictEqual(executionAsyncId(), ee1.asyncId);
   strictEqual(triggerAsyncId(), ee1.triggerAsyncId);
@@ -1947,8 +1785,7 @@ ee1.on('foo', () => {
 
 const ee2 = new EventEmitter();
 
-// 'foo' listeners on ordinary EventEmitters that do not track async
-// context, however, run in the same async context as the emit().
+// 然而，不跟踪异步上下文的普通 EventEmitter 上的 'foo' 监听器在与 emit() 相同的异步上下文中运行。
 ee2.on('foo', () => {
   notStrictEqual(executionAsyncId(), ee2.asyncId);
   notStrictEqual(triggerAsyncId(), ee2.triggerAsyncId);
@@ -1960,52 +1797,39 @@ Promise.resolve().then(() => {
 });
 ```
 
-The `EventEmitterAsyncResource` class has the same methods and takes the
-same options as `EventEmitter` and `AsyncResource` themselves.
+`EventEmitterAsyncResource` 类具有与 `EventEmitter` 和 `AsyncResource` 本身相同的方法并采用相同的选项。
 
 ### `new events.EventEmitterAsyncResource([options])`
 
 * `options` {Object}
-  * `captureRejections` {boolean} It enables
-    [automatic capturing of promise rejection][capturerejections].
-    **Default:** `false`.
-  * `name` {string} The type of async event. **Default:** [`new.target.name`][].
-  * `triggerAsyncId` {number} The ID of the execution context that created this
-    async event. **Default:** `executionAsyncId()`.
-  * `requireManualDestroy` {boolean} If set to `true`, disables `emitDestroy`
-    when the object is garbage collected. This usually does not need to be set
-    (even if `emitDestroy` is called manually), unless the resource's `asyncId`
-    is retrieved and the sensitive API's `emitDestroy` is called with it.
-    When set to `false`, the `emitDestroy` call on garbage collection
-    will only take place if there is at least one active `destroy` hook.
-    **Default:** `false`.
+  * `captureRejections` {boolean} 启用 [自动捕获 promise 拒绝][capturerejections]。
+    **默认值:** `false`.
+  * `name` {string} 异步事件的类型。**默认值:** [`new.target.name`][].
+  * `triggerAsyncId` {number} 创建此异步事件的执行上下文的 ID。**默认值:** `executionAsyncId()`.
+  * `requireManualDestroy` {boolean} 如果设置为 `true`，则在对象被垃圾回收时禁用 `emitDestroy`。这通常不需要设置（即使手动调用 `emitDestroy`），除非检索资源的 `asyncId` 并使用它调用敏感 API 的 `emitDestroy`。当设置为 `false` 时，仅当至少有一个活动的 `destroy` 钩子时，才会在垃圾回收时调用 `emitDestroy`。
+    **默认值:** `false`.
 
 ### `eventemitterasyncresource.asyncId`
 
-* Type: {number} The unique `asyncId` assigned to the resource.
+* 类型: {number} 分配给资源的唯一 `asyncId`。
 
 ### `eventemitterasyncresource.asyncResource`
 
-* Type: {AsyncResource} The underlying {AsyncResource}.
+* 类型: {AsyncResource} 底层的 {AsyncResource}。
 
-The returned `AsyncResource` object has an additional `eventEmitter` property
-that provides a reference to this `EventEmitterAsyncResource`.
+返回的 `AsyncResource` 对象有一个额外的 `eventEmitter` 属性，提供对此 `EventEmitterAsyncResource` 的引用。
 
 ### `eventemitterasyncresource.emitDestroy()`
 
-Call all `destroy` hooks. This should only ever be called once. An error will
-be thrown if it is called more than once. This **must** be manually called. If
-the resource is left to be collected by the GC then the `destroy` hooks will
-never be called.
+调用所有 `destroy` 钩子。这应该只被调用一次。如果被调用多次，将抛出错误。这**必须**手动调用。如果资源留给 GC 收集，则 `destroy` 钩子将永远不会被调用。
 
 ### `eventemitterasyncresource.triggerAsyncId`
 
-* Type: {number} The same `triggerAsyncId` that is passed to the
-  `AsyncResource` constructor.
+* 类型: {number} 传递给 `AsyncResource` 构造函数的相同 `triggerAsyncId`。
 
 <a id="event-target-and-event-api"></a>
 
-## `EventTarget` and `Event` API
+## `EventTarget` 和 `Event` API
 
 <!-- YAML
 added: v14.5.0
@@ -2022,8 +1846,7 @@ changes:
       The `EventTarget` and `Event` classes are now available as globals.
 -->
 
-The `EventTarget` and `Event` objects are a Node.js-specific implementation
-of the [`EventTarget` Web API][] that are exposed by some Node.js core APIs.
+`EventTarget` 和 `Event` 对象是 [`EventTarget` Web API][] 的 Node.js 特定实现，由一些 Node.js 核心 API 暴露。
 
 ```js
 const target = new EventTarget();
@@ -2033,81 +1856,60 @@ target.addEventListener('foo', (event) => {
 });
 ```
 
-### Node.js `EventTarget` vs. DOM `EventTarget`
+### Node.js `EventTarget` 与 DOM `EventTarget`
 
-There are two key differences between the Node.js `EventTarget` and the
-[`EventTarget` Web API][]:
+Node.js `EventTarget` 和 [`EventTarget` Web API][] 之间有两个关键区别：
 
-1. Whereas DOM `EventTarget` instances _may_ be hierarchical, there is no
-   concept of hierarchy and event propagation in Node.js. That is, an event
-   dispatched to an `EventTarget` does not propagate through a hierarchy of
-   nested target objects that may each have their own set of handlers for the
-   event.
-2. In the Node.js `EventTarget`, if an event listener is an async function
-   or returns a `Promise`, and the returned `Promise` rejects, the rejection
-   is automatically captured and handled the same way as a listener that
-   throws synchronously (see [`EventTarget` error handling][] for details).
+1. 虽然 DOM `EventTarget` 实例*可能*是分层的，但 Node.js 中没有层次结构和事件传播的概念。也就是说，分派给 `EventTarget` 的事件不会通过嵌套目标对象的层次结构传播，每个目标对象可能都有自己的一组用于该事件的处理程序。
+2. 在 Node.js `EventTarget` 中，如果事件监听器是异步函数或返回 `Promise`，并且返回的 `Promise` 被拒绝，则拒绝会自动捕获并以与同步抛出异常的监听器相同的方式处理（有关详细信息，请参阅 [`EventTarget` 错误处理][]）。
 
-### `NodeEventTarget` vs. `EventEmitter`
+### `NodeEventTarget` 与 `EventEmitter`
 
-The `NodeEventTarget` object implements a modified subset of the
-`EventEmitter` API that allows it to closely _emulate_ an `EventEmitter` in
-certain situations. A `NodeEventTarget` is _not_ an instance of `EventEmitter`
-and cannot be used in place of an `EventEmitter` in most cases.
+`NodeEventTarget` 对象实现了 `EventEmitter` API 的一个修改子集，允许它在某些情况下密切*模拟* `EventEmitter`。`NodeEventTarget` *不是* `EventEmitter` 的实例，并且在大多数情况下不能代替 `EventEmitter` 使用。
 
-1. Unlike `EventEmitter`, any given `listener` can be registered at most once
-   per event `type`. Attempts to register a `listener` multiple times are
-   ignored.
-2. The `NodeEventTarget` does not emulate the full `EventEmitter` API.
-   Specifically the `prependListener()`, `prependOnceListener()`,
-   `rawListeners()`, and `errorMonitor` APIs are not emulated.
-   The `'newListener'` and `'removeListener'` events will also not be emitted.
-3. The `NodeEventTarget` does not implement any special default behavior
-   for events with type `'error'`.
-4. The `NodeEventTarget` supports `EventListener` objects as well as
-   functions as handlers for all event types.
+1. 与 `EventEmitter` 不同，任何给定的 `listener` 每个事件 `type` 最多只能注册一次。多次注册 `listener` 的尝试将被忽略。
+2. `NodeEventTarget` 不模拟完整的 `EventEmitter` API。
+   具体来说，不模拟 `prependListener()`、`prependOnceListener()`、`rawListeners()` 和 `errorMonitor` API。
+   也不会触发 `'newListener'` 和 `'removeListener'` 事件。
+3. `NodeEventTarget` 不会对类型为 `'error'` 的事件实现任何特殊的默认行为。
+4. `NodeEventTarget` 支持 `EventListener` 对象以及函数作为所有事件类型的处理程序。
 
-### Event listener
+### 事件监听器
 
-Event listeners registered for an event `type` may either be JavaScript
-functions or objects with a `handleEvent` property whose value is a function.
+为事件 `type` 注册的事件监听器可以是 JavaScript 函数，也可以是具有 `handleEvent` 属性（其值为函数）的对象。
 
-In either case, the handler function is invoked with the `event` argument
-passed to the `eventTarget.dispatchEvent()` function.
+在任何一种情况下，处理函数都会使用传递给 `eventTarget.dispatchEvent()` 函数的 `event` 参数调用。
 
-Async functions may be used as event listeners. If an async handler function
-rejects, the rejection is captured and handled as described in
-[`EventTarget` error handling][].
+异步函数可以用作事件监听器。如果异步处理函数被拒绝，则拒绝会被捕获并按照 [`EventTarget` 错误处理][] 中的描述进行处理。
 
-An error thrown by one handler function does not prevent the other handlers
-from being invoked.
+一个处理函数抛出的错误不会阻止调用其他处理函数。
 
-The return value of a handler function is ignored.
+处理函数的返回值被忽略。
 
-Handlers are always invoked in the order they were added.
+处理程序总是按照它们被添加的顺序调用。
 
-Handler functions may mutate the `event` object.
+处理函数可以改变 `event` 对象。
 
 ```js
 function handler1(event) {
-  console.log(event.type);  // Prints 'foo'
+  console.log(event.type);  // 打印 'foo'
   event.a = 1;
 }
 
 async function handler2(event) {
-  console.log(event.type);  // Prints 'foo'
-  console.log(event.a);  // Prints 1
+  console.log(event.type);  // 打印 'foo'
+  console.log(event.a);  // 打印 1
 }
 
 const handler3 = {
   handleEvent(event) {
-    console.log(event.type);  // Prints 'foo'
+    console.log(event.type);  // 打印 'foo'
   },
 };
 
 const handler4 = {
   async handleEvent(event) {
-    console.log(event.type);  // Prints 'foo'
+    console.log(event.type);  // 打印 'foo'
   },
 };
 
@@ -2119,26 +1921,17 @@ target.addEventListener('foo', handler3);
 target.addEventListener('foo', handler4, { once: true });
 ```
 
-### `EventTarget` error handling
+### `EventTarget` 错误处理
 
-When a registered event listener throws (or returns a Promise that rejects),
-by default the error is treated as an uncaught exception on
-`process.nextTick()`. This means uncaught exceptions in `EventTarget`s will
-terminate the Node.js process by default.
+当注册的事件监听器抛出（或返回被拒绝的 Promise）时，默认情况下错误会在 `process.nextTick()` 上被视为未捕获的异常。这意味着 `EventTarget` 中的未捕获异常默认会终止 Node.js 进程。
 
-Throwing within an event listener will _not_ stop the other registered handlers
-from being invoked.
+在事件监听器中抛出*不会*停止调用其他已注册的处理程序。
 
-The `EventTarget` does not implement any special default handling for `'error'`
-type events like `EventEmitter`.
+`EventTarget` 不会对 `'error'` 类型的事件实现任何特殊的默认处理，就像 `EventEmitter` 那样。
 
-Currently errors are first forwarded to the `process.on('error')` event
-before reaching `process.on('uncaughtException')`. This behavior is
-deprecated and will change in a future release to align `EventTarget` with
-other Node.js APIs. Any code relying on the `process.on('error')` event should
-be aligned with the new behavior.
+目前，错误首先转发到 `process.on('error')` 事件，然后到达 `process.on('uncaughtException')`。此行为已弃用，并将在未来的版本中更改，以使 `EventTarget` 与其他 Node.js API 保持一致。任何依赖于 `process.on('error')` 事件的代码都应与新行为保持一致。
 
-### Class: `Event`
+### 类：`Event`
 
 <!-- YAML
 added: v14.5.0
@@ -2148,8 +1941,7 @@ changes:
     description: The `Event` class is now available through the global object.
 -->
 
-The `Event` object is an adaptation of the [`Event` Web API][]. Instances
-are created internally by Node.js.
+`Event` 对象是对 [`Event` Web API][] 的适配。实例由 Node.js 内部创建。
 
 #### `event.bubbles`
 
@@ -2157,9 +1949,9 @@ are created internally by Node.js.
 added: v14.5.0
 -->
 
-* Type: {boolean} Always returns `false`.
+* 类型: {boolean} 始终返回 `false`。
 
-This is not used in Node.js and is provided purely for completeness.
+这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.cancelBubble`
 
@@ -2169,10 +1961,9 @@ added: v14.5.0
 
 > Stability: 3 - Legacy: Use [`event.stopPropagation()`][] instead.
 
-* Type: {boolean}
+* 类型: {boolean}
 
-Alias for `event.stopPropagation()` if set to `true`. This is not used
-in Node.js and is provided purely for completeness.
+如果设置为 `true`，则为 `event.stopPropagation()` 的别名。这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.cancelable`
 
@@ -2180,7 +1971,7 @@ in Node.js and is provided purely for completeness.
 added: v14.5.0
 -->
 
-* Type: {boolean} True if the event was created with the `cancelable` option.
+* 类型: {boolean} 如果事件是使用 `cancelable` 选项创建的，则为 true。
 
 #### `event.composed`
 
@@ -2188,9 +1979,9 @@ added: v14.5.0
 added: v14.5.0
 -->
 
-* Type: {boolean} Always returns `false`.
+* 类型: {boolean} 始终返回 `false`。
 
-This is not used in Node.js and is provided purely for completeness.
+这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.composedPath()`
 
@@ -2198,9 +1989,7 @@ This is not used in Node.js and is provided purely for completeness.
 added: v14.5.0
 -->
 
-Returns an array containing the current `EventTarget` as the only entry or
-empty if the event is not being dispatched. This is not used in
-Node.js and is provided purely for completeness.
+返回一个数组，包含当前的 `EventTarget` 作为唯一条目，如果事件未被分派，则返回空数组。这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.currentTarget`
 
@@ -2208,9 +1997,9 @@ Node.js and is provided purely for completeness.
 added: v14.5.0
 -->
 
-* Type: {EventTarget} The `EventTarget` dispatching the event.
+* 类型: {EventTarget} 分派事件的 `EventTarget`。
 
-Alias for `event.target`.
+`event.target` 的别名。
 
 #### `event.defaultPrevented`
 
@@ -2218,10 +2007,9 @@ Alias for `event.target`.
 added: v14.5.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-Is `true` if `cancelable` is `true` and `event.preventDefault()` has been
-called.
+如果 `cancelable` 为 `true` 且已调用 `event.preventDefault()`，则为 `true`。
 
 #### `event.eventPhase`
 
@@ -2229,10 +2017,9 @@ called.
 added: v14.5.0
 -->
 
-* Type: {number} Returns `0` while an event is not being dispatched, `2` while
-  it is being dispatched.
+* 类型: {number} 当事件未被分派时返回 `0`，当它被分派时返回 `2`。
 
-This is not used in Node.js and is provided purely for completeness.
+这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.initEvent(type[, bubbles[, cancelable]])`
 
@@ -2247,8 +2034,7 @@ added: v19.5.0
 * `bubbles` {boolean}
 * `cancelable` {boolean}
 
-Redundant with event constructors and incapable of setting `composed`.
-This is not used in Node.js and is provided purely for completeness.
+与事件构造函数冗余且无法设置 `composed`。这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.isTrusted`
 
@@ -2256,10 +2042,9 @@ This is not used in Node.js and is provided purely for completeness.
 added: v14.5.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-The {AbortSignal} `"abort"` event is emitted with `isTrusted` set to `true`. The
-value is `false` in all other cases.
+{AbortSignal} `"abort"` 事件触发时 `isTrusted` 设置为 `true`。在所有其他情况下，值为 `false`。
 
 #### `event.preventDefault()`
 
@@ -2267,7 +2052,7 @@ value is `false` in all other cases.
 added: v14.5.0
 -->
 
-Sets the `defaultPrevented` property to `true` if `cancelable` is `true`.
+如果 `cancelable` 为 `true`，则将 `defaultPrevented` 属性设置为 `true`。
 
 #### `event.returnValue`
 
@@ -2277,10 +2062,9 @@ added: v14.5.0
 
 > Stability: 3 - Legacy: Use [`event.defaultPrevented`][] instead.
 
-* Type: {boolean} True if the event has not been canceled.
+* 类型: {boolean} 如果事件未被取消，则为 true。
 
-The value of `event.returnValue` is always the opposite of `event.defaultPrevented`.
-This is not used in Node.js and is provided purely for completeness.
+`event.returnValue` 的值总是与 `event.defaultPrevented` 相反。这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.srcElement`
 
@@ -2290,9 +2074,9 @@ added: v14.5.0
 
 > Stability: 3 - Legacy: Use [`event.target`][] instead.
 
-* Type: {EventTarget} The `EventTarget` dispatching the event.
+* 类型: {EventTarget} 分派事件的 `EventTarget`。
 
-Alias for `event.target`.
+`event.target` 的别名。
 
 #### `event.stopImmediatePropagation()`
 
@@ -2300,7 +2084,7 @@ Alias for `event.target`.
 added: v14.5.0
 -->
 
-Stops the invocation of event listeners after the current one completes.
+在当前监听器完成后停止调用事件监听器。
 
 #### `event.stopPropagation()`
 
@@ -2308,7 +2092,7 @@ Stops the invocation of event listeners after the current one completes.
 added: v14.5.0
 -->
 
-This is not used in Node.js and is provided purely for completeness.
+这在 Node.js 中未使用，仅为完整性而提供。
 
 #### `event.target`
 
@@ -2316,7 +2100,7 @@ This is not used in Node.js and is provided purely for completeness.
 added: v14.5.0
 -->
 
-* Type: {EventTarget} The `EventTarget` dispatching the event.
+* 类型: {EventTarget} 分派事件的 `EventTarget`。
 
 #### `event.timeStamp`
 
@@ -2324,9 +2108,9 @@ added: v14.5.0
 added: v14.5.0
 -->
 
-* Type: {number}
+* 类型: {number}
 
-The millisecond timestamp when the `Event` object was created.
+创建 `Event` 对象时的毫秒时间戳。
 
 #### `event.type`
 
@@ -2334,11 +2118,11 @@ The millisecond timestamp when the `Event` object was created.
 added: v14.5.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-The event type identifier.
+事件类型标识符。
 
-### Class: `EventTarget`
+### 类：`EventTarget`
 
 <!-- YAML
 added: v14.5.0
@@ -2362,39 +2146,31 @@ changes:
 * `type` {string}
 * `listener` {Function|EventListener}
 * `options` {Object}
-  * `once` {boolean} When `true`, the listener is automatically removed
-    when it is first invoked. **Default:** `false`.
-  * `passive` {boolean} When `true`, serves as a hint that the listener will
-    not call the `Event` object's `preventDefault()` method.
-    **Default:** `false`.
-  * `capture` {boolean} Not directly used by Node.js. Added for API
-    completeness. **Default:** `false`.
-  * `signal` {AbortSignal} The listener will be removed when the given
-    AbortSignal object's `abort()` method is called.
+  * `once` {boolean} 当为 `true` 时，监听器在第一次调用时自动移除。
+    **默认值:** `false`.
+  * `passive` {boolean} 当为 `true` 时，作为提示，监听器不会调用 `Event` 对象的 `preventDefault()` 方法。
+    **默认值:** `false`.
+  * `capture` {boolean} 不直接由 Node.js 使用。为 API 完整性而添加。
+    **默认值:** `false`.
+  * `signal` {AbortSignal} 当给定的 AbortSignal 对象的 `abort()` 方法被调用时，监听器将被移除。
 
-Adds a new handler for the `type` event. Any given `listener` is added
-only once per `type` and per `capture` option value.
+为 `type` 事件添加一个新的处理程序。任何给定的 `listener` 每个 `type` 和每个 `capture` 选项值仅添加一次。
 
-If the `once` option is `true`, the `listener` is removed after the
-next time a `type` event is dispatched.
+如果 `once` 选项为 `true`，则在下次分派 `type` 事件后移除 `listener`。
 
-The `capture` option is not used by Node.js in any functional way other than
-tracking registered event listeners per the `EventTarget` specification.
-Specifically, the `capture` option is used as part of the key when registering
-a `listener`. Any individual `listener` may be added once with
-`capture = false`, and once with `capture = true`.
+`capture` 选项除了按照 `EventTarget` 规范跟踪注册的事件监听器外，不以任何功能方式被 Node.js 使用。具体来说，`capture` 选项在注册 `listener` 时用作键的一部分。任何单独的 `listener` 可以添加一次 `capture = false`，一次 `capture = true`。
 
 ```js
 function handler(event) {}
 
 const target = new EventTarget();
-target.addEventListener('foo', handler, { capture: true });  // first
-target.addEventListener('foo', handler, { capture: false }); // second
+target.addEventListener('foo', handler, { capture: true });  // 第一个
+target.addEventListener('foo', handler, { capture: false }); // 第二个
 
-// Removes the second instance of handler
+// 移除 handler 的第二个实例
 target.removeEventListener('foo', handler);
 
-// Removes the first instance of handler
+// 移除 handler 的第一个实例
 target.removeEventListener('foo', handler, { capture: true });
 ```
 
@@ -2405,13 +2181,11 @@ added: v14.5.0
 -->
 
 * `event` {Event}
-* Returns: {boolean} `true` if either event's `cancelable` attribute value is
-  false or its `preventDefault()` method was not invoked, otherwise `false`.
+* 返回: {boolean} 如果事件的 `cancelable` 属性值为 false 或其 `preventDefault()` 方法未被调用，则为 `true`，否则为 `false`。
 
-Dispatches the `event` to the list of handlers for `event.type`.
+将 `event` 分派给 `event.type` 的处理程序列表。
 
-The registered event listeners is synchronously invoked in the order they
-were registered.
+注册的事件监听器按照它们被注册的顺序同步调用。
 
 #### `eventTarget.removeEventListener(type, listener[, options])`
 
@@ -2424,9 +2198,9 @@ added: v14.5.0
 * `options` {Object}
   * `capture` {boolean}
 
-Removes the `listener` from the list of handlers for event `type`.
+从事件 `type` 的处理程序列表中移除 `listener`。
 
-### Class: `CustomEvent`
+### 类：`CustomEvent`
 
 <!-- YAML
 added:
@@ -2446,10 +2220,9 @@ changes:
     description: No longer behind `--experimental-global-customevent` CLI flag.
 -->
 
-* Extends: {Event}
+* 扩展: {Event}
 
-The `CustomEvent` object is an adaptation of the [`CustomEvent` Web API][].
-Instances are created internally by Node.js.
+`CustomEvent` 对象是对 [`CustomEvent` Web API][] 的适配。实例由 Node.js 内部创建。
 
 #### `event.detail`
 
@@ -2465,20 +2238,19 @@ changes:
     description: CustomEvent is now stable.
 -->
 
-* Type: {any} Returns custom data passed when initializing.
+* 类型: {any} 返回初始化时传递的自定义数据。
 
-Read-only.
+只读。
 
-### Class: `NodeEventTarget`
+### 类：`NodeEventTarget`
 
 <!-- YAML
 added: v14.5.0
 -->
 
-* Extends: {EventTarget}
+* 扩展: {EventTarget}
 
-The `NodeEventTarget` is a Node.js-specific extension to `EventTarget`
-that emulates a subset of the `EventEmitter` API.
+`NodeEventTarget` 是 `EventTarget` 的 Node.js 特定扩展，它模拟了 `EventEmitter` API 的一个子集。
 
 #### `nodeEventTarget.addListener(type, listener)`
 
@@ -2490,12 +2262,9 @@ added: v14.5.0
 
 * `listener` {Function|EventListener}
 
-* Returns: {EventTarget} this
+* 返回: {EventTarget} this
 
-Node.js-specific extension to the `EventTarget` class that emulates the
-equivalent `EventEmitter` API. The only difference between `addListener()` and
-`addEventListener()` is that `addListener()` will return a reference to the
-`EventTarget`.
+`EventTarget` 类的 Node.js 特定扩展，模拟等效的 `EventEmitter` API。`addListener()` 和 `addEventListener()` 之间的唯一区别是 `addListener()` 将返回对 `EventTarget` 的引用。
 
 #### `nodeEventTarget.emit(type, arg)`
 
@@ -2505,11 +2274,9 @@ added: v15.2.0
 
 * `type` {string}
 * `arg` {any}
-* Returns: {boolean} `true` if event listeners registered for the `type` exist,
-  otherwise `false`.
+* 返回: {boolean} 如果存在为 `type` 注册的事件监听器，则为 `true`，否则为 `false`。
 
-Node.js-specific extension to the `EventTarget` class that dispatches the
-`arg` to the list of handlers for `type`.
+`EventTarget` 类的 Node.js 特定扩展，将 `arg` 分派给 `type` 的处理程序列表。
 
 #### `nodeEventTarget.eventNames()`
 
@@ -2517,10 +2284,9 @@ Node.js-specific extension to the `EventTarget` class that dispatches the
 added: v14.5.0
 -->
 
-* Returns: {string\[]}
+* 返回: {string\[]}
 
-Node.js-specific extension to the `EventTarget` class that returns an array
-of event `type` names for which event listeners are registered.
+`EventTarget` 类的 Node.js 特定扩展，返回已注册事件监听器的事件 `type` 名称数组。
 
 #### `nodeEventTarget.listenerCount(type)`
 
@@ -2530,10 +2296,9 @@ added: v14.5.0
 
 * `type` {string}
 
-* Returns: {number}
+* 返回: {number}
 
-Node.js-specific extension to the `EventTarget` class that returns the number
-of event listeners registered for the `type`.
+`EventTarget` 类的 Node.js 特定扩展，返回为 `type` 注册的事件监听器数量。
 
 #### `nodeEventTarget.setMaxListeners(n)`
 
@@ -2543,8 +2308,7 @@ added: v14.5.0
 
 * `n` {number}
 
-Node.js-specific extension to the `EventTarget` class that sets the number
-of max event listeners as `n`.
+`EventTarget` 类的 Node.js 特定扩展，将最大事件监听器数量设置为 `n`。
 
 #### `nodeEventTarget.getMaxListeners()`
 
@@ -2552,10 +2316,9 @@ of max event listeners as `n`.
 added: v14.5.0
 -->
 
-* Returns: {number}
+* 返回: {number}
 
-Node.js-specific extension to the `EventTarget` class that returns the number
-of max event listeners.
+`EventTarget` 类的 Node.js 特定扩展，返回最大事件监听器数量。
 
 #### `nodeEventTarget.off(type, listener[, options])`
 
@@ -2570,9 +2333,9 @@ added: v14.5.0
 * `options` {Object}
   * `capture` {boolean}
 
-* Returns: {EventTarget} this
+* 返回: {EventTarget} this
 
-Node.js-specific alias for `eventTarget.removeEventListener()`.
+`eventTarget.removeEventListener()` 的 Node.js 特定别名。
 
 #### `nodeEventTarget.on(type, listener)`
 
@@ -2584,9 +2347,9 @@ added: v14.5.0
 
 * `listener` {Function|EventListener}
 
-* Returns: {EventTarget} this
+* 返回: {EventTarget} this
 
-Node.js-specific alias for `eventTarget.addEventListener()`.
+`eventTarget.addEventListener()` 的 Node.js 特定别名。
 
 #### `nodeEventTarget.once(type, listener)`
 
@@ -2598,11 +2361,9 @@ added: v14.5.0
 
 * `listener` {Function|EventListener}
 
-* Returns: {EventTarget} this
+* 返回: {EventTarget} this
 
-Node.js-specific extension to the `EventTarget` class that adds a `once`
-listener for the given event `type`. This is equivalent to calling `on`
-with the `once` option set to `true`.
+`EventTarget` 类的 Node.js 特定扩展，为给定事件 `type` 添加一个 `once` 监听器。这等效于调用 `on` 并将 `once` 选项设置为 `true`。
 
 #### `nodeEventTarget.removeAllListeners([type])`
 
@@ -2612,11 +2373,9 @@ added: v14.5.0
 
 * `type` {string}
 
-* Returns: {EventTarget} this
+* 返回: {EventTarget} this
 
-Node.js-specific extension to the `EventTarget` class. If `type` is specified,
-removes all registered listeners for `type`, otherwise removes all registered
-listeners.
+`EventTarget` 类的 Node.js 特定扩展。如果指定了 `type`，则移除 `type` 的所有已注册监听器，否则移除所有已注册监听器。
 
 #### `nodeEventTarget.removeListener(type, listener[, options])`
 
@@ -2631,12 +2390,9 @@ added: v14.5.0
 * `options` {Object}
   * `capture` {boolean}
 
-* Returns: {EventTarget} this
+* 返回: {EventTarget} this
 
-Node.js-specific extension to the `EventTarget` class that removes the
-`listener` for the given `type`. The only difference between `removeListener()`
-and `removeEventListener()` is that `removeListener()` will return a reference
-to the `EventTarget`.
+`EventTarget` 类的 Node.js 特定扩展，移除给定 `type` 的 `listener`。`removeListener()` 和 `removeEventListener()` 之间的唯一区别是 `removeListener()` 将返回对 `EventTarget` 的引用。
 
 [WHATWG-EventTarget]: https://dom.spec.whatwg.org/#interface-eventtarget
 [`--trace-warnings`]: cli.md#--trace-warnings

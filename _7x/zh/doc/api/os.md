@@ -6,8 +6,7 @@
 
 <!-- source_link=lib/os.js -->
 
-The `node:os` module provides operating system-related utility methods and
-properties. It can be accessed using:
+`node:os` 模块提供了与操作系统相关的实用方法和属性。可以通过以下方式访问：
 
 ```mjs
 import os from 'node:os';
@@ -23,12 +22,12 @@ const os = require('node:os');
 added: v0.7.8
 -->
 
-* Type: {string}
+- 类型: {string}
 
-The operating system-specific end-of-line marker.
+特定于操作系统的行结束标记。
 
-* `\n` on POSIX
-* `\r\n` on Windows
+- 在 POSIX 系统上是 `\n`
+- 在 Windows 系统上是 `\r\n`
 
 ## `os.availableParallelism()`
 
@@ -38,12 +37,11 @@ added:
   - v18.14.0
 -->
 
-* Returns: {integer}
+- 返回: {integer}
 
-Returns an estimate of the default amount of parallelism a program should use.
-Always returns a value greater than zero.
+返回程序应使用的默认并行度估计值。始终返回一个大于零的值。
 
-This function is a small wrapper about libuv's [`uv_available_parallelism()`][].
+此函数是 libuv 的 [`uv_available_parallelism()`][] 的一个小包装。
 
 ## `os.arch()`
 
@@ -51,13 +49,11 @@ This function is a small wrapper about libuv's [`uv_available_parallelism()`][].
 added: v0.5.0
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the operating system CPU architecture for which the Node.js binary was
-compiled. Possible values are `'arm'`, `'arm64'`, `'ia32'`, `'loong64'`,
-`'mips'`, `'mipsel'`, `'ppc64'`, `'riscv64'`, `'s390x'`, and `'x64'`.
+返回为其编译 Node.js 二进制文件的操作系统 CPU 架构。可能的值有 `'arm'`、`'arm64'`、`'ia32'`、`'loong64'`、`'mips'`、`'mipsel'`、`'ppc64'`、`'riscv64'`、`'s390x'` 和 `'x64'`。
 
-The return value is equivalent to [`process.arch`][].
+返回值等同于 [`process.arch`][]。
 
 ## `os.constants`
 
@@ -65,11 +61,9 @@ The return value is equivalent to [`process.arch`][].
 added: v6.3.0
 -->
 
-* Type: {Object}
+- 类型: {Object}
 
-Contains commonly used operating system-specific constants for error codes,
-process signals, and so on. The specific constants defined are described in
-[OS constants](#os-constants).
+包含常用的操作系统特定常量，例如错误代码、进程信号等。定义的特定常量在 [OS 常量](#os-constants) 中描述。
 
 ## `os.cpus()`
 
@@ -77,22 +71,20 @@ process signals, and so on. The specific constants defined are described in
 added: v0.3.3
 -->
 
-* Returns: {Object\[]}
+- 返回: {Object\[]}
 
-Returns an array of objects containing information about each logical CPU core.
-The array will be empty if no CPU information is available, such as if the
-`/proc` file system is unavailable.
+返回一个包含有关每个逻辑 CPU 核心信息的对象数组。如果无法获取 CPU 信息（例如 `/proc` 文件系统不可用），则该数组将为空。
 
-The properties included on each object include:
+每个对象包含的属性包括：
 
-* `model` {string}
-* `speed` {number} (in MHz)
-* `times` {Object}
-  * `user` {number} The number of milliseconds the CPU has spent in user mode.
-  * `nice` {number} The number of milliseconds the CPU has spent in nice mode.
-  * `sys` {number} The number of milliseconds the CPU has spent in sys mode.
-  * `idle` {number} The number of milliseconds the CPU has spent in idle mode.
-  * `irq` {number} The number of milliseconds the CPU has spent in irq mode.
+- `model` {string}
+- `speed` {number} (单位 MHz)
+- `times` {Object}
+  - `user` {number} CPU 在用户模式下花费的毫秒数。
+  - `nice` {number} CPU 在 nice 模式下花费的毫秒数。
+  - `sys` {number} CPU 在系统模式下花费的毫秒数。
+  - `idle` {number} CPU 在空闲模式下花费的毫秒数。
+  - `irq` {number} CPU 在中断请求模式下花费的毫秒数。
 
 <!-- eslint-disable @stylistic/js/semi -->
 
@@ -142,15 +134,12 @@ The properties included on each object include:
       irq: 20,
     },
   },
-]
+];
 ```
 
-`nice` values are POSIX-only. On Windows, the `nice` values of all processors
-are always 0.
+`nice` 值仅在 POSIX 系统上有效。在 Windows 上，所有处理器的 `nice` 值始终为 0。
 
-`os.cpus().length` should not be used to calculate the amount of parallelism
-available to an application. Use
-[`os.availableParallelism()`](#osavailableparallelism) for this purpose.
+不应使用 `os.cpus().length` 来计算应用程序可用的并行量。请使用 [`os.availableParallelism()`](#osavailableparallelism) 来实现此目的。
 
 ## `os.devNull`
 
@@ -160,12 +149,12 @@ added:
   - v14.18.0
 -->
 
-* Type: {string}
+- 类型: {string}
 
-The platform-specific file path of the null device.
+空设备的平台特定文件路径。
 
-* `\\.\nul` on Windows
-* `/dev/null` on POSIX
+- 在 Windows 上是 `\\.\nul`
+- 在 POSIX 系统上是 `/dev/null`
 
 ## `os.endianness()`
 
@@ -173,12 +162,11 @@ The platform-specific file path of the null device.
 added: v0.9.4
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns a string identifying the endianness of the CPU for which the Node.js
-binary was compiled.
+返回一个字符串，标识为其编译 Node.js 二进制文件的 CPU 的字节序。
 
-Possible values are `'BE'` for big endian and `'LE'` for little endian.
+可能的值是 `'BE'` 表示大端序，`'LE'` 表示小端序。
 
 ## `os.freemem()`
 
@@ -186,9 +174,9 @@ Possible values are `'BE'` for big endian and `'LE'` for little endian.
 added: v0.3.3
 -->
 
-* Returns: {integer}
+- 返回: {integer}
 
-Returns the amount of free system memory in bytes as an integer.
+以整数形式返回系统空闲内存的字节数。
 
 ## `os.getPriority([pid])`
 
@@ -196,12 +184,10 @@ Returns the amount of free system memory in bytes as an integer.
 added: v10.10.0
 -->
 
-* `pid` {integer} The process ID to retrieve scheduling priority for.
-  **Default:** `0`.
-* Returns: {integer}
+- `pid` {integer} 要获取调度优先级的进程 ID。**默认值:** `0`。
+- 返回: {integer}
 
-Returns the scheduling priority for the process specified by `pid`. If `pid` is
-not provided or is `0`, the priority of the current process is returned.
+返回由 `pid` 指定的进程的调度优先级。如果未提供 `pid` 或 `pid` 为 `0`，则返回当前进程的优先级。
 
 ## `os.homedir()`
 
@@ -209,15 +195,13 @@ not provided or is `0`, the priority of the current process is returned.
 added: v2.3.0
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the string path of the current user's home directory.
+返回当前用户的主目录的字符串路径。
 
-On POSIX, it uses the `$HOME` environment variable if defined. Otherwise it
-uses the [effective UID][EUID] to look up the user's home directory.
+在 POSIX 系统上，如果定义了 `$HOME` 环境变量则使用它。否则，它使用 [有效 UID][EUID] 来查找用户的主目录。
 
-On Windows, it uses the `USERPROFILE` environment variable if defined.
-Otherwise it uses the path to the profile directory of the current user.
+在 Windows 上，如果定义了 `USERPROFILE` 环境变量则使用它。否则，它使用当前用户的配置文件目录的路径。
 
 ## `os.hostname()`
 
@@ -225,9 +209,9 @@ Otherwise it uses the path to the profile directory of the current user.
 added: v0.3.3
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the host name of the operating system as a string.
+以字符串形式返回操作系统的主机名。
 
 ## `os.loadavg()`
 
@@ -235,15 +219,13 @@ Returns the host name of the operating system as a string.
 added: v0.3.3
 -->
 
-* Returns: {number\[]}
+- 返回: {number\[]}
 
-Returns an array containing the 1, 5, and 15 minute load averages.
+返回一个包含 1、5 和 15 分钟平均负载的数组。
 
-The load average is a measure of system activity calculated by the operating
-system and expressed as a fractional number.
+平均负载是操作系统计算出的系统活动量度，以小数表示。
 
-The load average is a Unix-specific concept. On Windows, the return value is
-always `[0, 0, 0]`.
+平均负载是 Unix 特有的概念。在 Windows 上，返回值始终为 `[0, 0, 0]`。
 
 ## `os.machine()`
 
@@ -253,15 +235,11 @@ added:
   - v16.18.0
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the machine type as a string, such as `arm`, `arm64`, `aarch64`,
-`mips`, `mips64`, `ppc64`, `ppc64le`, `s390x`, `i386`, `i686`, `x86_64`.
+以字符串形式返回机器类型，例如 `arm`、`arm64`、`aarch64`、`mips`、`mips64`、`ppc64`、`ppc64le`、`s390x`、`i386`、`i686`、`x86_64`。
 
-On POSIX systems, the machine type is determined by calling
-[`uname(3)`][]. On Windows, `RtlGetVersion()` is used, and if it is not
-available, `GetVersionExW()` will be used. See
-<https://en.wikipedia.org/wiki/Uname#Examples> for more information.
+在 POSIX 系统上，机器类型通过调用 [`uname(3)`][] 确定。在 Windows 上，使用 `RtlGetVersion()`，如果不可用，则使用 `GetVersionExW()`。更多信息请参见 <https://en.wikipedia.org/wiki/Uname#Examples>。
 
 ## `os.networkInterfaces()`
 
@@ -270,33 +248,27 @@ added: v0.6.0
 changes:
   - version: v18.4.0
     pr-url: https://github.com/nodejs/node/pull/43054
-    description: The `family` property now returns a string instead of a number.
+    description: `family` 属性现在返回字符串而不是数字。
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41431
-    description: The `family` property now returns a number instead of a string.
+    description: `family` 属性现在返回数字而不是字符串。
 -->
 
-* Returns: {Object}
+- 返回: {Object}
 
-Returns an object containing network interfaces that have been assigned a
-network address.
+返回一个包含已分配网络地址的网络接口的对象。
 
-Each key on the returned object identifies a network interface. The associated
-value is an array of objects that each describe an assigned network address.
+返回对象上的每个键标识一个网络接口。关联的值是一个对象数组，每个对象描述一个已分配的网络地址。
 
-The properties available on the assigned network address object include:
+已分配网络地址对象上可用的属性包括：
 
-* `address` {string} The assigned IPv4 or IPv6 address
-* `netmask` {string} The IPv4 or IPv6 network mask
-* `family` {string} Either `IPv4` or `IPv6`
-* `mac` {string} The MAC address of the network interface
-* `internal` {boolean} `true` if the network interface is a loopback or
-  similar interface that is not remotely accessible; otherwise `false`
-* `scopeid` {number} The numeric IPv6 scope ID (only specified when `family`
-  is `IPv6`)
-* `cidr` {string} The assigned IPv4 or IPv6 address with the routing prefix
-  in CIDR notation. If the `netmask` is invalid, this property is set
-  to `null`.
+- `address` {string} 分配的 IPv4 或 IPv6 地址
+- `netmask` {string} IPv4 或 IPv6 网络掩码
+- `family` {string} `IPv4` 或 `IPv6`
+- `mac` {string} 网络接口的 MAC 地址
+- `internal` {boolean} 如果网络接口是环回或类似不可远程访问的接口，则为 `true`；否则为 `false`
+- `scopeid` {number} 数字 IPv6 作用域 ID（仅在 `family` 为 `IPv6` 时指定）
+- `cidr` {string} 带有 CIDR 表示法中路由前缀的已分配 IPv4 或 IPv6 地址。如果 `netmask` 无效，则此属性设置为 `null`。
 
 <!-- eslint-skip -->
 
@@ -349,17 +321,13 @@ The properties available on the assigned network address object include:
 added: v0.5.0
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns a string identifying the operating system platform for which
-the Node.js binary was compiled. The value is set at compile time.
-Possible values are `'aix'`, `'darwin'`, `'freebsd'`,`'linux'`,
-`'openbsd'`, `'sunos'`, and `'win32'`.
+返回一个字符串，标识为其编译 Node.js 二进制文件的操作系统平台。该值在编译时设置。可能的值有 `'aix'`、`'darwin'`、`'freebsd'`、`'linux'`、`'openbsd'`、`'sunos'` 和 `'win32'`。
 
-The return value is equivalent to [`process.platform`][].
+返回值等同于 [`process.platform`][]。
 
-The value `'android'` may also be returned if Node.js is built on the Android
-operating system. [Android support is experimental][Android building].
+如果 Node.js 是在 Android 操作系统上构建的，也可能返回 `'android'`。[Android 支持是实验性的][Android building]。
 
 ## `os.release()`
 
@@ -367,13 +335,11 @@ operating system. [Android support is experimental][Android building].
 added: v0.3.3
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the operating system as a string.
+以字符串形式返回操作系统版本。
 
-On POSIX systems, the operating system release is determined by calling
-[`uname(3)`][]. On Windows, `GetVersionExW()` is used. See
-<https://en.wikipedia.org/wiki/Uname#Examples> for more information.
+在 POSIX 系统上，操作系统版本通过调用 [`uname(3)`][] 确定。在 Windows 上，使用 `GetVersionExW()`。更多信息请参见 <https://en.wikipedia.org/wiki/Uname#Examples>。
 
 ## `os.setPriority([pid, ]priority)`
 
@@ -381,23 +347,14 @@ On POSIX systems, the operating system release is determined by calling
 added: v10.10.0
 -->
 
-* `pid` {integer} The process ID to set scheduling priority for.
-  **Default:** `0`.
-* `priority` {integer} The scheduling priority to assign to the process.
+- `pid` {integer} 要设置调度优先级的进程 ID。**默认值:** `0`。
+- `priority` {integer} 要分配给进程的调度优先级。
 
-Attempts to set the scheduling priority for the process specified by `pid`. If
-`pid` is not provided or is `0`, the process ID of the current process is used.
+尝试设置由 `pid` 指定的进程的调度优先级。如果未提供 `pid` 或 `pid` 为 `0`，则使用当前进程的进程 ID。
 
-The `priority` input must be an integer between `-20` (high priority) and `19`
-(low priority). Due to differences between Unix priority levels and Windows
-priority classes, `priority` is mapped to one of six priority constants in
-`os.constants.priority`. When retrieving a process priority level, this range
-mapping may cause the return value to be slightly different on Windows. To avoid
-confusion, set `priority` to one of the priority constants.
+`priority` 输入必须是一个介于 `-20`（高优先级）和 `19`（低优先级）之间的整数。由于 Unix 优先级级别和 Windows 优先级类之间的差异，`priority` 被映射到 `os.constants.priority` 中的六个优先级常量之一。在检索进程优先级级别时，此范围映射可能导致返回值在 Windows 上略有不同。为避免混淆，请将 `priority` 设置为优先级常量之一。
 
-On Windows, setting priority to `PRIORITY_HIGHEST` requires elevated user
-privileges. Otherwise the set priority will be silently reduced to
-`PRIORITY_HIGH`.
+在 Windows 上，将优先级设置为 `PRIORITY_HIGHEST` 需要提升的用户权限。否则，设置的优先级将被静默降低为 `PRIORITY_HIGH`。
 
 ## `os.tmpdir()`
 
@@ -406,27 +363,18 @@ added: v0.9.9
 changes:
   - version: v2.0.0
     pr-url: https://github.com/nodejs/node/pull/747
-    description: This function is now cross-platform consistent and no longer
-                 returns a path with a trailing slash on any platform.
+    description: 此函数现在是跨平台一致的，并且不再在任何平台上返回带有尾随斜杠的路径。
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the operating system's default directory for temporary files as a
-string.
+以字符串形式返回操作系统的默认临时文件目录。
 
-On Windows, the result can be overridden by `TEMP` and `TMP` environment variables, and
-`TEMP` takes precedence over `TMP`. If neither is set, it defaults to `%SystemRoot%\temp`
-or `%windir%\temp`.
+在 Windows 上，结果可以被 `TEMP` 和 `TMP` 环境变量覆盖，并且 `TEMP` 优先于 `TMP`。如果两者都未设置，则默认为 `%SystemRoot%\temp` 或 `%windir%\temp`。
 
-On non-Windows platforms, `TMPDIR`, `TMP` and `TEMP` environment variables will be checked
-to override the result of this method, in the described order. If none of them is set, it
-defaults to `/tmp`.
+在非 Windows 平台上，将检查 `TMPDIR`、`TMP` 和 `TEMP` 环境变量以覆盖此方法的结果，按描述的顺序。如果均未设置，则默认为 `/tmp`。
 
-Some operating system distributions would either configure `TMPDIR` (non-Windows) or
-`TEMP` and `TMP` (Windows) by default without additional configurations by the system
-administrators. The result of `os.tmpdir()` typically reflects the system preference
-unless it's explicitly overridden by the users.
+某些操作系统发行版会默认配置 `TMPDIR`（非 Windows）或 `TEMP` 和 `TMP`（Windows），而无需系统管理员进行额外配置。`os.tmpdir()` 的结果通常反映系统偏好，除非用户显式覆盖。
 
 ## `os.totalmem()`
 
@@ -434,9 +382,9 @@ unless it's explicitly overridden by the users.
 added: v0.3.3
 -->
 
-* Returns: {integer}
+- 返回: {integer}
 
-Returns the total amount of system memory in bytes as an integer.
+以整数形式返回系统内存总量的字节数。
 
 ## `os.type()`
 
@@ -444,13 +392,11 @@ Returns the total amount of system memory in bytes as an integer.
 added: v0.3.3
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns the operating system name as returned by [`uname(3)`][]. For example, it
-returns `'Linux'` on Linux, `'Darwin'` on macOS, and `'Windows_NT'` on Windows.
+返回由 [`uname(3)`][] 返回的操作系统名称。例如，在 Linux 上返回 `'Linux'`，在 macOS 上返回 `'Darwin'`，在 Windows 上返回 `'Windows_NT'`。
 
-See <https://en.wikipedia.org/wiki/Uname#Examples> for additional information
-about the output of running [`uname(3)`][] on various operating systems.
+有关在各种操作系统上运行 [`uname(3)`][] 的输出的更多信息，请参见 <https://en.wikipedia.org/wiki/Uname#Examples>。
 
 ## `os.uptime()`
 
@@ -459,13 +405,12 @@ added: v0.3.3
 changes:
   - version: v10.0.0
     pr-url: https://github.com/nodejs/node/pull/20129
-    description: The result of this function no longer contains a fraction
-                 component on Windows.
+    description: 此函数的结果在 Windows 上不再包含小数部分。
 -->
 
-* Returns: {integer}
+- 返回: {integer}
 
-Returns the system uptime in number of seconds.
+返回系统运行时间的秒数。
 
 ## `os.userInfo([options])`
 
@@ -473,23 +418,15 @@ Returns the system uptime in number of seconds.
 added: v6.0.0
 -->
 
-* `options` {Object}
-  * `encoding` {string} Character encoding used to interpret resulting strings.
-    If `encoding` is set to `'buffer'`, the `username`, `shell`, and `homedir`
-    values will be `Buffer` instances. **Default:** `'utf8'`.
-* Returns: {Object}
+- `options` {Object}
+  - `encoding` {string} 用于解释结果字符串的字符编码。如果 `encoding` 设置为 `'buffer'`，则 `username`、`shell` 和 `homedir` 值将是 `Buffer` 实例。**默认值:** `'utf8'`。
+- 返回: {Object}
 
-Returns information about the currently effective user. On POSIX platforms,
-this is typically a subset of the password file. The returned object includes
-the `username`, `uid`, `gid`, `shell`, and `homedir`. On Windows, the `uid` and
-`gid` fields are `-1`, and `shell` is `null`.
+返回有关当前有效用户的信息。在 POSIX 平台上，这通常是密码文件的子集。返回的对象包括 `username`、`uid`、`gid`、`shell` 和 `homedir`。在 Windows 上，`uid` 和 `gid` 字段为 `-1`，并且 `shell` 为 `null`。
 
-The value of `homedir` returned by `os.userInfo()` is provided by the operating
-system. This differs from the result of `os.homedir()`, which queries
-environment variables for the home directory before falling back to the
-operating system response.
+`os.userInfo()` 返回的 `homedir` 值由操作系统提供。这与 `os.homedir()` 的结果不同，后者在回退到操作系统响应之前会查询环境变量以获取主目录。
 
-Throws a [`SystemError`][] if a user has no `username` or `homedir`.
+如果用户没有 `username` 或 `homedir`，则抛出 [`SystemError`][]。
 
 ## `os.version()`
 
@@ -499,872 +436,828 @@ added:
  - v12.17.0
 -->
 
-* Returns: {string}
+- 返回: {string}
 
-Returns a string identifying the kernel version.
+返回一个标识内核版本的字符串。
 
-On POSIX systems, the operating system release is determined by calling
-[`uname(3)`][]. On Windows, `RtlGetVersion()` is used, and if it is not
-available, `GetVersionExW()` will be used. See
-<https://en.wikipedia.org/wiki/Uname#Examples> for more information.
+在 POSIX 系统上，操作系统版本通过调用 [`uname(3)`][] 确定。在 Windows 上，使用 `RtlGetVersion()`，如果不可用，则使用 `GetVersionExW()`。更多信息请参见 <https://en.wikipedia.org/wiki/Uname#Examples>。
 
-## OS constants
+## OS 常量
 
-The following constants are exported by `os.constants`.
+以下常量由 `os.constants` 导出。
 
-Not all constants will be available on every operating system.
+并非所有常量在每个操作系统上都可用。
 
-### Signal constants
+### 信号常量
 
 <!-- YAML
 changes:
   - version: v5.11.0
     pr-url: https://github.com/nodejs/node/pull/6093
-    description: Added support for `SIGINFO`.
+    description: 添加了对 `SIGINFO` 的支持。
 -->
 
-The following signal constants are exported by `os.constants.signals`.
+以下信号常量由 `os.constants.signals` 导出。
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>SIGHUP</code></td>
-    <td>Sent to indicate when a controlling terminal is closed or a parent
-    process exits.</td>
+    <td>当控制终端关闭或父进程退出时发送。</td>
   </tr>
   <tr>
     <td><code>SIGINT</code></td>
-    <td>Sent to indicate when a user wishes to interrupt a process
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>).</td>
+    <td>当用户希望中断进程时发送（<kbd>Ctrl</kbd>+<kbd>C</kbd>）。</td>
   </tr>
   <tr>
     <td><code>SIGQUIT</code></td>
-    <td>Sent to indicate when a user wishes to terminate a process and perform a
-    core dump.</td>
+    <td>当用户希望终止进程并执行核心转储时发送。</td>
   </tr>
   <tr>
     <td><code>SIGILL</code></td>
-    <td>Sent to a process to notify that it has attempted to perform an illegal,
-    malformed, unknown, or privileged instruction.</td>
+    <td>发送给进程以通知其尝试执行非法、格式错误、未知或特权指令。</td>
   </tr>
   <tr>
     <td><code>SIGTRAP</code></td>
-    <td>Sent to a process when an exception has occurred.</td>
+    <td>当进程发生异常时发送。</td>
   </tr>
   <tr>
     <td><code>SIGABRT</code></td>
-    <td>Sent to a process to request that it abort.</td>
+    <td>发送给进程以请求其中止。</td>
   </tr>
   <tr>
     <td><code>SIGIOT</code></td>
-    <td>Synonym for <code>SIGABRT</code></td>
+    <td><code>SIGABRT</code> 的同义词</td>
   </tr>
   <tr>
     <td><code>SIGBUS</code></td>
-    <td>Sent to a process to notify that it has caused a bus error.</td>
+    <td>发送给进程以通知其引起了总线错误。</td>
   </tr>
   <tr>
     <td><code>SIGFPE</code></td>
-    <td>Sent to a process to notify that it has performed an illegal arithmetic
-    operation.</td>
+    <td>发送给进程以通知其执行了非法的算术操作。</td>
   </tr>
   <tr>
     <td><code>SIGKILL</code></td>
-    <td>Sent to a process to terminate it immediately.</td>
+    <td>发送给进程以立即终止它。</td>
   </tr>
   <tr>
     <td><code>SIGUSR1</code> <code>SIGUSR2</code></td>
-    <td>Sent to a process to identify user-defined conditions.</td>
+    <td>发送给进程以标识用户定义的条件。</td>
   </tr>
   <tr>
     <td><code>SIGSEGV</code></td>
-    <td>Sent to a process to notify of a segmentation fault.</td>
+    <td>发送给进程以通知发生了分段错误。</td>
   </tr>
   <tr>
     <td><code>SIGPIPE</code></td>
-    <td>Sent to a process when it has attempted to write to a disconnected
-    pipe.</td>
+    <td>当进程尝试写入已断开的管道时发送。</td>
   </tr>
   <tr>
     <td><code>SIGALRM</code></td>
-    <td>Sent to a process when a system timer elapses.</td>
+    <td>当系统计时器到期时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGTERM</code></td>
-    <td>Sent to a process to request termination.</td>
+    <td>发送给进程以请求终止。</td>
   </tr>
   <tr>
     <td><code>SIGCHLD</code></td>
-    <td>Sent to a process when a child process terminates.</td>
+    <td>当子进程终止时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGSTKFLT</code></td>
-    <td>Sent to a process to indicate a stack fault on a coprocessor.</td>
+    <td>发送给进程以指示协处理器上的堆栈故障。</td>
   </tr>
   <tr>
     <td><code>SIGCONT</code></td>
-    <td>Sent to instruct the operating system to continue a paused process.</td>
+    <td>发送以指示操作系统继续已暂停的进程。</td>
   </tr>
   <tr>
     <td><code>SIGSTOP</code></td>
-    <td>Sent to instruct the operating system to halt a process.</td>
+    <td>发送以指示操作系统停止进程。</td>
   </tr>
   <tr>
     <td><code>SIGTSTP</code></td>
-    <td>Sent to a process to request it to stop.</td>
+    <td>发送给进程以请求其停止。</td>
   </tr>
   <tr>
     <td><code>SIGBREAK</code></td>
-    <td>Sent to indicate when a user wishes to interrupt a process.</td>
+    <td>当用户希望中断进程时发送。</td>
   </tr>
   <tr>
     <td><code>SIGTTIN</code></td>
-    <td>Sent to a process when it reads from the TTY while in the
-    background.</td>
+    <td>当进程在后台从 TTY 读取时发送。</td>
   </tr>
   <tr>
     <td><code>SIGTTOU</code></td>
-    <td>Sent to a process when it writes to the TTY while in the
-    background.</td>
+    <td>当进程在后台写入 TTY 时发送。</td>
   </tr>
   <tr>
     <td><code>SIGURG</code></td>
-    <td>Sent to a process when a socket has urgent data to read.</td>
+    <td>当套接字有紧急数据要读取时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGXCPU</code></td>
-    <td>Sent to a process when it has exceeded its limit on CPU usage.</td>
+    <td>当进程超出其 CPU 使用限制时发送。</td>
   </tr>
   <tr>
     <td><code>SIGXFSZ</code></td>
-    <td>Sent to a process when it grows a file larger than the maximum
-    allowed.</td>
+    <td>当进程使文件增长超过允许的最大值时发送。</td>
   </tr>
   <tr>
     <td><code>SIGVTALRM</code></td>
-    <td>Sent to a process when a virtual timer has elapsed.</td>
+    <td>当虚拟计时器到期时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGPROF</code></td>
-    <td>Sent to a process when a system timer has elapsed.</td>
+    <td>当系统计时器到期时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGWINCH</code></td>
-    <td>Sent to a process when the controlling terminal has changed its
-    size.</td>
+    <td>当控制终端改变大小时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGIO</code></td>
-    <td>Sent to a process when I/O is available.</td>
+    <td>当 I/O 可用时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGPOLL</code></td>
-    <td>Synonym for <code>SIGIO</code></td>
+    <td><code>SIGIO</code> 的同义词</td>
   </tr>
   <tr>
     <td><code>SIGLOST</code></td>
-    <td>Sent to a process when a file lock has been lost.</td>
+    <td>当文件锁丢失时发送给进程。</td>
   </tr>
   <tr>
     <td><code>SIGPWR</code></td>
-    <td>Sent to a process to notify of a power failure.</td>
+    <td>发送给进程以通知电源故障。</td>
   </tr>
   <tr>
     <td><code>SIGINFO</code></td>
-    <td>Synonym for <code>SIGPWR</code></td>
+    <td><code>SIGPWR</code> 的同义词</td>
   </tr>
   <tr>
     <td><code>SIGSYS</code></td>
-    <td>Sent to a process to notify of a bad argument.</td>
+    <td>发送给进程以通知错误的参数。</td>
   </tr>
   <tr>
     <td><code>SIGUNUSED</code></td>
-    <td>Synonym for <code>SIGSYS</code></td>
+    <td><code>SIGSYS</code> 的同义词</td>
   </tr>
 </table>
 
-### Error constants
+### 错误常量
 
-The following error constants are exported by `os.constants.errno`.
+以下错误常量由 `os.constants.errno` 导出。
 
-#### POSIX error constants
+#### POSIX 错误常量
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>E2BIG</code></td>
-    <td>Indicates that the list of arguments is longer than expected.</td>
+    <td>表示参数列表比预期长。</td>
   </tr>
   <tr>
     <td><code>EACCES</code></td>
-    <td>Indicates that the operation did not have sufficient permissions.</td>
+    <td>表示操作没有足够的权限。</td>
   </tr>
   <tr>
     <td><code>EADDRINUSE</code></td>
-    <td>Indicates that the network address is already in use.</td>
+    <td>表示网络地址已被使用。</td>
   </tr>
   <tr>
     <td><code>EADDRNOTAVAIL</code></td>
-    <td>Indicates that the network address is currently unavailable for
-    use.</td>
+    <td>表示网络地址当前不可用。</td>
   </tr>
   <tr>
     <td><code>EAFNOSUPPORT</code></td>
-    <td>Indicates that the network address family is not supported.</td>
+    <td>表示网络地址族不受支持。</td>
   </tr>
   <tr>
     <td><code>EAGAIN</code></td>
-    <td>Indicates that there is no data available and to try the
-    operation again later.</td>
+    <td>表示没有可用数据，稍后重试操作。</td>
   </tr>
   <tr>
     <td><code>EALREADY</code></td>
-    <td>Indicates that the socket already has a pending connection in
-    progress.</td>
+    <td>表示套接字已有挂起的连接在进行中。</td>
   </tr>
   <tr>
     <td><code>EBADF</code></td>
-    <td>Indicates that a file descriptor is not valid.</td>
+    <td>表示文件描述符无效。</td>
   </tr>
   <tr>
     <td><code>EBADMSG</code></td>
-    <td>Indicates an invalid data message.</td>
+    <td>表示无效的数据消息。</td>
   </tr>
   <tr>
     <td><code>EBUSY</code></td>
-    <td>Indicates that a device or resource is busy.</td>
+    <td>表示设备或资源繁忙。</td>
   </tr>
   <tr>
     <td><code>ECANCELED</code></td>
-    <td>Indicates that an operation was canceled.</td>
+    <td>表示操作已被取消。</td>
   </tr>
   <tr>
     <td><code>ECHILD</code></td>
-    <td>Indicates that there are no child processes.</td>
+    <td>表示没有子进程。</td>
   </tr>
   <tr>
     <td><code>ECONNABORTED</code></td>
-    <td>Indicates that the network connection has been aborted.</td>
+    <td>表示网络连接已中止。</td>
   </tr>
   <tr>
     <td><code>ECONNREFUSED</code></td>
-    <td>Indicates that the network connection has been refused.</td>
+    <td>表示网络连接被拒绝。</td>
   </tr>
   <tr>
     <td><code>ECONNRESET</code></td>
-    <td>Indicates that the network connection has been reset.</td>
+    <td>表示网络连接已重置。</td>
   </tr>
   <tr>
     <td><code>EDEADLK</code></td>
-    <td>Indicates that a resource deadlock has been avoided.</td>
+    <td>表示已避免资源死锁。</td>
   </tr>
   <tr>
     <td><code>EDESTADDRREQ</code></td>
-    <td>Indicates that a destination address is required.</td>
+    <td>表示需要目标地址。</td>
   </tr>
   <tr>
     <td><code>EDOM</code></td>
-    <td>Indicates that an argument is out of the domain of the function.</td>
+    <td>表示参数超出函数的域。</td>
   </tr>
   <tr>
     <td><code>EDQUOT</code></td>
-    <td>Indicates that the disk quota has been exceeded.</td>
+    <td>表示超出磁盘配额。</td>
   </tr>
   <tr>
     <td><code>EEXIST</code></td>
-    <td>Indicates that the file already exists.</td>
+    <td>表示文件已存在。</td>
   </tr>
   <tr>
     <td><code>EFAULT</code></td>
-    <td>Indicates an invalid pointer address.</td>
+    <td>表示无效的指针地址。</td>
   </tr>
   <tr>
     <td><code>EFBIG</code></td>
-    <td>Indicates that the file is too large.</td>
+    <td>表示文件太大。</td>
   </tr>
   <tr>
     <td><code>EHOSTUNREACH</code></td>
-    <td>Indicates that the host is unreachable.</td>
+    <td>表示主机不可达。</td>
   </tr>
   <tr>
     <td><code>EIDRM</code></td>
-    <td>Indicates that the identifier has been removed.</td>
+    <td>表示标识符已被移除。</td>
   </tr>
   <tr>
     <td><code>EILSEQ</code></td>
-    <td>Indicates an illegal byte sequence.</td>
+    <td>表示非法的字节序列。</td>
   </tr>
   <tr>
     <td><code>EINPROGRESS</code></td>
-    <td>Indicates that an operation is already in progress.</td>
+    <td>表示操作已在进行中。</td>
   </tr>
   <tr>
     <td><code>EINTR</code></td>
-    <td>Indicates that a function call was interrupted.</td>
+    <td>表示函数调用被中断。</td>
   </tr>
   <tr>
     <td><code>EINVAL</code></td>
-    <td>Indicates that an invalid argument was provided.</td>
+    <td>表示提供了无效参数。</td>
   </tr>
   <tr>
     <td><code>EIO</code></td>
-    <td>Indicates an otherwise unspecified I/O error.</td>
+    <td>表示未指定的 I/O 错误。</td>
   </tr>
   <tr>
     <td><code>EISCONN</code></td>
-    <td>Indicates that the socket is connected.</td>
+    <td>表示套接字已连接。</td>
   </tr>
   <tr>
     <td><code>EISDIR</code></td>
-    <td>Indicates that the path is a directory.</td>
+    <td>表示路径是目录。</td>
   </tr>
   <tr>
     <td><code>ELOOP</code></td>
-    <td>Indicates too many levels of symbolic links in a path.</td>
+    <td>表示路径中符号链接层级过多。</td>
   </tr>
   <tr>
     <td><code>EMFILE</code></td>
-    <td>Indicates that there are too many open files.</td>
+    <td>表示打开的文件过多。</td>
   </tr>
   <tr>
     <td><code>EMLINK</code></td>
-    <td>Indicates that there are too many hard links to a file.</td>
+    <td>表示文件的硬链接过多。</td>
   </tr>
   <tr>
     <td><code>EMSGSIZE</code></td>
-    <td>Indicates that the provided message is too long.</td>
+    <td>表示提供的消息过长。</td>
   </tr>
   <tr>
     <td><code>EMULTIHOP</code></td>
-    <td>Indicates that a multihop was attempted.</td>
+    <td>表示尝试了多跳。</td>
   </tr>
   <tr>
     <td><code>ENAMETOOLONG</code></td>
-    <td>Indicates that the filename is too long.</td>
+    <td>表示文件名过长。</td>
   </tr>
   <tr>
     <td><code>ENETDOWN</code></td>
-    <td>Indicates that the network is down.</td>
+    <td>表示网络已关闭。</td>
   </tr>
   <tr>
     <td><code>ENETRESET</code></td>
-    <td>Indicates that the connection has been aborted by the network.</td>
+    <td>表示连接已被网络中止。</td>
   </tr>
   <tr>
     <td><code>ENETUNREACH</code></td>
-    <td>Indicates that the network is unreachable.</td>
+    <td>表示网络不可达。</td>
   </tr>
   <tr>
     <td><code>ENFILE</code></td>
-    <td>Indicates too many open files in the system.</td>
+    <td>表示系统中打开的文件过多。</td>
   </tr>
   <tr>
     <td><code>ENOBUFS</code></td>
-    <td>Indicates that no buffer space is available.</td>
+    <td>表示没有可用的缓冲区空间。</td>
   </tr>
   <tr>
     <td><code>ENODATA</code></td>
-    <td>Indicates that no message is available on the stream head read
-    queue.</td>
+    <td>表示流头读取队列中没有可用消息。</td>
   </tr>
   <tr>
     <td><code>ENODEV</code></td>
-    <td>Indicates that there is no such device.</td>
+    <td>表示没有此类设备。</td>
   </tr>
   <tr>
     <td><code>ENOENT</code></td>
-    <td>Indicates that there is no such file or directory.</td>
+    <td>表示没有此类文件或目录。</td>
   </tr>
   <tr>
     <td><code>ENOEXEC</code></td>
-    <td>Indicates an exec format error.</td>
+    <td>表示 exec 格式错误。</td>
   </tr>
   <tr>
     <td><code>ENOLCK</code></td>
-    <td>Indicates that there are no locks available.</td>
+    <td>表示没有可用的锁。</td>
   </tr>
   <tr>
     <td><code>ENOLINK</code></td>
-    <td>Indications that a link has been severed.</td>
+    <td>表示链接已被切断。</td>
   </tr>
   <tr>
     <td><code>ENOMEM</code></td>
-    <td>Indicates that there is not enough space.</td>
+    <td>表示空间不足。</td>
   </tr>
   <tr>
     <td><code>ENOMSG</code></td>
-    <td>Indicates that there is no message of the desired type.</td>
+    <td>表示没有所需类型的消息。</td>
   </tr>
   <tr>
     <td><code>ENOPROTOOPT</code></td>
-    <td>Indicates that a given protocol is not available.</td>
+    <td>表示给定协议不可用。</td>
   </tr>
   <tr>
     <td><code>ENOSPC</code></td>
-    <td>Indicates that there is no space available on the device.</td>
+    <td>表示设备上没有可用空间。</td>
   </tr>
   <tr>
     <td><code>ENOSR</code></td>
-    <td>Indicates that there are no stream resources available.</td>
+    <td>表示没有可用的流资源。</td>
   </tr>
   <tr>
     <td><code>ENOSTR</code></td>
-    <td>Indicates that a given resource is not a stream.</td>
+    <td>表示给定资源不是流。</td>
   </tr>
   <tr>
     <td><code>ENOSYS</code></td>
-    <td>Indicates that a function has not been implemented.</td>
+    <td>表示函数未实现。</td>
   </tr>
   <tr>
     <td><code>ENOTCONN</code></td>
-    <td>Indicates that the socket is not connected.</td>
+    <td>表示套接字未连接。</td>
   </tr>
   <tr>
     <td><code>ENOTDIR</code></td>
-    <td>Indicates that the path is not a directory.</td>
+    <td>表示路径不是目录。</td>
   </tr>
   <tr>
     <td><code>ENOTEMPTY</code></td>
-    <td>Indicates that the directory is not empty.</td>
+    <td>表示目录不为空。</td>
   </tr>
   <tr>
     <td><code>ENOTSOCK</code></td>
-    <td>Indicates that the given item is not a socket.</td>
+    <td>表示给定项不是套接字。</td>
   </tr>
   <tr>
     <td><code>ENOTSUP</code></td>
-    <td>Indicates that a given operation is not supported.</td>
+    <td>表示给定操作不受支持。</td>
   </tr>
   <tr>
     <td><code>ENOTTY</code></td>
-    <td>Indicates an inappropriate I/O control operation.</td>
+    <td>表示不适当的 I/O 控制操作。</td>
   </tr>
   <tr>
     <td><code>ENXIO</code></td>
-    <td>Indicates no such device or address.</td>
+    <td>表示没有此类设备或地址。</td>
   </tr>
   <tr>
     <td><code>EOPNOTSUPP</code></td>
-    <td>Indicates that an operation is not supported on the socket. Although
-    <code>ENOTSUP</code> and <code>EOPNOTSUPP</code> have the same value
-    on Linux, according to POSIX.1 these error values should be distinct.)</td>
+    <td>表示套接字上不支持该操作。（尽管 <code>ENOTSUP</code> 和 <code>EOPNOTSUPP</code> 在 Linux 上具有相同的值，但根据 POSIX.1，这些错误值应该是不同的。）</td>
   </tr>
   <tr>
     <td><code>EOVERFLOW</code></td>
-    <td>Indicates that a value is too large to be stored in a given data
-    type.</td>
+    <td>表示值太大，无法存储在给定数据类型中。</td>
   </tr>
   <tr>
     <td><code>EPERM</code></td>
-    <td>Indicates that the operation is not permitted.</td>
+    <td>表示操作不被允许。</td>
   </tr>
   <tr>
     <td><code>EPIPE</code></td>
-    <td>Indicates a broken pipe.</td>
+    <td>表示管道破裂。</td>
   </tr>
   <tr>
     <td><code>EPROTO</code></td>
-    <td>Indicates a protocol error.</td>
+    <td>表示协议错误。</td>
   </tr>
   <tr>
     <td><code>EPROTONOSUPPORT</code></td>
-    <td>Indicates that a protocol is not supported.</td>
+    <td>表示协议不受支持。</td>
   </tr>
   <tr>
     <td><code>EPROTOTYPE</code></td>
-    <td>Indicates the wrong type of protocol for a socket.</td>
+    <td>表示套接字的协议类型错误。</td>
   </tr>
   <tr>
     <td><code>ERANGE</code></td>
-    <td>Indicates that the results are too large.</td>
+    <td>表示结果太大。</td>
   </tr>
   <tr>
     <td><code>EROFS</code></td>
-    <td>Indicates that the file system is read only.</td>
+    <td>表示文件系统为只读。</td>
   </tr>
   <tr>
     <td><code>ESPIPE</code></td>
-    <td>Indicates an invalid seek operation.</td>
+    <td>表示无效的查找操作。</td>
   </tr>
   <tr>
     <td><code>ESRCH</code></td>
-    <td>Indicates that there is no such process.</td>
+    <td>表示没有此类进程。</td>
   </tr>
   <tr>
     <td><code>ESTALE</code></td>
-    <td>Indicates that the file handle is stale.</td>
+    <td>表示文件句柄已过时。</td>
   </tr>
   <tr>
     <td><code>ETIME</code></td>
-    <td>Indicates an expired timer.</td>
+    <td>表示计时器已过期。</td>
   </tr>
   <tr>
     <td><code>ETIMEDOUT</code></td>
-    <td>Indicates that the connection timed out.</td>
+    <td>表示连接超时。</td>
   </tr>
   <tr>
     <td><code>ETXTBSY</code></td>
-    <td>Indicates that a text file is busy.</td>
+    <td>表示文本文件忙。</td>
   </tr>
   <tr>
     <td><code>EWOULDBLOCK</code></td>
-    <td>Indicates that the operation would block.</td>
+    <td>表示操作会阻塞。</td>
   </tr>
   <tr>
     <td><code>EXDEV</code></td>
-    <td>Indicates an improper link.</td>
+    <td>表示不当的链接。</td>
   </tr>
 </table>
 
-#### Windows-specific error constants
+#### Windows 特定错误常量
 
-The following error codes are specific to the Windows operating system.
+以下错误代码特定于 Windows 操作系统。
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>WSAEINTR</code></td>
-    <td>Indicates an interrupted function call.</td>
+    <td>表示中断的函数调用。</td>
   </tr>
   <tr>
     <td><code>WSAEBADF</code></td>
-    <td>Indicates an invalid file handle.</td>
+    <td>表示无效的文件句柄。</td>
   </tr>
   <tr>
     <td><code>WSAEACCES</code></td>
-    <td>Indicates insufficient permissions to complete the operation.</td>
+    <td>表示权限不足，无法完成操作。</td>
   </tr>
   <tr>
     <td><code>WSAEFAULT</code></td>
-    <td>Indicates an invalid pointer address.</td>
+    <td>表示无效的指针地址。</td>
   </tr>
   <tr>
     <td><code>WSAEINVAL</code></td>
-    <td>Indicates that an invalid argument was passed.</td>
+    <td>表示传递了无效参数。</td>
   </tr>
   <tr>
     <td><code>WSAEMFILE</code></td>
-    <td>Indicates that there are too many open files.</td>
+    <td>表示打开的文件过多。</td>
   </tr>
   <tr>
     <td><code>WSAEWOULDBLOCK</code></td>
-    <td>Indicates that a resource is temporarily unavailable.</td>
+    <td>表示资源暂时不可用。</td>
   </tr>
   <tr>
     <td><code>WSAEINPROGRESS</code></td>
-    <td>Indicates that an operation is currently in progress.</td>
+    <td>表示操作当前正在进行中。</td>
   </tr>
   <tr>
     <td><code>WSAEALREADY</code></td>
-    <td>Indicates that an operation is already in progress.</td>
+    <td>表示操作已在进行中。</td>
   </tr>
   <tr>
     <td><code>WSAENOTSOCK</code></td>
-    <td>Indicates that the resource is not a socket.</td>
+    <td>表示资源不是套接字。</td>
   </tr>
   <tr>
     <td><code>WSAEDESTADDRREQ</code></td>
-    <td>Indicates that a destination address is required.</td>
+    <td>表示需要目标地址。</td>
   </tr>
   <tr>
     <td><code>WSAEMSGSIZE</code></td>
-    <td>Indicates that the message size is too long.</td>
+    <td>表示消息过长。</td>
   </tr>
   <tr>
     <td><code>WSAEPROTOTYPE</code></td>
-    <td>Indicates the wrong protocol type for the socket.</td>
+    <td>表示套接字的协议类型错误。</td>
   </tr>
   <tr>
     <td><code>WSAENOPROTOOPT</code></td>
-    <td>Indicates a bad protocol option.</td>
+    <td>表示错误的协议选项。</td>
   </tr>
   <tr>
     <td><code>WSAEPROTONOSUPPORT</code></td>
-    <td>Indicates that the protocol is not supported.</td>
+    <td>表示协议不受支持。</td>
   </tr>
   <tr>
     <td><code>WSAESOCKTNOSUPPORT</code></td>
-    <td>Indicates that the socket type is not supported.</td>
+    <td>表示套接字类型不受支持。</td>
   </tr>
   <tr>
     <td><code>WSAEOPNOTSUPP</code></td>
-    <td>Indicates that the operation is not supported.</td>
+    <td>表示操作不受支持。</td>
   </tr>
   <tr>
     <td><code>WSAEPFNOSUPPORT</code></td>
-    <td>Indicates that the protocol family is not supported.</td>
+    <td>表示协议族不受支持。</td>
   </tr>
   <tr>
     <td><code>WSAEAFNOSUPPORT</code></td>
-    <td>Indicates that the address family is not supported.</td>
+    <td>表示地址族不受支持。</td>
   </tr>
   <tr>
     <td><code>WSAEADDRINUSE</code></td>
-    <td>Indicates that the network address is already in use.</td>
+    <td>表示网络地址已被使用。</td>
   </tr>
   <tr>
     <td><code>WSAEADDRNOTAVAIL</code></td>
-    <td>Indicates that the network address is not available.</td>
+    <td>表示网络地址不可用。</td>
   </tr>
   <tr>
     <td><code>WSAENETDOWN</code></td>
-    <td>Indicates that the network is down.</td>
+    <td>表示网络已关闭。</td>
   </tr>
   <tr>
     <td><code>WSAENETUNREACH</code></td>
-    <td>Indicates that the network is unreachable.</td>
+    <td>表示网络不可达。</td>
   </tr>
   <tr>
     <td><code>WSAENETRESET</code></td>
-    <td>Indicates that the network connection has been reset.</td>
+    <td>表示网络连接已重置。</td>
   </tr>
   <tr>
     <td><code>WSAECONNABORTED</code></td>
-    <td>Indicates that the connection has been aborted.</td>
+    <td>表示连接已中止。</td>
   </tr>
   <tr>
     <td><code>WSAECONNRESET</code></td>
-    <td>Indicates that the connection has been reset by the peer.</td>
+    <td>表示连接被对等方重置。</td>
   </tr>
   <tr>
     <td><code>WSAENOBUFS</code></td>
-    <td>Indicates that there is no buffer space available.</td>
+    <td>表示没有可用的缓冲区空间。</td>
   </tr>
   <tr>
     <td><code>WSAEISCONN</code></td>
-    <td>Indicates that the socket is already connected.</td>
+    <td>表示套接字已连接。</td>
   </tr>
   <tr>
     <td><code>WSAENOTCONN</code></td>
-    <td>Indicates that the socket is not connected.</td>
+    <td>表示套接字未连接。</td>
   </tr>
   <tr>
     <td><code>WSAESHUTDOWN</code></td>
-    <td>Indicates that data cannot be sent after the socket has been
-    shutdown.</td>
+    <td>表示套接字关闭后无法发送数据。</td>
   </tr>
   <tr>
     <td><code>WSAETOOMANYREFS</code></td>
-    <td>Indicates that there are too many references.</td>
+    <td>表示引用过多。</td>
   </tr>
   <tr>
     <td><code>WSAETIMEDOUT</code></td>
-    <td>Indicates that the connection has timed out.</td>
+    <td>表示连接超时。</td>
   </tr>
   <tr>
     <td><code>WSAECONNREFUSED</code></td>
-    <td>Indicates that the connection has been refused.</td>
+    <td>表示连接被拒绝。</td>
   </tr>
   <tr>
     <td><code>WSAELOOP</code></td>
-    <td>Indicates that a name cannot be translated.</td>
+    <td>表示名称无法翻译。</td>
   </tr>
   <tr>
     <td><code>WSAENAMETOOLONG</code></td>
-    <td>Indicates that a name was too long.</td>
+    <td>表示名称过长。</td>
   </tr>
   <tr>
     <td><code>WSAEHOSTDOWN</code></td>
-    <td>Indicates that a network host is down.</td>
+    <td>表示网络主机已关闭。</td>
   </tr>
   <tr>
     <td><code>WSAEHOSTUNREACH</code></td>
-    <td>Indicates that there is no route to a network host.</td>
+    <td>表示没有到网络主机的路由。</td>
   </tr>
   <tr>
     <td><code>WSAENOTEMPTY</code></td>
-    <td>Indicates that the directory is not empty.</td>
+    <td>表示目录不为空。</td>
   </tr>
   <tr>
     <td><code>WSAEPROCLIM</code></td>
-    <td>Indicates that there are too many processes.</td>
+    <td>表示进程过多。</td>
   </tr>
   <tr>
     <td><code>WSAEUSERS</code></td>
-    <td>Indicates that the user quota has been exceeded.</td>
+    <td>表示超出用户配额。</td>
   </tr>
   <tr>
     <td><code>WSAEDQUOT</code></td>
-    <td>Indicates that the disk quota has been exceeded.</td>
+    <td>表示超出磁盘配额。</td>
   </tr>
   <tr>
     <td><code>WSAESTALE</code></td>
-    <td>Indicates a stale file handle reference.</td>
+    <td>表示过时的文件句柄引用。</td>
   </tr>
   <tr>
     <td><code>WSAEREMOTE</code></td>
-    <td>Indicates that the item is remote.</td>
+    <td>表示项是远程的。</td>
   </tr>
   <tr>
     <td><code>WSASYSNOTREADY</code></td>
-    <td>Indicates that the network subsystem is not ready.</td>
+    <td>表示网络子系统未就绪。</td>
   </tr>
   <tr>
     <td><code>WSAVERNOTSUPPORTED</code></td>
-    <td>Indicates that the <code>winsock.dll</code> version is out of
-    range.</td>
+    <td>表示 <code>winsock.dll</code> 版本超出范围。</td>
   </tr>
   <tr>
     <td><code>WSANOTINITIALISED</code></td>
-    <td>Indicates that successful WSAStartup has not yet been performed.</td>
+    <td>表示尚未成功执行 WSAStartup。</td>
   </tr>
   <tr>
     <td><code>WSAEDISCON</code></td>
-    <td>Indicates that a graceful shutdown is in progress.</td>
+    <td>表示正在进行正常关闭。</td>
   </tr>
   <tr>
     <td><code>WSAENOMORE</code></td>
-    <td>Indicates that there are no more results.</td>
+    <td>表示没有更多结果。</td>
   </tr>
   <tr>
     <td><code>WSAECANCELLED</code></td>
-    <td>Indicates that an operation has been canceled.</td>
+    <td>表示操作已被取消。</td>
   </tr>
   <tr>
     <td><code>WSAEINVALIDPROCTABLE</code></td>
-    <td>Indicates that the procedure call table is invalid.</td>
+    <td>表示过程调用表无效。</td>
   </tr>
   <tr>
     <td><code>WSAEINVALIDPROVIDER</code></td>
-    <td>Indicates an invalid service provider.</td>
+    <td>表示无效的服务提供程序。</td>
   </tr>
   <tr>
     <td><code>WSAEPROVIDERFAILEDINIT</code></td>
-    <td>Indicates that the service provider failed to initialized.</td>
+    <td>表示服务提供程序初始化失败。</td>
   </tr>
   <tr>
     <td><code>WSASYSCALLFAILURE</code></td>
-    <td>Indicates a system call failure.</td>
+    <td>表示系统调用失败。</td>
   </tr>
   <tr>
     <td><code>WSASERVICE_NOT_FOUND</code></td>
-    <td>Indicates that a service was not found.</td>
+    <td>表示未找到服务。</td>
   </tr>
   <tr>
     <td><code>WSATYPE_NOT_FOUND</code></td>
-    <td>Indicates that a class type was not found.</td>
+    <td>表示未找到类类型。</td>
   </tr>
   <tr>
     <td><code>WSA_E_NO_MORE</code></td>
-    <td>Indicates that there are no more results.</td>
+    <td>表示没有更多结果。</td>
   </tr>
   <tr>
     <td><code>WSA_E_CANCELLED</code></td>
-    <td>Indicates that the call was canceled.</td>
+    <td>表示调用被取消。</td>
   </tr>
   <tr>
     <td><code>WSAEREFUSED</code></td>
-    <td>Indicates that a database query was refused.</td>
+    <td>表示数据库查询被拒绝。</td>
   </tr>
 </table>
 
-### dlopen constants
+### dlopen 常量
 
-If available on the operating system, the following constants
-are exported in `os.constants.dlopen`. See dlopen(3) for detailed
-information.
+如果在操作系统上可用，以下常量在 `os.constants.dlopen` 中导出。详细信息请参见 dlopen(3)。
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>RTLD_LAZY</code></td>
-    <td>Perform lazy binding. Node.js sets this flag by default.</td>
+    <td>执行延迟绑定。Node.js 默认设置此标志。</td>
   </tr>
   <tr>
     <td><code>RTLD_NOW</code></td>
-    <td>Resolve all undefined symbols in the library before dlopen(3)
-    returns.</td>
+    <td>在 dlopen(3) 返回之前解析库中所有未定义的符号。</td>
   </tr>
   <tr>
     <td><code>RTLD_GLOBAL</code></td>
-    <td>Symbols defined by the library will be made available for symbol
-    resolution of subsequently loaded libraries.</td>
+    <td>库定义的符号将可用于后续加载库的符号解析。</td>
   </tr>
   <tr>
     <td><code>RTLD_LOCAL</code></td>
-    <td>The converse of <code>RTLD_GLOBAL</code>. This is the default behavior
-    if neither flag is specified.</td>
+    <td><code>RTLD_GLOBAL</code> 的反义。如果未指定任何标志，这是默认行为。</td>
   </tr>
   <tr>
     <td><code>RTLD_DEEPBIND</code></td>
-    <td>Make a self-contained library use its own symbols in preference to
-    symbols from previously loaded libraries.</td>
+    <td>使自包含的库优先使用自己的符号，而不是之前加载的库中的符号。</td>
   </tr>
 </table>
 
-### Priority constants
+### 优先级常量
 
 <!-- YAML
 added: v10.10.0
 -->
 
-The following process scheduling constants are exported by
-`os.constants.priority`.
+以下进程调度常量由 `os.constants.priority` 导出。
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>PRIORITY_LOW</code></td>
-    <td>The lowest process scheduling priority. This corresponds to
-    <code>IDLE_PRIORITY_CLASS</code> on Windows, and a nice value of
-    <code>19</code> on all other platforms.</td>
+    <td>最低的进程调度优先级。这在 Windows 上对应于 <code>IDLE_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>19</code>。</td>
   </tr>
   <tr>
     <td><code>PRIORITY_BELOW_NORMAL</code></td>
-    <td>The process scheduling priority above <code>PRIORITY_LOW</code> and
-    below <code>PRIORITY_NORMAL</code>. This corresponds to
-    <code>BELOW_NORMAL_PRIORITY_CLASS</code> on Windows, and a nice value of
-    <code>10</code> on all other platforms.</td>
+    <td>高于 <code>PRIORITY_LOW</code> 但低于 <code>PRIORITY_NORMAL</code> 的进程调度优先级。这在 Windows 上对应于 <code>BELOW_NORMAL_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>10</code>。</td>
   </tr>
   <tr>
     <td><code>PRIORITY_NORMAL</code></td>
-    <td>The default process scheduling priority. This corresponds to
-    <code>NORMAL_PRIORITY_CLASS</code> on Windows, and a nice value of
-    <code>0</code> on all other platforms.</td>
+    <td>默认的进程调度优先级。这在 Windows 上对应于 <code>NORMAL_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>0</code>。</td>
   </tr>
   <tr>
     <td><code>PRIORITY_ABOVE_NORMAL</code></td>
-    <td>The process scheduling priority above <code>PRIORITY_NORMAL</code> and
-    below <code>PRIORITY_HIGH</code>. This corresponds to
-    <code>ABOVE_NORMAL_PRIORITY_CLASS</code> on Windows, and a nice value of
-    <code>-7</code> on all other platforms.</td>
+    <td>高于 <code>PRIORITY_NORMAL</code> 但低于 <code>PRIORITY_HIGH</code> 的进程调度优先级。这在 Windows 上对应于 <code>ABOVE_NORMAL_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>-7</code>。</td>
   </tr>
   <tr>
     <td><code>PRIORITY_HIGH</code></td>
-    <td>The process scheduling priority above <code>PRIORITY_ABOVE_NORMAL</code>
-    and below <code>PRIORITY_HIGHEST</code>. This corresponds to
-    <code>HIGH_PRIORITY_CLASS</code> on Windows, and a nice value of
-    <code>-14</code> on all other platforms.</td>
+    <td>高于 <code>PRIORITY_ABOVE_NORMAL</code> 但低于 <code>PRIORITY_HIGHEST</code> 的进程调度优先级。这在 Windows 上对应于 <code>HIGH_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>-14</code>。</td>
   </tr>
   <tr>
     <td><code>PRIORITY_HIGHEST</code></td>
-    <td>The highest process scheduling priority. This corresponds to
-    <code>REALTIME_PRIORITY_CLASS</code> on Windows, and a nice value of
-    <code>-20</code> on all other platforms.</td>
+    <td>最高的进程调度优先级。这在 Windows 上对应于 <code>REALTIME_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>-20</code>。</td>
   </tr>
 </table>
 
-### libuv constants
+### libuv 常量
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>UV_UDP_REUSEADDR</code></td>

@@ -1,4 +1,4 @@
-# DNS
+# 域名系统 DNS
 
 <!--introduced_in=v0.10.0-->
 
@@ -6,14 +6,9 @@
 
 <!-- source_link=lib/dns.js -->
 
-The `node:dns` module enables name resolution. For example, use it to look up IP
-addresses of host names.
+`node:dns` 模块实现了域名解析功能。例如，可以使用它来查询主机名的 IP 地址。
 
-Although named for the [Domain Name System (DNS)][], it does not always use the
-DNS protocol for lookups. [`dns.lookup()`][] uses the operating system
-facilities to perform name resolution. It may not need to perform any network
-communication. To perform name resolution the way other applications on the same
-system do, use [`dns.lookup()`][].
+虽然该模块以[域名系统 (DNS)][Domain Name System (DNS)]命名，但它并不总是使用 DNS 协议进行查找。[`dns.lookup()`][] 使用操作系统提供的设施来进行名称解析。它可能不需要执行任何网络通信。要以与系统上其他应用程序相同的方式执行名称解析，请使用 [`dns.lookup()`][]。
 
 ```mjs
 import dns from 'node:dns';
@@ -33,11 +28,7 @@ dns.lookup('example.org', (err, address, family) => {
 // address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6
 ```
 
-All other functions in the `node:dns` module connect to an actual DNS server to
-perform name resolution. They will always use the network to perform DNS
-queries. These functions do not use the same set of configuration files used by
-[`dns.lookup()`][] (e.g. `/etc/hosts`). Use these functions to always perform
-DNS queries, bypassing other name-resolution facilities.
+`node:dns` 模块中的所有其他函数都连接到实际的 DNS 服务器以执行名称解析。它们将始终使用网络来执行 DNS 查询。这些函数不使用 [`dns.lookup()`][] 所使用的同一组配置文件（例如 `/etc/hosts`）。使用这些函数可以始终执行 DNS 查询，绕过其他名称解析设施。
 
 ```mjs
 import dns from 'node:dns';
@@ -77,27 +68,24 @@ dns.resolve4('archive.org', (err, addresses) => {
 });
 ```
 
-See the [Implementation considerations section][] for more information.
+更多信息请参阅[实现考虑部分][Implementation considerations section]。
 
-## Class: `dns.Resolver`
+## 类：`dns.Resolver`
 
 <!-- YAML
 added: v8.3.0
 -->
 
-An independent resolver for DNS requests.
+一个独立的 DNS 请求解析器。
 
-Creating a new resolver uses the default server settings. Setting
-the servers used for a resolver using
-[`resolver.setServers()`][`dns.setServers()`] does not affect
-other resolvers:
+创建新的解析器会使用默认的服务器设置。使用 [`resolver.setServers()`][`dns.setServers()`] 设置解析器使用的服务器不会影响其他解析器：
 
 ```mjs
 import { Resolver } from 'node:dns';
 const resolver = new Resolver();
 resolver.setServers(['4.4.4.4']);
 
-// This request will use the server at 4.4.4.4, independent of global settings.
+// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。
 resolver.resolve4('example.org', (err, addresses) => {
   // ...
 });
@@ -108,13 +96,13 @@ const { Resolver } = require('node:dns');
 const resolver = new Resolver();
 resolver.setServers(['4.4.4.4']);
 
-// This request will use the server at 4.4.4.4, independent of global settings.
+// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。
 resolver.resolve4('example.org', (err, addresses) => {
   // ...
 });
 ```
 
-The following methods from the `node:dns` module are available:
+`node:dns` 模块中的以下方法可用：
 
 * [`resolver.getServers()`][`dns.getServers()`]
 * [`resolver.resolve()`][`dns.resolve()`]
@@ -150,15 +138,12 @@ changes:
                  The single supported option is `timeout`.
 -->
 
-Create a new resolver.
+创建一个新的解析器。
 
 * `options` {Object}
-  * `timeout` {integer} Query timeout in milliseconds, or `-1` to use the
-    default timeout.
-  * `tries` {integer} The number of tries the resolver will try contacting
-    each name server before giving up. **Default:** `4`
-  * `maxTimeout` {integer} The max retry timeout, in milliseconds.
-    **Default:** `0`, disabled.
+  * `timeout` {integer} 查询超时时间，单位为毫秒，或 `-1` 使用默认超时时间。
+  * `tries` {integer} 解析器在放弃之前尝试联系每个名称服务器的次数。**默认值：** `4`
+  * `maxTimeout` {integer} 最大重试超时时间，单位为毫秒。**默认值：** `0`，禁用。
 
 ### `resolver.cancel()`
 
@@ -166,8 +151,7 @@ Create a new resolver.
 added: v8.3.0
 -->
 
-Cancel all outstanding DNS queries made by this resolver. The corresponding
-callbacks will be called with an error with code `ECANCELLED`.
+取消此解析器进行的所有未完成的 DNS 查询。相应的回调将以错误码 `ECANCELLED` 调用。
 
 ### `resolver.setLocalAddress([ipv4][, ipv6])`
 
@@ -177,21 +161,14 @@ added:
   - v14.17.0
 -->
 
-* `ipv4` {string} A string representation of an IPv4 address.
-  **Default:** `'0.0.0.0'`
-* `ipv6` {string} A string representation of an IPv6 address.
-  **Default:** `'::0'`
+* `ipv4` {string} IPv4 地址的字符串表示。**默认值：** `'0.0.0.0'`
+* `ipv6` {string} IPv6 地址的字符串表示。**默认值：** `'::0'`
 
-The resolver instance will send its requests from the specified IP address.
-This allows programs to specify outbound interfaces when used on multi-homed
-systems.
+解析器实例将从指定的 IP 地址发送其请求。这允许程序在多宿主系统上使用时指定出站接口。
 
-If a v4 or v6 address is not specified, it is set to the default and the
-operating system will choose a local address automatically.
+如果未指定 v4 或 v6 地址，则设置为默认值，操作系统将自动选择本地地址。
 
-The resolver will use the v4 local address when making requests to IPv4 DNS
-servers, and the v6 local address when making requests to IPv6 DNS servers.
-The `rrtype` of resolution requests has no impact on the local address used.
+解析器在向 IPv4 DNS 服务器发出请求时将使用 v4 本地地址，在向 IPv6 DNS 服务器发出请求时将使用 v6 本地地址。解析请求的 `rrtype` 对使用的本地地址没有影响。
 
 ## `dns.getServers()`
 
@@ -199,11 +176,9 @@ The `rrtype` of resolution requests has no impact on the local address used.
 added: v0.11.3
 -->
 
-* Returns: {string\[]}
+* 返回：{string\[]}
 
-Returns an array of IP address strings, formatted according to [RFC 5952][],
-that are currently configured for DNS resolution. A string will include a port
-section if a custom port is used.
+返回一个 IP 地址字符串数组，根据 [RFC 5952][] 格式化，这些地址当前配置用于 DNS 解析。如果使用了自定义端口，字符串将包含端口部分。
 
 <!-- eslint-disable @stylistic/js/semi-->
 
@@ -249,60 +224,25 @@ changes:
 
 * `hostname` {string}
 * `options` {integer | Object}
-  * `family` {integer|string} The record family. Must be `4`, `6`, or `0`. For
-    backward compatibility reasons,`'IPv4'` and `'IPv6'` are interpreted as `4`
-    and `6` respectively. The value `0` indicates that either an IPv4 or IPv6
-    address is returned. If the value `0` is used with `{ all: true }` (see
-    below), either one of or both IPv4 and IPv6 addresses are returned,
-    depending on the system's DNS resolver. **Default:** `0`.
-  * `hints` {number} One or more [supported `getaddrinfo` flags][]. Multiple
-    flags may be passed by bitwise `OR`ing their values.
-  * `all` {boolean} When `true`, the callback returns all resolved addresses in
-    an array. Otherwise, returns a single address. **Default:** `false`.
-  * `order` {string} When `verbatim`, the resolved addresses are return
-    unsorted. When `ipv4first`, the resolved addresses are sorted by placing
-    IPv4 addresses before IPv6 addresses. When `ipv6first`, the resolved
-    addresses are sorted by placing IPv6 addresses before IPv4 addresses.
-    **Default:** `verbatim` (addresses are not reordered).
-    Default value is configurable using [`dns.setDefaultResultOrder()`][] or
-    [`--dns-result-order`][].
-  * `verbatim` {boolean} When `true`, the callback receives IPv4 and IPv6
-    addresses in the order the DNS resolver returned them. When `false`,
-    IPv4 addresses are placed before IPv6 addresses.
-    This option will be deprecated in favor of `order`. When both are specified,
-    `order` has higher precedence. New code should only use `order`.
-    **Default:** `true` (addresses are not reordered). Default value is
-    configurable using [`dns.setDefaultResultOrder()`][] or
-    [`--dns-result-order`][].
+  * `family` {integer|string} 记录族。必须为 `4`、`6` 或 `0`。出于向后兼容的原因，`'IPv4'` 和 `'IPv6'` 分别被解释为 `4` 和 `6`。值 `0` 表示返回 IPv4 或 IPv6 地址。如果值 `0` 与 `{ all: true }` 一起使用（见下文），则返回 IPv4 和 IPv6 地址中的一个或两个，具体取决于系统的 DNS 解析器。**默认值：** `0`。
+  * `hints` {number} 一个或多个[支持的 `getaddrinfo` 标志][supported `getaddrinfo` flags]。可以通过按位 `OR` 运算它们的值来传递多个标志。
+  * `all` {boolean} 当为 `true` 时，回调返回所有已解析地址的数组。否则，返回单个地址。**默认值：** `false`。
+  * `order` {string} 当为 `verbatim` 时，返回的地址未排序。当为 `ipv4first` 时，返回的地址通过将 IPv4 地址放在 IPv6 地址之前来排序。当为 `ipv6first` 时，返回的地址通过将 IPv6 地址放在 IPv4 地址之前来排序。**默认值：** `verbatim`（地址不重新排序）。默认值可使用 [`dns.setDefaultResultOrder()`][] 或 [`--dns-result-order`][] 配置。
+  * `verbatim` {boolean} 当为 `true` 时，回调按 DNS 解析器返回的顺序接收 IPv4 和 IPv6 地址。当为 `false` 时，IPv4 地址放在 IPv6 地址之前。此选项将被弃用，转而使用 `order`。当两者都指定时，`order` 具有更高的优先级。新代码应仅使用 `order`。**默认值：** `true`（地址不重新排序）。默认值可使用 [`dns.setDefaultResultOrder()`][] 或 [`--dns-result-order`][] 配置。
 * `callback` {Function}
   * `err` {Error}
-  * `address` {string} A string representation of an IPv4 or IPv6 address.
-  * `family` {integer} `4` or `6`, denoting the family of `address`, or `0` if
-    the address is not an IPv4 or IPv6 address. `0` is a likely indicator of a
-    bug in the name resolution service used by the operating system.
+  * `address` {string} IPv4 或 IPv6 地址的字符串表示。
+  * `family` {integer} `4` 或 `6`，表示 `address` 的族，如果地址不是 IPv4 或 IPv6 地址，则为 `0`。`0` 可能是操作系统使用的名称解析服务存在错误的指示。
 
-Resolves a host name (e.g. `'nodejs.org'`) into the first found A (IPv4) or
-AAAA (IPv6) record. All `option` properties are optional. If `options` is an
-integer, then it must be `4` or `6` – if `options` is not provided, then
-either IPv4 or IPv6 addresses, or both, are returned if found.
+将主机名（例如 `'nodejs.org'`）解析为找到的第一个 A (IPv4) 或 AAAA (IPv6) 记录。所有 `option` 属性都是可选的。如果 `options` 是整数，则必须是 `4` 或 `6` – 如果未提供 `options`，则如果找到，将返回 IPv4 或 IPv6 地址，或两者都返回。
 
-With the `all` option set to `true`, the arguments for `callback` change to
-`(err, addresses)`, with `addresses` being an array of objects with the
-properties `address` and `family`.
+当 `all` 选项设置为 `true` 时，`callback` 的参数变为 `(err, addresses)`，其中 `addresses` 是一个具有 `address` 和 `family` 属性的对象数组。
 
-On error, `err` is an [`Error`][] object, where `err.code` is the error code.
-Keep in mind that `err.code` will be set to `'ENOTFOUND'` not only when
-the host name does not exist but also when the lookup fails in other ways
-such as no available file descriptors.
+出错时，`err` 是一个 [`Error`][] 对象，其中 `err.code` 是错误代码。请记住，不仅当主机名不存在时 `err.code` 会被设置为 `'ENOTFOUND'`，而且当查找以其他方式失败时（例如没有可用的文件描述符）也会如此。
 
-`dns.lookup()` does not necessarily have anything to do with the DNS protocol.
-The implementation uses an operating system facility that can associate names
-with addresses and vice versa. This implementation can have subtle but
-important consequences on the behavior of any Node.js program. Please take some
-time to consult the [Implementation considerations section][] before using
-`dns.lookup()`.
+`dns.lookup()` 不一定与 DNS 协议有关。该实现使用操作系统提供的设施，可以将名称与地址关联，反之亦然。这种实现可能对任何 Node.js 程序的行为产生微妙但重要的影响。在使用 `dns.lookup()` 之前，请花些时间查阅[实现考虑部分][Implementation considerations section]。
 
-Example usage:
+用法示例：
 
 ```mjs
 import dns from 'node:dns';
@@ -314,7 +254,7 @@ dns.lookup('example.org', options, (err, address, family) =>
   console.log('address: %j family: IPv%s', address, family));
 // address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6
 
-// When options.all is true, the result will be an Array.
+// 当 options.all 为 true 时，结果将是一个数组。
 options.all = true;
 dns.lookup('example.org', options, (err, addresses) =>
   console.log('addresses: %j', addresses));
@@ -331,18 +271,16 @@ dns.lookup('example.org', options, (err, address, family) =>
   console.log('address: %j family: IPv%s', address, family));
 // address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6
 
-// When options.all is true, the result will be an Array.
+// 当 options.all 为 true 时，结果将是一个数组。
 options.all = true;
 dns.lookup('example.org', options, (err, addresses) =>
   console.log('addresses: %j', addresses));
 // addresses: [{"address":"2606:2800:21f:cb07:6820:80da:af6b:8b2c","family":6}]
 ```
 
-If this method is invoked as its [`util.promisify()`][]ed version, and `all`
-is not set to `true`, it returns a `Promise` for an `Object` with `address` and
-`family` properties.
+如果此方法以其 [`util.promisify()`][] 版本调用，且 `all` 未设置为 `true`，则返回一个包含 `address` 和 `family` 属性的 `Object` 的 `Promise`。
 
-### Supported getaddrinfo flags
+### 支持的 getaddrinfo 标志
 
 <!-- YAML
 changes:
@@ -353,16 +291,11 @@ changes:
     description: Added support for the `dns.ALL` flag.
 -->
 
-The following flags can be passed as hints to [`dns.lookup()`][].
+以下标志可以作为提示传递给 [`dns.lookup()`][]。
 
-* `dns.ADDRCONFIG`: Limits returned address types to the types of non-loopback
-  addresses configured on the system. For example, IPv4 addresses are only
-  returned if the current system has at least one IPv4 address configured.
-* `dns.V4MAPPED`: If the IPv6 family was specified, but no IPv6 addresses were
-  found, then return IPv4 mapped IPv6 addresses. It is not supported
-  on some operating systems (e.g. FreeBSD 10.1).
-* `dns.ALL`: If `dns.V4MAPPED` is specified, return resolved IPv6 addresses as
-  well as IPv4 mapped IPv6 addresses.
+* `dns.ADDRCONFIG`：将返回的地址类型限制为系统上配置的非回环地址类型。例如，仅当当前系统至少配置了一个 IPv4 地址时才返回 IPv4 地址。
+* `dns.V4MAPPED`：如果指定了 IPv6 族，但未找到 IPv6 地址，则返回 IPv4 映射的 IPv6 地址。在某些操作系统（例如 FreeBSD 10.1）上不支持。
+* `dns.ALL`：如果指定了 `dns.V4MAPPED`，则返回已解析的 IPv6 地址以及 IPv4 映射的 IPv6 地址。
 
 ## `dns.lookupService(address, port, callback)`
 
@@ -380,23 +313,20 @@ changes:
 * `port` {number}
 * `callback` {Function}
   * `err` {Error}
-  * `hostname` {string} e.g. `example.com`
-  * `service` {string} e.g. `http`
+  * `hostname` {string} 例如 `example.com`
+  * `service` {string} 例如 `http`
 
-Resolves the given `address` and `port` into a host name and service using
-the operating system's underlying `getnameinfo` implementation.
+使用操作系统底层的 `getnameinfo` 实现将给定的 `address` 和 `port` 解析为主机名和服务。
 
-If `address` is not a valid IP address, a `TypeError` will be thrown.
-The `port` will be coerced to a number. If it is not a legal port, a `TypeError`
-will be thrown.
+如果 `address` 不是有效的 IP 地址，将抛出 `TypeError`。`port` 将被强制转换为数字。如果它不是合法端口，将抛出 `TypeError`。
 
-On an error, `err` is an [`Error`][] object, where `err.code` is the error code.
+出错时，`err` 是一个 [`Error`][] 对象，其中 `err.code` 是错误代码。
 
 ```mjs
 import dns from 'node:dns';
 dns.lookupService('127.0.0.1', 22, (err, hostname, service) => {
   console.log(hostname, service);
-  // Prints: localhost ssh
+  // 打印: localhost ssh
 });
 ```
 
@@ -404,12 +334,11 @@ dns.lookupService('127.0.0.1', 22, (err, hostname, service) => {
 const dns = require('node:dns');
 dns.lookupService('127.0.0.1', 22, (err, hostname, service) => {
   console.log(hostname, service);
-  // Prints: localhost ssh
+  // 打印: localhost ssh
 });
 ```
 
-If this method is invoked as its [`util.promisify()`][]ed version, it returns a
-`Promise` for an `Object` with `hostname` and `service` properties.
+如果此方法以其 [`util.promisify()`][] 版本调用，则返回一个包含 `hostname` 和 `service` 属性的 `Object` 的 `Promise`。
 
 ## `dns.resolve(hostname[, rrtype], callback)`
 
@@ -423,35 +352,31 @@ changes:
                  `ERR_INVALID_CALLBACK`.
 -->
 
-* `hostname` {string} Host name to resolve.
-* `rrtype` {string} Resource record type. **Default:** `'A'`.
+* `hostname` {string} 要解析的主机名。
+* `rrtype` {string} 资源记录类型。**默认值：** `'A'`。
 * `callback` {Function}
   * `err` {Error}
   * `records` {string\[] | Object\[] | Object}
 
-Uses the DNS protocol to resolve a host name (e.g. `'nodejs.org'`) into an array
-of the resource records. The `callback` function has arguments
-`(err, records)`. When successful, `records` will be an array of resource
-records. The type and structure of individual results varies based on `rrtype`:
+使用 DNS 协议将主机名（例如 `'nodejs.org'`）解析为资源记录数组。`callback` 函数具有参数 `(err, records)`。成功时，`records` 将是资源记录数组。单个结果的类型和结构因 `rrtype` 而异：
 
-| `rrtype`  | `records` contains             | Result type | Shorthand method         |
-| --------- | ------------------------------ | ----------- | ------------------------ |
-| `'A'`     | IPv4 addresses (default)       | {string}    | [`dns.resolve4()`][]     |
-| `'AAAA'`  | IPv6 addresses                 | {string}    | [`dns.resolve6()`][]     |
-| `'ANY'`   | any records                    | {Object}    | [`dns.resolveAny()`][]   |
-| `'CAA'`   | CA authorization records       | {Object}    | [`dns.resolveCaa()`][]   |
-| `'CNAME'` | canonical name records         | {string}    | [`dns.resolveCname()`][] |
-| `'MX'`    | mail exchange records          | {Object}    | [`dns.resolveMx()`][]    |
-| `'NAPTR'` | name authority pointer records | {Object}    | [`dns.resolveNaptr()`][] |
-| `'NS'`    | name server records            | {string}    | [`dns.resolveNs()`][]    |
-| `'PTR'`   | pointer records                | {string}    | [`dns.resolvePtr()`][]   |
-| `'SOA'`   | start of authority records     | {Object}    | [`dns.resolveSoa()`][]   |
-| `'SRV'`   | service records                | {Object}    | [`dns.resolveSrv()`][]   |
-| `'TLSA'`  | certificate associations       | {Object}    | [`dns.resolveTlsa()`][]  |
-| `'TXT'`   | text records                   | {string\[]} | [`dns.resolveTxt()`][]   |
+| `rrtype`  | `records` 包含          | 结果类型 | 简写方法                 |
+| --------- | ----------------------- | -------- | ------------------------ |
+| `'A'`     | IPv4 地址（默认）       | {string} | [`dns.resolve4()`][]     |
+| `'AAAA'`  | IPv6 地址               | {string} | [`dns.resolve6()`][]     |
+| `'ANY'`   | 任何记录                | {Object} | [`dns.resolveAny()`][]   |
+| `'CAA'`   | CA 授权记录             | {Object} | [`dns.resolveCaa()`][]   |
+| `'CNAME'` | 规范名称记录            | {string} | [`dns.resolveCname()`][] |
+| `'MX'`    | 邮件交换记录            | {Object} | [`dns.resolveMx()`][]    |
+| `'NAPTR'` | 名称权威指针记录        | {Object} | [`dns.resolveNaptr()`][] |
+| `'NS'`    | 名称服务器记录          | {string} | [`dns.resolveNs()`][]    |
+| `'PTR'`   | 指针记录                | {string} | [`dns.resolvePtr()`][]   |
+| `'SOA'`   | 权威起始记录            | {Object} | [`dns.resolveSoa()`][]   |
+| `'SRV'`   | 服务记录                | {Object} | [`dns.resolveSrv()`][]   |
+| `'TLSA'`  | 证书关联记录            | {Object} | [`dns.resolveTlsa()`][]  |
+| `'TXT'`   | 文本记录                | {string\[]} | [`dns.resolveTxt()`][]   |
 
-On error, `err` is an [`Error`][] object, where `err.code` is one of the
-[DNS error codes][].
+出错时，`err` 是一个 [`Error`][] 对象，其中 `err.code` 是[DNS 错误代码][DNS error codes]之一。
 
 ## `dns.resolve4(hostname[, options], callback)`
 
@@ -469,20 +394,14 @@ changes:
                  specifically `options.ttl`.
 -->
 
-* `hostname` {string} Host name to resolve.
+* `hostname` {string} 要解析的主机名。
 * `options` {Object}
-  * `ttl` {boolean} Retrieves the Time-To-Live value (TTL) of each record.
-    When `true`, the callback receives an array of
-    `{ address: '1.2.3.4', ttl: 60 }` objects rather than an array of strings,
-    with the TTL expressed in seconds.
+  * `ttl` {boolean} 检索每条记录的生存时间值 (TTL)。当为 `true` 时，回调接收一个 `{ address: '1.2.3.4', ttl: 60 }` 对象数组，而不是字符串数组，TTL 以秒表示。
 * `callback` {Function}
   * `err` {Error}
   * `addresses` {string\[] | Object\[]}
 
-Uses the DNS protocol to resolve a IPv4 addresses (`A` records) for the
-`hostname`. The `addresses` argument passed to the `callback` function
-will contain an array of IPv4 addresses (e.g.
-`['74.125.79.104', '74.125.79.105', '74.125.79.106']`).
+使用 DNS 协议解析 `hostname` 的 IPv4 地址（`A` 记录）。传递给 `callback` 函数的 `addresses` 参数将包含一个 IPv4 地址数组（例如 `['74.125.79.104', '74.125.79.105', '74.125.79.106']`）。
 
 ## `dns.resolve6(hostname[, options], callback)`
 
@@ -500,19 +419,14 @@ changes:
                  specifically `options.ttl`.
 -->
 
-* `hostname` {string} Host name to resolve.
+* `hostname` {string} 要解析的主机名。
 * `options` {Object}
-  * `ttl` {boolean} Retrieve the Time-To-Live value (TTL) of each record.
-    When `true`, the callback receives an array of
-    `{ address: '0:1:2:3:4:5:6:7', ttl: 60 }` objects rather than an array of
-    strings, with the TTL expressed in seconds.
+  * `ttl` {boolean} 检索每条记录的生存时间值 (TTL)。当为 `true` 时，回调接收一个 `{ address: '0:1:2:3:4:5:6:7', ttl: 60 }` 对象数组，而不是字符串数组，TTL 以秒表示。
 * `callback` {Function}
   * `err` {Error}
   * `addresses` {string\[] | Object\[]}
 
-Uses the DNS protocol to resolve IPv6 addresses (`AAAA` records) for the
-`hostname`. The `addresses` argument passed to the `callback` function
-will contain an array of IPv6 addresses.
+使用 DNS 协议解析 `hostname` 的 IPv6 地址（`AAAA` 记录）。传递给 `callback` 函数的 `addresses` 参数将包含一个 IPv6 地址数组。
 
 ## `dns.resolveAny(hostname, callback)`
 
@@ -530,27 +444,23 @@ changes:
   * `err` {Error}
   * `ret` {Object\[]}
 
-Uses the DNS protocol to resolve all records (also known as `ANY` or `*` query).
-The `ret` argument passed to the `callback` function will be an array containing
-various types of records. Each object has a property `type` that indicates the
-type of the current record. And depending on the `type`, additional properties
-will be present on the object:
+使用 DNS 协议解析所有记录（也称为 `ANY` 或 `*` 查询）。传递给 `callback` 函数的 `ret` 参数将是一个包含各种类型记录的数组。每个对象都有一个属性 `type`，指示当前记录的类型。根据 `type`，对象上将存在其他属性：
 
-| Type      | Properties                                                                                                                                       |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `'A'`     | `address`/`ttl`                                                                                                                                  |
-| `'AAAA'`  | `address`/`ttl`                                                                                                                                  |
-| `'CNAME'` | `value`                                                                                                                                          |
-| `'MX'`    | Refer to [`dns.resolveMx()`][]                                                                                                                   |
-| `'NAPTR'` | Refer to [`dns.resolveNaptr()`][]                                                                                                                |
-| `'NS'`    | `value`                                                                                                                                          |
-| `'PTR'`   | `value`                                                                                                                                          |
-| `'SOA'`   | Refer to [`dns.resolveSoa()`][]                                                                                                                  |
-| `'SRV'`   | Refer to [`dns.resolveSrv()`][]                                                                                                                  |
-| `'TLSA'`  | Refer to [`dns.resolveTlsa()`][]                                                                                                                 |
-| `'TXT'`   | This type of record contains an array property called `entries` which refers to [`dns.resolveTxt()`][], e.g. `{ entries: ['...'], type: 'TXT' }` |
+| 类型      | 属性                                                                                                                                    |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `'A'`     | `address`/`ttl`                                                                                                                         |
+| `'AAAA'`  | `address`/`ttl`                                                                                                                         |
+| `'CNAME'` | `value`                                                                                                                                 |
+| `'MX'`    | 参考 [`dns.resolveMx()`][]                                                                                                              |
+| `'NAPTR'` | 参考 [`dns.resolveNaptr()`][]                                                                                                           |
+| `'NS'`    | `value`                                                                                                                                 |
+| `'PTR'`   | `value`                                                                                                                                 |
+| `'SOA'`   | 参考 [`dns.resolveSoa()`][]                                                                                                             |
+| `'SRV'`   | 参考 [`dns.resolveSrv()`][]                                                                                                             |
+| `'TLSA'`  | 参考 [`dns.resolveTlsa()`][]                                                                                                            |
+| `'TXT'`   | 此类型的记录包含一个名为 `entries` 的数组属性，参考 [`dns.resolveTxt()`][]，例如 `{ entries: ['...'], type: 'TXT' }` |
 
-Here is an example of the `ret` object passed to the callback:
+以下是传递给回调的 `ret` 对象示例：
 
 <!-- eslint-disable @stylistic/js/semi -->
 
@@ -570,9 +480,7 @@ Here is an example of the `ret` object passed to the callback:
     minttl: 60 } ]
 ```
 
-DNS server operators may choose not to respond to `ANY`
-queries. It may be better to call individual methods like [`dns.resolve4()`][],
-[`dns.resolveMx()`][], and so on. For more details, see [RFC 8482][].
+DNS 服务器运营商可能选择不响应 `ANY` 查询。最好调用单独的方法，如 [`dns.resolve4()`][]、[`dns.resolveMx()`][] 等。更多细节，请参阅 [RFC 8482][]。
 
 ## `dns.resolveCname(hostname, callback)`
 
@@ -591,10 +499,7 @@ changes:
   * `err` {Error}
   * `addresses` {string\[]}
 
-Uses the DNS protocol to resolve `CNAME` records for the `hostname`. The
-`addresses` argument passed to the `callback` function
-will contain an array of canonical name records available for the `hostname`
-(e.g. `['bar.example.com']`).
+使用 DNS 协议解析 `hostname` 的 `CNAME` 记录。传递给 `callback` 函数的 `addresses` 参数将包含 `hostname` 可用的规范名称记录数组（例如 `['bar.example.com']`）。
 
 ## `dns.resolveCaa(hostname, callback)`
 
@@ -615,11 +520,7 @@ changes:
   * `err` {Error}
   * `records` {Object\[]}
 
-Uses the DNS protocol to resolve `CAA` records for the `hostname`. The
-`addresses` argument passed to the `callback` function
-will contain an array of certification authority authorization records
-available for the `hostname` (e.g. `[{critical: 0, iodef:
-'mailto:pki@example.com'}, {critical: 128, issue: 'pki.example.com'}]`).
+使用 DNS 协议解析 `hostname` 的 `CAA` 记录。传递给 `callback` 函数的 `addresses` 参数将包含 `hostname` 可用的证书颁发机构授权记录数组（例如 `[{critical: 0, iodef: 'mailto:pki@example.com'}, {critical: 128, issue: 'pki.example.com'}]`）。
 
 ## `dns.resolveMx(hostname, callback)`
 
@@ -638,10 +539,7 @@ changes:
   * `err` {Error}
   * `addresses` {Object\[]}
 
-Uses the DNS protocol to resolve mail exchange records (`MX` records) for the
-`hostname`. The `addresses` argument passed to the `callback` function will
-contain an array of objects containing both a `priority` and `exchange`
-property (e.g. `[{priority: 10, exchange: 'mx.example.com'}, ...]`).
+使用 DNS 协议解析 `hostname` 的邮件交换记录（`MX` 记录）。传递给 `callback` 函数的 `addresses` 参数将包含一个包含 `priority` 和 `exchange` 属性的对象数组（例如 `[{priority: 10, exchange: 'mx.example.com'}, ...]`）。
 
 ## `dns.resolveNaptr(hostname, callback)`
 
@@ -660,9 +558,7 @@ changes:
   * `err` {Error}
   * `addresses` {Object\[]}
 
-Uses the DNS protocol to resolve regular expression-based records (`NAPTR`
-records) for the `hostname`. The `addresses` argument passed to the `callback`
-function will contain an array of objects with the following properties:
+使用 DNS 协议解析 `hostname` 的基于正则表达式的记录（`NAPTR` 记录）。传递给 `callback` 函数的 `addresses` 参数将包含一个具有以下属性的对象数组：
 
 * `flags`
 * `service`
@@ -701,10 +597,7 @@ changes:
   * `err` {Error}
   * `addresses` {string\[]}
 
-Uses the DNS protocol to resolve name server records (`NS` records) for the
-`hostname`. The `addresses` argument passed to the `callback` function will
-contain an array of name server records available for `hostname`
-(e.g. `['ns1.example.com', 'ns2.example.com']`).
+使用 DNS 协议解析 `hostname` 的名称服务器记录（`NS` 记录）。传递给 `callback` 函数的 `addresses` 参数将包含 `hostname` 可用的名称服务器记录数组（例如 `['ns1.example.com', 'ns2.example.com']`）。
 
 ## `dns.resolvePtr(hostname, callback)`
 
@@ -723,9 +616,7 @@ changes:
   * `err` {Error}
   * `addresses` {string\[]}
 
-Uses the DNS protocol to resolve pointer records (`PTR` records) for the
-`hostname`. The `addresses` argument passed to the `callback` function will
-be an array of strings containing the reply records.
+使用 DNS 协议解析 `hostname` 的指针记录（`PTR` 记录）。传递给 `callback` 函数的 `addresses` 参数将是一个包含回复记录的字符串数组。
 
 ## `dns.resolveSoa(hostname, callback)`
 
@@ -744,9 +635,7 @@ changes:
   * `err` {Error}
   * `address` {Object}
 
-Uses the DNS protocol to resolve a start of authority record (`SOA` record) for
-the `hostname`. The `address` argument passed to the `callback` function will
-be an object with the following properties:
+使用 DNS 协议解析 `hostname` 的权威起始记录（`SOA` 记录）。传递给 `callback` 函数的 `address` 参数将是一个具有以下属性的对象：
 
 * `nsname`
 * `hostmaster`
@@ -787,9 +676,7 @@ changes:
   * `err` {Error}
   * `addresses` {Object\[]}
 
-Uses the DNS protocol to resolve service records (`SRV` records) for the
-`hostname`. The `addresses` argument passed to the `callback` function will
-be an array of objects with the following properties:
+使用 DNS 协议解析 `hostname` 的服务记录（`SRV` 记录）。传递给 `callback` 函数的 `addresses` 参数将是一个具有以下属性的对象数组：
 
 * `priority`
 * `weight`
@@ -824,9 +711,7 @@ added:
 
 <!--lint enable no-undefined-references list-item-bullet-indent-->
 
-Uses the DNS protocol to resolve certificate associations (`TLSA` records) for
-the `hostname`. The `records` argument passed to the `callback` function is an
-array of objects with these properties:
+使用 DNS 协议解析 `hostname` 的证书关联记录（`TLSA` 记录）。传递给 `callback` 函数的 `records` 参数是一个具有以下属性的对象数组：
 
 * `certUsage`
 * `selector`
@@ -861,12 +746,7 @@ changes:
   * `err` {Error}
   * `records` {string\[]}
 
-Uses the DNS protocol to resolve text queries (`TXT` records) for the
-`hostname`. The `records` argument passed to the `callback` function is a
-two-dimensional array of the text records available for `hostname` (e.g.
-`[ ['v=spf1 ip4:0.0.0.0 ', '~all' ] ]`). Each sub-array contains TXT chunks of
-one record. Depending on the use case, these could be either joined together or
-treated separately.
+使用 DNS 协议解析 `hostname` 的文本查询（`TXT` 记录）。传递给 `callback` 函数的 `records` 参数是一个二维数组，包含 `hostname` 可用的文本记录（例如 `[ ['v=spf1 ip4:0.0.0.0 ', '~all' ] ]`）。每个子数组包含一条记录的 TXT 块。根据使用情况，这些可以连接在一起或单独处理。
 
 ## `dns.reverse(ip, callback)`
 
@@ -879,11 +759,9 @@ added: v0.1.16
   * `err` {Error}
   * `hostnames` {string\[]}
 
-Performs a reverse DNS query that resolves an IPv4 or IPv6 address to an
-array of host names.
+执行反向 DNS 查询，将 IPv4 或 IPv6 地址解析为主机名数组。
 
-On error, `err` is an [`Error`][] object, where `err.code` is
-one of the [DNS error codes][].
+出错时，`err` 是一个 [`Error`][] 对象，其中 `err.code` 是[DNS 错误代码][DNS error codes]之一。
 
 ## `dns.setDefaultResultOrder(order)`
 
@@ -902,19 +780,15 @@ changes:
     description: Changed default value to `verbatim`.
 -->
 
-* `order` {string} must be `'ipv4first'`, `'ipv6first'` or `'verbatim'`.
+* `order` {string} 必须是 `'ipv4first'`、`'ipv6first'` 或 `'verbatim'`。
 
-Set the default value of `order` in [`dns.lookup()`][] and
-[`dnsPromises.lookup()`][]. The value could be:
+设置 [`dns.lookup()`][] 和 [`dnsPromises.lookup()`][] 中 `order` 的默认值。值可以是：
 
-* `ipv4first`: sets default `order` to `ipv4first`.
-* `ipv6first`: sets default `order` to `ipv6first`.
-* `verbatim`: sets default `order` to `verbatim`.
+* `ipv4first`：将默认 `order` 设置为 `ipv4first`。
+* `ipv6first`：将默认 `order` 设置为 `ipv6first`。
+* `verbatim`：将默认 `order` 设置为 `verbatim`。
 
-The default is `verbatim` and [`dns.setDefaultResultOrder()`][] have higher
-priority than [`--dns-result-order`][]. When using [worker threads][],
-[`dns.setDefaultResultOrder()`][] from the main thread won't affect the default
-dns orders in workers.
+默认值为 `verbatim`，且 [`dns.setDefaultResultOrder()`][] 的优先级高于 [`--dns-result-order`][]。当使用[工作线程][worker threads]时，主线程中的 [`dns.setDefaultResultOrder()`][] 不会影响工作线程中的默认 DNS 顺序。
 
 ## `dns.getDefaultResultOrder()`
 
@@ -930,12 +804,11 @@ changes:
     description: The `ipv6first` value is supported now.
 -->
 
-Get the default value for `order` in [`dns.lookup()`][] and
-[`dnsPromises.lookup()`][]. The value could be:
+获取 [`dns.lookup()`][] 和 [`dnsPromises.lookup()`][] 中 `order` 的默认值。值可以是：
 
-* `ipv4first`: for `order` defaulting to `ipv4first`.
-* `ipv6first`: for `order` defaulting to `ipv6first`.
-* `verbatim`: for `order` defaulting to `verbatim`.
+* `ipv4first`：表示 `order` 默认为 `ipv4first`。
+* `ipv6first`：表示 `order` 默认为 `ipv6first`。
+* `verbatim`：表示 `order` 默认为 `verbatim`。
 
 ## `dns.setServers(servers)`
 
@@ -943,11 +816,9 @@ Get the default value for `order` in [`dns.lookup()`][] and
 added: v0.11.3
 -->
 
-* `servers` {string\[]} array of [RFC 5952][] formatted addresses
+* `servers` {string\[]} [RFC 5952][] 格式化地址的数组
 
-Sets the IP address and port of servers to be used when performing DNS
-resolution. The `servers` argument is an array of [RFC 5952][] formatted
-addresses. If the port is the IANA default DNS port (53) it can be omitted.
+设置执行 DNS 解析时要使用的服务器的 IP 地址和端口。`servers` 参数是 [RFC 5952][] 格式化地址的数组。如果端口是 IANA 默认 DNS 端口 (53)，则可以省略。
 
 ```js
 dns.setServers([
@@ -958,21 +829,13 @@ dns.setServers([
 ]);
 ```
 
-An error will be thrown if an invalid address is provided.
+如果提供了无效地址，将抛出错误。
 
-The `dns.setServers()` method must not be called while a DNS query is in
-progress.
+`dns.setServers()` 方法不得在 DNS 查询进行时调用。
 
-The [`dns.setServers()`][] method affects only [`dns.resolve()`][],
-`dns.resolve*()` and [`dns.reverse()`][] (and specifically _not_
-[`dns.lookup()`][]).
+[`dns.setServers()`][] 方法仅影响 [`dns.resolve()`][]、`dns.resolve*()` 和 [`dns.reverse()`][]（特别是不影响 [`dns.lookup()`][]）。
 
-This method works much like
-[resolve.conf](https://man7.org/linux/man-pages/man5/resolv.conf.5.html).
-That is, if attempting to resolve with the first server provided results in a
-`NOTFOUND` error, the `resolve()` method will _not_ attempt to resolve with
-subsequent servers provided. Fallback DNS servers will only be used if the
-earlier ones time out or result in some other error.
+此方法的工作方式非常类似于 [resolve.conf](https://man7.org/linux/man-pages/man5/resolv.conf.5.html)。也就是说，如果尝试使用提供的第一个服务器解析导致 `NOTFOUND` 错误，则 `resolve()` 方法将不会尝试使用后续提供的服务器进行解析。仅当较早的服务器超时或导致其他错误时，才会使用备用 DNS 服务器。
 
 ## DNS promises API
 
@@ -989,29 +852,24 @@ changes:
     description: This API is no longer experimental.
 -->
 
-The `dns.promises` API provides an alternative set of asynchronous DNS methods
-that return `Promise` objects rather than using callbacks. The API is accessible
-via `require('node:dns').promises` or `require('node:dns/promises')`.
+`dns.promises` API 提供了一组替代的异步 DNS 方法，这些方法返回 `Promise` 对象而不是使用回调。该 API 可通过 `require('node:dns').promises` 或 `require('node:dns/promises')` 访问。
 
-### Class: `dnsPromises.Resolver`
+### 类：`dnsPromises.Resolver`
 
 <!-- YAML
 added: v10.6.0
 -->
 
-An independent resolver for DNS requests.
+一个独立的 DNS 请求解析器。
 
-Creating a new resolver uses the default server settings. Setting
-the servers used for a resolver using
-[`resolver.setServers()`][`dnsPromises.setServers()`] does not affect
-other resolvers:
+创建新的解析器会使用默认的服务器设置。使用 [`resolver.setServers()`][`dnsPromises.setServers()`] 设置解析器使用的服务器不会影响其他解析器：
 
 ```mjs
 import { Resolver } from 'node:dns/promises';
 const resolver = new Resolver();
 resolver.setServers(['4.4.4.4']);
 
-// This request will use the server at 4.4.4.4, independent of global settings.
+// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。
 const addresses = await resolver.resolve4('example.org');
 ```
 
@@ -1020,18 +878,18 @@ const { Resolver } = require('node:dns').promises;
 const resolver = new Resolver();
 resolver.setServers(['4.4.4.4']);
 
-// This request will use the server at 4.4.4.4, independent of global settings.
+// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。
 resolver.resolve4('example.org').then((addresses) => {
   // ...
 });
 
-// Alternatively, the same code can be written using async-await style.
+// 或者，可以使用 async-await 风格编写相同的代码。
 (async function() {
   const addresses = await resolver.resolve4('example.org');
 })();
 ```
 
-The following methods from the `dnsPromises` API are available:
+`dnsPromises` API 中的以下方法可用：
 
 * [`resolver.getServers()`][`dnsPromises.getServers()`]
 * [`resolver.resolve()`][`dnsPromises.resolve()`]
@@ -1059,8 +917,7 @@ added:
   - v14.17.0
 -->
 
-Cancel all outstanding DNS queries made by this resolver. The corresponding
-promises will be rejected with an error with the code `ECANCELLED`.
+取消此解析器进行的所有未完成的 DNS 查询。相应的 promise 将被拒绝，错误码为 `ECANCELLED`。
 
 ### `dnsPromises.getServers()`
 
@@ -1068,11 +925,9 @@ promises will be rejected with an error with the code `ECANCELLED`.
 added: v10.6.0
 -->
 
-* Returns: {string\[]}
+* 返回：{string\[]}
 
-Returns an array of IP address strings, formatted according to [RFC 5952][],
-that are currently configured for DNS resolution. A string will include a port
-section if a custom port is used.
+返回一个 IP 地址字符串数组，根据 [RFC 5952][] 格式化，这些地址当前配置用于 DNS 解析。如果使用了自定义端口，字符串将包含端口部分。
 
 <!-- eslint-disable @stylistic/js/semi-->
 
@@ -1099,54 +954,21 @@ changes:
 
 * `hostname` {string}
 * `options` {integer | Object}
-  * `family` {integer} The record family. Must be `4`, `6`, or `0`. The value
-    `0` indicates that either an IPv4 or IPv6 address is returned. If the
-    value `0` is used with `{ all: true }` (see below), either one of or both
-    IPv4 and IPv6 addresses are returned, depending on the system's DNS
-    resolver. **Default:** `0`.
-  * `hints` {number} One or more [supported `getaddrinfo` flags][]. Multiple
-    flags may be passed by bitwise `OR`ing their values.
-  * `all` {boolean} When `true`, the `Promise` is resolved with all addresses in
-    an array. Otherwise, returns a single address. **Default:** `false`.
-  * `order` {string} When `verbatim`, the `Promise` is resolved with IPv4 and
-    IPv6 addresses in the order the DNS resolver returned them. When `ipv4first`,
-    IPv4 addresses are placed before IPv6 addresses. When `ipv6first`,
-    IPv6 addresses are placed before IPv4 addresses.
-    **Default:** `verbatim` (addresses are not reordered).
-    Default value is configurable using [`dns.setDefaultResultOrder()`][] or
-    [`--dns-result-order`][]. New code should use `{ order: 'verbatim' }`.
-  * `verbatim` {boolean} When `true`, the `Promise` is resolved with IPv4 and
-    IPv6 addresses in the order the DNS resolver returned them. When `false`,
-    IPv4 addresses are placed before IPv6 addresses.
-    This option will be deprecated in favor of `order`. When both are specified,
-    `order` has higher precedence. New code should only use `order`.
-    **Default:** currently `false` (addresses are reordered) but this is
-    expected to change in the not too distant future. Default value is
-    configurable using [`dns.setDefaultResultOrder()`][] or
-    [`--dns-result-order`][].
+  * `family` {integer} 记录族。必须为 `4`、`6` 或 `0`。值 `0` 表示返回 IPv4 或 IPv6 地址。如果值 `0` 与 `{ all: true }` 一起使用（见下文），则返回 IPv4 和 IPv6 地址中的一个或两个，具体取决于系统的 DNS 解析器。**默认值：** `0`。
+  * `hints` {number} 一个或多个[支持的 `getaddrinfo` 标志][supported `getaddrinfo` flags]。可以通过按位 `OR` 运算它们的值来传递多个标志。
+  * `all` {boolean} 当为 `true` 时，`Promise` 以所有地址的数组解析。否则，返回单个地址。**默认值：** `false`。
+  * `order` {string} 当为 `verbatim` 时，`Promise` 以 DNS 解析器返回的 IPv4 和 IPv6 地址顺序解析。当为 `ipv4first` 时，IPv4 地址放在 IPv6 地址之前。当为 `ipv6first` 时，IPv6 地址放在 IPv4 地址之前。**默认值：** `verbatim`（地址不重新排序）。默认值可使用 [`dns.setDefaultResultOrder()`][] 或 [`--dns-result-order`][] 配置。新代码应使用 `{ order: 'verbatim' }`。
+  * `verbatim` {boolean} 当为 `true` 时，`Promise` 以 DNS 解析器返回的 IPv4 和 IPv6 地址顺序解析。当为 `false` 时，IPv4 地址放在 IPv6 地址之前。此选项将被弃用，转而使用 `order`。当两者都指定时，`order` 具有更高的优先级。新代码应仅使用 `order`。**默认值：** 当前为 `false`（地址重新排序），但预计在不久的将来会更改。默认值可使用 [`dns.setDefaultResultOrder()`][] 或 [`--dns-result-order`][] 配置。
 
-Resolves a host name (e.g. `'nodejs.org'`) into the first found A (IPv4) or
-AAAA (IPv6) record. All `option` properties are optional. If `options` is an
-integer, then it must be `4` or `6` – if `options` is not provided, then
-either IPv4 or IPv6 addresses, or both, are returned if found.
+将主机名（例如 `'nodejs.org'`）解析为找到的第一个 A (IPv4) 或 AAAA (IPv6) 记录。所有 `option` 属性都是可选的。如果 `options` 是整数，则必须是 `4` 或 `6` – 如果未提供 `options`，则如果找到，将返回 IPv4 或 IPv6 地址，或两者都返回。
 
-With the `all` option set to `true`, the `Promise` is resolved with `addresses`
-being an array of objects with the properties `address` and `family`.
+当 `all` 选项设置为 `true` 时，`Promise` 以 `addresses` 解析，`addresses` 是一个具有 `address` 和 `family` 属性的对象数组。
 
-On error, the `Promise` is rejected with an [`Error`][] object, where `err.code`
-is the error code.
-Keep in mind that `err.code` will be set to `'ENOTFOUND'` not only when
-the host name does not exist but also when the lookup fails in other ways
-such as no available file descriptors.
+出错时，`Promise` 被拒绝，并带有一个 [`Error`][] 对象，其中 `err.code` 是错误代码。请记住，不仅当主机名不存在时 `err.code` 会被设置为 `'ENOTFOUND'`，而且当查找以其他方式失败时（例如没有可用的文件描述符）也会如此。
 
-[`dnsPromises.lookup()`][] does not necessarily have anything to do with the DNS
-protocol. The implementation uses an operating system facility that can
-associate names with addresses and vice versa. This implementation can have
-subtle but important consequences on the behavior of any Node.js program. Please
-take some time to consult the [Implementation considerations section][] before
-using `dnsPromises.lookup()`.
+[`dnsPromises.lookup()`][] 不一定与 DNS 协议有关。该实现使用操作系统提供的设施，可以将名称与地址关联，反之亦然。这种实现可能对任何 Node.js 程序的行为产生微妙但重要的影响。在使用 `dnsPromises.lookup()` 之前，请花些时间查阅[实现考虑部分][Implementation considerations section]。
 
-Example usage:
+用法示例：
 
 ```mjs
 import dns from 'node:dns';
@@ -1161,7 +983,7 @@ await dnsPromises.lookup('example.org', options).then((result) => {
   // address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6
 });
 
-// When options.all is true, the result will be an Array.
+// 当 options.all 为 true 时，结果将是一个数组。
 options.all = true;
 await dnsPromises.lookup('example.org', options).then((result) => {
   console.log('addresses: %j', result);
@@ -1182,7 +1004,7 @@ dnsPromises.lookup('example.org', options).then((result) => {
   // address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6
 });
 
-// When options.all is true, the result will be an Array.
+// 当 options.all 为 true 时，结果将是一个数组。
 options.all = true;
 dnsPromises.lookup('example.org', options).then((result) => {
   console.log('addresses: %j', result);
@@ -1199,28 +1021,24 @@ added: v10.6.0
 * `address` {string}
 * `port` {number}
 
-Resolves the given `address` and `port` into a host name and service using
-the operating system's underlying `getnameinfo` implementation.
+使用操作系统底层的 `getnameinfo` 实现将给定的 `address` 和 `port` 解析为主机名和服务。
 
-If `address` is not a valid IP address, a `TypeError` will be thrown.
-The `port` will be coerced to a number. If it is not a legal port, a `TypeError`
-will be thrown.
+如果 `address` 不是有效的 IP 地址，将抛出 `TypeError`。`port` 将被强制转换为数字。如果它不是合法端口，将抛出 `TypeError`。
 
-On error, the `Promise` is rejected with an [`Error`][] object, where `err.code`
-is the error code.
+出错时，`Promise` 被拒绝，并带有一个 [`Error`][] 对象，其中 `err.code` 是错误代码。
 
 ```mjs
 import dnsPromises from 'node:dns/promises';
 const result = await dnsPromises.lookupService('127.0.0.1', 22);
 
-console.log(result.hostname, result.service); // Prints: localhost ssh
+console.log(result.hostname, result.service); // 打印: localhost ssh
 ```
 
 ```cjs
 const dnsPromises = require('node:dns').promises;
 dnsPromises.lookupService('127.0.0.1', 22).then((result) => {
   console.log(result.hostname, result.service);
-  // Prints: localhost ssh
+  // 打印: localhost ssh
 });
 ```
 
@@ -1230,32 +1048,28 @@ dnsPromises.lookupService('127.0.0.1', 22).then((result) => {
 added: v10.6.0
 -->
 
-* `hostname` {string} Host name to resolve.
-* `rrtype` {string} Resource record type. **Default:** `'A'`.
+* `hostname` {string} 要解析的主机名。
+* `rrtype` {string} 资源记录类型。**默认值：** `'A'`。
 
-Uses the DNS protocol to resolve a host name (e.g. `'nodejs.org'`) into an array
-of the resource records. When successful, the `Promise` is resolved with an
-array of resource records. The type and structure of individual results vary
-based on `rrtype`:
+使用 DNS 协议将主机名（例如 `'nodejs.org'`）解析为资源记录数组。成功时，`Promise` 以资源记录数组解析。单个结果的类型和结构因 `rrtype` 而异：
 
-| `rrtype`  | `records` contains             | Result type | Shorthand method                 |
-| --------- | ------------------------------ | ----------- | -------------------------------- |
-| `'A'`     | IPv4 addresses (default)       | {string}    | [`dnsPromises.resolve4()`][]     |
-| `'AAAA'`  | IPv6 addresses                 | {string}    | [`dnsPromises.resolve6()`][]     |
-| `'ANY'`   | any records                    | {Object}    | [`dnsPromises.resolveAny()`][]   |
-| `'CAA'`   | CA authorization records       | {Object}    | [`dnsPromises.resolveCaa()`][]   |
-| `'CNAME'` | canonical name records         | {string}    | [`dnsPromises.resolveCname()`][] |
-| `'MX'`    | mail exchange records          | {Object}    | [`dnsPromises.resolveMx()`][]    |
-| `'NAPTR'` | name authority pointer records | {Object}    | [`dnsPromises.resolveNaptr()`][] |
-| `'NS'`    | name server records            | {string}    | [`dnsPromises.resolveNs()`][]    |
-| `'PTR'`   | pointer records                | {string}    | [`dnsPromises.resolvePtr()`][]   |
-| `'SOA'`   | start of authority records     | {Object}    | [`dnsPromises.resolveSoa()`][]   |
-| `'SRV'`   | service records                | {Object}    | [`dnsPromises.resolveSrv()`][]   |
-| `'TLSA'`  | certificate associations       | {Object}    | [`dnsPromises.resolveTlsa()`][]  |
-| `'TXT'`   | text records                   | {string\[]} | [`dnsPromises.resolveTxt()`][]   |
+| `rrtype`  | `records` 包含          | 结果类型 | 简写方法                     |
+| --------- | ----------------------- | -------- | ---------------------------- |
+| `'A'`     | IPv4 地址（默认）       | {string} | [`dnsPromises.resolve4()`][] |
+| `'AAAA'`  | IPv6 地址               | {string} | [`dnsPromises.resolve6()`][] |
+| `'ANY'`   | 任何记录                | {Object} | [`dnsPromises.resolveAny()`][] |
+| `'CAA'`   | CA 授权记录             | {Object} | [`dnsPromises.resolveCaa()`][] |
+| `'CNAME'` | 规范名称记录            | {string} | [`dnsPromises.resolveCname()`][] |
+| `'MX'`    | 邮件交换记录            | {Object} | [`dnsPromises.resolveMx()`][] |
+| `'NAPTR'` | 名称权威指针记录        | {Object} | [`dnsPromises.resolveNaptr()`][] |
+| `'NS'`    | 名称服务器记录          | {string} | [`dnsPromises.resolveNs()`][] |
+| `'PTR'`   | 指针记录                | {string} | [`dnsPromises.resolvePtr()`][] |
+| `'SOA'`   | 权威起始记录            | {Object} | [`dnsPromises.resolveSoa()`][] |
+| `'SRV'`   | 服务记录                | {Object} | [`dnsPromises.resolveSrv()`][] |
+| `'TLSA'`  | 证书关联记录            | {Object} | [`dnsPromises.resolveTlsa()`][] |
+| `'TXT'`   | 文本记录                | {string\[]} | [`dnsPromises.resolveTxt()`][] |
 
-On error, the `Promise` is rejected with an [`Error`][] object, where `err.code`
-is one of the [DNS error codes][].
+出错时，`Promise` 被拒绝，并带有一个 [`Error`][] 对象，其中 `err.code` 是[DNS 错误代码][DNS error codes]之一。
 
 ### `dnsPromises.resolve4(hostname[, options])`
 
@@ -1263,16 +1077,11 @@ is one of the [DNS error codes][].
 added: v10.6.0
 -->
 
-* `hostname` {string} Host name to resolve.
+* `hostname` {string} 要解析的主机名。
 * `options` {Object}
-  * `ttl` {boolean} Retrieve the Time-To-Live value (TTL) of each record.
-    When `true`, the `Promise` is resolved with an array of
-    `{ address: '1.2.3.4', ttl: 60 }` objects rather than an array of strings,
-    with the TTL expressed in seconds.
+  * `ttl` {boolean} 检索每条记录的生存时间值 (TTL)。当为 `true` 时，`Promise` 以 `{ address: '1.2.3.4', ttl: 60 }` 对象数组解析，而不是字符串数组，TTL 以秒表示。
 
-Uses the DNS protocol to resolve IPv4 addresses (`A` records) for the
-`hostname`. On success, the `Promise` is resolved with an array of IPv4
-addresses (e.g. `['74.125.79.104', '74.125.79.105', '74.125.79.106']`).
+使用 DNS 协议解析 `hostname` 的 IPv4 地址（`A` 记录）。成功时，`Promise` 以 IPv4 地址数组解析（例如 `['74.125.79.104', '74.125.79.105', '74.125.79.106']`）。
 
 ### `dnsPromises.resolve6(hostname[, options])`
 
@@ -1280,16 +1089,11 @@ addresses (e.g. `['74.125.79.104', '74.125.79.105', '74.125.79.106']`).
 added: v10.6.0
 -->
 
-* `hostname` {string} Host name to resolve.
+* `hostname` {string} 要解析的主机名。
 * `options` {Object}
-  * `ttl` {boolean} Retrieve the Time-To-Live value (TTL) of each record.
-    When `true`, the `Promise` is resolved with an array of
-    `{ address: '0:1:2:3:4:5:6:7', ttl: 60 }` objects rather than an array of
-    strings, with the TTL expressed in seconds.
+  * `ttl` {boolean} 检索每条记录的生存时间值 (TTL)。当为 `true` 时，`Promise` 以 `{ address: '0:1:2:3:4:5:6:7', ttl: 60 }` 对象数组解析，而不是字符串数组，TTL 以秒表示。
 
-Uses the DNS protocol to resolve IPv6 addresses (`AAAA` records) for the
-`hostname`. On success, the `Promise` is resolved with an array of IPv6
-addresses.
+使用 DNS 协议解析 `hostname` 的 IPv6 地址（`AAAA` 记录）。成功时，`Promise` 以 IPv6 地址数组解析。
 
 ### `dnsPromises.resolveAny(hostname)`
 
@@ -1299,27 +1103,23 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve all records (also known as `ANY` or `*` query).
-On success, the `Promise` is resolved with an array containing various types of
-records. Each object has a property `type` that indicates the type of the
-current record. And depending on the `type`, additional properties will be
-present on the object:
+使用 DNS 协议解析所有记录（也称为 `ANY` 或 `*` 查询）。成功时，`Promise` 以包含各种类型记录的数组解析。每个对象有一个属性 `type`，指示当前记录的类型。根据 `type`，对象上将存在其他属性：
 
-| Type      | Properties                                                                                                                                               |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `'A'`     | `address`/`ttl`                                                                                                                                          |
-| `'AAAA'`  | `address`/`ttl`                                                                                                                                          |
-| `'CNAME'` | `value`                                                                                                                                                  |
-| `'MX'`    | Refer to [`dnsPromises.resolveMx()`][]                                                                                                                   |
-| `'NAPTR'` | Refer to [`dnsPromises.resolveNaptr()`][]                                                                                                                |
-| `'NS'`    | `value`                                                                                                                                                  |
-| `'PTR'`   | `value`                                                                                                                                                  |
-| `'SOA'`   | Refer to [`dnsPromises.resolveSoa()`][]                                                                                                                  |
-| `'SRV'`   | Refer to [`dnsPromises.resolveSrv()`][]                                                                                                                  |
-| `'TLSA'`  | Refer to [`dnsPromises.resolveTlsa()`][]                                                                                                                 |
-| `'TXT'`   | This type of record contains an array property called `entries` which refers to [`dnsPromises.resolveTxt()`][], e.g. `{ entries: ['...'], type: 'TXT' }` |
+| 类型      | 属性                                                                                                                                    |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `'A'`     | `address`/`ttl`                                                                                                                         |
+| `'AAAA'`  | `address`/`ttl`                                                                                                                         |
+| `'CNAME'` | `value`                                                                                                                                 |
+| `'MX'`    | 参考 [`dnsPromises.resolveMx()`][]                                                                                                      |
+| `'NAPTR'` | 参考 [`dnsPromises.resolveNaptr()`][]                                                                                                   |
+| `'NS'`    | `value`                                                                                                                                 |
+| `'PTR'`   | `value`                                                                                                                                 |
+| `'SOA'`   | 参考 [`dnsPromises.resolveSoa()`][]                                                                                                     |
+| `'SRV'`   | 参考 [`dnsPromises.resolveSrv()`][]                                                                                                     |
+| `'TLSA'`  | 参考 [`dnsPromises.resolveTlsa()`][]                                                                                                    |
+| `'TXT'`   | 此类型的记录包含一个名为 `entries` 的数组属性，参考 [`dnsPromises.resolveTxt()`][]，例如 `{ entries: ['...'], type: 'TXT' }` |
 
-Here is an example of the result object:
+以下是结果对象的示例：
 
 <!-- eslint-disable @stylistic/js/semi -->
 
@@ -1349,11 +1149,7 @@ added:
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve `CAA` records for the `hostname`. On success,
-the `Promise` is resolved with an array of objects containing available
-certification authority authorization records available for the `hostname`
-(e.g. `[{critical: 0, iodef: 'mailto:pki@example.com'},{critical: 128, issue:
-'pki.example.com'}]`).
+使用 DNS 协议解析 `hostname` 的 `CAA` 记录。成功时，`Promise` 以包含 `hostname` 可用的证书颁发机构授权记录的对象数组解析（例如 `[{critical: 0, iodef: 'mailto:pki@example.com'},{critical: 128, issue: 'pki.example.com'}]`）。
 
 ### `dnsPromises.resolveCname(hostname)`
 
@@ -1363,9 +1159,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve `CNAME` records for the `hostname`. On success,
-the `Promise` is resolved with an array of canonical name records available for
-the `hostname` (e.g. `['bar.example.com']`).
+使用 DNS 协议解析 `hostname` 的 `CNAME` 记录。成功时，`Promise` 以 `hostname` 可用的规范名称记录数组解析（例如 `['bar.example.com']`）。
 
 ### `dnsPromises.resolveMx(hostname)`
 
@@ -1375,10 +1169,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve mail exchange records (`MX` records) for the
-`hostname`. On success, the `Promise` is resolved with an array of objects
-containing both a `priority` and `exchange` property (e.g.
-`[{priority: 10, exchange: 'mx.example.com'}, ...]`).
+使用 DNS 协议解析 `hostname` 的邮件交换记录（`MX` 记录）。成功时，`Promise` 以包含 `priority` 和 `exchange` 属性的对象数组解析（例如 `[{priority: 10, exchange: 'mx.example.com'}, ...]`）。
 
 ### `dnsPromises.resolveNaptr(hostname)`
 
@@ -1388,9 +1179,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve regular expression-based records (`NAPTR`
-records) for the `hostname`. On success, the `Promise` is resolved with an array
-of objects with the following properties:
+使用 DNS 协议解析 `hostname` 的基于正则表达式的记录（`NAPTR` 记录）。成功时，`Promise` 以具有以下属性的对象数组解析：
 
 * `flags`
 * `service`
@@ -1420,10 +1209,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve name server records (`NS` records) for the
-`hostname`. On success, the `Promise` is resolved with an array of name server
-records available for `hostname` (e.g.
-`['ns1.example.com', 'ns2.example.com']`).
+使用 DNS 协议解析 `hostname` 的名称服务器记录（`NS` 记录）。成功时，`Promise` 以 `hostname` 可用的名称服务器记录数组解析（例如 `['ns1.example.com', 'ns2.example.com']`）。
 
 ### `dnsPromises.resolvePtr(hostname)`
 
@@ -1433,9 +1219,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve pointer records (`PTR` records) for the
-`hostname`. On success, the `Promise` is resolved with an array of strings
-containing the reply records.
+使用 DNS 协议解析 `hostname` 的指针记录（`PTR` 记录）。成功时，`Promise` 以包含回复记录的字符串数组解析。
 
 ### `dnsPromises.resolveSoa(hostname)`
 
@@ -1445,9 +1229,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve a start of authority record (`SOA` record) for
-the `hostname`. On success, the `Promise` is resolved with an object with the
-following properties:
+使用 DNS 协议解析 `hostname` 的权威起始记录（`SOA` 记录）。成功时，`Promise` 以具有以下属性的对象解析：
 
 * `nsname`
 * `hostmaster`
@@ -1479,9 +1261,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve service records (`SRV` records) for the
-`hostname`. On success, the `Promise` is resolved with an array of objects with
-the following properties:
+使用 DNS 协议解析 `hostname` 的服务记录（`SRV` 记录）。成功时，`Promise` 以具有以下属性的对象数组解析：
 
 * `priority`
 * `weight`
@@ -1509,9 +1289,7 @@ added:
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve certificate associations (`TLSA` records) for
-the `hostname`. On success, the `Promise` is resolved with an array of objects
-with these properties:
+使用 DNS 协议解析 `hostname` 的证书关联记录（`TLSA` 记录）。成功时，`Promise` 以具有以下属性的对象数组解析：
 
 * `certUsage`
 * `selector`
@@ -1537,12 +1315,7 @@ added: v10.6.0
 
 * `hostname` {string}
 
-Uses the DNS protocol to resolve text queries (`TXT` records) for the
-`hostname`. On success, the `Promise` is resolved with a two-dimensional array
-of the text records available for `hostname` (e.g.
-`[ ['v=spf1 ip4:0.0.0.0 ', '~all' ] ]`). Each sub-array contains TXT chunks of
-one record. Depending on the use case, these could be either joined together or
-treated separately.
+使用 DNS 协议解析 `hostname` 的文本查询（`TXT` 记录）。成功时，`Promise` 以 `hostname` 可用的文本记录的二维数组解析（例如 `[ ['v=spf1 ip4:0.0.0.0 ', '~all' ] ]`）。每个子数组包含一条记录的 TXT 块。根据使用情况，这些可以连接在一起或单独处理。
 
 ### `dnsPromises.reverse(ip)`
 
@@ -1552,11 +1325,9 @@ added: v10.6.0
 
 * `ip` {string}
 
-Performs a reverse DNS query that resolves an IPv4 or IPv6 address to an
-array of host names.
+执行反向 DNS 查询，将 IPv4 或 IPv6 地址解析为主机名数组。
 
-On error, the `Promise` is rejected with an [`Error`][] object, where `err.code`
-is one of the [DNS error codes][].
+出错时，`Promise` 被拒绝，并带有一个 [`Error`][] 对象，其中 `err.code` 是[DNS 错误代码][DNS error codes]之一。
 
 ### `dnsPromises.setDefaultResultOrder(order)`
 
@@ -1575,19 +1346,15 @@ changes:
     description: Changed default value to `verbatim`.
 -->
 
-* `order` {string} must be `'ipv4first'`, `'ipv6first'` or `'verbatim'`.
+* `order` {string} 必须是 `'ipv4first'`、`'ipv6first'` 或 `'verbatim'`。
 
-Set the default value of `order` in [`dns.lookup()`][] and
-[`dnsPromises.lookup()`][]. The value could be:
+设置 [`dns.lookup()`][] 和 [`dnsPromises.lookup()`][] 中 `order` 的默认值。值可以是：
 
-* `ipv4first`: sets default `order` to `ipv4first`.
-* `ipv6first`: sets default `order` to `ipv6first`.
-* `verbatim`: sets default `order` to `verbatim`.
+* `ipv4first`：将默认 `order` 设置为 `ipv4first`。
+* `ipv6first`：将默认 `order` 设置为 `ipv6first`。
+* `verbatim`：将默认 `order` 设置为 `verbatim`。
 
-The default is `verbatim` and [`dnsPromises.setDefaultResultOrder()`][] have
-higher priority than [`--dns-result-order`][]. When using [worker threads][],
-[`dnsPromises.setDefaultResultOrder()`][] from the main thread won't affect the
-default dns orders in workers.
+默认值为 `verbatim`，且 [`dnsPromises.setDefaultResultOrder()`][] 的优先级高于 [`--dns-result-order`][]。当使用[工作线程][worker threads]时，主线程中的 [`dnsPromises.setDefaultResultOrder()`][] 不会影响工作线程中的默认 DNS 顺序。
 
 ### `dnsPromises.getDefaultResultOrder()`
 
@@ -1597,7 +1364,7 @@ added:
   - v18.17.0
 -->
 
-Get the value of `dnsOrder`.
+获取 `dnsOrder` 的值。
 
 ### `dnsPromises.setServers(servers)`
 
@@ -1605,11 +1372,9 @@ Get the value of `dnsOrder`.
 added: v10.6.0
 -->
 
-* `servers` {string\[]} array of [RFC 5952][] formatted addresses
+* `servers` {string\[]} [RFC 5952][] 格式化地址的数组
 
-Sets the IP address and port of servers to be used when performing DNS
-resolution. The `servers` argument is an array of [RFC 5952][] formatted
-addresses. If the port is the IANA default DNS port (53) it can be omitted.
+设置执行 DNS 解析时要使用的服务器的 IP 地址和端口。`servers` 参数是 [RFC 5952][] 格式化地址的数组。如果端口是 IANA 默认 DNS 端口 (53)，则可以省略。
 
 ```js
 dnsPromises.setServers([
@@ -1620,91 +1385,62 @@ dnsPromises.setServers([
 ]);
 ```
 
-An error will be thrown if an invalid address is provided.
+如果提供了无效地址，将抛出错误。
 
-The `dnsPromises.setServers()` method must not be called while a DNS query is in
-progress.
+`dnsPromises.setServers()` 方法不得在 DNS 查询进行时调用。
 
-This method works much like
-[resolve.conf](https://man7.org/linux/man-pages/man5/resolv.conf.5.html).
-That is, if attempting to resolve with the first server provided results in a
-`NOTFOUND` error, the `resolve()` method will _not_ attempt to resolve with
-subsequent servers provided. Fallback DNS servers will only be used if the
-earlier ones time out or result in some other error.
+此方法的工作方式非常类似于 [resolve.conf](https://man7.org/linux/man-pages/man5/resolv.conf.5.html)。也就是说，如果尝试使用提供的第一个服务器解析导致 `NOTFOUND` 错误，则 `resolve()` 方法将不会尝试使用后续提供的服务器进行解析。仅当较早的服务器超时或导致其他错误时，才会使用备用 DNS 服务器。
 
-## Error codes
+## 错误代码
 
-Each DNS query can return one of the following error codes:
+每个 DNS 查询可以返回以下错误代码之一：
 
-* `dns.NODATA`: DNS server returned an answer with no data.
-* `dns.FORMERR`: DNS server claims query was misformatted.
-* `dns.SERVFAIL`: DNS server returned general failure.
-* `dns.NOTFOUND`: Domain name not found.
-* `dns.NOTIMP`: DNS server does not implement the requested operation.
-* `dns.REFUSED`: DNS server refused query.
-* `dns.BADQUERY`: Misformatted DNS query.
-* `dns.BADNAME`: Misformatted host name.
-* `dns.BADFAMILY`: Unsupported address family.
-* `dns.BADRESP`: Misformatted DNS reply.
-* `dns.CONNREFUSED`: Could not contact DNS servers.
-* `dns.TIMEOUT`: Timeout while contacting DNS servers.
-* `dns.EOF`: End of file.
-* `dns.FILE`: Error reading file.
-* `dns.NOMEM`: Out of memory.
-* `dns.DESTRUCTION`: Channel is being destroyed.
-* `dns.BADSTR`: Misformatted string.
-* `dns.BADFLAGS`: Illegal flags specified.
-* `dns.NONAME`: Given host name is not numeric.
-* `dns.BADHINTS`: Illegal hints flags specified.
-* `dns.NOTINITIALIZED`: c-ares library initialization not yet performed.
-* `dns.LOADIPHLPAPI`: Error loading `iphlpapi.dll`.
-* `dns.ADDRGETNETWORKPARAMS`: Could not find `GetNetworkParams` function.
-* `dns.CANCELLED`: DNS query cancelled.
+* `dns.NODATA`: DNS 服务器返回无数据的答案。
+* `dns.FORMERR`: DNS 服务器声称查询格式错误。
+* `dns.SERVFAIL`: DNS 服务器返回一般故障。
+* `dns.NOTFOUND`: 未找到域名。
+* `dns.NOTIMP`: DNS 服务器未实现请求的操作。
+* `dns.REFUSED`: DNS 服务器拒绝查询。
+* `dns.BADQUERY`: 格式错误的 DNS 查询。
+* `dns.BADNAME`: 格式错误的主机名。
+* `dns.BADFAMILY`: 不支持的地址族。
+* `dns.BADRESP`: 格式错误的 DNS 回复。
+* `dns.CONNREFUSED`: 无法联系 DNS 服务器。
+* `dns.TIMEOUT`: 联系 DNS 服务器时超时。
+* `dns.EOF`: 文件结束。
+* `dns.FILE`: 读取文件时出错。
+* `dns.NOMEM`: 内存不足。
+* `dns.DESTRUCTION`: 通道正在被销毁。
+* `dns.BADSTR`: 格式错误的字符串。
+* `dns.BADFLAGS`: 指定了非法标志。
+* `dns.NONAME`: 给定的主机名不是数字。
+* `dns.BADHINTS`: 指定了非法提示标志。
+* `dns.NOTINITIALIZED`: c-ares 库尚未初始化。
+* `dns.LOADIPHLPAPI`: 加载 `iphlpapi.dll` 时出错。
+* `dns.ADDRGETNETWORKPARAMS`: 找不到 `GetNetworkParams` 函数。
+* `dns.CANCELLED`: DNS 查询已取消。
 
-The `dnsPromises` API also exports the above error codes, e.g., `dnsPromises.NODATA`.
+`dnsPromises` API 也导出上述错误代码，例如 `dnsPromises.NODATA`。
 
-## Implementation considerations
+## 实现考虑
 
-Although [`dns.lookup()`][] and the various `dns.resolve*()/dns.reverse()`
-functions have the same goal of associating a network name with a network
-address (or vice versa), their behavior is quite different. These differences
-can have subtle but significant consequences on the behavior of Node.js
-programs.
+尽管 [`dns.lookup()`][] 和各种 `dns.resolve*()/dns.reverse()` 函数具有将网络名称与网络地址（或反之）关联的相同目标，但它们的行为截然不同。这些差异可能对 Node.js 程序的行为产生微妙但重要的影响。
 
 ### `dns.lookup()`
 
-Under the hood, [`dns.lookup()`][] uses the same operating system facilities
-as most other programs. For instance, [`dns.lookup()`][] will almost always
-resolve a given name the same way as the `ping` command. On most POSIX-like
-operating systems, the behavior of the [`dns.lookup()`][] function can be
-modified by changing settings in nsswitch.conf(5) and/or resolv.conf(5),
-but changing these files will change the behavior of all other
-programs running on the same operating system.
+在底层，[`dns.lookup()`][] 使用与大多数其他程序相同的操作系统设施。例如，[`dns.lookup()`][] 几乎总是以与 `ping` 命令相同的方式解析给定名称。在大多数类 POSIX 操作系统上，[`dns.lookup()`][] 函数的行为可以通过更改 nsswitch.conf(5) 和/或 resolv.conf(5) 中的设置来修改，但更改这些文件将更改在同一操作系统上运行的所有其他程序的行为。
 
-Though the call to `dns.lookup()` will be asynchronous from JavaScript's
-perspective, it is implemented as a synchronous call to getaddrinfo(3) that runs
-on libuv's threadpool. This can have surprising negative performance
-implications for some applications, see the [`UV_THREADPOOL_SIZE`][]
-documentation for more information.
+尽管从 JavaScript 的角度来看，对 `dns.lookup()` 的调用是异步的，但它是作为对 getaddrinfo(3) 的同步调用在 libuv 的线程池中实现的。这可能对某些应用程序产生令人惊讶的负面性能影响，更多信息请参阅 [`UV_THREADPOOL_SIZE`][] 文档。
 
-Various networking APIs will call `dns.lookup()` internally to resolve
-host names. If that is an issue, consider resolving the host name to an address
-using `dns.resolve()` and using the address instead of a host name. Also, some
-networking APIs (such as [`socket.connect()`][] and [`dgram.createSocket()`][])
-allow the default resolver, `dns.lookup()`, to be replaced.
+各种网络 API 将在内部调用 `dns.lookup()` 来解析主机名。如果这是一个问题，考虑使用 `dns.resolve()` 将主机名解析为地址，并使用地址而不是主机名。此外，一些网络 API（如 [`socket.connect()`][] 和 [`dgram.createSocket()`][]）允许替换默认解析器 `dns.lookup()`。
 
-### `dns.resolve()`, `dns.resolve*()`, and `dns.reverse()`
+### `dns.resolve()`、`dns.resolve*()` 和 `dns.reverse()`
 
-These functions are implemented quite differently than [`dns.lookup()`][]. They
-do not use getaddrinfo(3) and they _always_ perform a DNS query on the
-network. This network communication is always done asynchronously and does not
-use libuv's threadpool.
+这些函数的实现与 [`dns.lookup()`][] 完全不同。它们不使用 getaddrinfo(3)，并且它们总是在网络上执行 DNS 查询。此网络通信始终是异步完成的，并且不使用 libuv 的线程池。
 
-As a result, these functions cannot have the same negative impact on other
-processing that happens on libuv's threadpool that [`dns.lookup()`][] can have.
+因此，这些函数不会对 libuv 线程池上发生的其他处理产生与 [`dns.lookup()`][] 相同的负面影响。
 
-They do not use the same set of configuration files that [`dns.lookup()`][]
-uses. For instance, they do not use the configuration from `/etc/hosts`.
+它们不使用 [`dns.lookup()`][] 使用的同一组配置文件。例如，它们不使用 `/etc/hosts` 中的配置。
 
 [DNS error codes]: #error-codes
 [Domain Name System (DNS)]: https://en.wikipedia.org/wiki/Domain_Name_System

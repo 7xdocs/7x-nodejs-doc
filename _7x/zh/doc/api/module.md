@@ -6,13 +6,11 @@
 added: v0.3.7
 -->
 
-## The `Module` object
+## `Module` 对象
 
-* Type: {Object}
+* 类型: {Object}
 
-Provides general utility methods when interacting with instances of
-`Module`, the [`module`][] variable often seen in [CommonJS][] modules. Accessed
-via `import 'node:module'` or `require('node:module')`.
+提供与 `Module` 实例（在 [CommonJS][] 模块中常见的 [`module`][] 变量）交互时的通用工具方法。通过 `import 'node:module'` 或 `require('node:module')` 访问。
 
 ### `module.builtinModules`
 
@@ -27,23 +25,21 @@ changes:
     description: The list now also contains prefix-only modules.
 -->
 
-* Type: {string\[]}
+* 类型: {string\[]}
 
-A list of the names of all modules provided by Node.js. Can be used to verify
-if a module is maintained by a third party or not.
+Node.js 提供的所有模块名称的列表。可用于验证一个模块是否由第三方维护。
 
-`module` in this context isn't the same object that's provided
-by the [module wrapper][]. To access it, require the `Module` module:
+此上下文中的 `module` 与 [模块包装器][] 提供的对象不同。要访问它，需要引入 `Module` 模块：
 
 ```mjs
 // module.mjs
-// In an ECMAScript module
+// 在 ECMAScript 模块中
 import { builtinModules as builtin } from 'node:module';
 ```
 
 ```cjs
 // module.cjs
-// In a CommonJS module
+// 在 CommonJS 模块中
 const builtin = require('node:module').builtinModules;
 ```
 
@@ -53,16 +49,14 @@ const builtin = require('node:module').builtinModules;
 added: v12.2.0
 -->
 
-* `filename` {string|URL} Filename to be used to construct the require
-  function. Must be a file URL object, file URL string, or absolute path
-  string.
-* Returns: {require} Require function
+* `filename` {string|URL} 用于构造 require 函数的文件名。必须是 file URL 对象、file URL 字符串或绝对路径字符串。
+* 返回: {require} Require 函数
 
 ```mjs
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 
-// sibling-module.js is a CommonJS module.
+// sibling-module.js 是一个 CommonJS 模块。
 const siblingModule = require('./sibling-module');
 ```
 
@@ -76,24 +70,13 @@ added:
 
 > Stability: 1.1 - Active Development
 
-* `specifier` {string|URL} The specifier for the module whose `package.json` to
-  retrieve. When passing a _bare specifier_, the `package.json` at the root of
-  the package is returned. When passing a _relative specifier_ or an _absolute specifier_,
-  the closest parent `package.json` is returned.
-* `base` {string|URL} The absolute location (`file:` URL string or FS path) of the
-  containing  module. For CJS, use `__filename` (not `__dirname`!); for ESM, use
-  `import.meta.url`. You do not need to pass it if `specifier` is an `absolute specifier`.
-* Returns: {string|undefined} A path if the `package.json` is found. When `specifier`
-  is a package, the package's root `package.json`; when a relative or unresolved, the closest
-  `package.json` to the `specifier`.
+* `specifier` {string|URL} 要检索其 `package.json` 的模块的说明符。传递 _裸说明符_ 时，返回包根目录的 `package.json`。传递 _相对说明符_ 或 _绝对说明符_ 时，返回最近的父级 `package.json`。
+* `base` {string|URL} 包含模块的绝对位置（`file:` URL 字符串或文件系统路径）。对于 CJS，使用 `__filename`（而不是 `__dirname`！）；对于 ESM，使用 `import.meta.url`。如果 `specifier` 是 _绝对说明符_，则无需传递此参数。
+* 返回: {string|undefined} 如果找到 `package.json` 则返回路径。当 `specifier` 是一个包时，返回包的根目录 `package.json`；当是相对或未解析的说明符时，返回最接近 `specifier` 的 `package.json`。
 
-> **Caveat**: Do not use this to try to determine module format. There are many things affecting
-> that determination; the `type` field of package.json is the _least_ definitive (ex file extension
-> supersedes it, and a loader hook supersedes that).
+> **注意**：不要使用此功能来尝试确定模块格式。影响该确定的因素很多；package.json 的 `type` 字段是 _最不_ 具有决定性的（例如，文件扩展名会覆盖它，而加载器钩子又会覆盖文件扩展名）。
 
-> **Caveat**: This currently leverages only the built-in default resolver; if
-> [`resolve` customization hooks][resolve hook] are registered, they will not affect the resolution.
-> This may change in the future.
+> **注意**：目前这仅利用了内置的默认解析器；如果注册了 [`resolve` 自定义钩子][resolve hook]，它们将不会影响解析。这将来可能会改变。
 
 ```text
 /path/to/project
@@ -117,14 +100,13 @@ import { findPackageJSON } from 'node:module';
 
 findPackageJSON('..', import.meta.url);
 // '/path/to/project/package.json'
-// Same result when passing an absolute specifier instead:
+// 传递绝对说明符时结果相同：
 findPackageJSON(new URL('../', import.meta.url));
 findPackageJSON(import.meta.resolve('../'));
 
 findPackageJSON('some-package', import.meta.url);
 // '/path/to/project/packages/bar/node_modules/some-package/package.json'
-// When passing an absolute specifier, you might get a different result if the
-// resolved module is inside a subfolder that has nested `package.json`.
+// 当传递绝对说明符时，如果解析的模块位于具有嵌套 `package.json` 的子文件夹内，可能会得到不同的结果。
 findPackageJSON(import.meta.resolve('some-package'));
 // '/path/to/project/packages/bar/node_modules/some-package/some-subfolder/package.json'
 
@@ -140,13 +122,12 @@ const path = require('node:path');
 
 findPackageJSON('..', __filename);
 // '/path/to/project/package.json'
-// Same result when passing an absolute specifier instead:
+// 传递绝对说明符时结果相同：
 findPackageJSON(pathToFileURL(path.join(__dirname, '..')));
 
 findPackageJSON('some-package', __filename);
 // '/path/to/project/packages/bar/node_modules/some-package/package.json'
-// When passing an absolute specifier, you might get a different result if the
-// resolved module is inside a subfolder that has nested `package.json`.
+// 当传递绝对说明符时，如果解析的模块位于具有嵌套 `package.json` 的子文件夹内，可能会得到不同的结果。
 findPackageJSON(pathToFileURL(require.resolve('some-package')));
 // '/path/to/project/packages/bar/node_modules/some-package/some-subfolder/package.json'
 
@@ -162,8 +143,8 @@ added:
   - v16.17.0
 -->
 
-* `moduleName` {string} name of the module
-* Returns: {boolean} returns true if the module is builtin else returns false
+* `moduleName` {string} 模块名称
+* 返回: {boolean} 如果模块是内置模块则返回 true，否则返回 false
 
 ```mjs
 import { isBuiltin } from 'node:module';
@@ -195,26 +176,16 @@ changes:
 
 > Stability: 1.2 - Release candidate
 
-* `specifier` {string|URL} Customization hooks to be registered; this should be
-  the same string that would be passed to `import()`, except that if it is
-  relative, it is resolved relative to `parentURL`.
-* `parentURL` {string|URL} If you want to resolve `specifier` relative to a base
-  URL, such as `import.meta.url`, you can pass that URL here. **Default:**
-  `'data:'`
+* `specifier` {string|URL} 要注册的自定义钩子；这应该是与传递给 `import()` 相同的字符串，但如果它是相对的，则相对于 `parentURL` 进行解析。
+* `parentURL` {string|URL} 如果你想相对于一个基础 URL（例如 `import.meta.url`）解析 `specifier`，可以在此处传递该 URL。**默认值:** `'data:'`
 * `options` {Object}
-  * `parentURL` {string|URL} If you want to resolve `specifier` relative to a
-    base URL, such as `import.meta.url`, you can pass that URL here. This
-    property is ignored if the `parentURL` is supplied as the second argument.
-    **Default:** `'data:'`
-  * `data` {any} Any arbitrary, cloneable JavaScript value to pass into the
-    [`initialize`][] hook.
-  * `transferList` {Object\[]} [transferable objects][] to be passed into the
-    `initialize` hook.
+  * `parentURL` {string|URL} 如果你想相对于一个基础 URL（例如 `import.meta.url`）解析 `specifier`，可以在此处传递该 URL。如果 `parentURL` 作为第二个参数提供，则忽略此属性。**默认值:** `'data:'`
+  * `data` {any} 传递给 [`initialize`][] 钩子的任意可克隆的 JavaScript 值。
+  * `transferList` {Object\[]} 传递给 `initialize` 钩子的 [可传输对象][]。
 
-Register a module that exports [hooks][] that customize Node.js module
-resolution and loading behavior. See [Customization hooks][].
+注册一个导出 [钩子][] 的模块，这些钩子用于自定义 Node.js 模块的解析和加载行为。参见 [自定义钩子][]。
 
-This feature requires `--allow-worker` if used with the [Permission Model][].
+如果与 [权限模型][] 一起使用，此功能需要 `--allow-worker`。
 
 ### `module.registerHooks(options)`
 
@@ -227,11 +198,10 @@ added:
 > Stability: 1.1 - Active development
 
 * `options` {Object}
-  * `load` {Function|undefined} See [load hook][]. **Default:** `undefined`.
-  * `resolve` {Function|undefined} See [resolve hook][]. **Default:** `undefined`.
+  * `load` {Function|undefined} 参见 [load 钩子][]。**默认值:** `undefined`。
+  * `resolve` {Function|undefined} 参见 [resolve 钩子][]。**默认值:** `undefined`。
 
-Register [hooks][] that customize Node.js module resolution and loading behavior.
-See [Customization hooks][].
+注册 [钩子][]，这些钩子用于自定义 Node.js 模块的解析和加载行为。参见 [自定义钩子][]。
 
 ### `module.stripTypeScriptTypes(code[, options])`
 
@@ -243,35 +213,28 @@ added:
 
 > Stability: 1.2 - Release candidate
 
-* `code` {string} The code to strip type annotations from.
+* `code` {string} 要从中剥离类型注解的代码。
 * `options` {Object}
-  * `mode` {string} **Default:** `'strip'`. Possible values are:
-    * `'strip'` Only strip type annotations without performing the transformation of TypeScript features.
-    * `'transform'` Strip type annotations and transform TypeScript features to JavaScript.
-  * `sourceMap` {boolean} **Default:** `false`. Only when `mode` is `'transform'`, if `true`, a source map
-    will be generated for the transformed code.
-  * `sourceUrl` {string}  Specifies the source url used in the source map.
-* Returns: {string} The code with type annotations stripped.
-  `module.stripTypeScriptTypes()` removes type annotations from TypeScript code. It
-  can be used to strip type annotations from TypeScript code before running it
-  with `vm.runInContext()` or `vm.compileFunction()`.
-  By default, it will throw an error if the code contains TypeScript features
-  that require transformation such as `Enums`,
-  see [type-stripping][] for more information.
-  When mode is `'transform'`, it also transforms TypeScript features to JavaScript,
-  see [transform TypeScript features][] for more information.
-  When mode is `'strip'`, source maps are not generated, because locations are preserved.
-  If `sourceMap` is provided, when mode is `'strip'`, an error will be thrown.
+  * `mode` {string} **默认值:** `'strip'`。可能的值有：
+    * `'strip'` 仅剥离类型注解，不执行 TypeScript 特性的转换。
+    * `'transform'` 剥离类型注解并将 TypeScript 特性转换为 JavaScript。
+  * `sourceMap` {boolean} **默认值:** `false`。仅当 `mode` 为 `'transform'` 时，如果为 `true`，将为转换后的代码生成 source map。
+  * `sourceUrl` {string} 指定在 source map 中使用的源 URL。
+* 返回: {string} 剥离了类型注解的代码。
+  `module.stripTypeScriptTypes()` 从 TypeScript 代码中移除类型注解。它可以在使用 `vm.runInContext()` 或 `vm.compileFunction()` 运行 TypeScript 代码之前，用于剥离类型注解。
+  默认情况下，如果代码包含需要转换的 TypeScript 特性（如 `Enums`），它将抛出一个错误，更多信息请参见 [类型剥离][]。
+  当模式为 `'transform'` 时，它还会将 TypeScript 特性转换为 JavaScript，更多信息请参见 [转换 TypeScript 特性][]。
+  当模式为 `'strip'` 时，不会生成 source map，因为位置信息被保留了。
+  如果提供了 `sourceMap` 而模式为 `'strip'`，将会抛出错误。
 
-_WARNING_: The output of this function should not be considered stable across Node.js versions,
-due to changes in the TypeScript parser.
+_警告_：由于 TypeScript 解析器的变化，此函数的输出在不同 Node.js 版本间不应被视为稳定。
 
 ```mjs
 import { stripTypeScriptTypes } from 'node:module';
 const code = 'const a: number = 1;';
 const strippedCode = stripTypeScriptTypes(code);
 console.log(strippedCode);
-// Prints: const a         = 1;
+// 打印: const a         = 1;
 ```
 
 ```cjs
@@ -279,17 +242,17 @@ const { stripTypeScriptTypes } = require('node:module');
 const code = 'const a: number = 1;';
 const strippedCode = stripTypeScriptTypes(code);
 console.log(strippedCode);
-// Prints: const a         = 1;
+// 打印: const a         = 1;
 ```
 
-If `sourceUrl` is provided, it will be used appended as a comment at the end of the output:
+如果提供了 `sourceUrl`，它将被附加在输出末尾作为注释：
 
 ```mjs
 import { stripTypeScriptTypes } from 'node:module';
 const code = 'const a: number = 1;';
 const strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });
 console.log(strippedCode);
-// Prints: const a         = 1\n\n//# sourceURL=source.ts;
+// 打印: const a         = 1\n\n//# sourceURL=source.ts;
 ```
 
 ```cjs
@@ -297,10 +260,10 @@ const { stripTypeScriptTypes } = require('node:module');
 const code = 'const a: number = 1;';
 const strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });
 console.log(strippedCode);
-// Prints: const a         = 1\n\n//# sourceURL=source.ts;
+// 打印: const a         = 1\n\n//# sourceURL=source.ts;
 ```
 
-When `mode` is `'transform'`, the code is transformed to JavaScript:
+当 `mode` 为 `'transform'` 时，代码被转换为 JavaScript：
 
 ```mjs
 import { stripTypeScriptTypes } from 'node:module';
@@ -310,7 +273,7 @@ const code = `
   }`;
 const strippedCode = stripTypeScriptTypes(code, { mode: 'transform', sourceMap: true });
 console.log(strippedCode);
-// Prints:
+// 打印:
 // var MathUtil;
 // (function(MathUtil) {
 //     MathUtil.add = (a, b)=>a + b;
@@ -326,7 +289,7 @@ const code = `
   }`;
 const strippedCode = stripTypeScriptTypes(code, { mode: 'transform', sourceMap: true });
 console.log(strippedCode);
-// Prints:
+// 打印:
 // var MathUtil;
 // (function(MathUtil) {
 //     MathUtil.add = (a, b)=>a + b;
@@ -340,9 +303,7 @@ console.log(strippedCode);
 added: v12.12.0
 -->
 
-The `module.syncBuiltinESMExports()` method updates all the live bindings for
-builtin [ES Modules][] to match the properties of the [CommonJS][] exports. It
-does not add or remove exported names from the [ES Modules][].
+`module.syncBuiltinESMExports()` 方法更新所有内置 [ES 模块][] 的实时绑定，以匹配 [CommonJS][] 导出的属性。它不会从 [ES 模块][] 中添加或移除导出的名称。
 
 ```js
 const fs = require('node:fs');
@@ -362,18 +323,18 @@ fs.newAPI = newAPI;
 syncBuiltinESMExports();
 
 import('node:fs').then((esmFS) => {
-  // It syncs the existing readFile property with the new value
+  // 它将现有的 readFile 属性与新值同步
   assert.strictEqual(esmFS.readFile, newAPI);
-  // readFileSync has been deleted from the required fs
+  // readFileSync 已从所需的 fs 中删除
   assert.strictEqual('readFileSync' in fs, false);
-  // syncBuiltinESMExports() does not remove readFileSync from esmFS
+  // syncBuiltinESMExports() 不会从 esmFS 中移除 readFileSync
   assert.strictEqual('readFileSync' in esmFS, true);
-  // syncBuiltinESMExports() does not add names
+  // syncBuiltinESMExports() 不会添加名称
   assert.strictEqual(esmFS.newAPI, undefined);
 });
 ```
 
-## Module compile cache
+## 模块编译缓存
 
 <!-- YAML
 added: v22.1.0
@@ -383,41 +344,18 @@ changes:
     description: add initial JavaScript APIs for runtime access.
 -->
 
-The module compile cache can be enabled either using the [`module.enableCompileCache()`][]
-method or the [`NODE_COMPILE_CACHE=dir`][] environment variable. After it is enabled,
-whenever Node.js compiles a CommonJS or a ECMAScript Module, it will use on-disk
-[V8 code cache][] persisted in the specified directory to speed up the compilation.
-This may slow down the first load of a module graph, but subsequent loads of the same module
-graph may get a significant speedup if the contents of the modules do not change.
+模块编译缓存可以通过使用 [`module.enableCompileCache()`][] 方法或 [`NODE_COMPILE_CACHE=dir`][] 环境变量来启用。启用后，每当 Node.js 编译一个 CommonJS 或 ECMAScript 模块时，它将使用指定目录中持久化的磁盘 [V8 代码缓存][] 来加速编译。
+这可能会减慢模块图的首次加载速度，但如果模块的内容没有更改，后续加载同一模块图可能会获得显著的速度提升。
 
-To clean up the generated compile cache on disk, simply remove the cache directory. The cache
-directory will be recreated the next time the same directory is used for for compile cache
-storage. To avoid filling up the disk with stale cache, it is recommended to use a directory
-under the [`os.tmpdir()`][]. If the compile cache is enabled by a call to
-[`module.enableCompileCache()`][] without specifying the directory, Node.js will use
-the [`NODE_COMPILE_CACHE=dir`][] environment variable if it's set, or defaults
-to `path.join(os.tmpdir(), 'node-compile-cache')` otherwise. To locate the compile cache
-directory used by a running Node.js instance, use [`module.getCompileCacheDir()`][].
+要清理磁盘上生成的编译缓存，只需删除缓存目录。下次使用同一目录存储编译缓存时，将重新创建缓存目录。为了避免磁盘被陈旧的缓存填满，建议使用 [`os.tmpdir()`][] 下的目录。如果通过调用 [`module.enableCompileCache()`][] 启用编译缓存而未指定目录，Node.js 将使用 [`NODE_COMPILE_CACHE=dir`][] 环境变量（如果已设置），否则默认使用 `path.join(os.tmpdir(), 'node-compile-cache')`。要定位正在运行的 Node.js 实例使用的编译缓存目录，请使用 [`module.getCompileCacheDir()`][]。
 
-Currently when using the compile cache with [V8 JavaScript code coverage][], the
-coverage being collected by V8 may be less precise in functions that are
-deserialized from the code cache. It's recommended to turn this off when
-running tests to generate precise coverage.
+目前，当使用编译缓存与 [V8 JavaScript 代码覆盖率][] 时，V8 收集的覆盖率对于从代码缓存反序列化的函数可能不太精确。建议在运行测试以生成精确覆盖率时关闭此功能。
 
-The enabled module compile cache can be disabled by the [`NODE_DISABLE_COMPILE_CACHE=1`][]
-environment variable. This can be useful when the compile cache leads to unexpected or
-undesired behaviors (e.g. less precise test coverage).
+可以通过 [`NODE_DISABLE_COMPILE_CACHE=1`][] 环境变量禁用已启用的模块编译缓存。当编译缓存导致意外或不希望的行为（例如，测试覆盖率不精确）时，这可能很有用。
 
-Compilation cache generated by one version of Node.js can not be reused by a different
-version of Node.js. Cache generated by different versions of Node.js will be stored
-separately if the same base directory is used to persist the cache, so they can co-exist.
+由一个版本的 Node.js 生成的编译缓存不能被不同版本的 Node.js 重用。如果使用相同的基础目录来持久化缓存，不同版本的 Node.js 生成的缓存将分开存储，因此它们可以共存。
 
-At the moment, when the compile cache is enabled and a module is loaded afresh, the
-code cache is generated from the compiled code immediately, but will only be written
-to disk when the Node.js instance is about to exit. This is subject to change. The
-[`module.flushCompileCache()`][] method can be used to ensure the accumulated code cache
-is flushed to disk in case the application wants to spawn other Node.js instances
-and let them share the cache long before the parent exits.
+目前，当启用编译缓存并且重新加载一个模块时，代码缓存会立即从编译后的代码生成，但仅在 Node.js 实例即将退出时才会写入磁盘。这一点可能会改变。[`module.flushCompileCache()`][] 方法可用于确保累积的代码缓存被刷新到磁盘，以防应用程序想要生成其他 Node.js 实例并让它们早在父进程退出之前就共享缓存。
 
 ### `module.constants.compileCacheStatus`
 
@@ -427,47 +365,35 @@ added: v22.8.0
 
 > Stability: 1.1 - Active Development
 
-The following constants are returned as the `status` field in the object returned by
-[`module.enableCompileCache()`][] to indicate the result of the attempt to enable the
-[module compile cache][].
+以下常量作为 [`module.enableCompileCache()`][] 返回的对象中的 `status` 字段返回，以指示启用 [模块编译缓存][] 尝试的结果。
 
 <table>
   <tr>
-    <th>Constant</th>
-    <th>Description</th>
+    <th>常量</th>
+    <th>描述</th>
   </tr>
   <tr>
     <td><code>ENABLED</code></td>
     <td>
-      Node.js has enabled the compile cache successfully. The directory used to store the
-      compile cache will be returned in the <code>directory</code> field in the
-      returned object.
+      Node.js 已成功启用编译缓存。用于存储编译缓存的目录将在返回对象的 <code>directory</code> 字段中返回。
     </td>
   </tr>
   <tr>
     <td><code>ALREADY_ENABLED</code></td>
     <td>
-      The compile cache has already been enabled before, either by a previous call to
-      <code>module.enableCompileCache()</code>, or by the <code>NODE_COMPILE_CACHE=dir</code>
-      environment variable. The directory used to store the
-      compile cache will be returned in the <code>directory</code> field in the
-      returned object.
+      编译缓存之前已经启用，无论是通过先前调用 <code>module.enableCompileCache()</code>，还是通过 <code>NODE_COMPILE_CACHE=dir</code> 环境变量。用于存储编译缓存的目录将在返回对象的 <code>directory</code> 字段中返回。
     </td>
   </tr>
   <tr>
     <td><code>FAILED</code></td>
     <td>
-      Node.js fails to enable the compile cache. This can be caused by the lack of
-      permission to use the specified directory, or various kinds of file system errors.
-      The detail of the failure will be returned in the <code>message</code> field in the
-      returned object.
+      Node.js 未能启用编译缓存。这可能是由于缺少使用指定目录的权限，或各种文件系统错误。失败的详细信息将在返回对象的 <code>message</code> 字段中返回。
     </td>
   </tr>
   <tr>
     <td><code>DISABLED</code></td>
     <td>
-      Node.js cannot enable the compile cache because the environment variable
-      <code>NODE_DISABLE_COMPILE_CACHE=1</code> has been set.
+      Node.js 无法启用编译缓存，因为环境变量 <code>NODE_DISABLE_COMPILE_CACHE=1</code> 已被设置。
     </td>
   </tr>
 </table>
@@ -480,40 +406,20 @@ added: v22.8.0
 
 > Stability: 1.1 - Active Development
 
-* `cacheDir` {string|undefined} Optional path to specify the directory where the compile cache
-  will be stored/retrieved.
-* Returns: {Object}
-  * `status` {integer} One of the [`module.constants.compileCacheStatus`][]
-  * `message` {string|undefined} If Node.js cannot enable the compile cache, this contains
-    the error message. Only set if `status` is `module.constants.compileCacheStatus.FAILED`.
-  * `directory` {string|undefined} If the compile cache is enabled, this contains the directory
-    where the compile cache is stored. Only set if  `status` is
-    `module.constants.compileCacheStatus.ENABLED` or
-    `module.constants.compileCacheStatus.ALREADY_ENABLED`.
+* `cacheDir` {string|undefined} 可选路径，指定存储/检索编译缓存的目录。
+* 返回: {Object}
+  * `status` {integer} [`module.constants.compileCacheStatus`][] 之一
+  * `message` {string|undefined} 如果 Node.js 无法启用编译缓存，此字段包含错误消息。仅当 `status` 为 `module.constants.compileCacheStatus.FAILED` 时设置。
+  * `directory` {string|undefined} 如果编译缓存已启用，此字段包含存储编译缓存的目录。仅当 `status` 为 `module.constants.compileCacheStatus.ENABLED` 或 `module.constants.compileCacheStatus.ALREADY_ENABLED` 时设置。
 
-Enable [module compile cache][] in the current Node.js instance.
+在当前 Node.js 实例中启用 [模块编译缓存][]。
 
-If `cacheDir` is not specified, Node.js will either use the directory specified by the
-[`NODE_COMPILE_CACHE=dir`][] environment variable if it's set, or use
-`path.join(os.tmpdir(), 'node-compile-cache')` otherwise. For general use cases, it's
-recommended to call `module.enableCompileCache()` without specifying the `cacheDir`,
-so that the directory can be overridden by the `NODE_COMPILE_CACHE` environment
-variable when necessary.
+如果未指定 `cacheDir`，Node.js 将使用 [`NODE_COMPILE_CACHE=dir`][] 环境变量指定的目录（如果已设置），否则使用 `path.join(os.tmpdir(), 'node-compile-cache')`。对于一般用例，建议调用 `module.enableCompileCache()` 而不指定 `cacheDir`，以便在必要时可以通过 `NODE_COMPILE_CACHE` 环境变量覆盖目录。
 
-Since compile cache is supposed to be a quiet optimization that is not required for the
-application to be functional, this method is designed to not throw any exception when the
-compile cache cannot be enabled. Instead, it will return an object containing an error
-message in the `message` field to aid debugging.
-If compile cache is enabled successfully, the `directory` field in the returned object
-contains the path to the directory where the compile cache is stored. The `status`
-field in the returned object would be one of the `module.constants.compileCacheStatus`
-values to indicate the result of the attempt to enable the [module compile cache][].
+由于编译缓存应该是一种静默优化，不是应用程序功能所必需的，因此此方法设计为在无法启用编译缓存时不抛出任何异常。相反，它将返回一个包含 `message` 字段中错误信息的对象以辅助调试。
+如果编译缓存成功启用，返回对象中的 `directory` 字段包含存储编译缓存的目录路径。返回对象中的 `status` 字段将是 `module.constants.compileCacheStatus` 值之一，以指示启用 [模块编译缓存][] 尝试的结果。
 
-This method only affects the current Node.js instance. To enable it in child worker threads,
-either call this method in child worker threads too, or set the
-`process.env.NODE_COMPILE_CACHE` value to compile cache directory so the behavior can
-be inherited into the child workers. The directory can be obtained either from the
-`directory` field returned by this method, or with [`module.getCompileCacheDir()`][].
+此方法仅影响当前 Node.js 实例。要在子工作线程中启用它，要么在子工作线程中也调用此方法，要么将 `process.env.NODE_COMPILE_CACHE` 值设置为编译缓存目录，以便行为可以继承到子工作线程中。目录可以从该方法返回的 `directory` 字段获取，或者使用 [`module.getCompileCacheDir()`][]。
 
 ### `module.flushCompileCache()`
 
@@ -525,11 +431,7 @@ added:
 
 > Stability: 1.1 - Active Development
 
-Flush the [module compile cache][] accumulated from modules already loaded
-in the current Node.js instance to disk. This returns after all the flushing
-file system operations come to an end, no matter they succeed or not. If there
-are any errors, this will fail silently, since compile cache misses should not
-interfere with the actual operation of the application.
+将当前 Node.js 实例中已加载模块累积的 [模块编译缓存][] 刷新到磁盘。此方法在所有刷新文件系统操作结束（无论成功与否）后返回。如果有任何错误，此操作将静默失败，因为编译缓存未命中不应干扰应用程序的实际操作。
 
 ### `module.getCompileCacheDir()`
 
@@ -539,12 +441,11 @@ added: v22.8.0
 
 > Stability: 1.1 - Active Development
 
-* Returns: {string|undefined} Path to the [module compile cache][] directory if it is enabled,
-  or `undefined` otherwise.
+* 返回: {string|undefined} 如果启用了 [模块编译缓存][]，则返回其目录路径，否则返回 `undefined`。
 
 <i id="module_customization_hooks"></i>
 
-## Customization Hooks
+## 自定义钩子
 
 <!-- YAML
 added: v8.8.0
@@ -575,27 +476,21 @@ changes:
 > Stability: 1.2 - Release candidate (asynchronous version)
 > Stability: 1.1 - Active development (synchronous version)
 
-There are two types of module customization hooks that are currently supported:
+目前支持两种类型的模块自定义钩子：
 
-1. `module.register(specifier[, parentURL][, options])` which takes a module that
-   exports asynchronous hook functions. The functions are run on a separate loader
-   thread.
-2. `module.registerHooks(options)` which takes synchronous hook functions that are
-   run directly on the thread where the module is loaded.
+1. `module.register(specifier[, parentURL][, options])`，它接受一个导出异步钩子函数的模块。这些函数在单独的加载器线程上运行。
+2. `module.registerHooks(options)`，它接受同步钩子函数，这些函数直接在加载模块的线程上运行。
 
 <i id="enabling_module_customization_hooks"></i>
 
-### Enabling
+### 启用
 
-Module resolution and loading can be customized by:
+模块解析和加载可以通过以下方式自定义：
 
-1. Registering a file which exports a set of asynchronous hook functions, using the
-   [`register`][] method from `node:module`,
-2. Registering a set of synchronous hook functions using the [`registerHooks`][] method
-   from `node:module`.
+1. 使用 `node:module` 的 [`register`][] 方法注册一个导出一组异步钩子函数的文件，
+2. 使用 `node:module` 的 [`registerHooks`][] 方法注册一组同步钩子函数。
 
-The hooks can be registered before the application code is run by using the
-[`--import`][] or [`--require`][] flag:
+可以使用 [`--import`][] 或 [`--require`][] 标志在应用程序代码运行之前注册钩子：
 
 ```bash
 node --import ./register-hooks.js ./my-app.js
@@ -604,8 +499,8 @@ node --require ./register-hooks.js ./my-app.js
 
 ```mjs
 // register-hooks.js
-// This file can only be require()-ed if it doesn't contain top-level await.
-// Use module.register() to register asynchronous hooks in a dedicated thread.
+// 如果此文件不包含顶级 await，则只能被 require()。
+// 使用 module.register() 在专用线程中注册异步钩子。
 import { register } from 'node:module';
 register('./hooks.mjs', import.meta.url);
 ```
@@ -614,12 +509,12 @@ register('./hooks.mjs', import.meta.url);
 // register-hooks.js
 const { register } = require('node:module');
 const { pathToFileURL } = require('node:url');
-// Use module.register() to register asynchronous hooks in a dedicated thread.
+// 使用 module.register() 在专用线程中注册异步钩子。
 register('./hooks.mjs', pathToFileURL(__filename));
 ```
 
 ```mjs
-// Use module.registerHooks() to register synchronous hooks in the main thread.
+// 使用 module.registerHooks() 在主线程中注册同步钩子。
 import { registerHooks } from 'node:module';
 registerHooks({
   resolve(specifier, context, nextResolve) { /* implementation */ },
@@ -628,7 +523,7 @@ registerHooks({
 ```
 
 ```cjs
-// Use module.registerHooks() to register synchronous hooks in the main thread.
+// 使用 module.registerHooks() 在主线程中注册同步钩子。
 const { registerHooks } = require('node:module');
 registerHooks({
   resolve(specifier, context, nextResolve) { /* implementation */ },
@@ -636,32 +531,25 @@ registerHooks({
 });
 ```
 
-The file passed to `--import` or `--require` can also be an export from a dependency:
+传递给 `--import` 或 `--require` 的文件也可以是依赖项的导出：
 
 ```bash
 node --import some-package/register ./my-app.js
 node --require some-package/register ./my-app.js
 ```
 
-Where `some-package` has an [`"exports"`][] field defining the `/register`
-export to map to a file that calls `register()`, like the following `register-hooks.js`
-example.
+其中 `some-package` 有一个 [`"exports"`][] 字段定义了 `/register` 导出，映射到一个调用 `register()` 的文件，如下面的 `register-hooks.js` 示例。
 
-Using `--import` or `--require` ensures that the hooks are registered before any
-application files are imported, including the entry point of the application and for
-any worker threads by default as well.
+使用 `--import` 或 `--require` 可确保在任何应用程序文件（包括应用程序的入口点以及默认情况下的任何工作线程）被导入之前注册钩子。
 
-Alternatively, `register()` and `registerHooks()` can be called from the entry point,
-though dynamic `import()` must be used for any ESM code that should be run after the hooks
-are registered.
+或者，可以从入口点调用 `register()` 和 `registerHooks()`，但对于任何应在钩子注册后运行的 ESM 代码，必须使用动态 `import()`。
 
 ```mjs
 import { register } from 'node:module';
 
 register('http-to-https', import.meta.url);
 
-// Because this is a dynamic `import()`, the `http-to-https` hooks will run
-// to handle `./my-app.js` and any other files it imports or requires.
+// 因为这是一个动态 `import()`，`http-to-https` 钩子将运行来处理 `./my-app.js` 及其导入或需要的任何其他文件。
 await import('./my-app.js');
 ```
 
@@ -671,39 +559,27 @@ const { pathToFileURL } = require('node:url');
 
 register('http-to-https', pathToFileURL(__filename));
 
-// Because this is a dynamic `import()`, the `http-to-https` hooks will run
-// to handle `./my-app.js` and any other files it imports or requires.
+// 因为这是一个动态 `import()`，`http-to-https` 钩子将运行来处理 `./my-app.js` 及其导入或需要的任何其他文件。
 import('./my-app.js');
 ```
 
-Customization hooks will run for any modules loaded later than the registration
-and the modules they reference via `import` and the built-in `require`.
-`require` function created by users using `module.createRequire()` can only be
-customized by the synchronous hooks.
+自定义钩子将对在注册之后加载的任何模块以及它们通过 `import` 和内置 `require` 引用的模块运行。
+用户使用 `module.createRequire()` 创建的 `require` 函数只能由同步钩子自定义。
 
-In this example, we are registering the `http-to-https` hooks, but they will
-only be available for subsequently imported modules — in this case, `my-app.js`
-and anything it references via `import` or built-in `require` in CommonJS dependencies.
+在此示例中，我们注册了 `http-to-https` 钩子，但它们仅对随后导入的模块可用——在本例中为 `my-app.js` 及其通过 `import` 或在 CommonJS 依赖项中通过内置 `require` 引用的任何内容。
 
-If the `import('./my-app.js')` had instead been a static `import './my-app.js'`, the
-app would have _already_ been loaded **before** the `http-to-https` hooks were
-registered. This due to the ES modules specification, where static imports are
-evaluated from the leaves of the tree first, then back to the trunk. There can
-be static imports _within_ `my-app.js`, which will not be evaluated until
-`my-app.js` is dynamically imported.
+如果 `import('./my-app.js')` 是静态的 `import './my-app.js'`，那么应用程序将在 `http-to-https` 钩子注册之前 _已经_ 被加载。这是由于 ES 模块规范，其中静态导入首先从树的叶子开始评估，然后回到主干。`my-app.js` 内部 _可能有_ 静态导入，这些导入在 `my-app.js` 被动态导入之前不会被评估。
 
-If synchronous hooks are used, both `import`, `require` and user `require` created
-using `createRequire()` are supported.
+如果使用同步钩子，则 `import`、`require` 和使用 `createRequire()` 创建的用户 `require` 都受支持。
 
 ```mjs
 import { registerHooks, createRequire } from 'node:module';
 
-registerHooks({ /* implementation of synchronous hooks */ });
+registerHooks({ /* 同步钩子的实现 */ });
 
 const require = createRequire(import.meta.url);
 
-// The synchronous hooks affect import, require() and user require() function
-// created through createRequire().
+// 同步钩子影响 import、require() 以及通过 createRequire() 创建的用户 require() 函数。
 await import('./my-app.js');
 require('./my-app-2.js');
 ```
@@ -712,28 +588,25 @@ require('./my-app-2.js');
 const { register, registerHooks } = require('node:module');
 const { pathToFileURL } = require('node:url');
 
-registerHooks({ /* implementation of synchronous hooks */ });
+registerHooks({ /* 同步钩子的实现 */ });
 
 const userRequire = createRequire(__filename);
 
-// The synchronous hooks affect import, require() and user require() function
-// created through createRequire().
+// 同步钩子影响 import、require() 以及通过 createRequire() 创建的用户 require() 函数。
 import('./my-app.js');
 require('./my-app-2.js');
 userRequire('./my-app-3.js');
 ```
 
-Finally, if all you want to do is register hooks before your app runs and you
-don't want to create a separate file for that purpose, you can pass a `data:`
-URL to `--import`:
+最后，如果您只想在应用程序运行之前注册钩子，并且不想为此目的创建单独的文件，可以将 `data:` URL 传递给 `--import`：
 
 ```bash
 node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("http-to-https", pathToFileURL("./"));' ./my-app.js
 ```
 
-### Chaining
+### 链式调用
 
-It's possible to call `register` more than once:
+可以多次调用 `register`：
 
 ```mjs
 // entrypoint.mjs
@@ -755,34 +628,24 @@ register('./bar.mjs', parentURL);
 import('./my-app.mjs');
 ```
 
-In this example, the registered hooks will form chains. These chains run
-last-in, first out (LIFO). If both `foo.mjs` and `bar.mjs` define a `resolve`
-hook, they will be called like so (note the right-to-left):
-node's default ← `./foo.mjs` ← `./bar.mjs`
-(starting with `./bar.mjs`, then `./foo.mjs`, then the Node.js default).
-The same applies to all the other hooks.
+在此示例中，注册的钩子将形成链。这些链以后进先出（LIFO）的方式运行。如果 `foo.mjs` 和 `bar.mjs` 都定义了一个 `resolve` 钩子，它们将被这样调用（注意从右到左）：
+Node.js 默认 ← `./foo.mjs` ← `./bar.mjs`
+（从 `./bar.mjs` 开始，然后是 `./foo.mjs`，然后是 Node.js 默认值）。
+所有其他钩子也是如此。
 
-The registered hooks also affect `register` itself. In this example,
-`bar.mjs` will be resolved and loaded via the hooks registered by `foo.mjs`
-(because `foo`'s hooks will have already been added to the chain). This allows
-for things like writing hooks in non-JavaScript languages, so long as
-earlier registered hooks transpile into JavaScript.
+注册的钩子也会影响 `register` 本身。在此示例中，`bar.mjs` 将通过 `foo.mjs` 注册的钩子进行解析和加载（因为 `foo` 的钩子将已经被添加到链中）。这允许实现诸如用非 JavaScript 语言编写钩子等功能，只要先前注册的钩子能够将其转译为 JavaScript。
 
-The `register` method cannot be called from within the module that defines the
-hooks.
+不能在定义钩子的模块内部调用 `register` 方法。
 
-Chaining of `registerHooks` work similarly. If synchronous and asynchronous
-hooks are mixed, the synchronous hooks are always run first before the asynchronous
-hooks start running, that is, in the last synchronous hook being run, its next
-hook includes invocation of the asynchronous hooks.
+`registerHooks` 的链式调用工作方式类似。如果混合使用同步和异步钩子，同步钩子总是在异步钩子开始运行之前首先运行，也就是说，在最后一个运行的同步钩子中，其下一个钩子包括异步钩子的调用。
 
 ```mjs
 // entrypoint.mjs
 import { registerHooks } from 'node:module';
 
-const hook1 = { /* implementation of hooks */ };
-const hook2 = { /* implementation of hooks */ };
-// hook2 run before hook1.
+const hook1 = { /* 钩子的实现 */ };
+const hook2 = { /* 钩子的实现 */ };
+// hook2 在 hook1 之前运行。
 registerHooks(hook1);
 registerHooks(hook2);
 ```
@@ -791,29 +654,24 @@ registerHooks(hook2);
 // entrypoint.cjs
 const { registerHooks } = require('node:module');
 
-const hook1 = { /* implementation of hooks */ };
-const hook2 = { /* implementation of hooks */ };
-// hook2 run before hook1.
+const hook1 = { /* 钩子的实现 */ };
+const hook2 = { /* 钩子的实现 */ };
+// hook2 在 hook1 之前运行。
 registerHooks(hook1);
 registerHooks(hook2);
 ```
 
-### Communication with module customization hooks
+### 与模块自定义钩子的通信
 
-Asynchronous hooks run on a dedicated thread, separate from the main
-thread that runs application code. This means mutating global variables won't
-affect the other thread(s), and message channels must be used to communicate
-between the threads.
+异步钩子在专用线程上运行，与运行应用程序代码的主线程分离。这意味着改变全局变量不会影响其他线程，并且必须使用消息通道在线程之间进行通信。
 
-The `register` method can be used to pass data to an [`initialize`][] hook. The
-data passed to the hook may include transferable objects like ports.
+`register` 方法可用于将数据传递给 [`initialize`][] 钩子。传递给钩子的数据可能包括可传输对象，如端口。
 
 ```mjs
 import { register } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
 
-// This example demonstrates how a message channel can be used to
-// communicate with the hooks, by sending `port2` to the hooks.
+// 此示例演示了如何使用消息通道与钩子通信，通过将 `port2` 发送给钩子。
 const { port1, port2 } = new MessageChannel();
 
 port1.on('message', (msg) => {
@@ -833,8 +691,7 @@ const { register } = require('node:module');
 const { pathToFileURL } = require('node:url');
 const { MessageChannel } = require('node:worker_threads');
 
-// This example showcases how a message channel can be used to
-// communicate with the hooks, by sending `port2` to the hooks.
+// 此示例展示了如何使用消息通道与钩子通信，通过将 `port2` 发送给钩子。
 const { port1, port2 } = new MessageChannel();
 
 port1.on('message', (msg) => {
@@ -849,39 +706,31 @@ register('./my-hooks.mjs', {
 });
 ```
 
-Synchronous module hooks are run on the same thread where the application code is
-run. They can directly mutate the globals of the context accessed by the main thread.
+同步模块钩子在运行应用程序代码的同一线程上运行。它们可以直接改变主线程访问的上下文的全局变量。
 
-### Hooks
+### 钩子
 
-#### Asynchronous hooks accepted by `module.register()`
+#### `module.register()` 接受的异步钩子
 
-The [`register`][] method can be used to register a module that exports a set of
-hooks. The hooks are functions that are called by Node.js to customize the
-module resolution and loading process. The exported functions must have specific
-names and signatures, and they must be exported as named exports.
+[`register`][] 方法可用于注册一个导出一组钩子的模块。这些钩子是 Node.js 为自定义模块解析和加载过程而调用的函数。导出的函数必须具有特定的名称和签名，并且必须作为命名导出。
 
 ```mjs
 export async function initialize({ number, port }) {
-  // Receives data from `register`.
+  // 从 `register` 接收数据。
 }
 
 export async function resolve(specifier, context, nextResolve) {
-  // Take an `import` or `require` specifier and resolve it to a URL.
+  // 获取 `import` 或 `require` 说明符并将其解析为 URL。
 }
 
 export async function load(url, context, nextLoad) {
-  // Take a resolved URL and return the source code to be evaluated.
+  // 获取已解析的 URL 并返回要评估的源代码。
 }
 ```
 
-Asynchronous hooks are run in a separate thread, isolated from the main thread where
-application code runs. That means it is a different [realm][]. The hooks thread
-may be terminated by the main thread at any time, so do not depend on
-asynchronous operations (like `console.log`) to complete. They are inherited into
-child workers by default.
+异步钩子在单独的线程中运行，与运行应用程序代码的主线程隔离。这意味着它是一个不同的 [领域][]。主线程可能随时终止钩子线程，因此不要依赖异步操作（如 `console.log`）完成。默认情况下，它们会被继承到子工作线程中。
 
-#### Synchronous hooks accepted by `module.registerHooks()`
+#### `module.registerHooks()` 接受的同步钩子
 
 <!-- YAML
 added:
@@ -891,43 +740,28 @@ added:
 
 > Stability: 1.1 - Active development
 
-The `module.registerHooks()` method accepts synchronous hook functions.
-`initialize()` is not supported nor necessary, as the hook implementer
-can simply run the initialization code directly before the call to
-`module.registerHooks()`.
+`module.registerHooks()` 方法接受同步钩子函数。
+不支持也不需要 `initialize()`，因为钩子实现者可以在调用 `module.registerHooks()` 之前直接运行初始化代码。
 
 ```mjs
 function resolve(specifier, context, nextResolve) {
-  // Take an `import` or `require` specifier and resolve it to a URL.
+  // 获取 `import` 或 `require` 说明符并将其解析为 URL。
 }
 
 function load(url, context, nextLoad) {
-  // Take a resolved URL and return the source code to be evaluated.
+  // 获取已解析的 URL 并返回要评估的源代码。
 }
 ```
 
-Synchronous hooks are run in the same thread and the same [realm][] where the modules
-are loaded. Unlike the asynchronous hooks they are not inherited into child worker
-threads by default, though if the hooks are registered using a file preloaded by
-[`--import`][] or [`--require`][], child worker threads can inherit the preloaded scripts
-via `process.execArgv` inheritance. See [the documentation of `Worker`][] for detail.
+同步钩子在加载模块的同一线程和同一 [领域][] 中运行。与异步钩子不同，默认情况下它们不会被继承到子工作线程中，但如果钩子是使用 [`--import`][] 或 [`--require`][] 预加载的文件注册的，子工作线程可以通过 `process.execArgv` 继承预加载的脚本。有关详细信息，请参见 [`Worker` 的文档][]。
 
-In synchronous hooks, users can expect `console.log()` to complete in the same way that
-they expect `console.log()` in module code to complete.
+在同步钩子中，用户可以期望 `console.log()` 以与模块代码中的 `console.log()` 相同的方式完成。
 
-#### Conventions of hooks
+#### 钩子的约定
 
-Hooks are part of a [chain][], even if that chain consists of only one
-custom (user-provided) hook and the default hook, which is always present. Hook
-functions nest: each one must always return a plain object, and chaining happens
-as a result of each function calling `next<hookName>()`, which is a reference to
-the subsequent loader's hook (in LIFO order).
+钩子是 [链][] 的一部分，即使该链仅包含一个自定义（用户提供）钩子和始终存在的默认钩子。钩子函数是嵌套的：每个函数必须始终返回一个普通对象，而链式调用是每个函数调用 `next<hookName>()` 的结果，这是对后续加载器钩子（按 LIFO 顺序）的引用。
 
-A hook that returns a value lacking a required property triggers an exception. A
-hook that returns without calling `next<hookName>()` _and_ without returning
-`shortCircuit: true` also triggers an exception. These errors are to help
-prevent unintentional breaks in the chain. Return `shortCircuit: true` from a
-hook to signal that the chain is intentionally ending at your hook.
+返回缺少必需属性的值的钩子会触发异常。返回而不调用 `next<hookName>()` _且_ 不返回 `shortCircuit: true` 的钩子也会触发异常。这些错误是为了防止链无意中断开。从钩子返回 `shortCircuit: true` 以表示链有意在您的钩子处结束。
 
 #### `initialize()`
 
@@ -939,22 +773,15 @@ added:
 
 > Stability: 1.2 - Release candidate
 
-* `data` {any} The data from `register(loader, import.meta.url, { data })`.
+* `data` {any} 来自 `register(loader, import.meta.url, { data })` 的数据。
 
-The `initialize` hook is only accepted by [`register`][]. `registerHooks()` does
-not support nor need it since initialization done for synchronous hooks can be run
-directly before the call to `registerHooks()`.
+`initialize` 钩子仅被 [`register`][] 接受。`registerHooks()` 不支持也不需要它，因为同步钩子的初始化可以在调用 `registerHooks()` 之前直接运行。
 
-The `initialize` hook provides a way to define a custom function that runs in
-the hooks thread when the hooks module is initialized. Initialization happens
-when the hooks module is registered via [`register`][].
+`initialize` 钩子提供了一种定义自定义函数的方法，该函数在钩子模块初始化时在钩子线程中运行。初始化发生在通过 [`register`][] 注册钩子模块时。
 
-This hook can receive data from a [`register`][] invocation, including
-ports and other transferable objects. The return value of `initialize` can be a
-{Promise}, in which case it will be awaited before the main application thread
-execution resumes.
+此钩子可以从 [`register`][] 调用接收数据，包括端口和其他可传输对象。`initialize` 的返回值可以是 {Promise}，在这种情况下，主应用程序线程执行恢复之前将等待它。
 
-Module customization code:
+模块自定义代码：
 
 ```mjs
 // path-to-my-hooks.js
@@ -964,16 +791,14 @@ export async function initialize({ number, port }) {
 }
 ```
 
-Caller code:
+调用者代码：
 
 ```mjs
 import assert from 'node:assert';
 import { register } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
 
-// This example showcases how a message channel can be used to communicate
-// between the main (application) thread and the hooks running on the hooks
-// thread, by sending `port2` to the `initialize` hook.
+// 此示例展示了如何使用消息通道在主（应用程序）线程和运行在钩子线程上的钩子之间进行通信，通过将 `port2` 发送给 `initialize` 钩子。
 const { port1, port2 } = new MessageChannel();
 
 port1.on('message', (msg) => {
@@ -994,9 +819,7 @@ const { register } = require('node:module');
 const { pathToFileURL } = require('node:url');
 const { MessageChannel } = require('node:worker_threads');
 
-// This example showcases how a message channel can be used to communicate
-// between the main (application) thread and the hooks running on the hooks
-// thread, by sending `port2` to the `initialize` hook.
+// 此示例展示了如何使用消息通道在主（应用程序）线程和运行在钩子线程上的钩子之间进行通信，通过将 `port2` 发送给 `initialize` 钩子。
 const { port1, port2 } = new MessageChannel();
 
 port1.on('message', (msg) => {
@@ -1044,67 +867,39 @@ changes:
 
 * `specifier` {string}
 * `context` {Object}
-  * `conditions` {string\[]} Export conditions of the relevant `package.json`
-  * `importAttributes` {Object} An object whose key-value pairs represent the
-    attributes for the module to import
-  * `parentURL` {string|undefined} The module importing this one, or undefined
-    if this is the Node.js entry point
-* `nextResolve` {Function} The subsequent `resolve` hook in the chain, or the
-  Node.js default `resolve` hook after the last user-supplied `resolve` hook
+  * `conditions` {string\[]} 相关 `package.json` 的导出条件
+  * `importAttributes` {Object} 一个对象，其键值对表示要导入模块的属性
+  * `parentURL` {string|undefined} 导入此模块的模块，如果这是 Node.js 入口点，则为 undefined
+* `nextResolve` {Function} 链中的下一个 `resolve` 钩子，或者是最后一个用户提供的 `resolve` 钩子之后的 Node.js 默认 `resolve` 钩子
   * `specifier` {string}
-  * `context` {Object|undefined} When omitted, the defaults are provided. When provided, defaults
-    are merged in with preference to the provided properties.
-* Returns: {Object|Promise} The asynchronous version takes either an object containing the
-  following properties, or a `Promise` that will resolve to such an object. The
-  synchronous version only accepts an object returned synchronously.
-  * `format` {string|null|undefined} A hint to the `load` hook (it might be ignored). It can be a
-    module format (such as `'commonjs'` or `'module'`) or an arbitrary value like `'css'` or
-    `'yaml'`.
-  * `importAttributes` {Object|undefined} The import attributes to use when
-    caching the module (optional; if excluded the input will be used)
-  * `shortCircuit` {undefined|boolean} A signal that this hook intends to
-    terminate the chain of `resolve` hooks. **Default:** `false`
-  * `url` {string} The absolute URL to which this input resolves
+  * `context` {Object|undefined} 如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。
+* 返回: {Object|Promise} 异步版本接受包含以下属性的对象，或者将解析为此类对象的 `Promise`。同步版本仅接受同步返回的对象。
+  * `format` {string|null|undefined} 给 `load` 钩子的提示（可能会被忽略）。它可以是模块格式（如 `'commonjs'` 或 `'module'`）或任意值，如 `'css'` 或 `'yaml'`。
+  * `importAttributes` {Object|undefined} 缓存模块时要使用的导入属性（可选；如果省略，将使用输入值）
+  * `shortCircuit` {undefined|boolean} 表示此钩子意图终止 `resolve` 钩子链的信号。**默认值:** `false`
+  * `url` {string} 此输入解析到的绝对 URL
 
-> **Warning** In the case of the asynchronous version, despite support for returning
-> promises and async functions, calls to `resolve` may still block the main thread which
-> can impact performance.
+> **警告** 对于异步版本，尽管支持返回 promise 和 async 函数，但调用 `resolve` 仍可能阻塞主线程，从而影响性能。
 
-The `resolve` hook chain is responsible for telling Node.js where to find and
-how to cache a given `import` statement or expression, or `require` call. It can
-optionally return a format (such as `'module'`) as a hint to the `load` hook. If
-a format is specified, the `load` hook is ultimately responsible for providing
-the final `format` value (and it is free to ignore the hint provided by
-`resolve`); if `resolve` provides a `format`, a custom `load` hook is required
-even if only to pass the value to the Node.js default `load` hook.
+`resolve` 钩子链负责告诉 Node.js 在哪里找到以及如何缓存给定的 `import` 语句或表达式，或 `require` 调用。它可以可选地返回一个格式（如 `'module'`）作为给 `load` 钩子的提示。如果指定了格式，`load` 钩子最终负责提供最终的 `format` 值（并且可以自由忽略 `resolve` 提供的提示）；如果 `resolve` 提供了 `format`，则即使仅为了将值传递给 Node.js 默认 `load` 钩子，也需要自定义 `load` 钩子。
 
-Import type attributes are part of the cache key for saving loaded modules into
-the internal module cache. The `resolve` hook is responsible for returning an
-`importAttributes` object if the module should be cached with different
-attributes than were present in the source code.
+导入类型属性是用于将已加载模块保存到内部模块缓存的缓存键的一部分。如果模块应使用与源代码中存在的属性不同的属性进行缓存，则 `resolve` 钩子负责返回一个 `importAttributes` 对象。
 
-The `conditions` property in `context` is an array of conditions that will be used
-to match [package exports conditions][Conditional exports] for this resolution
-request. They can be used for looking up conditional mappings elsewhere or to
-modify the list when calling the default resolution logic.
+`context` 中的 `conditions` 属性是一个条件数组，将用于匹配此解析请求的 [包导出条件][条件导出]。它们可用于在其他地方查找条件映射，或在调用默认解析逻辑时修改列表。
 
-The current [package exports conditions][Conditional exports] are always in
-the `context.conditions` array passed into the hook. To guarantee _default
-Node.js module specifier resolution behavior_ when calling `defaultResolve`, the
-`context.conditions` array passed to it _must_ include _all_ elements of the
-`context.conditions` array originally passed into the `resolve` hook.
+当前的 [包导出条件][条件导出] 始终在传递给钩子的 `context.conditions` 数组中。为了在调用 `defaultResolve` 时保证 _默认的 Node.js 模块说明符解析行为_，传递给它的 `context.conditions` 数组 _必须_ 包含最初传递给 `resolve` 钩子的 `context.conditions` 数组的 _所有_ 元素。
 
 <!-- TODO(joyeecheung): Math.random() is a bit too contrived. At least do a
 find-and-replace mangling on the URLs. -->
 
 ```mjs
-// Asynchronous version accepted by module.register().
+// module.register() 接受的异步版本。
 export async function resolve(specifier, context, nextResolve) {
   const { parentURL = null } = context;
 
-  if (Math.random() > 0.5) { // Some condition.
-    // For some or all specifiers, do some custom logic for resolving.
-    // Always return an object of the form {url: <string>}.
+  if (Math.random() > 0.5) { // 某个条件。
+    // 对于部分或所有说明符，执行一些自定义的解析逻辑。
+    // 始终返回 {url: <string>} 形式的对象。
     return {
       shortCircuit: true,
       url: parentURL ?
@@ -1113,26 +908,23 @@ export async function resolve(specifier, context, nextResolve) {
     };
   }
 
-  if (Math.random() < 0.5) { // Another condition.
-    // When calling `defaultResolve`, the arguments can be modified. In this
-    // case it's adding another value for matching conditional exports.
+  if (Math.random() < 0.5) { // 另一个条件。
+    // 当调用 `defaultResolve` 时，可以修改参数。在这种情况下，它添加了另一个用于匹配条件导出的值。
     return nextResolve(specifier, {
       ...context,
       conditions: [...context.conditions, 'another-condition'],
     });
   }
 
-  // Defer to the next hook in the chain, which would be the
-  // Node.js default resolve if this is the last user-specified loader.
+  // 推迟到链中的下一个钩子，如果这是最后一个用户指定的加载器，则将是 Node.js 默认解析钩子。
   return nextResolve(specifier);
 }
 ```
 
 ```mjs
-// Synchronous version accepted by module.registerHooks().
+// module.registerHooks() 接受的同步版本。
 function resolve(specifier, context, nextResolve) {
-  // Similar to the asynchronous resolve() above, since that one does not have
-  // any asynchronous logic.
+  // 类似于上面的异步 resolve()，因为该版本没有任何异步逻辑。
 }
 ```
 
@@ -1160,82 +952,53 @@ changes:
       its return.
 -->
 
-* `url` {string} The URL returned by the `resolve` chain
+* `url` {string} `resolve` 链返回的 URL
 * `context` {Object}
-  * `conditions` {string\[]} Export conditions of the relevant `package.json`
-  * `format` {string|null|undefined} The format optionally supplied by the
-    `resolve` hook chain. This can be any string value as an input; input values do not need to
-    conform to the list of acceptable return values described below.
+  * `conditions` {string\[]} 相关 `package.json` 的导出条件
+  * `format` {string|null|undefined} `resolve` 钩子链可选提供的格式。这可以是任何字符串值作为输入；输入值不需要符合下面描述的可接受返回值列表。
   * `importAttributes` {Object}
-* `nextLoad` {Function} The subsequent `load` hook in the chain, or the
-  Node.js default `load` hook after the last user-supplied `load` hook
+* `nextLoad` {Function} 链中的下一个 `load` 钩子，或者是最后一个用户提供的 `load` 钩子之后的 Node.js 默认 `load` 钩子
   * `url` {string}
-  * `context` {Object|undefined} When omitted, defaults are provided. When provided, defaults are
-    merged in with preference to the provided properties. In the default `nextLoad`, if
-    the module pointed to by `url` does not have explicit module type information,
-    `context.format` is mandatory.
+  * `context` {Object|undefined} 如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。在默认的 `nextLoad` 中，如果 `url` 指向的模块没有显式的模块类型信息，则 `context.format` 是强制性的。
     <!-- TODO(joyeecheung): make it at least optionally non-mandatory by allowing
          JS-style/TS-style module detection when the format is simply unknown -->
-* Returns: {Object|Promise} The asynchronous version takes either an object containing the
-  following properties, or a `Promise` that will resolve to such an object. The
-  synchronous version only accepts an object returned synchronously.
+* 返回: {Object|Promise} 异步版本接受包含以下属性的对象，或者将解析为此类对象的 `Promise`。同步版本仅接受同步返回的对象。
   * `format` {string}
-  * `shortCircuit` {undefined|boolean} A signal that this hook intends to
-    terminate the chain of `load` hooks. **Default:** `false`
-  * `source` {string|ArrayBuffer|TypedArray} The source for Node.js to evaluate
+  * `shortCircuit` {undefined|boolean} 表示此钩子意图终止 `load` 钩子链的信号。**默认值:** `false`
+  * `source` {string|ArrayBuffer|TypedArray} 供 Node.js 评估的源代码
 
-The `load` hook provides a way to define a custom method of determining how a
-URL should be interpreted, retrieved, and parsed. It is also in charge of
-validating the import attributes.
+`load` 钩子提供了一种自定义方法来解释、检索和解析 URL。它还负责验证导入属性。
 
-The final value of `format` must be one of the following:
+`format` 的最终值必须是以下之一：
 
-| `format`                | Description                                           | Acceptable types for `source` returned by `load`   |
+| `format`                | 描述                                           | `load` 返回的 `source` 可接受类型           |
 | ----------------------- | ----------------------------------------------------- | -------------------------------------------------- |
-| `'addon'`               | Load a Node.js addon                                  | {null}                                             |
-| `'builtin'`             | Load a Node.js builtin module                         | {null}                                             |
-| `'commonjs-typescript'` | Load a Node.js CommonJS module with TypeScript syntax | {string\|ArrayBuffer\|TypedArray\|null\|undefined} |
-| `'commonjs'`            | Load a Node.js CommonJS module                        | {string\|ArrayBuffer\|TypedArray\|null\|undefined} |
-| `'json'`                | Load a JSON file                                      | {string\|ArrayBuffer\|TypedArray}                  |
-| `'module-typescript'`   | Load an ES module with TypeScript syntax              | {string\|ArrayBuffer\|TypedArray}                  |
-| `'module'`              | Load an ES module                                     | {string\|ArrayBuffer\|TypedArray}                  |
-| `'wasm'`                | Load a WebAssembly module                             | {ArrayBuffer\|TypedArray}                          |
+| `'addon'`               | 加载 Node.js 插件                                  | {null}                                             |
+| `'builtin'`             | 加载 Node.js 内置模块                         | {null}                                             |
+| `'commonjs-typescript'` | 加载具有 TypeScript 语法的 Node.js CommonJS 模块 | {string\|ArrayBuffer\|TypedArray\|null\|undefined} |
+| `'commonjs'`            | 加载 Node.js CommonJS 模块                        | {string\|ArrayBuffer\|TypedArray\|null\|undefined} |
+| `'json'`                | 加载 JSON 文件                                      | {string\|ArrayBuffer\|TypedArray}                  |
+| `'module-typescript'`   | 加载具有 TypeScript 语法的 ES 模块              | {string\|ArrayBuffer\|TypedArray}                  |
+| `'module'`              | 加载 ES 模块                                     | {string\|ArrayBuffer\|TypedArray}                  |
+| `'wasm'`                | 加载 WebAssembly 模块                             | {ArrayBuffer\|TypedArray}                          |
 
-The value of `source` is ignored for type `'builtin'` because currently it is
-not possible to replace the value of a Node.js builtin (core) module.
+对于类型 `'builtin'`，`source` 的值被忽略，因为目前无法替换 Node.js 内置（核心）模块的值。
 
-##### Caveat in the asynchronous `load` hook
+##### 异步 `load` 钩子的注意事项
 
-When using the asynchronous `load` hook, omitting vs providing a `source` for
-`'commonjs'` has very different effects:
+当使用异步 `load` 钩子时，对于 `'commonjs'` 省略 `source` 与提供 `source` 有非常不同的效果：
 
-* When a `source` is provided, all `require` calls from this module will be
-  processed by the ESM loader with registered `resolve` and `load` hooks; all
-  `require.resolve` calls from this module will be processed by the ESM loader
-  with registered `resolve` hooks; only a subset of the CommonJS API will be
-  available (e.g. no `require.extensions`, no `require.cache`, no
-  `require.resolve.paths`) and monkey-patching on the CommonJS module loader
-  will not apply.
-* If `source` is undefined or `null`, it will be handled by the CommonJS module
-  loader and `require`/`require.resolve` calls will not go through the
-  registered hooks. This behavior for nullish `source` is temporary — in the
-  future, nullish `source` will not be supported.
+* 当提供了 `source` 时，此模块的所有 `require` 调用将由具有注册的 `resolve` 和 `load` 钩子的 ESM 加载器处理；此模块的所有 `require.resolve` 调用将由具有注册的 `resolve` 钩子的 ESM 加载器处理；只有一部分 CommonJS API 可用（例如，没有 `require.extensions`，没有 `require.cache`，没有 `require.resolve.paths`），并且对 CommonJS 模块加载器的猴子补丁将不适用。
+* 如果 `source` 是 undefined 或 `null`，它将由 CommonJS 模块加载器处理，并且 `require`/`require.resolve` 调用不会经过注册的钩子。对于空值 `source` 的此行为是临时的——将来，将不支持空值 `source`。
 
-These caveats do not apply to the synchronous `load` hook, in which case
-the complete set of CommonJS APIs available to the customized CommonJS
-modules, and `require`/`require.resolve` always go through the registered
-hooks.
+这些注意事项不适用于同步 `load` 钩子，在这种情况下，自定义 CommonJS 模块可用的完整 CommonJS API 集，并且 `require`/`require.resolve` 总是经过注册的钩子。
 
-The Node.js internal asynchronous `load` implementation, which is the value of `next` for the
-last hook in the `load` chain, returns `null` for `source` when `format` is
-`'commonjs'` for backward compatibility. Here is an example hook that would
-opt-in to using the non-default behavior:
+Node.js 内部的异步 `load` 实现（作为链中最后一个钩子的 `next` 的值）在 `format` 为 `'commonjs'` 时为了向后兼容性返回 `null` 作为 `source`。以下是一个钩子示例，它将选择使用非默认行为：
 
 ```mjs
 import { readFile } from 'node:fs/promises';
 
-// Asynchronous version accepted by module.register(). This fix is not needed
-// for the synchronous version accepted by module.registerHooks().
+// module.register() 接受的异步版本。对于 module.registerHooks() 接受的同步版本不需要此修复。
 export async function load(url, context, nextLoad) {
   const result = await nextLoad(url, context);
   if (result.format === 'commonjs') {
@@ -1245,40 +1008,31 @@ export async function load(url, context, nextLoad) {
 }
 ```
 
-This doesn't apply to the synchronous `load` hook either, in which case the
-`source` returned contains source code loaded by the next hook, regardless
-of module format.
+这也不适用于同步 `load` 钩子，在这种情况下，返回的 `source` 包含下一个钩子加载的源代码，无论模块格式如何。
 
-> **Warning**: The asynchronous `load` hook and namespaced exports from CommonJS
-> modules are incompatible. Attempting to use them together will result in an empty
-> object from the import. This may be addressed in the future. This does not apply
-> to the synchronous `load` hook, in which case exports can be used as usual.
+> **警告**：异步 `load` 钩子和来自 CommonJS 模块的命名空间导出不兼容。尝试同时使用它们将导致导入返回空对象。这可能在将来得到解决。这不适用于同步 `load` 钩子，在这种情况下，可以正常使用导出。
 
-> These types all correspond to classes defined in ECMAScript.
+> 这些类型都对应于 ECMAScript 中定义的类。
 
-* The specific {ArrayBuffer} object is a {SharedArrayBuffer}.
-* The specific {TypedArray} object is a {Uint8Array}.
+* 特定的 {ArrayBuffer} 对象是 {SharedArrayBuffer}。
+* 特定的 {TypedArray} 对象是 {Uint8Array}。
 
-If the source value of a text-based format (i.e., `'json'`, `'module'`)
-is not a string, it is converted to a string using [`util.TextDecoder`][].
+如果基于文本的格式（即 `'json'`、`'module'`）的源值不是字符串，则使用 [`util.TextDecoder`][] 将其转换为字符串。
 
-The `load` hook provides a way to define a custom method for retrieving the
-source code of a resolved URL. This would allow a loader to potentially avoid
-reading files from disk. It could also be used to map an unrecognized format to
-a supported one, for example `yaml` to `module`.
+`load` 钩子提供了一种自定义检索已解析 URL 的源代码的方法。这将允许加载器潜在地避免从磁盘读取文件。它还可以用于将无法识别的格式映射到支持的格式，例如将 `yaml` 映射到 `module`。
 
 ```mjs
-// Asynchronous version accepted by module.register().
+// module.register() 接受的异步版本。
 export async function load(url, context, nextLoad) {
   const { format } = context;
 
-  if (Math.random() > 0.5) { // Some condition
+  if (Math.random() > 0.5) { // 某个条件
     /*
-      For some or all URLs, do some custom logic for retrieving the source.
-      Always return an object of the form {
+      对于部分或所有 URL，执行一些自定义的检索源代码的逻辑。
+      始终返回 {
         format: <string>,
         source: <string|buffer>,
-      }.
+      } 形式的对象。
     */
     return {
       format,
@@ -1287,43 +1041,34 @@ export async function load(url, context, nextLoad) {
     };
   }
 
-  // Defer to the next hook in the chain.
+  // 推迟到链中的下一个钩子。
   return nextLoad(url);
 }
 ```
 
 ```mjs
-// Synchronous version accepted by module.registerHooks().
+// module.registerHooks() 接受的同步版本。
 function load(url, context, nextLoad) {
-  // Similar to the asynchronous load() above, since that one does not have
-  // any asynchronous logic.
+  // 类似于上面的异步 load()，因为该版本没有任何异步逻辑。
 }
 ```
 
-In a more advanced scenario, this can also be used to transform an unsupported
-source to a supported one (see [Examples](#examples) below).
+在更高级的场景中，这也可以用于将不支持的源转换为支持的源（参见下面的 [示例](#示例)）。
 
-### Examples
+### 示例
 
-The various module customization hooks can be used together to accomplish
-wide-ranging customizations of the Node.js code loading and evaluation
-behaviors.
+各种模块自定义钩子可以一起使用，以实现对 Node.js 代码加载和评估行为的广泛自定义。
 
-#### Import from HTTPS
+#### 从 HTTPS 导入
 
-The hook below registers hooks to enable rudimentary support for such
-specifiers. While this may seem like a significant improvement to Node.js core
-functionality, there are substantial downsides to actually using these hooks:
-performance is much slower than loading files from disk, there is no caching,
-and there is no security.
+下面的钩子注册了钩子以启用对此类说明符的基本支持。虽然这似乎是对 Node.js 核心功能的重大改进，但实际上使用这些钩子存在明显的缺点：性能比从磁盘加载文件慢得多，没有缓存，也没有安全性。
 
 ```mjs
 // https-hooks.mjs
 import { get } from 'node:https';
 
 export function load(url, context, nextLoad) {
-  // For JavaScript to be loaded over the network, we need to fetch and
-  // return it.
+  // 对于要通过网络加载的 JavaScript，我们需要获取并返回它。
   if (url.startsWith('https://')) {
     return new Promise((resolve, reject) => {
       get(url, (res) => {
@@ -1331,8 +1076,7 @@ export function load(url, context, nextLoad) {
         res.setEncoding('utf8');
         res.on('data', (chunk) => data += chunk);
         res.on('end', () => resolve({
-          // This example assumes all network-provided JavaScript is ES module
-          // code.
+          // 此示例假设所有网络提供的 JavaScript 都是 ES 模块代码。
           format: 'module',
           shortCircuit: true,
           source: data,
@@ -1341,7 +1085,7 @@ export function load(url, context, nextLoad) {
     });
   }
 
-  // Let Node.js handle all other URLs.
+  // 让 Node.js 处理所有其他 URL。
   return nextLoad(url);
 }
 ```
@@ -1353,24 +1097,21 @@ import { VERSION } from 'https://coffeescript.org/browser-compiler-modern/coffee
 console.log(VERSION);
 ```
 
-With the preceding hooks module, running
+使用前面的钩子模块，运行
 `node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./https-hooks.mjs"));' ./main.mjs`
-prints the current version of CoffeeScript per the module at the URL in
-`main.mjs`.
+根据 `main.mjs` 中 URL 处的模块打印当前版本的 CoffeeScript。
 
 <!-- TODO(joyeecheung): add an example on how to implement it with a fetchSync based on
 workers and Atomics.wait() - or all these examples are too much to be put in the API
 documentation already and should be put into a repository instead? -->
 
-#### Transpilation
+#### 转译
 
-Sources that are in formats Node.js doesn't understand can be converted into
-JavaScript using the [`load` hook][load hook].
+Node.js 无法理解的格式的源代码可以使用 [`load` 钩子][load hook] 转换为 JavaScript。
 
-This is less performant than transpiling source files before running Node.js;
-transpiler hooks should only be used for development and testing purposes.
+这比在运行 Node.js 之前转译源文件性能更低；转译器钩子应仅用于开发和测试目的。
 
-##### Asynchronous version
+##### 异步版本
 
 ```mjs
 // coffeescript-hooks.mjs
@@ -1382,16 +1123,12 @@ const extensionsRegex = /\.(coffee|litcoffee|coffee\.md)$/;
 
 export async function load(url, context, nextLoad) {
   if (extensionsRegex.test(url)) {
-    // CoffeeScript files can be either CommonJS or ES modules. Use a custom format
-    // to tell Node.js not to detect its module type.
+    // CoffeeScript 文件可以是 CommonJS 或 ES 模块。使用自定义格式告诉 Node.js 不要检测其模块类型。
     const { source: rawSource } = await nextLoad(url, { ...context, format: 'coffee' });
-    // This hook converts CoffeeScript source code into JavaScript source code
-    // for all imported CoffeeScript files.
+    // 此钩子将所有导入的 CoffeeScript 文件的 CoffeeScript 源代码转换为 JavaScript 源代码。
     const transformedSource = coffeescript.compile(rawSource.toString(), url);
 
-    // To determine how Node.js would interpret the transpilation result,
-    // search up the file system for the nearest parent package.json file
-    // and read its "type" field.
+    // 为了确定 Node.js 将如何解释转译结果，请在文件系统中向上搜索最近的父 package.json 文件并读取其 "type" 字段。
     return {
       format: await getPackageType(url),
       shortCircuit: true,
@@ -1399,18 +1136,14 @@ export async function load(url, context, nextLoad) {
     };
   }
 
-  // Let Node.js handle all other URLs.
+  // 让 Node.js 处理所有其他 URL。
   return nextLoad(url, context);
 }
 
 async function getPackageType(url) {
-  // `url` is only a file path during the first iteration when passed the
-  // resolved url from the load() hook
-  // an actual file path from load() will contain a file extension as it's
-  // required by the spec
-  // this simple truthy check for whether `url` contains a file extension will
-  // work for most projects but does not cover some edge-cases (such as
-  // extensionless files or a url ending in a trailing space)
+  // `url` 仅在第一次迭代时是文件路径，当传递来自 load() 钩子的已解析 url 时
+  // 来自 load() 的实际文件路径将包含文件扩展名，因为规范要求如此
+  // 这个简单的检查 `url` 是否包含文件扩展名的真值检查对于大多数项目都有效，但不能涵盖一些边缘情况（例如无扩展名文件或以尾随空格结尾的 url）
   const pJson = findPackageJSON(url);
 
   return readFile(pJson, 'utf8')
@@ -1420,7 +1153,7 @@ async function getPackageType(url) {
 }
 ```
 
-##### Synchronous version
+##### 同步版本
 
 ```mjs
 // coffeescript-sync-hooks.mjs
@@ -1461,7 +1194,7 @@ function getPackageType(url) {
 registerHooks({ load });
 ```
 
-#### Running hooks
+#### 运行钩子
 
 ```coffee
 # main.coffee
@@ -1477,8 +1210,7 @@ console.log "Brought to you by Node.js version #{version}"
 export scream = (str) -> str.toUpperCase()
 ```
 
-For the sake of running the example, add a `package.json` file containing the
-module type of the CoffeeScript files.
+为了运行示例，添加一个包含 CoffeeScript 文件模块类型的 `package.json` 文件。
 
 ```json
 {
@@ -1486,28 +1218,18 @@ module type of the CoffeeScript files.
 }
 ```
 
-This is only for running the example. In real world loaders, `getPackageType()` must be
-able to return an `format` known to Node.js even in the absence of an explicit type in a
-`package.json`, or otherwise the `nextLoad` call would throw `ERR_UNKNOWN_FILE_EXTENSION`
-(if undefined) or `ERR_UNKNOWN_MODULE_FORMAT` (if it's not a known format listed in
-the [load hook][] documentation).
+这仅用于运行示例。在真实的加载器中，即使在没有 `package.json` 中显式类型的情况下，`getPackageType()` 也必须能够返回 Node.js 已知的 `format`，否则 `nextLoad` 调用将抛出 `ERR_UNKNOWN_FILE_EXTENSION`（如果为 undefined）或 `ERR_UNKNOWN_MODULE_FORMAT`（如果它不是 [load 钩子][] 文档中列出的已知格式）。
 
-With the preceding hooks modules, running
+使用前面的钩子模块，运行
 `node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./coffeescript-hooks.mjs"));' ./main.coffee`
-or `node --import ./coffeescript-sync-hooks.mjs ./main.coffee`
-causes `main.coffee` to be turned into JavaScript after its source code is
-loaded from disk but before Node.js executes it; and so on for any `.coffee`,
-`.litcoffee` or `.coffee.md` files referenced via `import` statements of any
-loaded file.
+或 `node --import ./coffeescript-sync-hooks.mjs ./main.coffee`
+会导致 `main.coffee` 在其源代码从磁盘加载后但在 Node.js 执行之前被转换为 JavaScript；对于任何通过任何加载文件的 `import` 语句引用的 `.coffee`、`.litcoffee` 或 `.coffee.md` 文件也是如此。
 
-#### Import maps
+#### 导入映射
 
-The previous two examples defined `load` hooks. This is an example of a
-`resolve` hook. This hooks module reads an `import-map.json` file that defines
-which specifiers to override to other URLs (this is a very simplistic
-implementation of a small subset of the "import maps" specification).
+前两个示例定义了 `load` 钩子。这是一个 `resolve` 钩子的示例。此钩子模块读取一个 `import-map.json` 文件，该文件定义了哪些说明符应覆盖到其他 URL（这是 "导入映射" 规范的一小部分子集的非常简单的实现）。
 
-##### Asynchronous version
+##### 异步版本
 
 ```mjs
 // import-map-hooks.js
@@ -1524,7 +1246,7 @@ export async function resolve(specifier, context, nextResolve) {
 }
 ```
 
-##### Synchronous version
+##### 同步版本
 
 ```mjs
 // import-map-sync-hooks.js
@@ -1544,9 +1266,9 @@ function resolve(specifier, context, nextResolve) {
 module.registerHooks({ resolve });
 ```
 
-##### Using the hooks
+##### 使用钩子
 
-With these files:
+使用这些文件：
 
 ```mjs
 // main.js
@@ -1567,11 +1289,11 @@ import 'a-module';
 console.log('some module!');
 ```
 
-Running `node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./import-map-hooks.js"));' main.js`
-or `node --import ./import-map-sync-hooks.js main.js`
-should print `some module!`.
+运行 `node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./import-map-hooks.js"));' main.js`
+或 `node --import ./import-map-sync-hooks.js main.js`
+应该打印 `some module!`。
 
-## Source Map Support
+## Source Map 支持
 
 <!-- YAML
 added:
@@ -1581,27 +1303,21 @@ added:
 
 > Stability: 1 - Experimental
 
-Node.js supports TC39 ECMA-426 [Source Map][] format (it was called Source map
-revision 3 format).
+Node.js 支持 TC39 ECMA-426 [Source Map][] 格式（以前称为 Source map revision 3 格式）。
 
-The APIs in this section are helpers for interacting with the source map
-cache. This cache is populated when source map parsing is enabled and
-[source map include directives][] are found in a modules' footer.
+本节中的 API 是与 source map 缓存交互的辅助工具。当启用 source map 解析并且在模块的页脚中找到 [source map include directives][] 时，将填充此缓存。
 
-To enable source map parsing, Node.js must be run with the flag
-[`--enable-source-maps`][], or with code coverage enabled by setting
-[`NODE_V8_COVERAGE=dir`][], or be enabled programmatically via
-[`module.setSourceMapsSupport()`][].
+要启用 source map 解析，必须使用标志 [`--enable-source-maps`][] 运行 Node.js，或者通过设置 [`NODE_V8_COVERAGE=dir`][] 启用代码覆盖，或者通过 [`module.setSourceMapsSupport()`][] 以编程方式启用。
 
 ```mjs
 // module.mjs
-// In an ECMAScript module
+// 在 ECMAScript 模块中
 import { findSourceMap, SourceMap } from 'node:module';
 ```
 
 ```cjs
 // module.cjs
-// In a CommonJS module
+// 在 CommonJS 模块中
 const { findSourceMap, SourceMap } = require('node:module');
 ```
 
@@ -1613,13 +1329,12 @@ added:
   - v22.14.0
 -->
 
-* Returns: {Object}
-  * `enabled` {boolean} If the source maps support is enabled
-  * `nodeModules` {boolean} If the support is enabled for files in `node_modules`.
-  * `generatedCode` {boolean} If the support is enabled for generated code from `eval` or `new Function`.
+* 返回: {Object}
+  * `enabled` {boolean} 是否启用了 source maps 支持
+  * `nodeModules` {boolean} 是否为 `node_modules` 中的文件启用了支持。
+  * `generatedCode` {boolean} 是否为来自 `eval` 或 `new Function` 的生成代码启用了支持。
 
-This method returns whether the [Source Map v3][Source Map] support for stack
-traces is enabled.
+此方法返回是否启用于堆栈跟踪的 [Source Map v3][Source Map] 支持。
 
 <!-- Anchors to make sure old links find a target -->
 
@@ -1634,11 +1349,9 @@ added:
 -->
 
 * `path` {string}
-* Returns: {module.SourceMap|undefined} Returns `module.SourceMap` if a source
-  map is found, `undefined` otherwise.
+* 返回: {module.SourceMap|undefined} 如果找到 source map 则返回 `module.SourceMap`，否则返回 `undefined`。
 
-`path` is the resolved path for the file for which a corresponding source map
-should be fetched.
+`path` 是应获取对应 source map 的文件的已解析路径。
 
 ### `module.setSourceMapsSupport(enabled[, options])`
 
@@ -1648,26 +1361,18 @@ added:
   - v22.14.0
 -->
 
-* `enabled` {boolean} Enable the source map support.
-* `options` {Object} Optional
-  * `nodeModules` {boolean} If enabling the support for files in
-    `node_modules`. **Default:** `false`.
-  * `generatedCode` {boolean} If enabling the support for generated code from
-    `eval` or `new Function`. **Default:** `false`.
+* `enabled` {boolean} 启用 source map 支持。
+* `options` {Object} 可选
+  * `nodeModules` {boolean} 是否为 `node_modules` 中的文件启用支持。**默认值:** `false`。
+  * `generatedCode` {boolean} 是否为来自 `eval` 或 `new Function` 的生成代码启用支持。**默认值:** `false`。
 
-This function enables or disables the [Source Map v3][Source Map] support for
-stack traces.
+此函数启用或禁用用于堆栈跟踪的 [Source Map v3][Source Map] 支持。
 
-It provides same features as launching Node.js process with commandline options
-`--enable-source-maps`, with additional options to alter the support for files
-in `node_modules` or generated codes.
+它提供了与使用命令行选项 `--enable-source-maps` 启动 Node.js 进程相同的功能，并附加了用于改变对 `node_modules` 中文件或生成代码的支持的选项。
 
-Only source maps in JavaScript files that are loaded after source maps has been
-enabled will be parsed and loaded. Preferably, use the commandline options
-`--enable-source-maps` to avoid losing track of source maps of modules loaded
-before this API call.
+只有在启用 source maps 后加载的 JavaScript 文件中的 source maps 才会被解析和加载。最好使用命令行选项 `--enable-source-maps` 以避免丢失在此 API 调用之前加载的模块的 source maps。
 
-### Class: `module.SourceMap`
+### 类: `module.SourceMap`
 
 <!-- YAML
 added:
@@ -1687,9 +1392,9 @@ changes:
 * `payload` {Object}
 * `lineLengths` {number\[]}
 
-Creates a new `sourceMap` instance.
+创建一个新的 `sourceMap` 实例。
 
-`payload` is an object with keys matching the [Source map format][]:
+`payload` 是一个对象，其键与 [Source map 格式][] 匹配：
 
 * `file` {string}
 * `version` {number}
@@ -1699,50 +1404,34 @@ Creates a new `sourceMap` instance.
 * `mappings` {string}
 * `sourceRoot` {string}
 
-`lineLengths` is an optional array of the length of each line in the
-generated code.
+`lineLengths` 是一个可选数组，表示生成代码中每行的长度。
 
 #### `sourceMap.payload`
 
-* Returns: {Object}
+* 返回: {Object}
 
-Getter for the payload used to construct the [`SourceMap`][] instance.
+获取用于构造 [`SourceMap`][] 实例的有效负载。
 
 #### `sourceMap.findEntry(lineOffset, columnOffset)`
 
-* `lineOffset` {number} The zero-indexed line number offset in
-  the generated source
-* `columnOffset` {number} The zero-indexed column number offset
-  in the generated source
-* Returns: {Object}
+* `lineOffset` {number} 生成源文件中的从零开始的行号偏移量
+* `columnOffset` {number} 生成源文件中的从零开始的列号偏移量
+* 返回: {Object}
 
-Given a line offset and column offset in the generated source
-file, returns an object representing the SourceMap range in the
-original file if found, or an empty object if not.
+给定生成源文件中的行偏移量和列偏移量，如果找到，则返回一个表示原始文件中 SourceMap 范围的对象，否则返回一个空对象。
 
-The object returned contains the following keys:
+返回的对象包含以下键：
 
-* `generatedLine` {number} The line offset of the start of the
-  range in the generated source
-* `generatedColumn` {number} The column offset of start of the
-  range in the generated source
-* `originalSource` {string} The file name of the original source,
-  as reported in the SourceMap
-* `originalLine` {number} The line offset of the start of the
-  range in the original source
-* `originalColumn` {number} The column offset of start of the
-  range in the original source
+* `generatedLine` {number} 生成源中范围开始的行偏移量
+* `generatedColumn` {number} 生成源中范围开始的列偏移量
+* `originalSource` {string} 原始源的文件名，如 SourceMap 中报告的那样
+* `originalLine` {number} 原始源中范围开始的行偏移量
+* `originalColumn` {number} 原始源中范围开始的列偏移量
 * `name` {string}
 
-The returned value represents the raw range as it appears in the
-SourceMap, based on zero-indexed offsets, _not_ 1-indexed line and
-column numbers as they appear in Error messages and CallSite
-objects.
+返回值表示它在 SourceMap 中出现的原始范围，基于从零开始的偏移量，_而不是_ 错误消息和 CallSite 对象中出现的从 1 开始的行号和列号。
 
-To get the corresponding 1-indexed line and column numbers from a
-lineNumber and columnNumber as they are reported by Error stacks
-and CallSite objects, use `sourceMap.findOrigin(lineNumber,
-columnNumber)`
+要从 Error 堆栈和 CallSite 对象报告的行号和列号获取对应的从 1 开始的行号和列号，请使用 `sourceMap.findOrigin(lineNumber, columnNumber)`
 
 #### `sourceMap.findOrigin(lineNumber, columnNumber)`
 
@@ -1752,38 +1441,28 @@ added:
   - v18.18.0
 -->
 
-* `lineNumber` {number} The 1-indexed line number of the call
-  site in the generated source
-* `columnNumber` {number} The 1-indexed column number
-  of the call site in the generated source
-* Returns: {Object}
+* `lineNumber` {number} 生成源中调用点的从 1 开始的行号
+* `columnNumber` {number} 生成源中调用点的从 1 开始的列号
+* 返回: {Object}
 
-Given a 1-indexed `lineNumber` and `columnNumber` from a call site in
-the generated source, find the corresponding call site location
-in the original source.
+给定生成源中调用点的从 1 开始的 `lineNumber` 和 `columnNumber`，查找原始源中对应的调用点位置。
 
-If the `lineNumber` and `columnNumber` provided are not found in any
-source map, then an empty object is returned. Otherwise, the
-returned object contains the following keys:
+如果提供的 `lineNumber` 和 `columnNumber` 在任何 source map 中都找不到，则返回一个空对象。否则，返回的对象包含以下键：
 
-* `name` {string|undefined} The name of the range in the
-  source map, if one was provided
-* `fileName` {string} The file name of the original source, as
-  reported in the SourceMap
-* `lineNumber` {number} The 1-indexed lineNumber of the
-  corresponding call site in the original source
-* `columnNumber` {number} The 1-indexed columnNumber of the
-  corresponding call site in the original source
+* `name` {string|undefined} source map 中范围的名称（如果提供了）
+* `fileName` {string} 原始源的文件名，如 SourceMap 中报告的那样
+* `lineNumber` {number} 原始源中对应调用点的从 1 开始的行号
+* `columnNumber` {number} 原始源中对应调用点的从 1 开始的列号
 
 [CommonJS]: modules.md
-[Conditional exports]: packages.md#conditional-exports
-[Customization hooks]: #customization-hooks
-[ES Modules]: esm.md
-[Permission Model]: permissions.md#permission-model
+[条件导出]: packages.md#conditional-exports
+[自定义钩子]: #customization-hooks
+[ES 模块]: esm.md
+[权限模型]: permissions.md#permission-model
 [Source Map]: https://tc39.es/ecma426/
-[Source map format]: https://tc39.es/ecma426/#sec-source-map-format
-[V8 JavaScript code coverage]: https://v8project.blogspot.com/2017/12/javascript-code-coverage.html
-[V8 code cache]: https://v8.dev/blog/code-caching-for-devs
+[Source map 格式]: https://tc39.es/ecma426/#sec-source-map-format
+[V8 JavaScript 代码覆盖率]: https://v8project.blogspot.com/2017/12/javascript-code-coverage.html
+[V8 代码缓存]: https://v8.dev/blog/code-caching-for-devs
 [`"exports"`]: packages.md#exports
 [`--enable-source-maps`]: cli.md#--enable-source-maps
 [`--import`]: cli.md#--importmodule
@@ -1803,15 +1482,15 @@ returned object contains the following keys:
 [`registerHooks`]: #moduleregisterhooksoptions
 [`register`]: #moduleregisterspecifier-parenturl-options
 [`util.TextDecoder`]: util.md#class-utiltextdecoder
-[chain]: #chaining
-[hooks]: #customization-hooks
+[链]: #chaining
+[钩子]: #customization-hooks
 [load hook]: #loadurl-context-nextload
-[module compile cache]: #module-compile-cache
-[module wrapper]: modules.md#the-module-wrapper
-[realm]: https://tc39.es/ecma262/#realm
+[模块编译缓存]: #module-compile-cache
+[模块包装器]: modules.md#the-module-wrapper
+[领域]: https://tc39.es/ecma262/#realm
 [resolve hook]: #resolvespecifier-context-nextresolve
 [source map include directives]: https://tc39.es/ecma426/#sec-linking-generated-code
-[the documentation of `Worker`]: worker_threads.md#new-workerfilename-options
-[transferable objects]: worker_threads.md#portpostmessagevalue-transferlist
-[transform TypeScript features]: typescript.md#typescript-features
-[type-stripping]: typescript.md#type-stripping
+[`Worker` 的文档]: worker_threads.md#new-workerfilename-options
+[可传输对象]: worker_threads.md#portpostmessagevalue-transferlist
+[转换 TypeScript 特性]: typescript.md#typescript-features
+[类型剥离]: typescript.md#type-stripping

@@ -81,15 +81,13 @@ changes:
 
 > Stability: 2 - Stable
 
-## Introduction
+## 引言
 
 <!--name=esm-->
 
-ECMAScript modules are [the official standard format][] to package JavaScript
-code for reuse. Modules are defined using a variety of [`import`][] and
-[`export`][] statements.
+ECMAScript 模块是 [官方标准格式][the official standard format]，用于打包 JavaScript 代码以供重用。模块使用各种 [`import`][] 和 [`export`][] 语句来定义。
 
-The following example of an ES module exports a function:
+以下 ES 模块示例导出了一个函数：
 
 ```js
 // addTwo.mjs
@@ -100,7 +98,7 @@ function addTwo(num) {
 export { addTwo };
 ```
 
-The following example of an ES module imports the function from `addTwo.mjs`:
+以下 ES 模块示例从 `addTwo.mjs` 导入了该函数：
 
 ```js
 // app.mjs
@@ -110,137 +108,96 @@ import { addTwo } from './addTwo.mjs';
 console.log(addTwo(4));
 ```
 
-Node.js fully supports ECMAScript modules as they are currently specified and
-provides interoperability between them and its original module format,
-[CommonJS][].
+Node.js 完全支持当前规范的 ECMAScript 模块，并提供了它们与其原始模块格式 [CommonJS][] 之间的互操作性。
 
 <!-- Anchors to make sure old links find a target -->
 
 <i id="esm_package_json_type_field"></i><i id="esm_package_scope_and_file_extensions"></i><i id="esm_input_type_flag"></i>
 
-## Enabling
+## 启用
 
 <!-- type=misc -->
 
-Node.js has two module systems: [CommonJS][] modules and ECMAScript modules.
+Node.js 有两个模块系统：[CommonJS][] 模块和 ECMAScript 模块。
 
-Authors can tell Node.js to interpret JavaScript as an ES module via the `.mjs`
-file extension, the `package.json` [`"type"`][] field with a value `"module"`,
-or the [`--input-type`][] flag with a value of `"module"`. These are explicit
-markers of code being intended to run as an ES module.
+作者可以通过 `.mjs` 文件扩展名、`package.json` 中值为 `"module"` 的 [`"type"`][] 字段，或值为 `"module"` 的 [`--input-type`][] 标志，来告诉 Node.js 将 JavaScript 解释为 ES 模块。这些是代码旨在作为 ES 模块运行的显式标记。
 
-Inversely, authors can explicitly tell Node.js to interpret JavaScript as
-CommonJS via the `.cjs` file extension, the `package.json` [`"type"`][] field
-with a value `"commonjs"`, or the [`--input-type`][] flag with a value of
-`"commonjs"`.
+相反，作者可以通过 `.cjs` 文件扩展名、`package.json` 中值为 `"commonjs"` 的 [`"type"`][] 字段，或值为 `"commonjs"` 的 [`--input-type`][] 标志，来明确告诉 Node.js 将 JavaScript 解释为 CommonJS。
 
-When code lacks explicit markers for either module system, Node.js will inspect
-the source code of a module to look for ES module syntax. If such syntax is
-found, Node.js will run the code as an ES module; otherwise it will run the
-module as CommonJS. See [Determining module system][] for more details.
+当代码缺乏两种模块系统的显式标记时，Node.js 会检查模块的源代码以查找 ES 模块语法。如果找到此类语法，Node.js 会将代码作为 ES 模块运行；否则，它将作为 CommonJS 运行模块。有关更多详细信息，请参阅 [确定模块系统][Determining module system]。
 
 <!-- Anchors to make sure old links find a target -->
 
 <i id="esm_package_entry_points"></i><i id="esm_main_entry_point_export"></i><i id="esm_subpath_exports"></i><i id="esm_package_exports_fallbacks"></i><i id="esm_exports_sugar"></i><i id="esm_conditional_exports"></i><i id="esm_nested_conditions"></i><i id="esm_self_referencing_a_package_using_its_name"></i><i id="esm_internal_package_imports"></i><i id="esm_dual_commonjs_es_module_packages"></i><i id="esm_dual_package_hazard"></i><i id="esm_writing_dual_packages_while_avoiding_or_minimizing_hazards"></i><i id="esm_approach_1_use_an_es_module_wrapper"></i><i id="esm_approach_2_isolate_state"></i>
 
-## Packages
+## 包
 
-This section was moved to [Modules: Packages](packages.md).
+此部分已移至 [Modules: Packages](packages.md)。
 
-## `import` Specifiers
+## `import` 说明符
 
-### Terminology
+### 术语
 
-The _specifier_ of an `import` statement is the string after the `from` keyword,
-e.g. `'node:path'` in `import { sep } from 'node:path'`. Specifiers are also
-used in `export from` statements, and as the argument to an `import()`
-expression.
+`import` 语句的 _说明符_ 是 `from` 关键字之后的字符串，例如 `import { sep } from 'node:path'` 中的 `'node:path'`。说明符也用于 `export from` 语句，以及作为 `import()` 表达式的参数。
 
-There are three types of specifiers:
+说明符有三种类型：
 
-* _Relative specifiers_ like `'./startup.js'` or `'../config.mjs'`. They refer
-  to a path relative to the location of the importing file. _The file extension
-  is always necessary for these._
+* _相对说明符_，如 `'./startup.js'` 或 `'../config.mjs'`。它们引用相对于导入文件位置的路径。_对于这些，文件扩展名总是必需的。_
 
-* _Bare specifiers_ like `'some-package'` or `'some-package/shuffle'`. They can
-  refer to the main entry point of a package by the package name, or a
-  specific feature module within a package prefixed by the package name as per
-  the examples respectively. _Including the file extension is only necessary
-  for packages without an [`"exports"`][] field._
+* _裸说明符_，如 `'some-package'` 或 `'some-package/shuffle'`。它们可以分别通过包名引用包的主入口点，或者通过包名前缀引用包内的特定功能模块。_仅对于没有 [`"exports"`][] 字段的包，才需要包含文件扩展名。_
 
-* _Absolute specifiers_ like `'file:///opt/nodejs/config.js'`. They refer
-  directly and explicitly to a full path.
+* _绝对说明符_，如 `'file:///opt/nodejs/config.js'`。它们直接且明确地引用完整路径。
 
-Bare specifier resolutions are handled by the [Node.js module
-resolution and loading algorithm][].
-All other specifier resolutions are always only resolved with
-the standard relative [URL][] resolution semantics.
+裸说明符的解析由 [Node.js 模块解析和加载算法][Node.js module resolution and loading algorithm] 处理。
+所有其他说明符的解析始终仅使用标准的相对 [URL][] 解析语义。
 
-Like in CommonJS, module files within packages can be accessed by appending a
-path to the package name unless the package's [`package.json`][] contains an
-[`"exports"`][] field, in which case files within packages can only be accessed
-via the paths defined in [`"exports"`][].
+与 CommonJS 中一样，除非包的 [`package.json`][] 包含 [`"exports"`][] 字段，否则可以通过将路径附加到包名来访问包内的模块文件。如果包含 [`"exports"`][] 字段，则包内的文件只能通过 [`"exports"`][] 中定义的路径访问。
 
-For details on these package resolution rules that apply to bare specifiers in
-the Node.js module resolution, see the [packages documentation](packages.md).
+有关适用于 Node.js 模块解析中裸说明符的这些包解析规则的详细信息，请参阅 [包文档](packages.md)。
 
-### Mandatory file extensions
+### 强制文件扩展名
 
-A file extension must be provided when using the `import` keyword to resolve
-relative or absolute specifiers. Directory indexes (e.g. `'./startup/index.js'`)
-must also be fully specified.
+使用 `import` 关键字解析相对或绝对说明符时，必须提供文件扩展名。目录索引（例如 `'./startup/index.js'`）也必须完全指定。
 
-This behavior matches how `import` behaves in browser environments, assuming a
-typically configured server.
+此行为与 `import` 在浏览器环境中的行为相匹配，假设服务器配置通常如此。
 
 ### URLs
 
-ES modules are resolved and cached as URLs. This means that special characters
-must be [percent-encoded][], such as `#` with `%23` and `?` with `%3F`.
+ES 模块作为 URL 进行解析和缓存。这意味着特殊字符必须进行 [百分比编码][percent-encoded]，例如 `#` 编码为 `%23`，`?` 编码为 `%3F`。
 
-`file:`, `node:`, and `data:` URL schemes are supported. A specifier like
-`'https://example.com/app.js'` is not supported natively in Node.js unless using
-a [custom HTTPS loader][].
+支持 `file:`、`node:` 和 `data:` URL 方案。像 `'https://example.com/app.js'` 这样的说明符在 Node.js 中本身不支持，除非使用 [自定义 HTTPS 加载器][custom HTTPS loader]。
 
 #### `file:` URLs
 
-Modules are loaded multiple times if the `import` specifier used to resolve
-them has a different query or fragment.
+如果用于解析模块的 `import` 说明符具有不同的查询或片段，则模块会被多次加载。
 
 ```js
-import './foo.mjs?query=1'; // loads ./foo.mjs with query of "?query=1"
-import './foo.mjs?query=2'; // loads ./foo.mjs with query of "?query=2"
+import './foo.mjs?query=1'; // 加载带有 "?query=1" 查询的 ./foo.mjs
+import './foo.mjs?query=2'; // 加载带有 "?query=2" 查询的 ./foo.mjs
 ```
 
-The volume root may be referenced via `/`, `//`, or `file:///`. Given the
-differences between [URL][] and path resolution (such as percent encoding
-details), it is recommended to use [url.pathToFileURL][] when importing a path.
+可以通过 `/`、`//` 或 `file:///` 引用卷根目录。鉴于 [URL][] 和路径解析之间的差异（例如百分比编码细节），建议在导入路径时使用 [url.pathToFileURL][]。
 
-#### `data:` imports
+#### `data:` 导入
 
 <!-- YAML
 added: v12.10.0
 -->
 
-[`data:` URLs][] are supported for importing with the following MIME types:
+支持使用以下 MIME 类型通过 [`data:` URLs][] 进行导入：
 
-* `text/javascript` for ES modules
-* `application/json` for JSON
-* `application/wasm` for Wasm
+* 用于 ES 模块的 `text/javascript`
+* 用于 JSON 的 `application/json`
+* 用于 Wasm 的 `application/wasm`
 
 ```js
 import 'data:text/javascript,console.log("hello!");';
 import _ from 'data:application/json,"world!"' with { type: 'json' };
 ```
 
-`data:` URLs only resolve [bare specifiers][Terminology] for builtin modules
-and [absolute specifiers][Terminology]. Resolving
-[relative specifiers][Terminology] does not work because `data:` is not a
-[special scheme][]. For example, attempting to load `./foo`
-from `data:text/javascript,import "./foo";` fails to resolve because there
-is no concept of relative resolution for `data:` URLs.
+`data:` URLs 仅解析内置模块的 [裸说明符][Terminology] 和 [绝对说明符][Terminology]。解析 [相对说明符][Terminology] 不起作用，因为 `data:` 不是 [特殊方案][special scheme]。例如，尝试从 `data:text/javascript,import "./foo";` 加载 `./foo` 会解析失败，因为 `data:` URLs 没有相对解析的概念。
 
-#### `node:` imports
+#### `node:` 导入
 
 <!-- YAML
 added:
@@ -254,9 +211,7 @@ changes:
     description: Added `node:` import support to `require(...)`.
 -->
 
-`node:` URLs are supported as an alternative means to load Node.js builtin
-modules. This URL scheme allows for builtin modules to be referenced by valid
-absolute URL strings.
+`node:` URLs 作为加载 Node.js 内置模块的替代方式被支持。此 URL 方案允许通过有效的绝对 URL 字符串引用内置模块。
 
 ```js
 import fs from 'node:fs/promises';
@@ -264,7 +219,7 @@ import fs from 'node:fs/promises';
 
 <a id="import-assertions"></a>
 
-## Import attributes
+## 导入属性
 
 <!-- YAML
 added:
@@ -279,8 +234,7 @@ changes:
     description: Switch from Import Assertions to Import Attributes.
 -->
 
-[Import attributes][Import Attributes MDN] are an inline syntax for module import
-statements to pass on more information alongside the module specifier.
+[导入属性][Import Attributes MDN] 是模块导入语句的内联语法，用于沿着模块说明符传递更多信息。
 
 ```js
 import fooData from './foo.json' with { type: 'json' };
@@ -289,21 +243,17 @@ const { default: barData } =
   await import('./bar.json', { with: { type: 'json' } });
 ```
 
-Node.js only supports the `type` attribute, for which it supports the following values:
+Node.js 仅支持 `type` 属性，它支持以下值：
 
-| Attribute `type` | Needed for       |
+| 属性 `type` | 用于             |
 | ---------------- | ---------------- |
-| `'json'`         | [JSON modules][] |
+| `'json'`         | [JSON 模块][] |
 
-The `type: 'json'` attribute is mandatory when importing JSON modules.
+导入 JSON 模块时，`type: 'json'` 属性是强制性的。
 
-## Built-in modules
+## 内置模块
 
-[Built-in modules][] provide named exports of their public API. A
-default export is also provided which is the value of the CommonJS exports.
-The default export can be used for, among other things, modifying the named
-exports. Named exports of built-in modules are updated only by calling
-[`module.syncBuiltinESMExports()`][].
+[内置模块][Built-in modules] 提供其公共 API 的命名导出。还提供了一个默认导出，它是 CommonJS 导出的值。默认导出可用于，除其他外，修改命名导出。内置模块的命名导出仅通过调用 [`module.syncBuiltinESMExports()`][] 来更新。
 
 ```js
 import EventEmitter from 'node:events';
@@ -332,18 +282,15 @@ syncBuiltinESMExports();
 fs.readFileSync === readFileSync;
 ```
 
-## `import()` expressions
+## `import()` 表达式
 
-[Dynamic `import()`][] provides an asynchronous way to import modules. It is
-supported in both CommonJS and ES modules, and can be used to load both CommonJS
-and ES modules.
+[动态 `import()`][Dynamic `import()`] 提供了一种异步导入模块的方式。它在 CommonJS 和 ES 模块中都受支持，并且可用于加载 CommonJS 和 ES 模块。
 
 ## `import.meta`
 
-* Type: {Object}
+* 类型: {Object}
 
-The `import.meta` meta property is an `Object` that contains the following
-properties. It is only supported in ES modules.
+`import.meta` 元属性是一个 `Object`，包含以下属性。它仅在 ES 模块中受支持。
 
 ### `import.meta.dirname`
 
@@ -357,11 +304,11 @@ changes:
     description: This property is no longer experimental.
 -->
 
-* Type: {string} The directory name of the current module.
+* 类型: {string} 当前模块的目录名。
 
-This is the same as the [`path.dirname()`][] of the [`import.meta.filename`][].
+这与 [`import.meta.filename`][] 的 [`path.dirname()`][] 相同。
 
-> **Caveat**: only present on `file:` modules.
+> **注意**：仅存在于 `file:` 模块上。
 
 ### `import.meta.filename`
 
@@ -375,22 +322,19 @@ changes:
     description: This property is no longer experimental.
 -->
 
-* Type: {string} The full absolute path and filename of the current module, with
-  symlinks resolved.
+* 类型: {string} 当前模块的完整绝对路径和文件名，已解析符号链接。
 
-This is the same as the [`url.fileURLToPath()`][] of the [`import.meta.url`][].
+这与 [`import.meta.url`][] 的 [`url.fileURLToPath()`][] 相同。
 
-> **Caveat** only local modules support this property. Modules not using the
-> `file:` protocol will not provide it.
+> **注意** 仅本地模块支持此属性。不使用 `file:` 协议的模块不提供此属性。
 
 ### `import.meta.url`
 
-* Type: {string} The absolute `file:` URL of the module.
+* 类型: {string} 模块的绝对 `file:` URL。
 
-This is defined exactly the same as it is in browsers providing the URL of the
-current module file.
+这与在浏览器中定义的方式完全相同，提供当前模块文件的 URL。
 
-This enables useful patterns such as relative file loading:
+这启用了有用的模式，例如相对文件加载：
 
 ```js
 import { readFileSync } from 'node:fs';
@@ -406,11 +350,11 @@ added:
 
 > Stability: 1.0 - Early development
 
-* Type: {boolean} `true` when the current module is the entry point of the current process; `false` otherwise.
+* 类型: {boolean} 当当前模块是当前进程的入口点时，为 `true`；否则为 `false`。
 
-Equivalent to `require.main === module` in CommonJS.
+等效于 CommonJS 中的 `require.main === module`。
 
-Analogous to Python's `__name__ == "__main__"`.
+类似于 Python 的 `__name__ == "__main__"`。
 
 ```js
 export function foo() {
@@ -423,7 +367,7 @@ function main() {
 }
 
 if (import.meta.main) main();
-// `foo` can be imported from another module without possible side-effects from `main`
+// `foo` 可以从另一个模块导入，而不会受到 `main` 可能的副作用影响
 ```
 
 ### `import.meta.resolve(specifier)`
@@ -459,12 +403,10 @@ changes:
 
 > Stability: 1.2 - Release candidate
 
-* `specifier` {string} The module specifier to resolve relative to the
-  current module.
-* Returns: {string} The absolute URL string that the specifier would resolve to.
+* `specifier` {string} 相对于当前模块要解析的模块说明符。
+* 返回: {string} 说明符将解析到的绝对 URL 字符串。
 
-[`import.meta.resolve`][] is a module-relative resolution function scoped to
-each module, returning the URL string.
+[`import.meta.resolve`][] 是一个相对于每个模块的作用域解析函数，返回 URL 字符串。
 
 ```js
 const dependencyAsset = import.meta.resolve('component-lib/asset.css');
@@ -473,45 +415,34 @@ import.meta.resolve('./dep.js');
 // file:///app/dep.js
 ```
 
-All features of the Node.js module resolution are supported. Dependency
-resolutions are subject to the permitted exports resolutions within the package.
+支持 Node.js 模块解析的所有功能。依赖项解析受包内允许的导出解析的限制。
 
-**Caveats**:
+**注意事项**：
 
-* This can result in synchronous file-system operations, which
-  can impact performance similarly to `require.resolve`.
-* This feature is not available within custom loaders (it would
-  create a deadlock).
+* 这可能导致同步文件系统操作，这可能会类似地影响性能，如同 `require.resolve`。
+* 此功能在自定义加载器中不可用（它会导致死锁）。
 
-**Non-standard API**:
+**非标准 API**：
 
-When using the `--experimental-import-meta-resolve` flag, that function accepts
-a second argument:
+当使用 `--experimental-import-meta-resolve` 标志时，该函数接受第二个参数：
 
-* `parent` {string|URL} An optional absolute parent module URL to resolve from.
-  **Default:** `import.meta.url`
+* `parent` {string|URL} 一个可选的绝对父模块 URL，用于从中解析。**默认值:** `import.meta.url`
 
-## Interoperability with CommonJS
+## 与 CommonJS 的互操作性
 
-### `import` statements
+### `import` 语句
 
-An `import` statement can reference an ES module or a CommonJS module.
-`import` statements are permitted only in ES modules, but dynamic [`import()`][]
-expressions are supported in CommonJS for loading ES modules.
+`import` 语句可以引用 ES 模块或 CommonJS 模块。`import` 语句仅在 ES 模块中允许，但动态 [`import()`][] 表达式在 CommonJS 中受支持，用于加载 ES 模块。
 
-When importing [CommonJS modules](#commonjs-namespaces), the
-`module.exports` object is provided as the default export. Named exports may be
-available, provided by static analysis as a convenience for better ecosystem
-compatibility.
+导入 [CommonJS 模块](#commonjs-namespaces) 时，`module.exports` 对象作为默认导出提供。命名导出可能可用，通过静态分析提供，以便更好地实现生态系统兼容性。
 
 ### `require`
 
-The CommonJS module `require` currently only supports loading synchronous ES
-modules (that is, ES modules that do not use top-level `await`).
+CommonJS 模块 `require` 目前仅支持加载同步 ES 模块（即不使用顶层 `await` 的 ES 模块）。
 
-See [Loading ECMAScript modules using `require()`][] for details.
+有关详细信息，请参阅 [使用 `require()` 加载 ECMAScript 模块][Loading ECMAScript modules using `require()`]。
 
-### CommonJS Namespaces
+### CommonJS 命名空间
 
 <!-- YAML
 added: v14.13.0
@@ -521,42 +452,31 @@ changes:
     description: Added `'module.exports'` export marker to CJS namespaces.
 -->
 
-CommonJS modules consist of a `module.exports` object which can be of any type.
+CommonJS 模块由一个 `module.exports` 对象组成，该对象可以是任何类型。
 
-To support this, when importing CommonJS from an ECMAScript module, a namespace
-wrapper for the CommonJS module is constructed, which always provides a
-`default` export key pointing to the CommonJS `module.exports` value.
+为了支持这一点，当从 ECMAScript 模块导入 CommonJS 时，会为 CommonJS 模块构造一个命名空间包装器，该包装器始终提供一个指向 CommonJS `module.exports` 值的 `default` 导出键。
 
-In addition, a heuristic static analysis is performed against the source text of
-the CommonJS module to get a best-effort static list of exports to provide on
-the namespace from values on `module.exports`. This is necessary since these
-namespaces must be constructed prior to the evaluation of the CJS module.
+此外，对 CommonJS 模块的源文本执行启发式静态分析，以获取 `module.exports` 上值的尽力静态导出列表，以在命名空间上提供。这是必要的，因为这些命名空间必须在 CJS 模块评估之前构造。
 
-These CommonJS namespace objects also provide the `default` export as a
-`'module.exports'` named export, in order to unambiguously indicate that their
-representation in CommonJS uses this value, and not the namespace value. This
-mirrors the semantics of the handling of the `'module.exports'` export name in
-[`require(esm)`][] interop support.
+这些 CommonJS 命名空间对象还提供了一个 `default` 导出作为 `'module.exports'` 命名导出，以便明确指示它们在 CommonJS 中的表示使用此值，而不是命名空间值。这反映了 [`require(esm)`][] 互操作性支持中处理 `'module.exports'` 导出名称的语义。
 
-When importing a CommonJS module, it can be reliably imported using the ES
-module default import or its corresponding sugar syntax:
+导入 CommonJS 模块时，可以使用 ES 模块默认导入或其相应的语法糖可靠地导入：
 
 <!-- eslint-disable no-duplicate-imports -->
 
 ```js
 import { default as cjs } from 'cjs';
-// Identical to the above
+// 与上述相同
 import cjsSugar from 'cjs';
 
 console.log(cjs);
 console.log(cjs === cjsSugar);
-// Prints:
+// 打印:
 //   <module.exports>
 //   true
 ```
 
-This Module Namespace Exotic Object can be directly observed either when using
-`import * as m from 'cjs'` or a dynamic import:
+当使用 `import * as m from 'cjs'` 或动态导入时，可以直接观察到这个模块命名空间异质对象：
 
 <!-- eslint-skip -->
 
@@ -564,39 +484,36 @@ This Module Namespace Exotic Object can be directly observed either when using
 import * as m from 'cjs';
 console.log(m);
 console.log(m === await import('cjs'));
-// Prints:
+// 打印:
 //   [Module] { default: <module.exports>, 'module.exports': <module.exports> }
 //   true
 ```
 
-For better compatibility with existing usage in the JS ecosystem, Node.js
-in addition attempts to determine the CommonJS named exports of every imported
-CommonJS module to provide them as separate ES module exports using a static
-analysis process.
+为了更好地与 JS 生态系统中的现有用法兼容，Node.js 还尝试确定每个导入的 CommonJS 模块的 CommonJS 命名导出，以通过静态分析过程将它们作为单独的 ES 模块导出提供。
 
-For example, consider a CommonJS module written:
+例如，考虑一个用以下方式编写的 CommonJS 模块：
 
 ```cjs
 // cjs.cjs
 exports.name = 'exported';
 ```
 
-The preceding module supports named imports in ES modules:
+前面的模块在 ES 模块中支持命名导入：
 
 <!-- eslint-disable no-duplicate-imports -->
 
 ```js
 import { name } from './cjs.cjs';
 console.log(name);
-// Prints: 'exported'
+// 打印: 'exported'
 
 import cjs from './cjs.cjs';
 console.log(cjs);
-// Prints: { name: 'exported' }
+// 打印: { name: 'exported' }
 
 import * as m from './cjs.cjs';
 console.log(m);
-// Prints:
+// 打印:
 //   [Module] {
 //     default: { name: 'exported' },
 //     'module.exports': { name: 'exported' },
@@ -604,75 +521,61 @@ console.log(m);
 //   }
 ```
 
-As can be seen from the last example of the Module Namespace Exotic Object being
-logged, the `name` export is copied off of the `module.exports` object and set
-directly on the ES module namespace when the module is imported.
+从记录的模块命名空间异质对象的最后一个示例中可以看出，`name` 导出从 `module.exports` 对象复制并在导入模块时直接设置在 ES 模块命名空间上。
 
-Live binding updates or new exports added to `module.exports` are not detected
-for these named exports.
+对这些命名导出不会检测到对 `module.exports` 的实时绑定更新或新增的导出。
 
-The detection of named exports is based on common syntax patterns but does not
-always correctly detect named exports. In these cases, using the default
-import form described above can be a better option.
+命名导出的检测基于常见的语法模式，但并非总能正确检测到命名导出。在这些情况下，使用上述默认导入形式可能是更好的选择。
 
-Named exports detection covers many common export patterns, reexport patterns
-and build tool and transpiler outputs. See [cjs-module-lexer][] for the exact
-semantics implemented.
+命名导出检测涵盖了许多常见的导出模式、重新导出模式以及构建工具和转译器的输出。有关实现的精确语义，请参阅 [cjs-module-lexer][]。
 
-### Differences between ES modules and CommonJS
+### ES 模块和 CommonJS 之间的差异
 
-#### No `require`, `exports`, or `module.exports`
+#### 没有 `require`、`exports` 或 `module.exports`
 
-In most cases, the ES module `import` can be used to load CommonJS modules.
+在大多数情况下，可以使用 ES 模块 `import` 来加载 CommonJS 模块。
 
-If needed, a `require` function can be constructed within an ES module using
-[`module.createRequire()`][].
+如果需要，可以使用 [`module.createRequire()`][] 在 ES 模块内构造 `require` 函数。
 
-#### No `__filename` or `__dirname`
+#### 没有 `__filename` 或 `__dirname`
 
-These CommonJS variables are not available in ES modules.
+这些 CommonJS 变量在 ES 模块中不可用。
 
-`__filename` and `__dirname` use cases can be replicated via
-[`import.meta.filename`][] and [`import.meta.dirname`][].
+`__filename` 和 `__dirname` 的用例可以通过 [`import.meta.filename`][] 和 [`import.meta.dirname`][] 来复制。
 
-#### No Addon Loading
+#### 没有插件加载
 
-[Addons][] are not currently supported with ES module imports.
+[插件][Addons] 目前不支持通过 ES 模块导入。
 
-They can instead be loaded with [`module.createRequire()`][] or
-[`process.dlopen`][].
+它们可以使用 [`module.createRequire()`][] 或 [`process.dlopen`][] 加载。
 
-#### No `require.main`
+#### 没有 `require.main`
 
-To replace `require.main === module`, there is the [`import.meta.main`][] API.
+要替换 `require.main === module`，有 [`import.meta.main`][] API。
 
-#### No `require.resolve`
+#### 没有 `require.resolve`
 
-Relative resolution can be handled via `new URL('./local', import.meta.url)`.
+相对解析可以通过 `new URL('./local', import.meta.url)` 处理。
 
-For a complete `require.resolve` replacement, there is the
-[import.meta.resolve][] API.
+对于完整的 `require.resolve` 替换，有 [import.meta.resolve][] API。
 
-Alternatively `module.createRequire()` can be used.
+或者可以使用 `module.createRequire()`。
 
-#### No `NODE_PATH`
+#### 没有 `NODE_PATH`
 
-`NODE_PATH` is not part of resolving `import` specifiers. Please use symlinks
-if this behavior is desired.
+`NODE_PATH` 不是解析 `import` 说明符的一部分。如果需要此行为，请使用符号链接。
 
-#### No `require.extensions`
+#### 没有 `require.extensions`
 
-`require.extensions` is not used by `import`. Module customization hooks can
-provide a replacement.
+`import` 不使用 `require.extensions`。模块自定义钩子可以提供替代方案。
 
-#### No `require.cache`
+#### 没有 `require.cache`
 
-`require.cache` is not used by `import` as the ES module loader has its own
-separate cache.
+`import` 不使用 `require.cache`，因为 ES 模块加载器有自己的独立缓存。
 
 <i id="esm_experimental_json_modules"></i>
 
-## JSON modules
+## JSON 模块
 
 <!-- YAML
 changes:
@@ -685,22 +588,19 @@ changes:
     description: JSON modules are no longer experimental.
 -->
 
-JSON files can be referenced by `import`:
+JSON 文件可以通过 `import` 引用：
 
 ```js
 import packageConfig from './package.json' with { type: 'json' };
 ```
 
-The `with { type: 'json' }` syntax is mandatory; see [Import Attributes][].
+`with { type: 'json' }` 语法是强制性的；请参阅 [导入属性][Import Attributes]。
 
-The imported JSON only exposes a `default` export. There is no support for named
-exports. A cache entry is created in the CommonJS cache to avoid duplication.
-The same object is returned in CommonJS if the JSON module has already been
-imported from the same path.
+导入的 JSON 仅公开一个 `default` 导出。不支持命名导出。会在 CommonJS 缓存中创建一个缓存条目以避免重复。如果已经从同一路径导入了 JSON 模块，则在 CommonJS 中返回相同的对象。
 
 <i id="esm_experimental_wasm_modules"></i>
 
-## Wasm modules
+## Wasm 模块
 
 <!-- YAML
 changes:
@@ -709,13 +609,11 @@ changes:
     description: Wasm modules no longer require the `--experimental-wasm-modules` flag.
 -->
 
-Importing both WebAssembly module instances and WebAssembly source phase
-imports is supported.
+支持导入 WebAssembly 模块实例和 WebAssembly 源阶段导入。
 
-Both of these integrations are in line with the
-[ES Module Integration Proposal for WebAssembly][].
+这两种集成都符合 [WebAssembly 的 ES 模块集成提案][ES Module Integration Proposal for WebAssembly]。
 
-### Wasm Source Phase Imports
+### Wasm 源阶段导入
 
 > Stability: 1.2 - Release candidate
 
@@ -723,15 +621,11 @@ Both of these integrations are in line with the
 added: v24.0.0
 -->
 
-The [Source Phase Imports][] proposal allows the `import source` keyword
-combination to import a `WebAssembly.Module` object directly, instead of getting
-a module instance already instantiated with its dependencies.
+[源阶段导入][Source Phase Imports] 提案允许使用 `import source` 关键字组合直接导入 `WebAssembly.Module` 对象，而不是获取已经使用其依赖项实例化的模块实例。
 
-This is useful when needing custom instantiations for Wasm, while still
-resolving and loading it through the ES module integration.
+当需要为 Wasm 进行自定义实例化，同时仍然通过 ES 模块集成解析和加载它时，这很有用。
 
-For example, to create multiple instances of a module, or to pass custom imports
-into a new instance of `library.wasm`:
+例如，要创建模块的多个实例，或将自定义导入传递到 `library.wasm` 的新实例中：
 
 ```js
 import source libraryModule from './library.wasm';
@@ -741,8 +635,7 @@ const instance1 = await WebAssembly.instantiate(libraryModule, importObject1);
 const instance2 = await WebAssembly.instantiate(libraryModule, importObject2);
 ```
 
-In addition to the static source phase, there is also a dynamic variant of the
-source phase via the `import.source` dynamic phase import syntax:
+除了静态源阶段之外，还有通过 `import.source` 动态阶段导入语法的动态变体：
 
 ```js
 const dynamicLibrary = await import.source('./library.wasm');
@@ -750,7 +643,7 @@ const dynamicLibrary = await import.source('./library.wasm');
 const instance = await WebAssembly.instantiate(dynamicLibrary, importObject);
 ```
 
-### JavaScript String Builtins
+### JavaScript 字符串内置函数
 
 > Stability: 1.2 - Release candidate
 
@@ -758,120 +651,105 @@ const instance = await WebAssembly.instantiate(dynamicLibrary, importObject);
 added: v24.5.0
 -->
 
-When importing WebAssembly modules, the
-[WebAssembly JS String Builtins Proposal][] is automatically enabled through the
-ESM Integration. This allows WebAssembly modules to directly use efficient
-compile-time string builtins from the `wasm:js-string` namespace.
+导入 WebAssembly 模块时，[WebAssembly JS 字符串内置函数提案][WebAssembly JS String Builtins Proposal] 通过 ESM 集成自动启用。这允许 WebAssembly 模块直接使用来自 `wasm:js-string` 命名空间的高效编译时字符串内置函数。
 
-For example, the following Wasm module exports a string `getLength` function using
-the `wasm:js-string` `length` builtin:
+例如，以下 Wasm 模块使用 `wasm:js-string` 的 `length` 内置函数导出一个字符串 `getLength` 函数：
 
 ```text
 (module
-  ;; Compile-time import of the string length builtin.
+  ;; 编译时导入字符串长度内置函数。
   (import "wasm:js-string" "length" (func $string_length (param externref) (result i32)))
 
-  ;; Define getLength, taking a JS value parameter assumed to be a string,
-  ;; calling string length on it and returning the result.
+  ;; 定义 getLength，接受一个假定为字符串的 JS 值参数，
+  ;; 对其调用字符串长度并返回结果。
   (func $getLength (param $str externref) (result i32)
     local.get $str
     call $string_length
   )
 
-  ;; Export the getLength function.
+  ;; 导出 getLength 函数。
   (export "getLength" (func $get_length))
 )
 ```
 
 ```js
 import { getLength } from './string-len.wasm';
-getLength('foo'); // Returns 3.
+getLength('foo'); // 返回 3。
 ```
 
-Wasm builtins are compile-time imports that are linked during module compilation
-rather than during instantiation. They do not behave like normal module graph
-imports and they cannot be inspected via `WebAssembly.Module.imports(mod)`
-or virtualized unless recompiling the module using the direct
-`WebAssembly.compile` API with string builtins disabled.
+Wasm 内置函数是编译时导入，在模块编译期间链接，而不是在实例化期间。它们的行为不像普通的模块图导入，并且无法通过 `WebAssembly.Module.imports(mod)` 进行检查或虚拟化，除非使用直接的 `WebAssembly.compile` API 并禁用字符串内置函数重新编译模块。
 
-Importing a module in the source phase before it has been instantiated will also
-use the compile-time builtins automatically:
+在模块实例化之前以源阶段导入模块也会自动使用编译时内置函数：
 
 ```js
 import source mod from './string-len.wasm';
 const { exports: { getLength } } = await WebAssembly.instantiate(mod, {});
-getLength('foo'); // Also returns 3.
+getLength('foo'); // 也返回 3。
 ```
 
-### Wasm Instance Phase Imports
+### Wasm 实例阶段导入
 
 > Stability: 1.1 - Active development
 
-Instance imports allow any `.wasm` files to be imported as normal modules,
-supporting their module imports in turn.
+实例导入允许任何 `.wasm` 文件作为普通模块导入，进而支持它们的模块导入。
 
-For example, an `index.js` containing:
+例如，一个包含以下内容的 `index.js`：
 
 ```js
 import * as M from './library.wasm';
 console.log(M);
 ```
 
-executed under:
+在以下情况下执行：
 
 ```bash
 node index.mjs
 ```
 
-would provide the exports interface for the instantiation of `library.wasm`.
+将提供 `library.wasm` 实例化的导出接口。
 
-### Reserved Wasm Namespaces
+### 保留的 Wasm 命名空间
 
 <!-- YAML
 added: v24.5.0
 -->
 
-When importing WebAssembly module instances, they cannot use import module
-names or import/export names that start with reserved prefixes:
+导入 WebAssembly 模块实例时，它们不能使用以保留前缀开头的导入模块名称或导入/导出名称：
 
-* `wasm-js:` - reserved in all module import names, module names and export
-  names.
-* `wasm:` - reserved in module import names and export names (imported module
-  names are allowed in order to support future builtin polyfills).
+* `wasm-js:` - 在所有模块导入名称、模块名称和导出名称中保留。
+* `wasm:` - 在模块导入名称和导出名称中保留（允许导入的模块名称以支持未来的内置函数填充）。
 
-Importing a module using the above reserved names will throw a
-`WebAssembly.LinkError`.
+使用上述保留名称导入模块将抛出 `WebAssembly.LinkError`。
 
 <i id="esm_experimental_top_level_await"></i>
 
-## Top-level `await`
+## 顶层 `await`
 
 <!-- YAML
 added: v14.8.0
 -->
 
-The `await` keyword may be used in the top level body of an ECMAScript module.
+`await` 关键字可以在 ECMAScript 模块的顶层主体中使用。
 
-Assuming an `a.mjs` with
+假设有一个 `a.mjs`，内容为：
 
 ```js
 export const five = await Promise.resolve(5);
 ```
 
-And a `b.mjs` with
+以及一个 `b.mjs`，内容为：
 
 ```js
 import { five } from './a.mjs';
 
-console.log(five); // Logs `5`
+console.log(five); // 打印 `5`
 ```
 
 ```bash
-node b.mjs # works
+node b.mjs # 正常工作
 ```
 
-If a top level `await` expression never resolves, the `node` process will exit
-with a `13` [status code][].
+如果顶层 `await` 表达式从未解析，`node` 进程将以 `13` [状态码][status code] 退出。
 
 ```js
 import { spawn } from 'node:child_process';
@@ -880,390 +758,303 @@ import { execPath } from 'node:process';
 spawn(execPath, [
   '--input-type=module',
   '--eval',
-  // Never-resolving Promise:
+  // 永不解析的 Promise：
   'await new Promise(() => {})',
 ]).once('exit', (code) => {
-  console.log(code); // Logs `13`
+  console.log(code); // 打印 `13`
 });
 ```
 
 <i id="esm_experimental_loaders"></i>
 
-## Loaders
+## 加载器
 
-The former Loaders documentation is now at
-[Modules: Customization hooks][Module customization hooks].
+以前的加载器文档现在位于 [Modules: Customization hooks][Module customization hooks]。
 
-## Resolution and loading algorithm
+## 解析和加载算法
 
-### Features
+### 特性
 
-The default resolver has the following properties:
+默认解析器具有以下属性：
 
-* FileURL-based resolution as is used by ES modules
-* Relative and absolute URL resolution
-* No default extensions
-* No folder mains
-* Bare specifier package resolution lookup through node\_modules
-* Does not fail on unknown extensions or protocols
-* Can optionally provide a hint of the format to the loading phase
+* 基于 FileURL 的解析，如同 ES 模块所使用的
+* 相对和绝对 URL 解析
+* 无默认扩展名
+* 无文件夹主文件
+* 通过 node\_modules 进行裸说明符包解析查找
+* 不会因未知扩展名或协议而失败
+* 可以选择向加载阶段提供格式提示
 
-The default loader has the following properties
+默认加载器具有以下属性：
 
-* Support for builtin module loading via `node:` URLs
-* Support for "inline" module loading via `data:` URLs
-* Support for `file:` module loading
-* Fails on any other URL protocol
-* Fails on unknown extensions for `file:` loading
-  (supports only `.cjs`, `.js`, and `.mjs`)
+* 通过 `node:` URLs 支持内置模块加载
+* 通过 `data:` URLs 支持“内联”模块加载
+* 支持 `file:` 模块加载
+* 对任何其他 URL 协议失败
+* 对 `file:` 加载的未知扩展名失败（仅支持 `.cjs`、`.js` 和 `.mjs`）
 
-### Resolution algorithm
+### 解析算法
 
-The algorithm to load an ES module specifier is given through the
-**ESM\_RESOLVE** method below. It returns the resolved URL for a
-module specifier relative to a parentURL.
+加载 ES 模块说明符的算法通过下面的 **ESM\_RESOLVE** 方法给出。它返回相对于 parentURL 的模块说明符的解析后 URL。
 
-The resolution algorithm determines the full resolved URL for a module
-load, along with its suggested module format. The resolution algorithm
-does not determine whether the resolved URL protocol can be loaded,
-or whether the file extensions are permitted, instead these validations
-are applied by Node.js during the load phase
-(for example, if it was asked to load a URL that has a protocol that is
-not `file:`, `data:` or `node:`.
+解析算法确定模块加载的完整解析 URL，以及其建议的模块格式。解析算法不确定解析后的 URL 协议是否可以加载，或者文件扩展名是否被允许，相反，这些验证由 Node.js 在加载阶段应用（例如，如果要求加载一个具有非 `file:`、`data:` 或 `node:` 协议的 URL）。
 
-The algorithm also tries to determine the format of the file based
-on the extension (see `ESM_FILE_FORMAT` algorithm below). If it does
-not recognize the file extension (eg if it is not `.mjs`, `.cjs`, or
-`.json`), then a format of `undefined` is returned,
-which will throw during the load phase.
+该算法还尝试根据扩展名确定文件的格式（参见下面的 `ESM_FILE_FORMAT` 算法）。如果它不认识文件扩展名（例如，如果不是 `.mjs`、`.cjs` 或 `.json`），则返回 `undefined` 格式，这将在加载阶段抛出。
 
-The algorithm to determine the module format of a resolved URL is
-provided by **ESM\_FILE\_FORMAT**, which returns the unique module
-format for any file. The _"module"_ format is returned for an ECMAScript
-Module, while the _"commonjs"_ format is used to indicate loading through the
-legacy CommonJS loader. Additional formats such as _"addon"_ can be extended in
-future updates.
+确定解析 URL 的模块格式的算法由 **ESM\_FILE\_FORMAT** 提供，它返回任何文件的唯一模块格式。对于 ECMAScript 模块返回 _"module"_ 格式，而 _"commonjs"_ 格式用于指示通过传统 CommonJS 加载器加载。未来更新可以扩展其他格式，例如 _"addon"_。
 
-In the following algorithms, all subroutine errors are propagated as errors
-of these top-level routines unless stated otherwise.
+在以下算法中，除非另有说明，所有子程序错误都会作为这些顶级例程的错误传播。
 
-_defaultConditions_ is the conditional environment name array,
-`["node", "import"]`.
+_defaultConditions_ 是条件环境名称数组，`["node", "import"]`。
 
-The resolver can throw the following errors:
+解析器可以抛出以下错误：
 
-* _Invalid Module Specifier_: Module specifier is an invalid URL, package name
-  or package subpath specifier.
-* _Invalid Package Configuration_: package.json configuration is invalid or
-  contains an invalid configuration.
-* _Invalid Package Target_: Package exports or imports define a target module
-  for the package that is an invalid type or string target.
-* _Package Path Not Exported_: Package exports do not define or permit a target
-  subpath in the package for the given module.
-* _Package Import Not Defined_: Package imports do not define the specifier.
-* _Module Not Found_: The package or module requested does not exist.
-* _Unsupported Directory Import_: The resolved path corresponds to a directory,
-  which is not a supported target for module imports.
+* _无效模块说明符_：模块说明符是无效的 URL、包名或包子路径说明符。
+* _无效包配置_：package.json 配置无效或包含无效配置。
+* _无效包目标_：包导出或导入为包定义了一个无效类型或字符串目标模块。
+* _包路径未导出_：包导出未定义或不允许包中给定模块的目标子路径。
+* _包导入未定义_：包导入未定义说明符。
+* _模块未找到_：请求的包或模块不存在。
+* _不支持的目录导入_：解析后的路径对应于一个目录，这不是模块导入支持的目标。
 
-### Resolution Algorithm Specification
+### 解析算法规范
 
 **ESM\_RESOLVE**(_specifier_, _parentURL_)
 
-> 1. Let _resolved_ be **undefined**.
-> 2. If _specifier_ is a valid URL, then
->    1. Set _resolved_ to the result of parsing and reserializing
->       _specifier_ as a URL.
-> 3. Otherwise, if _specifier_ starts with _"/"_, _"./"_, or _"../"_, then
->    1. Set _resolved_ to the URL resolution of _specifier_ relative to
->       _parentURL_.
-> 4. Otherwise, if _specifier_ starts with _"#"_, then
->    1. Set _resolved_ to the result of
->       **PACKAGE\_IMPORTS\_RESOLVE**(_specifier_,
->       _parentURL_, _defaultConditions_).
-> 5. Otherwise,
->    1. Note: _specifier_ is now a bare specifier.
->    2. Set _resolved_ the result of
->       **PACKAGE\_RESOLVE**(_specifier_, _parentURL_).
-> 6. Let _format_ be **undefined**.
-> 7. If _resolved_ is a _"file:"_ URL, then
->    1. If _resolved_ contains any percent encodings of _"/"_ or _"\\"_ (_"%2F"_
->       and _"%5C"_ respectively), then
->       1. Throw an _Invalid Module Specifier_ error.
->    2. If the file at _resolved_ is a directory, then
->       1. Throw an _Unsupported Directory Import_ error.
->    3. If the file at _resolved_ does not exist, then
->       1. Throw a _Module Not Found_ error.
->    4. Set _resolved_ to the real path of _resolved_, maintaining the
->       same URL querystring and fragment components.
->    5. Set _format_ to the result of **ESM\_FILE\_FORMAT**(_resolved_).
-> 8. Otherwise,
->    1. Set _format_ the module format of the content type associated with the
->       URL _resolved_.
-> 9. Return _format_ and _resolved_ to the loading phase
+> 1. 令 _resolved_ 为 **undefined**。
+> 2. 如果 _specifier_ 是有效的 URL，则
+>    1. 将 _resolved_ 设置为将 _specifier_ 解析并重新序列化为 URL 的结果。
+> 3. 否则，如果 _specifier_ 以 _"/"_、_"./"_ 或 _"../"_ 开头，则
+>    1. 将 _resolved_ 设置为 _specifier_ 相对于 _parentURL_ 的 URL 解析结果。
+> 4. 否则，如果 _specifier_ 以 _"#"_ 开头，则
+>    1. 将 _resolved_ 设置为 **PACKAGE\_IMPORTS\_RESOLVE**(_specifier_, _parentURL_, _defaultConditions_) 的结果。
+> 5. 否则，
+>    1. 注意：_specifier_ 现在是裸说明符。
+>    2. 将 _resolved_ 设置为 **PACKAGE\_RESOLVE**(_specifier_, _parentURL_) 的结果。
+> 6. 令 _format_ 为 **undefined**。
+> 7. 如果 _resolved_ 是 _"file:"_ URL，则
+>    1. 如果 _resolved_ 包含 _"/"_ 或 _"\\"_ 的任何百分比编码（分别为 _"%2F"_ 和 _"%5C"_），则
+>       1. 抛出 _无效模块说明符_ 错误。
+>    2. 如果 _resolved_ 处的文件是目录，则
+>       1. 抛出 _不支持的目录导入_ 错误。
+>    3. 如果 _resolved_ 处的文件不存在，则
+>       1. 抛出 _模块未找到_ 错误。
+>    4. 将 _resolved_ 设置为 _resolved_ 的真实路径，保持相同的 URL 查询字符串和片段组件。
+>    5. 将 _format_ 设置为 **ESM\_FILE\_FORMAT**(_resolved_) 的结果。
+> 8. 否则，
+>    1. 将 _format_ 设置为与 URL _resolved_ 关联的内容类型的模块格式。
+> 9. 将 _format_ 和 _resolved_ 返回给加载阶段。
 
 **PACKAGE\_RESOLVE**(_packageSpecifier_, _parentURL_)
 
-> 1. Let _packageName_ be **undefined**.
-> 2. If _packageSpecifier_ is an empty string, then
->    1. Throw an _Invalid Module Specifier_ error.
-> 3. If _packageSpecifier_ is a Node.js builtin module name, then
->    1. Return the string _"node:"_ concatenated with _packageSpecifier_.
-> 4. If _packageSpecifier_ does not start with _"@"_, then
->    1. Set _packageName_ to the substring of _packageSpecifier_ until the first
->       _"/"_ separator or the end of the string.
-> 5. Otherwise,
->    1. If _packageSpecifier_ does not contain a _"/"_ separator, then
->       1. Throw an _Invalid Module Specifier_ error.
->    2. Set _packageName_ to the substring of _packageSpecifier_
->       until the second _"/"_ separator or the end of the string.
-> 6. If _packageName_ starts with _"."_ or contains _"\\"_ or _"%"_, then
->    1. Throw an _Invalid Module Specifier_ error.
-> 7. Let _packageSubpath_ be _"."_ concatenated with the substring of
->    _packageSpecifier_ from the position at the length of _packageName_.
-> 8. Let _selfUrl_ be the result of
->    **PACKAGE\_SELF\_RESOLVE**(_packageName_, _packageSubpath_, _parentURL_).
-> 9. If _selfUrl_ is not **undefined**, return _selfUrl_.
-> 10. While _parentURL_ is not the file system root,
->     1. Let _packageURL_ be the URL resolution of _"node\_modules/"_
->        concatenated with _packageName_, relative to _parentURL_.
->     2. Set _parentURL_ to the parent folder URL of _parentURL_.
->     3. If the folder at _packageURL_ does not exist, then
->        1. Continue the next loop iteration.
->     4. Let _pjson_ be the result of **READ\_PACKAGE\_JSON**(_packageURL_).
->     5. If _pjson_ is not **null** and _pjson_._exports_ is not **null** or
->        **undefined**, then
->        1. Return the result of **PACKAGE\_EXPORTS\_RESOLVE**(_packageURL_,
->           _packageSubpath_, _pjson.exports_, _defaultConditions_).
->     6. Otherwise, if _packageSubpath_ is equal to _"."_, then
->        1. If _pjson.main_ is a string, then
->           1. Return the URL resolution of _main_ in _packageURL_.
->     7. Otherwise,
->        1. Return the URL resolution of _packageSubpath_ in _packageURL_.
-> 11. Throw a _Module Not Found_ error.
+> 1. 令 _packageName_ 为 **undefined**。
+> 2. 如果 _packageSpecifier_ 是空字符串，则
+>    1. 抛出 _无效模块说明符_ 错误。
+> 3. 如果 _packageSpecifier_ 是 Node.js 内置模块名称，则
+>    1. 返回字符串 _"node:"_ 连接 _packageSpecifier_。
+> 4. 如果 _packageSpecifier_ 不以 _"@"_ 开头，则
+>    1. 将 _packageName_ 设置为 _packageSpecifier_ 的子字符串，直到第一个 _"/"_ 分隔符或字符串结尾。
+> 5. 否则，
+>    1. 如果 _packageSpecifier_ 不包含 _"/"_ 分隔符，则
+>       1. 抛出 _无效模块说明符_ 错误。
+>    2. 将 _packageName_ 设置为 _packageSpecifier_ 的子字符串，直到第二个 _"/"_ 分隔符或字符串结尾。
+> 6. 如果 _packageName_ 以 _"."_ 开头或包含 _"\\"_ 或 _"%"_，则
+>    1. 抛出 _无效模块说明符_ 错误。
+> 7. 令 _packageSubpath_ 为 _"."_ 连接 _packageSpecifier_ 从 _packageName_ 长度位置开始的子字符串。
+> 8. 令 _selfUrl_ 为 **PACKAGE\_SELF\_RESOLVE**(_packageName_, _packageSubpath_, _parentURL_) 的结果。
+> 9. 如果 _selfUrl_ 不是 **undefined**，返回 _selfUrl_。
+> 10. 当 _parentURL_ 不是文件系统根目录时，
+>     1. 令 _packageURL_ 为 _"node\_modules/"_ 连接 _packageName_ 相对于 _parentURL_ 的 URL 解析结果。
+>     2. 将 _parentURL_ 设置为 _parentURL_ 的父文件夹 URL。
+>     3. 如果 _packageURL_ 处的文件夹不存在，则
+>        1. 继续下一个循环迭代。
+>     4. 令 _pjson_ 为 **READ\_PACKAGE\_JSON**(_packageURL_) 的结果。
+>     5. 如果 _pjson_ 不是 **null** 且 _pjson_._exports_ 不是 **null** 或 **undefined**，则
+>        1. 返回 **PACKAGE\_EXPORTS\_RESOLVE**(_packageURL_, _packageSubpath_, _pjson.exports_, _defaultConditions_) 的结果。
+>     6. 否则，如果 _packageSubpath_ 等于 _"."_，则
+>        1. 如果 _pjson.main_ 是字符串，则
+>           1. 返回 _packageURL_ 中 _main_ 的 URL 解析结果。
+>     7. 否则，
+>        1. 返回 _packageURL_ 中 _packageSubpath_ 的 URL 解析结果。
+> 11. 抛出 _模块未找到_ 错误。
 
 **PACKAGE\_SELF\_RESOLVE**(_packageName_, _packageSubpath_, _parentURL_)
 
-> 1. Let _packageURL_ be the result of **LOOKUP\_PACKAGE\_SCOPE**(_parentURL_).
-> 2. If _packageURL_ is **null**, then
->    1. Return **undefined**.
-> 3. Let _pjson_ be the result of **READ\_PACKAGE\_JSON**(_packageURL_).
-> 4. If _pjson_ is **null** or if _pjson_._exports_ is **null** or
->    **undefined**, then
->    1. Return **undefined**.
-> 5. If _pjson.name_ is equal to _packageName_, then
->    1. Return the result of **PACKAGE\_EXPORTS\_RESOLVE**(_packageURL_,
->       _packageSubpath_, _pjson.exports_, _defaultConditions_).
-> 6. Otherwise, return **undefined**.
+> 1. 令 _packageURL_ 为 **LOOKUP\_PACKAGE\_SCOPE**(_parentURL_) 的结果。
+> 2. 如果 _packageURL_ 是 **null**，则
+>    1. 返回 **undefined**。
+> 3. 令 _pjson_ 为 **READ\_PACKAGE\_JSON**(_packageURL_) 的结果。
+> 4. 如果 _pjson_ 是 **null** 或如果 _pjson_._exports_ 是 **null** 或 **undefined**，则
+>    1. 返回 **undefined**。
+> 5. 如果 _pjson.name_ 等于 _packageName_，则
+>    1. 返回 **PACKAGE\_EXPORTS\_RESOLVE**(_packageURL_, _packageSubpath_, _pjson.exports_, _defaultConditions_) 的结果。
+> 6. 否则，返回 **undefined**。
 
 **PACKAGE\_EXPORTS\_RESOLVE**(_packageURL_, _subpath_, _exports_, _conditions_)
 
-Note: This function is directly invoked by the CommonJS resolution algorithm.
+注意：此函数由 CommonJS 解析算法直接调用。
 
-> 1. If _exports_ is an Object with both a key starting with _"."_ and a key not
->    starting with _"."_, throw an _Invalid Package Configuration_ error.
-> 2. If _subpath_ is equal to _"."_, then
->    1. Let _mainExport_ be **undefined**.
->    2. If _exports_ is a String or Array, or an Object containing no keys
->       starting with _"."_, then
->       1. Set _mainExport_ to _exports_.
->    3. Otherwise if _exports_ is an Object containing a _"."_ property, then
->       1. Set _mainExport_ to _exports_\[_"."_].
->    4. If _mainExport_ is not **undefined**, then
->       1. Let _resolved_ be the result of **PACKAGE\_TARGET\_RESOLVE**(
->          _packageURL_, _mainExport_, **null**, **false**, _conditions_).
->       2. If _resolved_ is not **null** or **undefined**, return _resolved_.
-> 3. Otherwise, if _exports_ is an Object and all keys of _exports_ start with
->    _"."_, then
->    1. Assert: _subpath_ begins with _"./"_.
->    2. Let _resolved_ be the result of **PACKAGE\_IMPORTS\_EXPORTS\_RESOLVE**(
->       _subpath_, _exports_, _packageURL_, **false**, _conditions_).
->    3. If _resolved_ is not **null** or **undefined**, return _resolved_.
-> 4. Throw a _Package Path Not Exported_ error.
+> 1. 如果 _exports_ 是一个对象，同时具有以 _"."_ 开头的键和不以 _"."_ 开头的键，则抛出 _无效包配置_ 错误。
+> 2. 如果 _subpath_ 等于 _"."_，则
+>    1. 令 _mainExport_ 为 **undefined**。
+>    2. 如果 _exports_ 是字符串或数组，或者是不包含以 _"."_ 开头的键的对象，则
+>       1. 将 _mainExport_ 设置为 _exports_。
+>    3. 否则，如果 _exports_ 是包含 _"."_ 属性的对象，则
+>       1. 将 _mainExport_ 设置为 _exports_\[_"."_]。
+>    4. 如果 _mainExport_ 不是 **undefined**，则
+>       1. 令 _resolved_ 为 **PACKAGE\_TARGET\_RESOLVE**( _packageURL_, _mainExport_, **null**, **false**, _conditions_) 的结果。
+>       2. 如果 _resolved_ 不是 **null** 或 **undefined**，返回 _resolved_。
+> 3. 否则，如果 _exports_ 是一个对象且 _exports_ 的所有键都以 _"."_ 开头，则
+>    1. 断言：_subpath_ 以 _"./"_ 开头。
+>    2. 令 _resolved_ 为 **PACKAGE\_IMPORTS\_EXPORTS\_RESOLVE**( _subpath_, _exports_, _packageURL_, **false**, _conditions_) 的结果。
+>    3. 如果 _resolved_ 不是 **null** 或 **undefined**，返回 _resolved_。
+> 4. 抛出 _包路径未导出_ 错误。
 
 **PACKAGE\_IMPORTS\_RESOLVE**(_specifier_, _parentURL_, _conditions_)
 
-Note: This function is directly invoked by the CommonJS resolution algorithm.
+注意：此函数由 CommonJS 解析算法直接调用。
 
-> 1. Assert: _specifier_ begins with _"#"_.
-> 2. If _specifier_ is exactly equal to _"#"_ or starts with _"#/"_, then
->    1. Throw an _Invalid Module Specifier_ error.
-> 3. Let _packageURL_ be the result of **LOOKUP\_PACKAGE\_SCOPE**(_parentURL_).
-> 4. If _packageURL_ is not **null**, then
->    1. Let _pjson_ be the result of **READ\_PACKAGE\_JSON**(_packageURL_).
->    2. If _pjson.imports_ is a non-null Object, then
->       1. Let _resolved_ be the result of
->          **PACKAGE\_IMPORTS\_EXPORTS\_RESOLVE**(
->          _specifier_, _pjson.imports_, _packageURL_, **true**, _conditions_).
->       2. If _resolved_ is not **null** or **undefined**, return _resolved_.
-> 5. Throw a _Package Import Not Defined_ error.
+> 1. 断言：_specifier_ 以 _"#"_ 开头。
+> 2. 如果 _specifier_ 完全等于 _"#"_ 或以 _"#/"_ 开头，则
+>    1. 抛出 _无效模块说明符_ 错误。
+> 3. 令 _packageURL_ 为 **LOOKUP\_PACKAGE\_SCOPE**(_parentURL_) 的结果。
+> 4. 如果 _packageURL_ 不是 **null**，则
+>    1. 令 _pjson_ 为 **READ\_PACKAGE\_JSON**(_packageURL_) 的结果。
+>    2. 如果 _pjson.imports_ 是非空对象，则
+>       1. 令 _resolved_ 为 **PACKAGE\_IMPORTS\_EXPORTS\_RESOLVE**( _specifier_, _pjson.imports_, _packageURL_, **true**, _conditions_) 的结果。
+>       2. 如果 _resolved_ 不是 **null** 或 **undefined**，返回 _resolved_。
+> 5. 抛出 _包导入未定义_ 错误。
 
-**PACKAGE\_IMPORTS\_EXPORTS\_RESOLVE**(_matchKey_, _matchObj_, _packageURL_,
-_isImports_, _conditions_)
+**PACKAGE\_IMPORTS\_EXPORTS\_RESOLVE**(_matchKey_, _matchObj_, _packageURL_, _isImports_, _conditions_)
 
-> 1. If _matchKey_ ends in _"/"_, then
->    1. Throw an _Invalid Module Specifier_ error.
-> 2. If _matchKey_ is a key of _matchObj_ and does not contain _"\*"_, then
->    1. Let _target_ be the value of _matchObj_\[_matchKey_].
->    2. Return the result of **PACKAGE\_TARGET\_RESOLVE**(_packageURL_,
->       _target_, **null**, _isImports_, _conditions_).
-> 3. Let _expansionKeys_ be the list of keys of _matchObj_ containing only a
->    single _"\*"_, sorted by the sorting function **PATTERN\_KEY\_COMPARE**
->    which orders in descending order of specificity.
-> 4. For each key _expansionKey_ in _expansionKeys_, do
->    1. Let _patternBase_ be the substring of _expansionKey_ up to but excluding
->       the first _"\*"_ character.
->    2. If _matchKey_ starts with but is not equal to _patternBase_, then
->       1. Let _patternTrailer_ be the substring of _expansionKey_ from the
->          index after the first _"\*"_ character.
->       2. If _patternTrailer_ has zero length, or if _matchKey_ ends with
->          _patternTrailer_ and the length of _matchKey_ is greater than or
->          equal to the length of _expansionKey_, then
->          1. Let _target_ be the value of _matchObj_\[_expansionKey_].
->          2. Let _patternMatch_ be the substring of _matchKey_ starting at the
->             index of the length of _patternBase_ up to the length of
->             _matchKey_ minus the length of _patternTrailer_.
->          3. Return the result of **PACKAGE\_TARGET\_RESOLVE**(_packageURL_,
->             _target_, _patternMatch_, _isImports_, _conditions_).
-> 5. Return **null**.
+> 1. 如果 _matchKey_ 以 _"/"_ 结尾，则
+>    1. 抛出 _无效模块说明符_ 错误。
+> 2. 如果 _matchKey_ 是 _matchObj_ 的键且不包含 _"\*"_，则
+>    1. 令 _target_ 为 _matchObj_\[_matchKey_] 的值。
+>    2. 返回 **PACKAGE\_TARGET\_RESOLVE**(_packageURL_, _target_, **null**, _isImports_, _conditions_) 的结果。
+> 3. 令 _expansionKeys_ 为 _matchObj_ 的键列表，这些键仅包含单个 _"\*"_，通过排序函数 **PATTERN\_KEY\_COMPARE** 排序，该函数按特异性降序排序。
+> 4. 对于 _expansionKeys_ 中的每个键 _expansionKey_，执行
+>    1. 令 _patternBase_ 为 _expansionKey_ 的子字符串，直到但不包括第一个 _"\*"_ 字符。
+>    2. 如果 _matchKey_ 以 _patternBase_ 开头但不等于 _patternBase_，则
+>       1. 令 _patternTrailer_ 为 _expansionKey_ 从第一个 _"\*"_ 字符之后的索引开始的子字符串。
+>       2. 如果 _patternTrailer_ 长度为零，或者如果 _matchKey_ 以 _patternTrailer_ 结尾且 _matchKey_ 的长度大于或等于 _expansionKey_ 的长度，则
+>          1. 令 _target_ 为 _matchObj_\[_expansionKey_] 的值。
+>          2. 令 _patternMatch_ 为 _matchKey_ 从 _patternBase_ 长度索引开始到 _matchKey_ 长度减去 _patternTrailer_ 长度的子字符串。
+>          3. 返回 **PACKAGE\_TARGET\_RESOLVE**(_packageURL_, _target_, _patternMatch_, _isImports_, _conditions_) 的结果。
+> 5. 返回 **null**。
 
 **PATTERN\_KEY\_COMPARE**(_keyA_, _keyB_)
 
-> 1. Assert: _keyA_ contains only a single _"\*"_.
-> 2. Assert: _keyB_ contains only a single _"\*"_.
-> 3. Let _baseLengthA_ be the index of _"\*"_ in _keyA_.
-> 4. Let _baseLengthB_ be the index of _"\*"_ in _keyB_.
-> 5. If _baseLengthA_ is greater than _baseLengthB_, return -1.
-> 6. If _baseLengthB_ is greater than _baseLengthA_, return 1.
-> 7. If the length of _keyA_ is greater than the length of _keyB_, return -1.
-> 8. If the length of _keyB_ is greater than the length of _keyA_, return 1.
-> 9. Return 0.
+> 1. 断言：_keyA_ 仅包含单个 _"\*"_。
+> 2. 断言：_keyB_ 仅包含单个 _"\*"_。
+> 3. 令 _baseLengthA_ 为 _keyA_ 中 _"\*"_ 的索引。
+> 4. 令 _baseLengthB_ 为 _keyB_ 中 _"\*"_ 的索引。
+> 5. 如果 _baseLengthA_ 大于 _baseLengthB_，返回 -1。
+> 6. 如果 _baseLengthB_ 大于 _baseLengthA_，返回 1。
+> 7. 如果 _keyA_ 的长度大于 _keyB_ 的长度，返回 -1。
+> 8. 如果 _keyB_ 的长度大于 _keyA_ 的长度，返回 1。
+> 9. 返回 0。
 
-**PACKAGE\_TARGET\_RESOLVE**(_packageURL_, _target_, _patternMatch_,
-_isImports_, _conditions_)
+**PACKAGE\_TARGET\_RESOLVE**(_packageURL_, _target_, _patternMatch_, _isImports_, _conditions_)
 
-> 1. If _target_ is a String, then
->    1. If _target_ does not start with _"./"_, then
->       1. If _isImports_ is **false**, or if _target_ starts with _"../"_ or
->          _"/"_, or if _target_ is a valid URL, then
->          1. Throw an _Invalid Package Target_ error.
->       2. If _patternMatch_ is a String, then
->          1. Return **PACKAGE\_RESOLVE**(_target_ with every instance of _"\*"_
->             replaced by _patternMatch_, _packageURL_ + _"/"_).
->       3. Return **PACKAGE\_RESOLVE**(_target_, _packageURL_ + _"/"_).
->    2. If _target_ split on _"/"_ or _"\\"_ contains any _""_, _"."_, _".."_,
->       or _"node\_modules"_ segments after the first _"."_ segment, case
->       insensitive and including percent encoded variants, throw an _Invalid
->       Package Target_ error.
->    3. Let _resolvedTarget_ be the URL resolution of the concatenation of
->       _packageURL_ and _target_.
->    4. Assert: _packageURL_ is contained in _resolvedTarget_.
->    5. If _patternMatch_ is **null**, then
->       1. Return _resolvedTarget_.
->    6. If _patternMatch_ split on _"/"_ or _"\\"_ contains any _""_, _"."_,
->       _".."_, or _"node\_modules"_ segments, case insensitive and including
->       percent encoded variants, throw an _Invalid Module Specifier_ error.
->    7. Return the URL resolution of _resolvedTarget_ with every instance of
->       _"\*"_ replaced with _patternMatch_.
-> 2. Otherwise, if _target_ is a non-null Object, then
->    1. If _target_ contains any index property keys, as defined in ECMA-262
->       [6.1.7 Array Index][], throw an _Invalid Package Configuration_ error.
->    2. For each property _p_ of _target_, in object insertion order as,
->       1. If _p_ equals _"default"_ or _conditions_ contains an entry for _p_,
->          then
->          1. Let _targetValue_ be the value of the _p_ property in _target_.
->          2. Let _resolved_ be the result of **PACKAGE\_TARGET\_RESOLVE**(
->             _packageURL_, _targetValue_, _patternMatch_, _isImports_,
->             _conditions_).
->          3. If _resolved_ is equal to **undefined**, continue the loop.
->          4. Return _resolved_.
->    3. Return **undefined**.
-> 3. Otherwise, if _target_ is an Array, then
->    1. If \_target.length is zero, return **null**.
->    2. For each item _targetValue_ in _target_, do
->       1. Let _resolved_ be the result of **PACKAGE\_TARGET\_RESOLVE**(
->          _packageURL_, _targetValue_, _patternMatch_, _isImports_,
->          _conditions_), continuing the loop on any _Invalid Package Target_
->          error.
->       2. If _resolved_ is **undefined**, continue the loop.
->       3. Return _resolved_.
->    3. Return or throw the last fallback resolution **null** return or error.
-> 4. Otherwise, if _target_ is _null_, return **null**.
-> 5. Otherwise throw an _Invalid Package Target_ error.
+> 1. 如果 _target_ 是字符串，则
+>    1. 如果 _target_ 不以 _"./"_ 开头，则
+>       1. 如果 _isImports_ 为 **false**，或者如果 _target_ 以 _"../"_ 或 _"/"_ 开头，或者如果 _target_ 是有效的 URL，则
+>          1. 抛出 _无效包目标_ 错误。
+>       2. 如果 _patternMatch_ 是字符串，则
+>          1. 返回 **PACKAGE\_RESOLVE**(_target_ 中每个 _"\*"_ 实例替换为 _patternMatch_ 的结果, _packageURL_ + _"/"_)。
+>       3. 返回 **PACKAGE\_RESOLVE**(_target_, _packageURL_ + _"/"_)。
+>    2. 如果 _target_ 在 _"/"_ 或 _"\\"_ 上拆分后，在第一个 _"."_ 段之后包含任何 _""_、_"."_、_".."_ 或 _"node\_modules"_ 段，不区分大小写且包括百分比编码变体，则抛出 _无效包目标_ 错误。
+>    3. 令 _resolvedTarget_ 为 _packageURL_ 和 _target_ 连接后的 URL 解析结果。
+>    4. 断言：_packageURL_ 包含在 _resolvedTarget_ 中。
+>    5. 如果 _patternMatch_ 为 **null**，则
+>       1. 返回 _resolvedTarget_。
+>    6. 如果 _patternMatch_ 在 _"/"_ 或 _"\\"_ 上拆分后包含任何 _""_、_"."_、_".."_ 或 _"node\_modules"_ 段，不区分大小写且包括百分比编码变体，则抛出 _无效模块说明符_ 错误。
+>    7. 返回 _resolvedTarget_ 中每个 _"\*"_ 实例替换为 _patternMatch_ 后的 URL 解析结果。
+> 2. 否则，如果 _target_ 是非空对象，则
+>    1. 如果 _target_ 包含任何索引属性键，如 ECMA-262 [6.1.7 Array Index][] 中所定义，则抛出 _无效包配置_ 错误。
+>    2. 对于 _target_ 的每个属性 _p_，按对象插入顺序，
+>       1. 如果 _p_ 等于 _"default"_ 或 _conditions_ 包含 _p_ 的条目，则
+>          1. 令 _targetValue_ 为 _target_ 中 _p_ 属性的值。
+>          2. 令 _resolved_ 为 **PACKAGE\_TARGET\_RESOLVE**( _packageURL_, _targetValue_, _patternMatch_, _isImports_, _conditions_) 的结果。
+>          3. 如果 _resolved_ 等于 **undefined**，继续循环。
+>          4. 返回 _resolved_。
+>    3. 返回 **undefined**。
+> 3. 否则，如果 _target_ 是数组，则
+>    1. 如果 \_target.length 为零，返回 **null**。
+>    2. 对于 _target_ 中的每个项目 _targetValue_，执行
+>       1. 令 _resolved_ 为 **PACKAGE\_TARGET\_RESOLVE**( _packageURL_, _targetValue_, _patternMatch_, _isImports_, _conditions_) 的结果，在任何 _无效包目标_ 错误时继续循环。
+>       2. 如果 _resolved_ 是 **undefined**，继续循环。
+>       3. 返回 _resolved_。
+>    3. 返回或抛出最后一个回退解析 **null** 返回或错误。
+> 4. 否则，如果 _target_ 是 _null_，返回 **null**。
+> 5. 否则抛出 _无效包目标_ 错误。
 
 **ESM\_FILE\_FORMAT**(_url_)
 
-> 1. Assert: _url_ corresponds to an existing file.
-> 2. If _url_ ends in _".mjs"_, then
->    1. Return _"module"_.
-> 3. If _url_ ends in _".cjs"_, then
->    1. Return _"commonjs"_.
-> 4. If _url_ ends in _".json"_, then
->    1. Return _"json"_.
-> 5. If _url_ ends in
->    _".wasm"_, then
->    1. Return _"wasm"_.
-> 6. If `--experimental-addon-modules` is enabled and _url_ ends in
->    _".node"_, then
->    1. Return _"addon"_.
-> 7. Let _packageURL_ be the result of **LOOKUP\_PACKAGE\_SCOPE**(_url_).
-> 8. Let _pjson_ be the result of **READ\_PACKAGE\_JSON**(_packageURL_).
-> 9. Let _packageType_ be **null**.
-> 10. If _pjson?.type_ is _"module"_ or _"commonjs"_, then
->     1. Set _packageType_ to _pjson.type_.
-> 11. If _url_ ends in _".js"_, then
->     1. If _packageType_ is not **null**, then
->        1. Return _packageType_.
->     2. If the result of **DETECT\_MODULE\_SYNTAX**(_source_) is true, then
->        1. Return _"module"_.
->     3. Return _"commonjs"_.
-> 12. If _url_ does not have any extension, then
->     1. If _packageType_ is _"module"_ and the file at _url_ contains the
->        "application/wasm" content type header for a WebAssembly module, then
->        1. Return _"wasm"_.
->     2. If _packageType_ is not **null**, then
->        1. Return _packageType_.
->     3. If the result of **DETECT\_MODULE\_SYNTAX**(_source_) is true, then
->        1. Return _"module"_.
->     4. Return _"commonjs"_.
-> 13. Return **undefined** (will throw during load phase).
+> 1. 断言：_url_ 对应于现有文件。
+> 2. 如果 _url_ 以 _".mjs"_ 结尾，则
+>    1. 返回 _"module"_。
+> 3. 如果 _url_ 以 _".cjs"_ 结尾，则
+>    1. 返回 _"commonjs"_。
+> 4. 如果 _url_ 以 _".json"_ 结尾，则
+>    1. 返回 _"json"_。
+> 5. 如果 _url_ 以 _".wasm"_ 结尾，则
+>    1. 返回 _"wasm"_。
+> 6. 如果启用了 `--experimental-addon-modules` 且 _url_ 以 _".node"_ 结尾，则
+>    1. 返回 _"addon"_。
+> 7. 令 _packageURL_ 为 **LOOKUP\_PACKAGE\_SCOPE**(_url_) 的结果。
+> 8. 令 _pjson_ 为 **READ\_PACKAGE\_JSON**(_packageURL_) 的结果。
+> 9. 令 _packageType_ 为 **null**。
+> 10. 如果 _pjson?.type_ 是 _"module"_ 或 _"commonjs"_，则
+>     1. 将 _packageType_ 设置为 _pjson.type_。
+> 11. 如果 _url_ 以 _".js"_ 结尾，则
+>     1. 如果 _packageType_ 不是 **null**，则
+>        1. 返回 _packageType_。
+>     2. 如果 **DETECT\_MODULE\_SYNTAX**(_source_) 的结果为 true，则
+>        1. 返回 _"module"_。
+>     3. 返回 _"commonjs"_。
+> 12. 如果 _url_ 没有任何扩展名，则
+>     1. 如果 _packageType_ 是 _"module"_ 且 _url_ 处的文件包含 WebAssembly 模块的 "application/wasm" 内容类型头，则
+>        1. 返回 _"wasm"_。
+>     2. 如果 _packageType_ 不是 **null**，则
+>        1. 返回 _packageType_。
+>     3. 如果 **DETECT\_MODULE\_SYNTAX**(_source_) 的结果为 true，则
+>        1. 返回 _"module"_。
+>     4. 返回 _"commonjs"_。
+> 13. 返回 **undefined**（将在加载阶段抛出）。
 
 **LOOKUP\_PACKAGE\_SCOPE**(_url_)
 
-> 1. Let _scopeURL_ be _url_.
-> 2. While _scopeURL_ is not the file system root,
->    1. Set _scopeURL_ to the parent URL of _scopeURL_.
->    2. If _scopeURL_ ends in a _"node\_modules"_ path segment, return **null**.
->    3. Let _pjsonURL_ be the resolution of _"package.json"_ within
->       _scopeURL_.
->    4. if the file at _pjsonURL_ exists, then
->       1. Return _scopeURL_.
-> 3. Return **null**.
+> 1. 令 _scopeURL_ 为 _url_。
+> 2. 当 _scopeURL_ 不是文件系统根目录时，
+>    1. 将 _scopeURL_ 设置为 _scopeURL_ 的父 URL。
+>    2. 如果 _scopeURL_ 以 _"node\_modules"_ 路径段结尾，返回 **null**。
+>    3. 令 _pjsonURL_ 为 _scopeURL_ 内 _"package.json"_ 的解析结果。
+>    4. 如果 _pjsonURL_ 处的文件存在，则
+>       1. 返回 _scopeURL_。
+> 3. 返回 **null**。
 
 **READ\_PACKAGE\_JSON**(_packageURL_)
 
-> 1. Let _pjsonURL_ be the resolution of _"package.json"_ within _packageURL_.
-> 2. If the file at _pjsonURL_ does not exist, then
->    1. Return **null**.
-> 3. If the file at _packageURL_ does not parse as valid JSON, then
->    1. Throw an _Invalid Package Configuration_ error.
-> 4. Return the parsed JSON source of the file at _pjsonURL_.
+> 1. 令 _pjsonURL_ 为 _packageURL_ 内 _"package.json"_ 的解析结果。
+> 2. 如果 _pjsonURL_ 处的文件不存在，则
+>    1. 返回 **null**。
+> 3. 如果 _packageURL_ 处的文件无法解析为有效的 JSON，则
+>    1. 抛出 _无效包配置_ 错误。
+> 4. 返回 _pjsonURL_ 处文件的已解析 JSON 源。
 
 **DETECT\_MODULE\_SYNTAX**(_source_)
 
-> 1. Parse _source_ as an ECMAScript module.
-> 2. If the parse is successful, then
->    1. If _source_ contains top-level `await`, static `import` or `export`
->       statements, or `import.meta`, return **true**.
->    2. If _source_ contains a top-level lexical declaration (`const`, `let`,
->       or `class`) of any of the CommonJS wrapper variables (`require`,
->       `exports`, `module`, `__filename`, or `__dirname`) then return **true**.
-> 3. Else return **false**.
+> 1. 将 _source_ 解析为 ECMAScript 模块。
+> 2. 如果解析成功，则
+>    1. 如果 _source_ 包含顶层 `await`、静态 `import` 或 `export` 语句，或 `import.meta`，返回 **true**。
+>    2. 如果 _source_ 包含任何 CommonJS 包装器变量（`require`、`exports`、`module`、`__filename` 或 `__dirname`）的顶层词法声明（`const`、`let` 或 `class`），则返回 **true**。
+> 3. 否则返回 **false**。
 
-### Customizing ESM specifier resolution algorithm
+### 自定义 ESM 说明符解析算法
 
-[Module customization hooks][] provide a mechanism for customizing the ESM
-specifier resolution algorithm. An example that provides CommonJS-style
-resolution for ESM specifiers is [commonjs-extension-resolution-loader][].
+[模块自定义钩子][Module customization hooks] 提供了一种自定义 ESM 说明符解析算法的机制。一个为 ESM 说明符提供 CommonJS 样式解析的示例是 [commonjs-extension-resolution-loader][]。
 
 <!-- Note: The cjs-module-lexer link should be kept in-sync with the deps version -->
 

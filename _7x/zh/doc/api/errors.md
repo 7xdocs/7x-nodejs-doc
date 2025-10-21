@@ -1,67 +1,46 @@
-# Errors
+# Errors（错误）
 
 <!--introduced_in=v4.0.0-->
 
 <!--type=misc-->
 
-Applications running in Node.js will generally experience the following
-categories of errors:
+在 Node.js 中运行的应用程序通常会遇到以下几类错误：
 
-* Standard JavaScript errors such as {EvalError}, {SyntaxError}, {RangeError},
-  {ReferenceError}, {TypeError}, and {URIError}.
-* Standard `DOMException`s.
-* System errors triggered by underlying operating system constraints such
-  as attempting to open a file that does not exist or attempting to send data
-  over a closed socket.
-* `AssertionError`s are a special class of error that can be triggered when
-  Node.js detects an exceptional logic violation that should never occur. These
-  are raised typically by the `node:assert` module.
-* User-specified errors triggered by application code.
+* 标准 JavaScript 错误，例如 {EvalError}、{SyntaxError}、{RangeError}、{ReferenceError}、{TypeError} 和 {URIError}。
+* 标准 `DOMException` 错误。
+* 由底层操作系统约束触发的系统错误，例如尝试打开不存在的文件或尝试通过已关闭的套接字发送数据。
+* `AssertionError` 是一类特殊的错误，当 Node.js 检测到不应发生的异常逻辑违规时会触发。这些通常由 `node:assert` 模块引发。
+* 由应用程序代码触发的用户指定错误。
 
-All JavaScript and system errors raised by Node.js inherit from, or are
-instances of, the standard JavaScript {Error} class and are guaranteed
-to provide _at least_ the properties available on that class.
+Node.js 引发的所有 JavaScript 和系统错误都继承自标准 JavaScript {Error} 类，或者是该类的实例，并保证 _至少_ 提供该类上可用的属性。
 
-The [`error.message`][] property of errors raised by Node.js may be changed in
-any versions. Use [`error.code`][] to identify an error instead. For a
-`DOMException`, use [`domException.name`][] to identify its type.
+Node.js 引发的错误的 [`error.message`][] 属性可能在任意版本中更改。请使用 [`error.code`][] 来识别错误。对于 `DOMException`，使用 [`domException.name`][] 来识别其类型。
 
-## Error propagation and interception
+## 错误传播与拦截
 
 <!--type=misc-->
 
-Node.js supports several mechanisms for propagating and handling errors that
-occur while an application is running. How these errors are reported and
-handled depends entirely on the type of `Error` and the style of the API that is
-called.
+Node.js 支持多种机制来传播和处理应用程序运行时发生的错误。这些错误的报告和处理方式完全取决于 `Error` 的类型和所调用 API 的风格。
 
-All JavaScript errors are handled as exceptions that _immediately_ generate
-and throw an error using the standard JavaScript `throw` mechanism. These
-are handled using the [`try…catch` construct][try-catch] provided by the
-JavaScript language.
+所有 JavaScript 错误都作为异常处理，使用标准的 JavaScript `throw` 机制 _立即_ 生成并抛出错误。这些错误使用 JavaScript 语言提供的 [`try…catch` 结构][try-catch] 来处理。
 
 ```js
-// Throws with a ReferenceError because z is not defined.
+// 由于 z 未定义，抛出 ReferenceError。
 try {
   const m = 1;
   const n = m + z;
 } catch (err) {
-  // Handle the error here.
+  // 在此处理错误。
 }
 ```
 
-Any use of the JavaScript `throw` mechanism will raise an exception that
-_must_ be handled or the Node.js process will exit immediately.
+任何使用 JavaScript `throw` 机制的操作都会引发异常，该异常 _必须_ 被处理，否则 Node.js 进程将立即退出。
 
-With few exceptions, _Synchronous_ APIs (any blocking method that does not
-return a {Promise} nor accept a `callback` function, such as
-[`fs.readFileSync`][]), will use `throw` to report errors.
+除了少数例外，_同步_ API（任何不返回 {Promise} 也不接受 `callback` 函数的阻塞方法，例如 [`fs.readFileSync`][]）将使用 `throw` 来报告错误。
 
-Errors that occur within _Asynchronous APIs_ may be reported in multiple ways:
+在 _异步 API_ 中发生的错误可能通过多种方式报告：
 
-* Some asynchronous methods returns a {Promise}, you should always take into
-  account that it might be rejected. See [`--unhandled-rejections`][] flag for
-  how the process will react to an unhandled promise rejection.
+* 一些异步方法返回 {Promise}，你应该始终考虑到它可能会被拒绝。有关进程对未处理的 Promise 拒绝如何反应，请参见 [`--unhandled-rejections`][] 标志。
 
   <!-- eslint-disable no-useless-return -->
 
@@ -73,17 +52,14 @@ Errors that occur within _Asynchronous APIs_ may be reported in multiple ways:
     try {
       data = await fs.readFile('a file that does not exist');
     } catch (err) {
-      console.error('There was an error reading the file!', err);
+      console.error('读取文件时出错！', err);
       return;
     }
-    // Otherwise handle the data
+    // 否则处理数据
   })();
   ```
 
-* Most asynchronous methods that accept a `callback` function will accept an
-  `Error` object passed as the first argument to that function. If that first
-  argument is not `null` and is an instance of `Error`, then an error occurred
-  that should be handled.
+* 大多数接受 `callback` 函数的异步方法会将 `Error` 对象作为该函数的第一个参数传递。如果第一个参数不是 `null` 且是 `Error` 的实例，则表示发生了应处理的错误。
 
   <!-- eslint-disable no-useless-return -->
 
@@ -91,116 +67,82 @@ Errors that occur within _Asynchronous APIs_ may be reported in multiple ways:
   const fs = require('node:fs');
   fs.readFile('a file that does not exist', (err, data) => {
     if (err) {
-      console.error('There was an error reading the file!', err);
+      console.error('读取文件时出错！', err);
       return;
     }
-    // Otherwise handle the data
+    // 否则处理数据
   });
   ```
 
-* When an asynchronous method is called on an object that is an
-  [`EventEmitter`][], errors can be routed to that object's `'error'` event.
+* 在作为 [`EventEmitter`][] 的对象上调用异步方法时，错误可以被路由到该对象的 `'error'` 事件。
 
   ```js
   const net = require('node:net');
   const connection = net.connect('localhost');
 
-  // Adding an 'error' event handler to a stream:
+  // 向流添加 'error' 事件处理程序：
   connection.on('error', (err) => {
-    // If the connection is reset by the server, or if it can't
-    // connect at all, or on any sort of error encountered by
-    // the connection, the error will be sent here.
+    // 如果连接被服务器重置，或根本无法连接，或连接遇到任何错误，错误将发送到此。
     console.error(err);
   });
 
   connection.pipe(process.stdout);
   ```
 
-* A handful of typically asynchronous methods in the Node.js API may still
-  use the `throw` mechanism to raise exceptions that must be handled using
-  `try…catch`. There is no comprehensive list of such methods; please
-  refer to the documentation of each method to determine the appropriate
-  error handling mechanism required.
+* Node.js API 中少数通常为异步的方法可能仍使用 `throw` 机制来引发必须使用 `try…catch` 处理的异常。没有此类方法的完整列表；请参考每个方法的文档以确定所需的适当错误处理机制。
 
-The use of the `'error'` event mechanism is most common for [stream-based][]
-and [event emitter-based][] APIs, which themselves represent a series of
-asynchronous operations over time (as opposed to a single operation that may
-pass or fail).
+`'error'` 事件机制的使用在[基于流的][stream-based]和[基于事件发射器的][event emitter-based] API 中最常见，这些 API 本身代表一系列随时间推移的异步操作（与可能通过或失败的单一操作相对）。
 
-For _all_ [`EventEmitter`][] objects, if an `'error'` event handler is not
-provided, the error will be thrown, causing the Node.js process to report an
-uncaught exception and crash unless either: a handler has been registered for
-the [`'uncaughtException'`][] event, or the deprecated [`node:domain`][domains]
-module is used.
+对于 _所有_ [`EventEmitter`][] 对象，如果未提供 `'error'` 事件处理程序，错误将被抛出，导致 Node.js 进程报告未捕获的异常并崩溃，除非：要么已经为 [`'uncaughtException'`][] 事件注册了处理程序，要么使用了已弃用的 [`node:domain`][domains] 模块。
 
 ```js
 const EventEmitter = require('node:events');
 const ee = new EventEmitter();
 
 setImmediate(() => {
-  // This will crash the process because no 'error' event
-  // handler has been added.
-  ee.emit('error', new Error('This will crash'));
+  // 这将使进程崩溃，因为未添加 'error' 事件处理程序。
+  ee.emit('error', new Error('这将导致崩溃'));
 });
 ```
 
-Errors generated in this way _cannot_ be intercepted using `try…catch` as
-they are thrown _after_ the calling code has already exited.
+以这种方式产生的错误 _无法_ 使用 `try…catch` 拦截，因为它们在调用代码已经退出 _之后_ 抛出。
 
-Developers must refer to the documentation for each method to determine
-exactly how errors raised by those methods are propagated.
+开发人员必须参考每个方法的文档以确切了解这些方法引发的错误是如何传播的。
 
-## Class: `Error`
+## 类：`Error`
 
 <!--type=class-->
 
-A generic JavaScript {Error} object that does not denote any specific
-circumstance of why the error occurred. `Error` objects capture a "stack trace"
-detailing the point in the code at which the `Error` was instantiated, and may
-provide a text description of the error.
+通用的 JavaScript {Error} 对象，不表示错误发生的任何具体情况。`Error` 对象捕获了一个“栈追踪”，详细说明了 `Error` 被实例化的代码点，并可能提供错误的文本描述。
 
-All errors generated by Node.js, including all system and JavaScript errors,
-will either be instances of, or inherit from, the `Error` class.
+Node.js 生成的所有错误，包括所有系统和 JavaScript 错误，都将是 `Error` 类的实例或继承自该类。
 
 ### `new Error(message[, options])`
 
 * `message` {string}
 * `options` {Object}
-  * `cause` {any} The error that caused the newly created error.
+  * `cause` {any} 导致新创建错误的原因错误。
 
-Creates a new `Error` object and sets the `error.message` property to the
-provided text message. If an object is passed as `message`, the text message
-is generated by calling `String(message)`. If the `cause` option is provided,
-it is assigned to the `error.cause` property. The `error.stack` property will
-represent the point in the code at which `new Error()` was called. Stack traces
-are dependent on [V8's stack trace API][]. Stack traces extend only to either
-(a) the beginning of _synchronous code execution_, or (b) the number of frames
-given by the property `Error.stackTraceLimit`, whichever is smaller.
+创建一个新的 `Error` 对象并将 `error.message` 属性设置为提供的文本消息。如果传递了一个对象作为 `message`，则通过调用 `String(message)` 生成文本消息。如果提供了 `cause` 选项，它将被赋值给 `error.cause` 属性。`error.stack` 属性将表示在代码中调用 `new Error()` 的点。栈追踪依赖于 [V8 的栈追踪 API][]。栈追踪仅扩展到 (a) _同步代码执行_ 的开始，或 (b) 属性 `Error.stackTraceLimit` 给出的帧数，以较小者为准。
 
 ### `Error.captureStackTrace(targetObject[, constructorOpt])`
 
 * `targetObject` {Object}
 * `constructorOpt` {Function}
 
-Creates a `.stack` property on `targetObject`, which when accessed returns
-a string representing the location in the code at which
-`Error.captureStackTrace()` was called.
+在 `targetObject` 上创建一个 `.stack` 属性，当访问时返回一个字符串，表示在代码中调用 `Error.captureStackTrace()` 的位置。
 
 ```js
 const myObject = {};
 Error.captureStackTrace(myObject);
-myObject.stack;  // Similar to `new Error().stack`
+myObject.stack;  // 类似于 `new Error().stack`
 ```
 
-The first line of the trace will be prefixed with
-`${myObject.name}: ${myObject.message}`.
+追踪的第一行将以 `${myObject.name}: ${myObject.message}` 为前缀。
 
-The optional `constructorOpt` argument accepts a function. If given, all frames
-above `constructorOpt`, including `constructorOpt`, will be omitted from the
-generated stack trace.
+可选的 `constructorOpt` 参数接受一个函数。如果给定，则 `constructorOpt` 以上的所有帧，包括 `constructorOpt`，将从生成的栈追踪中省略。
 
-The `constructorOpt` argument is useful for hiding implementation
-details of error generation from the user. For instance:
+`constructorOpt` 参数对于向用户隐藏错误生成的实现细节非常有用。例如：
 
 ```js
 function a() {
@@ -212,14 +154,14 @@ function b() {
 }
 
 function c() {
-  // Create an error without stack trace to avoid calculating the stack trace twice.
+  // 创建一个没有栈追踪的错误以避免计算两次栈追踪。
   const { stackTraceLimit } = Error;
   Error.stackTraceLimit = 0;
   const error = new Error();
   Error.stackTraceLimit = stackTraceLimit;
 
-  // Capture the stack trace above function b
-  Error.captureStackTrace(error, b); // Neither function c, nor b is included in the stack trace
+  // 捕获函数 b 以上的栈追踪
+  Error.captureStackTrace(error, b); // 函数 c 和 b 都不包含在栈追踪中
   throw error;
 }
 
@@ -228,17 +170,13 @@ a();
 
 ### `Error.stackTraceLimit`
 
-* Type: {number}
+* 类型：{number}
 
-The `Error.stackTraceLimit` property specifies the number of stack frames
-collected by a stack trace (whether generated by `new Error().stack` or
-`Error.captureStackTrace(obj)`).
+`Error.stackTraceLimit` 属性指定了栈追踪收集的栈帧数量（无论是通过 `new Error().stack` 还是 `Error.captureStackTrace(obj)` 生成）。
 
-The default value is `10` but may be set to any valid JavaScript number. Changes
-will affect any stack trace captured _after_ the value has been changed.
+默认值为 `10`，但可以设置为任何有效的 JavaScript 数字。更改将影响在值更改 _之后_ 捕获的任何栈追踪。
 
-If set to a non-number value, or set to a negative number, stack traces will
-not capture any frames.
+如果设置为非数字值，或设置为负数，栈追踪将不会捕获任何帧。
 
 ### `error.cause`
 
@@ -246,31 +184,26 @@ not capture any frames.
 added: v16.9.0
 -->
 
-* Type: {any}
+* 类型：{any}
 
-If present, the `error.cause` property is the underlying cause of the `Error`.
-It is used when catching an error and throwing a new one with a different
-message or code in order to still have access to the original error.
+如果存在，`error.cause` 属性是 `Error` 的根本原因。它在捕获错误并抛出具有不同消息或代码的新错误时使用，以便仍然能够访问原始错误。
 
-The `error.cause` property is typically set by calling
-`new Error(message, { cause })`. It is not set by the constructor if the
-`cause` option is not provided.
+`error.cause` 属性通常通过调用 `new Error(message, { cause })` 来设置。如果未提供 `cause` 选项，则构造函数不会设置此属性。
 
-This property allows errors to be chained. When serializing `Error` objects,
-[`util.inspect()`][] recursively serializes `error.cause` if it is set.
+此属性允许错误链式连接。当序列化 `Error` 对象时，如果设置了 `error.cause`，[`util.inspect()`][] 会递归地序列化它。
 
 ```js
-const cause = new Error('The remote HTTP server responded with a 500 status');
-const symptom = new Error('The message failed to send', { cause });
+const cause = new Error('远程 HTTP 服务器响应了 500 状态码');
+const symptom = new Error('消息发送失败', { cause });
 
 console.log(symptom);
-// Prints:
-//   Error: The message failed to send
+// 打印：
+//   Error: 消息发送失败
 //       at REPL2:1:17
 //       at Script.runInThisContext (node:vm:130:12)
-//       ... 7 lines matching cause stack trace ...
+//       ... 7 行匹配原因栈追踪 ...
 //       at [_line] [as _line] (node:internal/readline/interface:886:18) {
-//     [cause]: Error: The remote HTTP server responded with a 500 status
+//     [cause]: Error: 远程 HTTP 服务器响应了 500 状态码
 //         at REPL1:1:15
 //         at Script.runInThisContext (node:vm:130:12)
 //         at REPLServer.defaultEval (node:repl:574:29)
@@ -285,37 +218,27 @@ console.log(symptom);
 
 ### `error.code`
 
-* Type: {string}
+* 类型：{string}
 
-The `error.code` property is a string label that identifies the kind of error.
-`error.code` is the most stable way to identify an error. It will only change
-between major versions of Node.js. In contrast, `error.message` strings may
-change between any versions of Node.js. See [Node.js error codes][] for details
-about specific codes.
+`error.code` 属性是一个字符串标签，用于标识错误的类型。`error.code` 是识别错误最稳定的方式。它只会在 Node.js 的主要版本之间更改。相比之下，`error.message` 字符串可能在 Node.js 的任何版本之间更改。有关特定代码的详细信息，请参见 [Node.js 错误代码][]。
 
 ### `error.message`
 
-* Type: {string}
+* 类型：{string}
 
-The `error.message` property is the string description of the error as set by
-calling `new Error(message)`. The `message` passed to the constructor will also
-appear in the first line of the stack trace of the `Error`, however changing
-this property after the `Error` object is created _may not_ change the first
-line of the stack trace (for example, when `error.stack` is read before this
-property is changed).
+`error.message` 属性是通过调用 `new Error(message)` 设置的错误字符串描述。传递给构造函数的 `message` 也会出现在 `Error` 栈追踪的第一行，但是在 `Error` 对象创建后更改此属性 _可能不会_ 更改栈追踪的第一行（例如，在更改此属性之前读取了 `error.stack`）。
 
 ```js
-const err = new Error('The message');
+const err = new Error('消息');
 console.error(err.message);
-// Prints: The message
+// 打印：消息
 ```
 
 ### `error.stack`
 
-* Type: {string}
+* 类型：{string}
 
-The `error.stack` property is a string describing the point in the code at which
-the `Error` was instantiated.
+`error.stack` 属性是一个字符串，描述了实例化 `Error` 的代码点。
 
 ```console
 Error: Things keep happening!
@@ -325,33 +248,22 @@ Error: Things keep happening!
    at increaseSynergy (/home/gbusey/actors.js:701:6)
 ```
 
-The first line is formatted as `<error class name>: <error message>`, and
-is followed by a series of stack frames (each line beginning with "at ").
-Each frame describes a call site within the code that lead to the error being
-generated. V8 attempts to display a name for each function (by variable name,
-function name, or object method name), but occasionally it will not be able to
-find a suitable name. If V8 cannot determine a name for the function, only
-location information will be displayed for that frame. Otherwise, the
-determined function name will be displayed with location information appended
-in parentheses.
+第一行格式为 `<error class name>: <error message>`，后跟一系列栈帧（每行以 "at " 开头）。每帧描述了导致错误生成的代码中的调用站点。V8 尝试为每个函数显示一个名称（通过变量名、函数名或对象方法名），但偶尔它无法找到合适的名称。如果 V8 无法确定函数的名称，则仅显示该帧的位置信息。否则，确定的函数名将显示，并在括号中附加位置信息。
 
-Frames are only generated for JavaScript functions. If, for example, execution
-synchronously passes through a C++ addon function called `cheetahify` which
-itself calls a JavaScript function, the frame representing the `cheetahify` call
-will not be present in the stack traces:
+帧仅针对 JavaScript 函数生成。例如，如果执行同步地通过一个名为 `cheetahify` 的 C++ 插件函数，而该函数本身调用了一个 JavaScript 函数，则代表 `cheetahify` 调用的帧将不会出现在栈追踪中：
 
 ```js
 const cheetahify = require('./native-binding.node');
 
 function makeFaster() {
-  // `cheetahify()` *synchronously* calls speedy.
+  // `cheetahify()` *同步地* 调用 speedy。
   cheetahify(function speedy() {
     throw new Error('oh no!');
   });
 }
 
 makeFaster();
-// will throw:
+// 将抛出：
 //   /home/gbusey/file.js:6
 //       throw new Error('oh no!');
 //           ^
@@ -368,285 +280,217 @@ makeFaster();
 //       at node.js:906:3
 ```
 
-The location information will be one of:
+位置信息将是以下之一：
 
-* `native`, if the frame represents a call internal to V8 (as in `[].forEach`).
-* `plain-filename.js:line:column`, if the frame represents a call internal
-  to Node.js.
-* `/absolute/path/to/file.js:line:column`, if the frame represents a call in
-  a user program (using CommonJS module system), or its dependencies.
-* `<transport-protocol>:///url/to/module/file.mjs:line:column`, if the frame
-  represents a call in a user program (using ES module system), or
-  its dependencies.
+* `native`，如果帧表示对 V8 内部的调用（如 `[].forEach`）。
+* `plain-filename.js:line:column`，如果帧表示对 Node.js 内部的调用。
+* `/absolute/path/to/file.js:line:column`，如果帧表示用户程序（使用 CommonJS 模块系统）或其依赖项中的调用。
+* `<transport-protocol>:///url/to/module/file.mjs:line:column`，如果帧表示用户程序（使用 ES 模块系统）或其依赖项中的调用。
 
-The string representing the stack trace is lazily generated when the
-`error.stack` property is **accessed**.
+表示栈追踪的字符串在 **访问** `error.stack` 属性时 **延迟生成**。
 
-The number of frames captured by the stack trace is bounded by the smaller of
-`Error.stackTraceLimit` or the number of available frames on the current event
-loop tick.
+栈追踪捕获的帧数受 `Error.stackTraceLimit` 或当前事件循环滴答中可用帧数的较小值限制。
 
-## Class: `AssertionError`
+## 类：`AssertionError`
 
-* Extends: {errors.Error}
+* 扩展自：{errors.Error}
 
-Indicates the failure of an assertion. For details, see
-[`Class: assert.AssertionError`][].
+表示断言失败。有关详细信息，请参见 [`Class: assert.AssertionError`][]。
 
-## Class: `RangeError`
+## 类：`RangeError`
 
-* Extends: {errors.Error}
+* 扩展自：{errors.Error}
 
-Indicates that a provided argument was not within the set or range of
-acceptable values for a function; whether that is a numeric range, or
-outside the set of options for a given function parameter.
+表示提供的参数不在函数可接受值的集合或范围内；无论是数值范围，还是给定函数参数选项集之外。
 
 ```js
 require('node:net').connect(-1);
-// Throws "RangeError: "port" option should be >= 0 and < 65536: -1"
+// 抛出 "RangeError: "port" 选项应 >= 0 且 < 65536: -1"
 ```
 
-Node.js will generate and throw `RangeError` instances _immediately_ as a form
-of argument validation.
+Node.js 将 _立即_ 生成并抛出 `RangeError` 实例作为参数验证的一种形式。
 
-## Class: `ReferenceError`
+## 类：`ReferenceError`
 
-* Extends: {errors.Error}
+* 扩展自：{errors.Error}
 
-Indicates that an attempt is being made to access a variable that is not
-defined. Such errors commonly indicate typos in code, or an otherwise broken
-program.
+表示尝试访问未定义的变量。此类错误通常表示代码中的拼写错误或其他程序损坏。
 
-While client code may generate and propagate these errors, in practice, only V8
-will do so.
+虽然客户端代码可能会生成和传播这些错误，但在实践中，只有 V8 会这样做。
 
 ```js
 doesNotExist;
-// Throws ReferenceError, doesNotExist is not a variable in this program.
+// 抛出 ReferenceError，doesNotExist 不是此程序中的变量。
 ```
 
-Unless an application is dynamically generating and running code,
-`ReferenceError` instances indicate a bug in the code or its dependencies.
+除非应用程序动态生成并运行代码，否则 `ReferenceError` 实例表示代码或其依赖项中存在错误。
 
-## Class: `SyntaxError`
+## 类：`SyntaxError`
 
-* Extends: {errors.Error}
+* 扩展自：{errors.Error}
 
-Indicates that a program is not valid JavaScript. These errors may only be
-generated and propagated as a result of code evaluation. Code evaluation may
-happen as a result of `eval`, `Function`, `require`, or [vm][]. These errors
-are almost always indicative of a broken program.
+表示程序不是有效的 JavaScript。这些错误可能仅作为代码评估的结果生成和传播。代码评估可能由于 `eval`、`Function`、`require` 或 [vm][] 而发生。这些错误几乎总是表明程序已损坏。
 
 ```js
 try {
   require('node:vm').runInThisContext('binary ! isNotOk');
 } catch (err) {
-  // 'err' will be a SyntaxError.
+  // 'err' 将是 SyntaxError。
 }
 ```
 
-`SyntaxError` instances are unrecoverable in the context that created them –
-they may only be caught by other contexts.
+`SyntaxError` 实例在创建它们的上下文中是不可恢复的——它们只能被其他上下文捕获。
 
-## Class: `SystemError`
+## 类：`SystemError`
 
-* Extends: {errors.Error}
+* 扩展自：{errors.Error}
 
-Node.js generates system errors when exceptions occur within its runtime
-environment. These usually occur when an application violates an operating
-system constraint. For example, a system error will occur if an application
-attempts to read a file that does not exist.
+当异常发生在 Node.js 运行时环境中时，Node.js 会生成系统错误。这通常发生在应用程序违反操作系统约束时。例如，如果应用程序尝试读取不存在的文件，将发生系统错误。
 
-* `address` {string} If present, the address to which a network connection
-  failed
-* `code` {string} The string error code
-* `dest` {string} If present, the file path destination when reporting a file
-  system error
-* `errno` {number} The system-provided error number
-* `info` {Object} If present, extra details about the error condition
-* `message` {string} A system-provided human-readable description of the error
-* `path` {string} If present, the file path when reporting a file system error
-* `port` {number} If present, the network connection port that is not available
-* `syscall` {string} The name of the system call that triggered the error
+* `address` {string} 如果存在，网络连接失败的地址
+* `code` {string} 字符串错误代码
+* `dest` {string} 如果存在，报告文件系统错误时的文件路径目标
+* `errno` {number} 系统提供的错误号
+* `info` {Object} 如果存在，关于错误条件的额外详细信息
+* `message` {string} 系统提供的错误描述（人类可读）
+* `path` {string} 如果存在，报告文件系统错误时的文件路径
+* `port` {number} 如果存在，不可用的网络连接端口
+* `syscall` {string} 触发错误的系统调用的名称
 
 ### `error.address`
 
-* Type: {string}
+* 类型：{string}
 
-If present, `error.address` is a string describing the address to which a
-network connection failed.
+如果存在，`error.address` 是一个字符串，描述网络连接失败的地址。
 
 ### `error.code`
 
-* Type: {string}
+* 类型：{string}
 
-The `error.code` property is a string representing the error code.
+`error.code` 属性是一个字符串，表示错误代码。
 
 ### `error.dest`
 
-* Type: {string}
+* 类型：{string}
 
-If present, `error.dest` is the file path destination when reporting a file
-system error.
+如果存在，`error.dest` 是报告文件系统错误时的文件路径目标。
 
 ### `error.errno`
 
-* Type: {number}
+* 类型：{number}
 
-The `error.errno` property is a negative number which corresponds
-to the error code defined in [`libuv Error handling`][].
+`error.errno` 属性是一个负数，对应于 [`libuv Error handling`][] 中定义的错误代码。
 
-On Windows the error number provided by the system will be normalized by libuv.
+在 Windows 上，系统提供的错误号将由 libuv 规范化。
 
-To get the string representation of the error code, use
-[`util.getSystemErrorName(error.errno)`][].
+要获取错误代码的字符串表示，请使用 [`util.getSystemErrorName(error.errno)`][]。
 
 ### `error.info`
 
-* Type: {Object}
+* 类型：{Object}
 
-If present, `error.info` is an object with details about the error condition.
+如果存在，`error.info` 是一个包含错误条件详细信息的对象。
 
 ### `error.message`
 
-* Type: {string}
+* 类型：{string}
 
-`error.message` is a system-provided human-readable description of the error.
+`error.message` 是系统提供的错误描述（人类可读）。
 
 ### `error.path`
 
-* Type: {string}
+* 类型：{string}
 
-If present, `error.path` is a string containing a relevant invalid pathname.
+如果存在，`error.path` 是一个包含相关无效路径名的字符串。
 
 ### `error.port`
 
-* Type: {number}
+* 类型：{number}
 
-If present, `error.port` is the network connection port that is not available.
+如果存在，`error.port` 是不可用的网络连接端口。
 
 ### `error.syscall`
 
-* Type: {string}
+* 类型：{string}
 
-The `error.syscall` property is a string describing the [syscall][] that failed.
+`error.syscall` 属性是一个字符串，描述失败的 [syscall][]。
 
-### Common system errors
+### 常见系统错误
 
-This is a list of system errors commonly-encountered when writing a Node.js
-program. For a comprehensive list, see the [`errno`(3) man page][].
+这是在编写 Node.js 程序时经常遇到的系统错误列表。有关完整列表，请参见 [`errno`(3) man page][]。
 
-* `EACCES` (Permission denied): An attempt was made to access a file in a way
-  forbidden by its file access permissions.
+* `EACCES`（权限被拒绝）：尝试以文件访问权限禁止的方式访问文件。
 
-* `EADDRINUSE` (Address already in use): An attempt to bind a server
-  ([`net`][], [`http`][], or [`https`][]) to a local address failed due to
-  another server on the local system already occupying that address.
+* `EADDRINUSE`（地址已被使用）：尝试将服务器（[`net`][]、[`http`][] 或 [`https`][]）绑定到本地地址失败，因为本地系统上的另一个服务器已经占用了该地址。
 
-* `ECONNREFUSED` (Connection refused): No connection could be made because the
-  target machine actively refused it. This usually results from trying to
-  connect to a service that is inactive on the foreign host.
+* `ECONNREFUSED`（连接被拒绝）：无法建立连接，因为目标机器主动拒绝。这通常是由于尝试连接到外部主机上未激活的服务所致。
 
-* `ECONNRESET` (Connection reset by peer): A connection was forcibly closed by
-  a peer. This normally results from a loss of the connection on the remote
-  socket due to a timeout or reboot. Commonly encountered via the [`http`][]
-  and [`net`][] modules.
+* `ECONNRESET`（连接被对端重置）：连接被对端强制关闭。这通常是由于远程套接字因超时或重启导致连接丢失。通常通过 [`http`][] 和 [`net`][] 模块遇到。
 
-* `EEXIST` (File exists): An existing file was the target of an operation that
-  required that the target not exist.
+* `EEXIST`（文件已存在）：现有文件是要求目标不存在的操作的目标。
 
-* `EISDIR` (Is a directory): An operation expected a file, but the given
-  pathname was a directory.
+* `EISDIR`（是一个目录）：操作期望一个文件，但给定的路径名是一个目录。
 
-* `EMFILE` (Too many open files in system): Maximum number of
-  [file descriptors][] allowable on the system has been reached, and
-  requests for another descriptor cannot be fulfilled until at least one
-  has been closed. This is encountered when opening many files at once in
-  parallel, especially on systems (in particular, macOS) where there is a low
-  file descriptor limit for processes. To remedy a low limit, run
-  `ulimit -n 2048` in the same shell that will run the Node.js process.
+* `EMFILE`（系统中打开的文件过多）：系统允许的[文件描述符][]的最大数量已达到，在至少关闭一个之前，无法满足另一个描述符的请求。这在同时并行打开许多文件时遇到，特别是在那些进程文件描述符限制较低的系统（特别是 macOS）上。要补救低限制，请在运行 Node.js 进程的同一 shell 中运行 `ulimit -n 2048`。
 
-* `ENOENT` (No such file or directory): Commonly raised by [`fs`][] operations
-  to indicate that a component of the specified pathname does not exist. No
-  entity (file or directory) could be found by the given path.
+* `ENOENT`（没有这样的文件或目录）：通常由 [`fs`][] 操作引发，表示指定路径名的组件不存在。给定路径找不到任何实体（文件或目录）。
 
-* `ENOTDIR` (Not a directory): A component of the given pathname existed, but
-  was not a directory as expected. Commonly raised by [`fs.readdir`][].
+* `ENOTDIR`（不是目录）：给定路径名的组件存在，但不是预期的目录。通常由 [`fs.readdir`][] 引发。
 
-* `ENOTEMPTY` (Directory not empty): A directory with entries was the target
-  of an operation that requires an empty directory, usually [`fs.unlink`][].
+* `ENOTEMPTY`（目录非空）：包含条目的目录是需要空目录的操作的目标，通常是 [`fs.unlink`][]。
 
-* `ENOTFOUND` (DNS lookup failed): Indicates a DNS failure of either
-  `EAI_NODATA` or `EAI_NONAME`. This is not a standard POSIX error.
+* `ENOTFOUND`（DNS 查找失败）：表示 `EAI_NODATA` 或 `EAI_NONAME` 的 DNS 失败。这不是标准的 POSIX 错误。
 
-* `EPERM` (Operation not permitted): An attempt was made to perform an
-  operation that requires elevated privileges.
+* `EPERM`（操作不被允许）：尝试执行需要提升权限的操作。
 
-* `EPIPE` (Broken pipe): A write on a pipe, socket, or FIFO for which there is
-  no process to read the data. Commonly encountered at the [`net`][] and
-  [`http`][] layers, indicative that the remote side of the stream being
-  written to has been closed.
+* `EPIPE`（管道破裂）：在管道、套接字或 FIFO 上进行写入，但没有进程读取数据。通常在 [`net`][] 和 [`http`][] 层遇到，表示写入的流的远程端已关闭。
 
-* `ETIMEDOUT` (Operation timed out): A connect or send request failed because
-  the connected party did not properly respond after a period of time. Usually
-  encountered by [`http`][] or [`net`][]. Often a sign that a `socket.end()`
-  was not properly called.
+* `ETIMEDOUT`（操作超时）：连接或发送请求失败，因为连接方在一段时间后未正确响应。通常由 [`http`][] 或 [`net`][] 遇到。通常表示未正确调用 `socket.end()`。
 
-## Class: `TypeError`
+## 类：`TypeError`
 
-* Extends {errors.Error}
+* 扩展自 {errors.Error}
 
-Indicates that a provided argument is not an allowable type. For example,
-passing a function to a parameter which expects a string would be a `TypeError`.
+表示提供的参数不是允许的类型。例如，将函数传递给期望字符串的参数将是一个 `TypeError`。
 
 ```js
 require('node:url').parse(() => { });
-// Throws TypeError, since it expected a string.
+// 抛出 TypeError，因为它期望一个字符串。
 ```
 
-Node.js will generate and throw `TypeError` instances _immediately_ as a form
-of argument validation.
+Node.js 将 _立即_ 生成并抛出 `TypeError` 实例作为参数验证的一种形式。
 
-## Exceptions vs. errors
+## 异常与错误
 
 <!--type=misc-->
 
-A JavaScript exception is a value that is thrown as a result of an invalid
-operation or as the target of a `throw` statement. While it is not required
-that these values are instances of `Error` or classes which inherit from
-`Error`, all exceptions thrown by Node.js or the JavaScript runtime _will_ be
-instances of `Error`.
+JavaScript 异常是由于无效操作或作为 `throw` 语句的目标而抛出的值。虽然不要求这些值是 `Error` 的实例或继承自 `Error`，但 Node.js 或 JavaScript 运行时抛出的所有异常 _都将是_ `Error` 的实例。
 
-Some exceptions are _unrecoverable_ at the JavaScript layer. Such exceptions
-will _always_ cause the Node.js process to crash. Examples include `assert()`
-checks or `abort()` calls in the C++ layer.
+一些异常在 JavaScript 层是 _不可恢复的_。此类异常将 _总是_ 导致 Node.js 进程崩溃。示例包括 C++ 层中的 `assert()` 检查或 `abort()` 调用。
 
-## OpenSSL errors
+## OpenSSL 错误
 
-Errors originating in `crypto` or `tls` are of class `Error`, and in addition to
-the standard `.code` and `.message` properties, may have some additional
-OpenSSL-specific properties.
+源自 `crypto` 或 `tls` 的错误属于 `Error` 类，除了标准的 `.code` 和 `.message` 属性外，可能还有一些额外的 OpenSSL 特定属性。
 
 ### `error.opensslErrorStack`
 
-An array of errors that can give context to where in the OpenSSL library an
-error originates from.
+一个错误数组，可以提供错误在 OpenSSL 库中起源位置的上下文。
 
 ### `error.function`
 
-The OpenSSL function the error originates in.
+错误起源的 OpenSSL 函数。
 
 ### `error.library`
 
-The OpenSSL library the error originates in.
+错误起源的 OpenSSL 库。
 
 ### `error.reason`
 
-A human-readable string describing the reason for the error.
+描述错误原因的人类可读字符串。
 
 <a id="nodejs-error-codes"></a>
 
-## Node.js error codes
+## Node.js 错误代码
 
 <a id="ABORT_ERR"></a>
 
@@ -656,123 +500,103 @@ A human-readable string describing the reason for the error.
 added: v15.0.0
 -->
 
-Used when an operation has been aborted (typically using an `AbortController`).
+当操作被中止时使用（通常使用 `AbortController`）。
 
-APIs _not_ using `AbortSignal`s typically do not raise an error with this code.
+_不_ 使用 `AbortSignal` 的 API 通常不会引发带有此代码的错误。
 
-This code does not use the regular `ERR_*` convention Node.js errors use in
-order to be compatible with the web platform's `AbortError`.
+此代码不使用 Node.js 错误使用的常规 `ERR_*` 约定，以便与 Web 平台的 `AbortError` 兼容。
 
 <a id="ERR_ACCESS_DENIED"></a>
 
 ### `ERR_ACCESS_DENIED`
 
-A special type of error that is triggered whenever Node.js tries to get access
-to a resource restricted by the [Permission Model][].
+一种特殊类型的错误，每当 Node.js 尝试访问受[权限模型][Permission Model]限制的资源时触发。
 
 <a id="ERR_AMBIGUOUS_ARGUMENT"></a>
 
 ### `ERR_AMBIGUOUS_ARGUMENT`
 
-A function argument is being used in a way that suggests that the function
-signature may be misunderstood. This is thrown by the `node:assert` module when
-the `message` parameter in `assert.throws(block, message)` matches the error
-message thrown by `block` because that usage suggests that the user believes
-`message` is the expected message rather than the message the `AssertionError`
-will display if `block` does not throw.
+函数参数的使用方式暗示函数签名可能被误解。当 `node:assert` 模块中的 `assert.throws(block, message)` 的 `message` 参数与 `block` 抛出的错误消息匹配时，会抛出此错误，因为这种用法表明用户认为 `message` 是预期消息，而不是如果 `block` 未抛出时 `AssertionError` 将显示的消息。
 
 <a id="ERR_ARG_NOT_ITERABLE"></a>
 
 ### `ERR_ARG_NOT_ITERABLE`
 
-An iterable argument (i.e. a value that works with `for...of` loops) was
-required, but not provided to a Node.js API.
+需要可迭代参数（即适用于 `for...of` 循环的值），但未提供给 Node.js API。
 
 <a id="ERR_ASSERTION"></a>
 
 ### `ERR_ASSERTION`
 
-A special type of error that can be triggered whenever Node.js detects an
-exceptional logic violation that should never occur. These are raised typically
-by the `node:assert` module.
+一种特殊类型的错误，每当 Node.js 检测到不应发生的异常逻辑违规时可以触发。这些通常由 `node:assert` 模块引发。
 
 <a id="ERR_ASYNC_CALLBACK"></a>
 
-### `ERR_ASYNC_CALLBACK`
+### `ERR_ASYNC_CALLBACK```
 
-An attempt was made to register something that is not a function as an
-`AsyncHooks` callback.
+尝试将不是函数的内容注册为 `AsyncHooks` 回调。
 
 <a id="ERR_ASYNC_TYPE"></a>
 
 ### `ERR_ASYNC_TYPE`
 
-The type of an asynchronous resource was invalid. Users are also able
-to define their own types if using the public embedder API.
+异步资源的类型无效。如果使用公共嵌入器 API，用户也能够定义自己的类型。
 
 <a id="ERR_BROTLI_COMPRESSION_FAILED"></a>
 
 ### `ERR_BROTLI_COMPRESSION_FAILED`
 
-Data passed to a Brotli stream was not successfully compressed.
+传递给 Brotli 流的数据未能成功压缩。
 
 <a id="ERR_BROTLI_INVALID_PARAM"></a>
 
 ### `ERR_BROTLI_INVALID_PARAM`
 
-An invalid parameter key was passed during construction of a Brotli stream.
+在构建 Brotli 流期间传递了无效的参数键。
 
 <a id="ERR_BUFFER_CONTEXT_NOT_AVAILABLE"></a>
 
-### `ERR_BUFFER_CONTEXT_NOT_AVAILABLE`
+### `ERR_BUFFER_CONTEXT_NOT_AVAILABLE```
 
-An attempt was made to create a Node.js `Buffer` instance from addon or embedder
-code, while in a JS engine Context that is not associated with a Node.js
-instance. The data passed to the `Buffer` method will have been released
-by the time the method returns.
+尝试从插件或嵌入器代码创建 Node.js `Buffer` 实例，但所在的 JS 引擎上下文与 Node.js 实例无关。传递给 `Buffer` 方法的数据将在方法返回时被释放。
 
-When encountering this error, a possible alternative to creating a `Buffer`
-instance is to create a normal `Uint8Array`, which only differs in the
-prototype of the resulting object. `Uint8Array`s are generally accepted in all
-Node.js core APIs where `Buffer`s are; they are available in all Contexts.
+遇到此错误时，创建 `Buffer` 实例的一个可能替代方法是创建普通的 `Uint8Array`，它仅在结果对象的原型上有所不同。`Uint8Array` 通常在所有接受 `Buffer` 的 Node.js 核心 API 中被接受；它们在所有上下文中都可用。
 
 <a id="ERR_BUFFER_OUT_OF_BOUNDS"></a>
 
-### `ERR_BUFFER_OUT_OF_BOUNDS`
+### `ERR_BUFFER_OUT_OF_BOUNDS```
 
-An operation outside the bounds of a `Buffer` was attempted.
+尝试在 `Buffer` 的边界之外进行操作。
 
 <a id="ERR_BUFFER_TOO_LARGE"></a>
 
-### `ERR_BUFFER_TOO_LARGE`
+### `ERR_BUFFER_TOO_LARGE```
 
-An attempt has been made to create a `Buffer` larger than the maximum allowed
-size.
+尝试创建超过最大允许大小的 `Buffer`。
 
 <a id="ERR_CANNOT_WATCH_SIGINT"></a>
 
-### `ERR_CANNOT_WATCH_SIGINT`
+### `ERR_CANNOT_WATCH_SIGINT```
 
-Node.js was unable to watch for the `SIGINT` signal.
+Node.js 无法监视 `SIGINT` 信号。
 
 <a id="ERR_CHILD_CLOSED_BEFORE_REPLY"></a>
 
-### `ERR_CHILD_CLOSED_BEFORE_REPLY`
+### `ERR_CHILD_CLOSED_BEFORE_REPLY```
 
-A child process was closed before the parent received a reply.
+子进程在父进程收到回复之前关闭。
 
 <a id="ERR_CHILD_PROCESS_IPC_REQUIRED"></a>
 
-### `ERR_CHILD_PROCESS_IPC_REQUIRED`
+### `ERR_CHILD_PROCESS_IPC_REQUIRED```
 
-Used when a child process is being forked without specifying an IPC channel.
+当派生子进程时未指定 IPC 通道时使用。
 
 <a id="ERR_CHILD_PROCESS_STDIO_MAXBUFFER"></a>
 
-### `ERR_CHILD_PROCESS_STDIO_MAXBUFFER`
+### `ERR_CHILD_PROCESS_STDIO_MAXBUFFER```
 
-Used when the main process is trying to read data from the child process's
-STDERR/STDOUT, and the data's length is longer than the `maxBuffer` option.
+当主进程尝试从子进程的 STDERR/STDOUT 读取数据，且数据长度超过 `maxBuffer` 选项时使用。
 
 <a id="ERR_CLOSED_MESSAGE_PORT"></a>
 
@@ -791,15 +615,13 @@ changes:
     description: The error message was removed.
 -->
 
-There was an attempt to use a `MessagePort` instance in a closed
-state, usually after `.close()` has been called.
+尝试在关闭状态下使用 `MessagePort` 实例，通常在调用 `.close()` 之后。
 
 <a id="ERR_CONSOLE_WRITABLE_STREAM"></a>
 
-### `ERR_CONSOLE_WRITABLE_STREAM`
+### `ERR_CONSOLE_WRITABLE_STREAM```
 
-`Console` was instantiated without `stdout` stream, or `Console` has a
-non-writable `stdout` or `stderr` stream.
+`Console` 实例化时没有 `stdout` 流，或者 `Console` 的 `stdout` 或 `stderr` 流不可写。
 
 <a id="ERR_CONSTRUCT_CALL_INVALID"></a>
 
@@ -809,22 +631,19 @@ non-writable `stdout` or `stderr` stream.
 added: v12.5.0
 -->
 
-A class constructor was called that is not callable.
+调用了不可调用的类构造函数。
 
 <a id="ERR_CONSTRUCT_CALL_REQUIRED"></a>
 
-### `ERR_CONSTRUCT_CALL_REQUIRED`
+### `ERR_CONSTRUCT_CALL_REQUIRED```
 
-A constructor for a class was called without `new`.
+类的构造函数被调用时没有使用 `new`。
 
 <a id="ERR_CONTEXT_NOT_INITIALIZED"></a>
 
-### `ERR_CONTEXT_NOT_INITIALIZED`
+### `ERR_CONTEXT_NOT_INITIALIZED```
 
-The vm context passed into the API is not yet initialized. This could happen
-when an error occurs (and is caught) during the creation of the
-context, for example, when the allocation fails or the maximum call stack
-size is reached when the context is created.
+传递给 API 的 vm 上下文尚未初始化。这可能在上下文创建期间发生错误（并被捕获）时发生，例如，在分配失败或创建上下文时达到最大调用栈大小。
 
 <a id="ERR_CPU_PROFILE_ALREADY_STARTED"></a>
 
@@ -834,7 +653,7 @@ size is reached when the context is created.
 added: v24.8.0
 -->
 
-The CPU profile with the given name is already started.
+具有给定名称的 CPU 分析已启动。
 
 <a id="ERR_CPU_PROFILE_NOT_STARTED"></a>
 
@@ -844,7 +663,7 @@ The CPU profile with the given name is already started.
 added: v24.8.0
 -->
 
-The CPU profile with the given name is not started.
+具有给定名称的 CPU 分析未启动。
 
 <a id="ERR_CPU_PROFILE_TOO_MANY"></a>
 
@@ -854,82 +673,73 @@ The CPU profile with the given name is not started.
 added: v24.8.0
 -->
 
-There are too many CPU profiles being collected.
+正在收集的 CPU 分析过多。
 
 <a id="ERR_CRYPTO_ARGON2_NOT_SUPPORTED"></a>
 
-### `ERR_CRYPTO_ARGON2_NOT_SUPPORTED`
+### `ERR_CRYPTO_ARGON2_NOT_SUPPORTED```
 
-Argon2 is not supported by the current version of OpenSSL being used.
+当前使用的 OpenSSL 版本不支持 Argon2。
 
 <a id="ERR_CRYPTO_CUSTOM_ENGINE_NOT_SUPPORTED"></a>
 
-### `ERR_CRYPTO_CUSTOM_ENGINE_NOT_SUPPORTED`
+### `ERR_CRYPTO_CUSTOM_ENGINE_NOT_SUPPORTED```
 
-An OpenSSL engine was requested (for example, through the `clientCertEngine` or
-`privateKeyEngine` TLS options) that is not supported by the version of OpenSSL
-being used, likely due to the compile-time flag `OPENSSL_NO_ENGINE`.
+请求了当前使用的 OpenSSL 版本不支持的 OpenSSL 引擎（例如，通过 `clientCertEngine` 或 `privateKeyEngine` TLS 选项），可能是由于编译时标志 `OPENSSL_NO_ENGINE`。
 
 <a id="ERR_CRYPTO_ECDH_INVALID_FORMAT"></a>
 
-### `ERR_CRYPTO_ECDH_INVALID_FORMAT`
+### `ERR_CRYPTO_ECDH_INVALID_FORMAT```
 
-An invalid value for the `format` argument was passed to the `crypto.ECDH()`
-class `getPublicKey()` method.
+向 `crypto.ECDH()` 类的 `getPublicKey()` 方法传递了无效的 `format` 参数值。
 
 <a id="ERR_CRYPTO_ECDH_INVALID_PUBLIC_KEY"></a>
 
-### `ERR_CRYPTO_ECDH_INVALID_PUBLIC_KEY`
+### `ERR_CRYPTO_ECDH_INVALID_PUBLIC_KEY```
 
-An invalid value for the `key` argument has been passed to the
-`crypto.ECDH()` class `computeSecret()` method. It means that the public
-key lies outside of the elliptic curve.
+向 `crypto.ECDH()` 类的 `computeSecret()` 方法传递了无效的 `key` 参数值。这意味着公钥位于椭圆曲线之外。
 
 <a id="ERR_CRYPTO_ENGINE_UNKNOWN"></a>
 
-### `ERR_CRYPTO_ENGINE_UNKNOWN`
+### `ERR_CRYPTO_ENGINE_UNKNOWN```
 
-An invalid crypto engine identifier was passed to
-[`require('node:crypto').setEngine()`][].
+向 [`require('node:crypto').setEngine()`][] 传递了无效的加密引擎标识符。
 
 <a id="ERR_CRYPTO_FIPS_FORCED"></a>
 
-### `ERR_CRYPTO_FIPS_FORCED`
+### `ERR_CRYPTO_FIPS_FORCED```
 
-The [`--force-fips`][] command-line argument was used but there was an attempt
-to enable or disable FIPS mode in the `node:crypto` module.
+使用了 [`--force-fips`][] 命令行参数，但尝试在 `node:crypto` 模块中启用或禁用 FIPS 模式。
 
 <a id="ERR_CRYPTO_FIPS_UNAVAILABLE"></a>
 
-### `ERR_CRYPTO_FIPS_UNAVAILABLE`
+### `ERR_CRYPTO_FIPS_UNAVAILABLE```
 
-An attempt was made to enable or disable FIPS mode, but FIPS mode was not
-available.
+尝试启用或禁用 FIPS 模式，但 FIPS 模式不可用。
 
 <a id="ERR_CRYPTO_HASH_FINALIZED"></a>
 
-### `ERR_CRYPTO_HASH_FINALIZED`
+### `ERR_CRYPTO_HASH_FINALIZED```
 
-[`hash.digest()`][] was called multiple times. The `hash.digest()` method must
-be called no more than one time per instance of a `Hash` object.
+[`hash.digest()`][] 被多次调用。`hash.digest()` 方法在每个 `Hash` 对象实例中最多只能调用一次。
 
 <a id="ERR_CRYPTO_HASH_UPDATE_FAILED"></a>
 
-### `ERR_CRYPTO_HASH_UPDATE_FAILED`
+### `ERR_CRYPTO_HASH_UPDATE_FAILED```
 
-[`hash.update()`][] failed for any reason. This should rarely, if ever, happen.
+[`hash.update()`][] 因任何原因失败。这应该很少发生。
 
 <a id="ERR_CRYPTO_INCOMPATIBLE_KEY"></a>
 
-### `ERR_CRYPTO_INCOMPATIBLE_KEY`
+### `ERR_CRYPTO_INCOMPATIBLE_KEY```
 
-The given crypto keys are incompatible with the attempted operation.
+给定的加密密钥与尝试的操作不兼容。
 
 <a id="ERR_CRYPTO_INCOMPATIBLE_KEY_OPTIONS"></a>
 
-### `ERR_CRYPTO_INCOMPATIBLE_KEY_OPTIONS`
+### `ERR_CRYPTO_INCOMPATIBLE_KEY_OPTIONS```
 
-The selected public or private key encoding is incompatible with other options.
+选择的公钥或私钥编码与其他选项不兼容。
 
 <a id="ERR_CRYPTO_INITIALIZATION_FAILED"></a>
 
@@ -939,7 +749,7 @@ The selected public or private key encoding is incompatible with other options.
 added: v15.0.0
 -->
 
-Initialization of the crypto subsystem failed.
+加密子系统初始化失败。
 
 <a id="ERR_CRYPTO_INVALID_AUTH_TAG"></a>
 
@@ -949,7 +759,7 @@ Initialization of the crypto subsystem failed.
 added: v15.0.0
 -->
 
-An invalid authentication tag was provided.
+提供了无效的身份验证标签。
 
 <a id="ERR_CRYPTO_INVALID_COUNTER"></a>
 
@@ -959,7 +769,7 @@ An invalid authentication tag was provided.
 added: v15.0.0
 -->
 
-An invalid counter was provided for a counter-mode cipher.
+为计数器模式密码提供了无效的计数器。
 
 <a id="ERR_CRYPTO_INVALID_CURVE"></a>
 
@@ -969,13 +779,13 @@ An invalid counter was provided for a counter-mode cipher.
 added: v15.0.0
 -->
 
-An invalid elliptic-curve was provided.
+提供了无效的椭圆曲线。
 
 <a id="ERR_CRYPTO_INVALID_DIGEST"></a>
 
-### `ERR_CRYPTO_INVALID_DIGEST`
+### `ERR_CRYPTO_INVALID_DIGEST```
 
-An invalid [crypto digest algorithm][] was specified.
+指定了无效的[加密摘要算法][crypto digest algorithm]。
 
 <a id="ERR_CRYPTO_INVALID_IV"></a>
 
@@ -985,7 +795,7 @@ An invalid [crypto digest algorithm][] was specified.
 added: v15.0.0
 -->
 
-An invalid initialization vector was provided.
+提供了无效的初始化向量。
 
 <a id="ERR_CRYPTO_INVALID_JWK"></a>
 
@@ -995,7 +805,7 @@ An invalid initialization vector was provided.
 added: v15.0.0
 -->
 
-An invalid JSON Web Key was provided.
+提供了无效的 JSON Web Key。
 
 <a id="ERR_CRYPTO_INVALID_KEYLEN"></a>
 
@@ -1005,7 +815,7 @@ An invalid JSON Web Key was provided.
 added: v15.0.0
 -->
 
-An invalid key length was provided.
+提供了无效的密钥长度。
 
 <a id="ERR_CRYPTO_INVALID_KEYPAIR"></a>
 
@@ -1015,7 +825,7 @@ An invalid key length was provided.
 added: v15.0.0
 -->
 
-An invalid key pair was provided.
+提供了无效的密钥对。
 
 <a id="ERR_CRYPTO_INVALID_KEYTYPE"></a>
 
@@ -1025,13 +835,13 @@ An invalid key pair was provided.
 added: v15.0.0
 -->
 
-An invalid key type was provided.
+提供了无效的密钥类型。
 
 <a id="ERR_CRYPTO_INVALID_KEY_OBJECT_TYPE"></a>
 
-### `ERR_CRYPTO_INVALID_KEY_OBJECT_TYPE`
+### `ERR_CRYPTO_INVALID_KEY_OBJECT_TYPE```
 
-The given crypto key object's type is invalid for the attempted operation.
+给定的加密密钥对象的类型对于尝试的操作无效。
 
 <a id="ERR_CRYPTO_INVALID_MESSAGELEN"></a>
 
@@ -1041,7 +851,7 @@ The given crypto key object's type is invalid for the attempted operation.
 added: v15.0.0
 -->
 
-An invalid message length was provided.
+提供了无效的消息长度。
 
 <a id="ERR_CRYPTO_INVALID_SCRYPT_PARAMS"></a>
 
@@ -1051,15 +861,13 @@ An invalid message length was provided.
 added: v15.0.0
 -->
 
-One or more [`crypto.scrypt()`][] or [`crypto.scryptSync()`][] parameters are
-outside their legal range.
+一个或多个 [`crypto.scrypt()`][] 或 [`crypto.scryptSync()`][] 参数超出其合法范围。
 
 <a id="ERR_CRYPTO_INVALID_STATE"></a>
 
-### `ERR_CRYPTO_INVALID_STATE`
+### `ERR_CRYPTO_INVALID_STATE```
 
-A crypto method was used on an object that was in an invalid state. For
-instance, calling [`cipher.getAuthTag()`][] before calling `cipher.final()`.
+在处于无效状态的对象上使用了加密方法。例如，在调用 `cipher.final()` 之前调用 [`cipher.getAuthTag()`][]。
 
 <a id="ERR_CRYPTO_INVALID_TAG_LENGTH"></a>
 
@@ -1069,7 +877,7 @@ instance, calling [`cipher.getAuthTag()`][] before calling `cipher.final()`.
 added: v15.0.0
 -->
 
-An invalid authentication tag length was provided.
+提供了无效的身份验证标签长度。
 
 <a id="ERR_CRYPTO_JOB_INIT_FAILED"></a>
 
@@ -1079,21 +887,19 @@ An invalid authentication tag length was provided.
 added: v15.0.0
 -->
 
-Initialization of an asynchronous crypto operation failed.
+异步加密操作初始化失败。
 
 <a id="ERR_CRYPTO_JWK_UNSUPPORTED_CURVE"></a>
 
-### `ERR_CRYPTO_JWK_UNSUPPORTED_CURVE`
+### `ERR_CRYPTO_JWK_UNSUPPORTED_CURVE```
 
-Key's Elliptic Curve is not registered for use in the
-[JSON Web Key Elliptic Curve Registry][].
+密钥的椭圆曲线未在 [JSON Web Key Elliptic Curve Registry][] 中注册使用。
 
 <a id="ERR_CRYPTO_JWK_UNSUPPORTED_KEY_TYPE"></a>
 
-### `ERR_CRYPTO_JWK_UNSUPPORTED_KEY_TYPE`
+### `ERR_CRYPTO_JWK_UNSUPPORTED_KEY_TYPE```
 
-Key's Asymmetric Key Type is not registered for use in the
-[JSON Web Key Types Registry][].
+密钥的非对称密钥类型未在 [JSON Web Key Types Registry][] 中注册使用。
 
 <a id="ERR_CRYPTO_KEM_NOT_SUPPORTED"></a>
 
@@ -1103,8 +909,7 @@ Key's Asymmetric Key Type is not registered for use in the
 added: v24.7.0
 -->
 
-Attempted to use KEM operations while Node.js was not compiled with
-OpenSSL with KEM support.
+尝试使用 KEM 操作，但 Node.js 编译时未使用支持 KEM 的 OpenSSL。
 
 <a id="ERR_CRYPTO_OPERATION_FAILED"></a>
 
@@ -1114,47 +919,43 @@ OpenSSL with KEM support.
 added: v15.0.0
 -->
 
-A crypto operation failed for an otherwise unspecified reason.
+加密操作因其他未指定的原因失败。
 
 <a id="ERR_CRYPTO_PBKDF2_ERROR"></a>
 
-### `ERR_CRYPTO_PBKDF2_ERROR`
+### `ERR_CRYPTO_PBKDF2_ERROR```
 
-The PBKDF2 algorithm failed for unspecified reasons. OpenSSL does not provide
-more details and therefore neither does Node.js.
+PBKDF2 算法因未指定的原因失败。OpenSSL 不提供更多细节，因此 Node.js 也不提供。
 
 <a id="ERR_CRYPTO_SCRYPT_NOT_SUPPORTED"></a>
 
-### `ERR_CRYPTO_SCRYPT_NOT_SUPPORTED`
+### `ERR_CRYPTO_SCRYPT_NOT_SUPPORTED```
 
-Node.js was compiled without `scrypt` support. Not possible with the official
-release binaries but can happen with custom builds, including distro builds.
+Node.js 编译时未包含 `scrypt` 支持。官方发布版本不可能发生，但可能发生在自定义构建中，包括发行版构建。
 
 <a id="ERR_CRYPTO_SIGN_KEY_REQUIRED"></a>
 
-### `ERR_CRYPTO_SIGN_KEY_REQUIRED`
+### `ERR_CRYPTO_SIGN_KEY_REQUIRED```
 
-A signing `key` was not provided to the [`sign.sign()`][] method.
+未向 [`sign.sign()`][] 方法提供签名 `key`。
 
 <a id="ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH"></a>
 
-### `ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH`
+### `ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH```
 
-[`crypto.timingSafeEqual()`][] was called with `Buffer`, `TypedArray`, or
-`DataView` arguments of different lengths.
+使用不同长度的 `Buffer`、`TypedArray` 或 `DataView` 参数调用了 [`crypto.timingSafeEqual()`][]。
 
 <a id="ERR_CRYPTO_UNKNOWN_CIPHER"></a>
 
-### `ERR_CRYPTO_UNKNOWN_CIPHER`
+### `ERR_CRYPTO_UNKNOWN_CIPHER```
 
-An unknown cipher was specified.
+指定了未知的密码。
 
 <a id="ERR_CRYPTO_UNKNOWN_DH_GROUP"></a>
 
-### `ERR_CRYPTO_UNKNOWN_DH_GROUP`
+### `ERR_CRYPTO_UNKNOWN_DH_GROUP```
 
-An unknown Diffie-Hellman group name was given. See
-[`crypto.getDiffieHellman()`][] for a list of valid group names.
+给出了未知的 Diffie-Hellman 组名。有关有效组名列表，请参见 [`crypto.getDiffieHellman()`][]。
 
 <a id="ERR_CRYPTO_UNSUPPORTED_OPERATION"></a>
 
@@ -1166,7 +967,7 @@ added:
   - v14.18.0
 -->
 
-An attempt to invoke an unsupported crypto operation was made.
+尝试调用不受支持的加密操作。
 
 <a id="ERR_DEBUGGER_ERROR"></a>
 
@@ -1178,7 +979,7 @@ added:
   - v14.17.4
 -->
 
-An error occurred with the [debugger][].
+[调试器][debugger]发生错误。
 
 <a id="ERR_DEBUGGER_STARTUP_ERROR"></a>
 
@@ -1190,13 +991,13 @@ added:
   - v14.17.4
 -->
 
-The [debugger][] timed out waiting for the required host/port to be free.
+[调试器][debugger]在等待所需的主机/端口空闲时超时。
 
 <a id="ERR_DIR_CLOSED"></a>
 
-### `ERR_DIR_CLOSED`
+### `ERR_DIR_CLOSED```
 
-The [`fs.Dir`][] was previously closed.
+[`fs.Dir`][] 先前已关闭。
 
 <a id="ERR_DIR_CONCURRENT_OPERATION"></a>
 
@@ -1206,8 +1007,7 @@ The [`fs.Dir`][] was previously closed.
 added: v14.3.0
 -->
 
-A synchronous read or close call was attempted on an [`fs.Dir`][] which has
-ongoing asynchronous operations.
+尝试在具有正在进行异步操作的 [`fs.Dir`][] 上进行同步读取或关闭调用。
 
 <a id="ERR_DLOPEN_DISABLED"></a>
 
@@ -1219,7 +1019,7 @@ added:
   - v14.19.0
 -->
 
-Loading native addons has been disabled using [`--no-addons`][].
+已使用 [`--no-addons`][] 禁用加载原生插件。
 
 <a id="ERR_DLOPEN_FAILED"></a>
 
@@ -1229,80 +1029,69 @@ Loading native addons has been disabled using [`--no-addons`][].
 added: v15.0.0
 -->
 
-A call to `process.dlopen()` failed.
+调用 `process.dlopen()` 失败。
 
 <a id="ERR_DNS_SET_SERVERS_FAILED"></a>
 
-### `ERR_DNS_SET_SERVERS_FAILED`
+### `ERR_DNS_SET_SERVERS_FAILED```
 
-`c-ares` failed to set the DNS server.
+`c-ares` 未能设置 DNS 服务器。
 
 <a id="ERR_DOMAIN_CALLBACK_NOT_AVAILABLE"></a>
 
-### `ERR_DOMAIN_CALLBACK_NOT_AVAILABLE`
+### `ERR_DOMAIN_CALLBACK_NOT_AVAILABLE```
 
-The `node:domain` module was not usable since it could not establish the
-required error handling hooks, because
-[`process.setUncaughtExceptionCaptureCallback()`][] had been called at an
-earlier point in time.
+`node:domain` 模块不可用，因为它无法建立所需的错误处理钩子，因为 [`process.setUncaughtExceptionCaptureCallback()`][] 在更早的时间点已被调用。
 
 <a id="ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE"></a>
 
-### `ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE`
+### `ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE```
 
-[`process.setUncaughtExceptionCaptureCallback()`][] could not be called
-because the `node:domain` module has been loaded at an earlier point in time.
+无法调用 [`process.setUncaughtExceptionCaptureCallback()`][]，因为 `node:domain` 模块在更早的时间点已被加载。
 
-The stack trace is extended to include the point in time at which the
-`node:domain` module had been loaded.
+栈追踪被扩展以包含加载 `node:domain` 模块的时间点。
 
 <a id="ERR_DUPLICATE_STARTUP_SNAPSHOT_MAIN_FUNCTION"></a>
 
-### `ERR_DUPLICATE_STARTUP_SNAPSHOT_MAIN_FUNCTION`
+### `ERR_DUPLICATE_STARTUP_SNAPSHOT_MAIN_FUNCTION```
 
-[`v8.startupSnapshot.setDeserializeMainFunction()`][] could not be called
-because it had already been called before.
+无法调用 [`v8.startupSnapshot.setDeserializeMainFunction()`][]，因为它之前已被调用过。
 
 <a id="ERR_ENCODING_INVALID_ENCODED_DATA"></a>
 
-### `ERR_ENCODING_INVALID_ENCODED_DATA`
+### `ERR_ENCODING_INVALID_ENCODED_DATA```
 
-Data provided to `TextDecoder()` API was invalid according to the encoding
-provided.
+提供给 `TextDecoder()` API 的数据根据提供的编码无效。
 
 <a id="ERR_ENCODING_NOT_SUPPORTED"></a>
 
-### `ERR_ENCODING_NOT_SUPPORTED`
+### `ERR_ENCODING_NOT_SUPPORTED```
 
-Encoding provided to `TextDecoder()` API was not one of the
-[WHATWG Supported Encodings][].
+提供给 `TextDecoder()` API 的编码不是 [WHATWG 支持的编码][WHATWG Supported Encodings] 之一。
 
 <a id="ERR_EVAL_ESM_CANNOT_PRINT"></a>
 
-### `ERR_EVAL_ESM_CANNOT_PRINT`
+### `ERR_EVAL_ESM_CANNOT_PRINT```
 
-`--print` cannot be used with ESM input.
+`--print` 不能与 ESM 输入一起使用。
 
 <a id="ERR_EVENT_RECURSION"></a>
 
-### `ERR_EVENT_RECURSION`
+### `ERR_EVENT_RECURSION```
 
-Thrown when an attempt is made to recursively dispatch an event on `EventTarget`.
+尝试在 `EventTarget` 上递归分发事件时抛出。
 
 <a id="ERR_EXECUTION_ENVIRONMENT_NOT_AVAILABLE"></a>
 
-### `ERR_EXECUTION_ENVIRONMENT_NOT_AVAILABLE`
+### `ERR_EXECUTION_ENVIRONMENT_NOT_AVAILABLE```
 
-The JS execution context is not associated with a Node.js environment.
-This may occur when Node.js is used as an embedded library and some hooks
-for the JS engine are not set up properly.
+JS 执行上下文与 Node.js 环境无关。这可能发生在 Node.js 被用作嵌入式库且未正确设置 JS 引擎的一些钩子时。
 
 <a id="ERR_FALSY_VALUE_REJECTION"></a>
 
-### `ERR_FALSY_VALUE_REJECTION`
+### `ERR_FALSY_VALUE_REJECTION```
 
-A `Promise` that was callbackified via `util.callbackify()` was rejected with a
-falsy value.
+通过 `util.callbackify()` 回调化的 `Promise` 被拒绝，且拒绝值为假值。
 
 <a id="ERR_FEATURE_UNAVAILABLE_ON_PLATFORM"></a>
 
@@ -1312,8 +1101,7 @@ falsy value.
 added: v14.0.0
 -->
 
-Used when a feature that is not available
-to the current platform which is running Node.js is used.
+当使用对运行 Node.js 的当前平台不可用的功能时使用。
 
 <a id="ERR_FS_CP_DIR_TO_NON_DIR"></a>
 
@@ -1323,8 +1111,7 @@ to the current platform which is running Node.js is used.
 added: v16.7.0
 -->
 
-An attempt was made to copy a directory to a non-directory (file, symlink,
-etc.) using [`fs.cp()`][].
+尝试使用 [`fs.cp()`][] 将目录复制到非目录（文件、符号链接等）。
 
 <a id="ERR_FS_CP_EEXIST"></a>
 
@@ -1334,8 +1121,7 @@ etc.) using [`fs.cp()`][].
 added: v16.7.0
 -->
 
-An attempt was made to copy over a file that already existed with
-[`fs.cp()`][], with the `force` and `errorOnExist` set to `true`.
+尝试使用 [`fs.cp()`][] 覆盖已存在的文件，且 `force` 和 `errorOnExist` 设置为 `true`。
 
 <a id="ERR_FS_CP_EINVAL"></a>
 
@@ -1345,7 +1131,7 @@ An attempt was made to copy over a file that already existed with
 added: v16.7.0
 -->
 
-When using [`fs.cp()`][], `src` or `dest` pointed to an invalid path.
+使用 [`fs.cp()`][] 时，`src` 或 `dest` 指向无效路径。
 
 <a id="ERR_FS_CP_FIFO_PIPE"></a>
 
@@ -1355,7 +1141,7 @@ When using [`fs.cp()`][], `src` or `dest` pointed to an invalid path.
 added: v16.7.0
 -->
 
-An attempt was made to copy a named pipe with [`fs.cp()`][].
+尝试使用 [`fs.cp()`][] 复制命名管道。
 
 <a id="ERR_FS_CP_NON_DIR_TO_DIR"></a>
 
@@ -1365,8 +1151,7 @@ An attempt was made to copy a named pipe with [`fs.cp()`][].
 added: v16.7.0
 -->
 
-An attempt was made to copy a non-directory (file, symlink, etc.) to a directory
-using [`fs.cp()`][].
+尝试使用 [`fs.cp()`][] 将非目录（文件、符号链接等）复制到目录。
 
 <a id="ERR_FS_CP_SOCKET"></a>
 
@@ -1376,7 +1161,7 @@ using [`fs.cp()`][].
 added: v16.7.0
 -->
 
-An attempt was made to copy to a socket with [`fs.cp()`][].
+尝试使用 [`fs.cp()`][] 复制到套接字。
 
 <a id="ERR_FS_CP_SYMLINK_TO_SUBDIRECTORY"></a>
 
@@ -1386,8 +1171,7 @@ An attempt was made to copy to a socket with [`fs.cp()`][].
 added: v16.7.0
 -->
 
-When using [`fs.cp()`][], a symlink in `dest` pointed to a subdirectory
-of `src`.
+使用 [`fs.cp()`][] 时，`dest` 中的符号链接指向 `src` 的子目录。
 
 <a id="ERR_FS_CP_UNKNOWN"></a>
 
@@ -1397,318 +1181,283 @@ of `src`.
 added: v16.7.0
 -->
 
-An attempt was made to copy to an unknown file type with [`fs.cp()`][].
+尝试使用 [`fs.cp()`][] 复制到未知文件类型。
 
 <a id="ERR_FS_EISDIR"></a>
 
-### `ERR_FS_EISDIR`
+### `ERR_FS_EISDIR```
 
-Path is a directory.
+路径是目录。
 
 <a id="ERR_FS_FILE_TOO_LARGE"></a>
 
-### `ERR_FS_FILE_TOO_LARGE`
+### `ERR_FS_FILE_TOO_LARGE```
 
-An attempt was made to read a file larger than the supported 2 GiB limit for
-`fs.readFile()`. This is not a limitation of `Buffer`, but an internal I/O constraint.
-For handling larger files, consider using `fs.createReadStream()` to read the
-file in chunks.
+尝试读取大于 `fs.readFile()` 支持的 2 GiB 限制的文件。这不是 `Buffer` 的限制，而是内部 I/O 约束。要处理更大的文件，请考虑使用 `fs.createReadStream()` 分块读取文件。
 
 <a id="ERR_FS_WATCH_QUEUE_OVERFLOW"></a>
 
-### `ERR_FS_WATCH_QUEUE_OVERFLOW`
+### `ERR_FS_WATCH_QUEUE_OVERFLOW```
 
-The number of file system events queued without being handled exceeded the size specified in
-`maxQueue` in `fs.watch()`.
+未处理的文件系统事件队列数量超过了 `fs.watch()` 中 `maxQueue` 指定的大小。
 
 <a id="ERR_HTTP2_ALTSVC_INVALID_ORIGIN"></a>
 
-### `ERR_HTTP2_ALTSVC_INVALID_ORIGIN`
+### `ERR_HTTP2_ALTSVC_INVALID_ORIGIN```
 
-HTTP/2 ALTSVC frames require a valid origin.
+HTTP/2 ALTSVC 帧需要有效的来源。
 
 <a id="ERR_HTTP2_ALTSVC_LENGTH"></a>
 
-### `ERR_HTTP2_ALTSVC_LENGTH`
+### `ERR_HTTP2_ALTSVC_LENGTH```
 
-HTTP/2 ALTSVC frames are limited to a maximum of 16,382 payload bytes.
+HTTP/2 ALTSVC 帧限制为最多 16,382 个有效载荷字节。
 
 <a id="ERR_HTTP2_CONNECT_AUTHORITY"></a>
 
-### `ERR_HTTP2_CONNECT_AUTHORITY`
+### `ERR_HTTP2_CONNECT_AUTHORITY```
 
-For HTTP/2 requests using the `CONNECT` method, the `:authority` pseudo-header
-is required.
+对于使用 `CONNECT` 方法的 HTTP/2 请求，需要 `:authority` 伪头部。
 
 <a id="ERR_HTTP2_CONNECT_PATH"></a>
 
-### `ERR_HTTP2_CONNECT_PATH`
+### `ERR_HTTP2_CONNECT_PATH```
 
-For HTTP/2 requests using the `CONNECT` method, the `:path` pseudo-header is
-forbidden.
+对于使用 `CONNECT` 方法的 HTTP/2 请求，禁止使用 `:path` 伪头部。
 
 <a id="ERR_HTTP2_CONNECT_SCHEME"></a>
 
-### `ERR_HTTP2_CONNECT_SCHEME`
+### `ERR_HTTP2_CONNECT_SCHEME```
 
-For HTTP/2 requests using the `CONNECT` method, the `:scheme` pseudo-header is
-forbidden.
+对于使用 `CONNECT` 方法的 HTTP/2 请求，禁止使用 `:scheme` 伪头部。
 
 <a id="ERR_HTTP2_ERROR"></a>
 
-### `ERR_HTTP2_ERROR`
+### `ERR_HTTP2_ERROR```
 
-A non-specific HTTP/2 error has occurred.
+发生了非特定的 HTTP/2 错误。
 
 <a id="ERR_HTTP2_GOAWAY_SESSION"></a>
 
-### `ERR_HTTP2_GOAWAY_SESSION`
+### `ERR_HTTP2_GOAWAY_SESSION```
 
-New HTTP/2 Streams may not be opened after the `Http2Session` has received a
-`GOAWAY` frame from the connected peer.
+在 `Http2Session` 从连接的对端接收到 `GOAWAY` 帧后，可能无法打开新的 HTTP/2 流。
 
 <a id="ERR_HTTP2_HEADERS_AFTER_RESPOND"></a>
 
-### `ERR_HTTP2_HEADERS_AFTER_RESPOND`
+### `ERR_HTTP2_HEADERS_AFTER_RESPOND```
 
-An additional headers was specified after an HTTP/2 response was initiated.
+在 HTTP/2 响应启动后指定了额外的头部。
 
 <a id="ERR_HTTP2_HEADERS_SENT"></a>
 
-### `ERR_HTTP2_HEADERS_SENT`
+### `ERR_HTTP2_HEADERS_SENT```
 
-An attempt was made to send multiple response headers.
+尝试发送多个响应头部。
 
 <a id="ERR_HTTP2_HEADER_SINGLE_VALUE"></a>
 
-### `ERR_HTTP2_HEADER_SINGLE_VALUE`
+### `ERR_HTTP2_HEADER_SINGLE_VALUE```
 
-Multiple values were provided for an HTTP/2 header field that was required to
-have only a single value.
+为需要只有一个值的 HTTP/2 头部字段提供了多个值。
 
 <a id="ERR_HTTP2_INFO_STATUS_NOT_ALLOWED"></a>
 
-### `ERR_HTTP2_INFO_STATUS_NOT_ALLOWED`
+### `ERR_HTTP2_INFO_STATUS_NOT_ALLOWED```
 
-Informational HTTP status codes (`1xx`) may not be set as the response status
-code on HTTP/2 responses.
+信息性 HTTP 状态码（`1xx`）不能设置为 HTTP/2 响应的响应状态码。
 
 <a id="ERR_HTTP2_INVALID_CONNECTION_HEADERS"></a>
 
-### `ERR_HTTP2_INVALID_CONNECTION_HEADERS`
+### `ERR_HTTP2_INVALID_CONNECTION_HEADERS```
 
-HTTP/1 connection specific headers are forbidden to be used in HTTP/2
-requests and responses.
+HTTP/1 连接特定的头部禁止在 HTTP/2 请求和响应中使用。
 
 <a id="ERR_HTTP2_INVALID_HEADER_VALUE"></a>
 
-### `ERR_HTTP2_INVALID_HEADER_VALUE`
+### `ERR_HTTP2_INVALID_HEADER_VALUE```
 
-An invalid HTTP/2 header value was specified.
+指定了无效的 HTTP/2 头部值。
 
 <a id="ERR_HTTP2_INVALID_INFO_STATUS"></a>
 
-### `ERR_HTTP2_INVALID_INFO_STATUS`
+### `ERR_HTTP2_INVALID_INFO_STATUS```
 
-An invalid HTTP informational status code has been specified. Informational
-status codes must be an integer between `100` and `199` (inclusive).
+指定了无效的 HTTP 信息状态码。信息状态码必须是 `100` 到 `199`（包含）之间的整数。
 
 <a id="ERR_HTTP2_INVALID_ORIGIN"></a>
 
-### `ERR_HTTP2_INVALID_ORIGIN`
+### `ERR_HTTP2_INVALID_ORIGIN```
 
-HTTP/2 `ORIGIN` frames require a valid origin.
+HTTP/2 `ORIGIN` 帧需要有效的来源。
 
 <a id="ERR_HTTP2_INVALID_PACKED_SETTINGS_LENGTH"></a>
 
-### `ERR_HTTP2_INVALID_PACKED_SETTINGS_LENGTH`
+### `ERR_HTTP2_INVALID_PACKED_SETTINGS_LENGTH```
 
-Input `Buffer` and `Uint8Array` instances passed to the
-`http2.getUnpackedSettings()` API must have a length that is a multiple of
-six.
+传递给 `http2.getUnpackedSettings()` API 的输入 `Buffer` 和 `Uint8Array` 实例的长度必须是六的倍数。
 
 <a id="ERR_HTTP2_INVALID_PSEUDOHEADER"></a>
 
-### `ERR_HTTP2_INVALID_PSEUDOHEADER`
+### `ERR_HTTP2_INVALID_PSEUDOHEADER```
 
-Only valid HTTP/2 pseudoheaders (`:status`, `:path`, `:authority`, `:scheme`,
-and `:method`) may be used.
+只能使用有效的 HTTP/2 伪头部（`:status`、`:path`、`:authority`、`:scheme` 和 `:method`）。
 
 <a id="ERR_HTTP2_INVALID_SESSION"></a>
 
-### `ERR_HTTP2_INVALID_SESSION`
+### `ERR_HTTP2_INVALID_SESSION```
 
-An action was performed on an `Http2Session` object that had already been
-destroyed.
+在已经销毁的 `Http2Session` 对象上执行了操作。
 
 <a id="ERR_HTTP2_INVALID_SETTING_VALUE"></a>
 
-### `ERR_HTTP2_INVALID_SETTING_VALUE`
+### `ERR_HTTP2_INVALID_SETTING_VALUE```
 
-An invalid value has been specified for an HTTP/2 setting.
+为 HTTP/2 设置指定了无效的值。
 
 <a id="ERR_HTTP2_INVALID_STREAM"></a>
 
-### `ERR_HTTP2_INVALID_STREAM`
+### `ERR_HTTP2_INVALID_STREAM```
 
-An operation was performed on a stream that had already been destroyed.
+在已经销毁的流上执行了操作。
 
 <a id="ERR_HTTP2_MAX_PENDING_SETTINGS_ACK"></a>
 
-### `ERR_HTTP2_MAX_PENDING_SETTINGS_ACK`
+### `ERR_HTTP2_MAX_PENDING_SETTINGS_ACK```
 
-Whenever an HTTP/2 `SETTINGS` frame is sent to a connected peer, the peer is
-required to send an acknowledgment that it has received and applied the new
-`SETTINGS`. By default, a maximum number of unacknowledged `SETTINGS` frames may
-be sent at any given time. This error code is used when that limit has been
-reached.
+每当 HTTP/2 `SETTINGS` 帧发送到连接的对端时，对端需要发送确认，表示已接收并应用新的 `SETTINGS`。默认情况下，在任何给定时间可以发送的最大未确认 `SETTINGS` 帧数量是有限的。当达到该限制时，使用此错误代码。
 
 <a id="ERR_HTTP2_NESTED_PUSH"></a>
 
-### `ERR_HTTP2_NESTED_PUSH`
+### `ERR_HTTP2_NESTED_PUSH```
 
-An attempt was made to initiate a new push stream from within a push stream.
-Nested push streams are not permitted.
+尝试从推送流内部启动新的推送流。不允许嵌套推送流。
 
 <a id="ERR_HTTP2_NO_MEM"></a>
 
-### `ERR_HTTP2_NO_MEM`
+### `ERR_HTTP2_NO_MEM```
 
-Out of memory when using the `http2session.setLocalWindowSize(windowSize)` API.
+使用 `http2session.setLocalWindowSize(windowSize)` API 时内存不足。
 
 <a id="ERR_HTTP2_NO_SOCKET_MANIPULATION"></a>
 
-### `ERR_HTTP2_NO_SOCKET_MANIPULATION`
+### `ERR_HTTP2_NO_SOCKET_MANIPULATION```
 
-An attempt was made to directly manipulate (read, write, pause, resume, etc.) a
-socket attached to an `Http2Session`.
+尝试直接操作（读取、写入、暂停、恢复等）附加到 `Http2Session` 的套接字。
 
 <a id="ERR_HTTP2_ORIGIN_LENGTH"></a>
 
-### `ERR_HTTP2_ORIGIN_LENGTH`
+### `ERR_HTTP2_ORIGIN_LENGTH```
 
-HTTP/2 `ORIGIN` frames are limited to a length of 16382 bytes.
+HTTP/2 `ORIGIN` 帧限制为 16382 字节的长度。
 
 <a id="ERR_HTTP2_OUT_OF_STREAMS"></a>
 
-### `ERR_HTTP2_OUT_OF_STREAMS`
+### `ERR_HTTP2_OUT_OF_STREAMS```
 
-The number of streams created on a single HTTP/2 session reached the maximum
-limit.
+在单个 HTTP/2 会话上创建的流数量达到最大限制。
 
 <a id="ERR_HTTP2_PAYLOAD_FORBIDDEN"></a>
 
-### `ERR_HTTP2_PAYLOAD_FORBIDDEN`
+### `ERR_HTTP2_PAYLOAD_FORBIDDEN```
 
-A message payload was specified for an HTTP response code for which a payload is
-forbidden.
+为禁止有效载荷的 HTTP 响应代码指定了消息有效载荷。
 
 <a id="ERR_HTTP2_PING_CANCEL"></a>
 
-### `ERR_HTTP2_PING_CANCEL`
+### `ERR_HTTP2_PING_CANCEL```
 
-An HTTP/2 ping was canceled.
+HTTP/2 ping 被取消。
 
 <a id="ERR_HTTP2_PING_LENGTH"></a>
 
-### `ERR_HTTP2_PING_LENGTH`
+### `ERR_HTTP2_PING_LENGTH```
 
-HTTP/2 ping payloads must be exactly 8 bytes in length.
+HTTP/2 ping 有效载荷必须正好是 8 字节长。
 
 <a id="ERR_HTTP2_PSEUDOHEADER_NOT_ALLOWED"></a>
 
-### `ERR_HTTP2_PSEUDOHEADER_NOT_ALLOWED`
+### `ERR_HTTP2_PSEUDOHEADER_NOT_ALLOWED```
 
-An HTTP/2 pseudo-header has been used inappropriately. Pseudo-headers are header
-key names that begin with the `:` prefix.
+HTTP/2 伪头部使用不当。伪头部是以 `:` 前缀开头的头部键名。
 
 <a id="ERR_HTTP2_PUSH_DISABLED"></a>
 
-### `ERR_HTTP2_PUSH_DISABLED`
+### `ERR_HTTP2_PUSH_DISABLED```
 
-An attempt was made to create a push stream, which had been disabled by the
-client.
+尝试创建推送流，但已被客户端禁用。
 
 <a id="ERR_HTTP2_SEND_FILE"></a>
 
-### `ERR_HTTP2_SEND_FILE`
+### `ERR_HTTP2_SEND_FILE```
 
-An attempt was made to use the `Http2Stream.prototype.responseWithFile()` API to
-send a directory.
+尝试使用 `Http2Stream.prototype.responseWithFile()` API 发送目录。
 
 <a id="ERR_HTTP2_SEND_FILE_NOSEEK"></a>
 
-### `ERR_HTTP2_SEND_FILE_NOSEEK`
+### `ERR_HTTP2_SEND_FILE_NOSEEK```
 
-An attempt was made to use the `Http2Stream.prototype.responseWithFile()` API to
-send something other than a regular file, but `offset` or `length` options were
-provided.
+尝试使用 `Http2Stream.prototype.responseWithFile()` API 发送非普通文件的内容，但提供了 `offset` 或 `length` 选项。
 
 <a id="ERR_HTTP2_SESSION_ERROR"></a>
 
-### `ERR_HTTP2_SESSION_ERROR`
+### `ERR_HTTP2_SESSION_ERROR```
 
-The `Http2Session` closed with a non-zero error code.
+`Http2Session` 以非零错误代码关闭。
 
 <a id="ERR_HTTP2_SETTINGS_CANCEL"></a>
 
-### `ERR_HTTP2_SETTINGS_CANCEL`
+### `ERR_HTTP2_SETTINGS_CANCEL```
 
-The `Http2Session` settings canceled.
+`Http2Session` 设置被取消。
 
 <a id="ERR_HTTP2_SOCKET_BOUND"></a>
 
-### `ERR_HTTP2_SOCKET_BOUND`
+### `ERR_HTTP2_SOCKET_BOUND```
 
-An attempt was made to connect a `Http2Session` object to a `net.Socket` or
-`tls.TLSSocket` that had already been bound to another `Http2Session` object.
+尝试将 `Http2Session` 对象连接到已绑定到另一个 `Http2Session` 对象的 `net.Socket` 或 `tls.TLSSocket`。
 
 <a id="ERR_HTTP2_SOCKET_UNBOUND"></a>
 
-### `ERR_HTTP2_SOCKET_UNBOUND`
+### `ERR_HTTP2_SOCKET_UNBOUND```
 
-An attempt was made to use the `socket` property of an `Http2Session` that
-has already been closed.
+尝试使用已经关闭的 `Http2Session` 的 `socket` 属性。
 
 <a id="ERR_HTTP2_STATUS_101"></a>
 
-### `ERR_HTTP2_STATUS_101`
+### `ERR_HTTP2_STATUS_101```
 
-Use of the `101` Informational status code is forbidden in HTTP/2.
+在 HTTP/2 中禁止使用 `101` 信息状态码。
 
 <a id="ERR_HTTP2_STATUS_INVALID"></a>
 
-### `ERR_HTTP2_STATUS_INVALID`
+### `ERR_HTTP2_STATUS_INVALID```
 
-An invalid HTTP status code has been specified. Status codes must be an integer
-between `100` and `599` (inclusive).
+指定了无效的 HTTP 状态码。状态码必须是 `100` 到 `599`（包含）之间的整数。
 
 <a id="ERR_HTTP2_STREAM_CANCEL"></a>
 
-### `ERR_HTTP2_STREAM_CANCEL`
+### `ERR_HTTP2_STREAM_CANCEL```
 
-An `Http2Stream` was destroyed before any data was transmitted to the connected
-peer.
+在有任何数据传输到连接的对端之前，`Http2Stream` 被销毁。
 
 <a id="ERR_HTTP2_STREAM_ERROR"></a>
 
-### `ERR_HTTP2_STREAM_ERROR`
+### `ERR_HTTP2_STREAM_ERROR```
 
-A non-zero error code was been specified in an `RST_STREAM` frame.
+在 `RST_STREAM` 帧中指定了非零错误代码。
 
 <a id="ERR_HTTP2_STREAM_SELF_DEPENDENCY"></a>
 
-### `ERR_HTTP2_STREAM_SELF_DEPENDENCY`
+### `ERR_HTTP2_STREAM_SELF_DEPENDENCY```
 
-When setting the priority for an HTTP/2 stream, the stream may be marked as
-a dependency for a parent stream. This error code is used when an attempt is
-made to mark a stream and dependent of itself.
+当设置 HTTP/2 流的优先级时，流可能被标记为父流的依赖项。当尝试将流标记为其自身的依赖项时，使用此错误代码。
 
 <a id="ERR_HTTP2_TOO_MANY_CUSTOM_SETTINGS"></a>
 
-### `ERR_HTTP2_TOO_MANY_CUSTOM_SETTINGS`
+### `ERR_HTTP2_TOO_MANY_CUSTOM_SETTINGS```
 
-The number of supported custom settings (10) has been exceeded.
+支持的自定义设置数量（10）已超出。
 
 <a id="ERR_HTTP2_TOO_MANY_INVALID_FRAMES"></a>
 
@@ -1718,92 +1467,85 @@ The number of supported custom settings (10) has been exceeded.
 added: v15.14.0
 -->
 
-The limit of acceptable invalid HTTP/2 protocol frames sent by the peer,
-as specified through the `maxSessionInvalidFrames` option, has been exceeded.
+对端发送的不可接受无效 HTTP/2 协议帧的数量已超过通过 `maxSessionInvalidFrames` 选项指定的限制。
 
 <a id="ERR_HTTP2_TRAILERS_ALREADY_SENT"></a>
 
-### `ERR_HTTP2_TRAILERS_ALREADY_SENT`
+### `ERR_HTTP2_TRAILERS_ALREADY_SENT```
 
-Trailing headers have already been sent on the `Http2Stream`.
+尾部头部已在 `Http2Stream` 上发送。
 
 <a id="ERR_HTTP2_TRAILERS_NOT_READY"></a>
 
-### `ERR_HTTP2_TRAILERS_NOT_READY`
+### `ERR_HTTP2_TRAILERS_NOT_READY```
 
-The `http2stream.sendTrailers()` method cannot be called until after the
-`'wantTrailers'` event is emitted on an `Http2Stream` object. The
-`'wantTrailers'` event will only be emitted if the `waitForTrailers` option
-is set for the `Http2Stream`.
+在 `Http2Stream` 对象上发出 `'wantTrailers'` 事件之前，不能调用 `http2stream.sendTrailers()` 方法。仅当为 `Http2Stream` 设置了 `waitForTrailers` 选项时，才会发出 `'wantTrailers'` 事件。
 
 <a id="ERR_HTTP2_UNSUPPORTED_PROTOCOL"></a>
 
-### `ERR_HTTP2_UNSUPPORTED_PROTOCOL`
+### `ERR_HTTP2_UNSUPPORTED_PROTOCOL```
 
-`http2.connect()` was passed a URL that uses any protocol other than `http:` or
-`https:`.
+`http2.connect()` 传递了使用 `http:` 或 `https:` 以外协议的 URL。
 
 <a id="ERR_HTTP_BODY_NOT_ALLOWED"></a>
 
-### `ERR_HTTP_BODY_NOT_ALLOWED`
+### `ERR_HTTP_BODY_NOT_ALLOWED```
 
-An error is thrown when writing to an HTTP response which does not allow
-contents.
+当写入不允许内容的 HTTP 响应时抛出错误。
 
 <a id="ERR_HTTP_CONTENT_LENGTH_MISMATCH"></a>
 
-### `ERR_HTTP_CONTENT_LENGTH_MISMATCH`
+### `ERR_HTTP_CONTENT_LENGTH_MISMATCH```
 
-Response body size doesn't match with the specified content-length header value.
+响应体大小与指定的 content-length 头部值不匹配。
 
 <a id="ERR_HTTP_HEADERS_SENT"></a>
 
-### `ERR_HTTP_HEADERS_SENT`
+### `ERR_HTTP_HEADERS_SENT```
 
-An attempt was made to add more headers after the headers had already been sent.
+在头部已经发送后尝试添加更多头部。
 
 <a id="ERR_HTTP_INVALID_HEADER_VALUE"></a>
 
-### `ERR_HTTP_INVALID_HEADER_VALUE`
+### `ERR_HTTP_INVALID_HEADER_VALUE```
 
-An invalid HTTP header value was specified.
+指定了无效的 HTTP 头部值。
 
 <a id="ERR_HTTP_INVALID_STATUS_CODE"></a>
 
-### `ERR_HTTP_INVALID_STATUS_CODE`
+### `ERR_HTTP_INVALID_STATUS_CODE```
 
-Status code was outside the regular status code range (100-999).
+状态码超出常规状态码范围（100-999）。
 
 <a id="ERR_HTTP_REQUEST_TIMEOUT"></a>
 
-### `ERR_HTTP_REQUEST_TIMEOUT`
+### `ERR_HTTP_REQUEST_TIMEOUT```
 
-The client has not sent the entire request within the allowed time.
+客户端未在允许的时间内发送完整请求。
 
 <a id="ERR_HTTP_SOCKET_ASSIGNED"></a>
 
-### `ERR_HTTP_SOCKET_ASSIGNED`
+### `ERR_HTTP_SOCKET_ASSIGNED```
 
-The given [`ServerResponse`][] was already assigned a socket.
+给定的 [`ServerResponse`][] 已被分配套接字。
 
 <a id="ERR_HTTP_SOCKET_ENCODING"></a>
 
-### `ERR_HTTP_SOCKET_ENCODING`
+### `ERR_HTTP_SOCKET_ENCODING```
 
-Changing the socket encoding is not allowed per [RFC 7230 Section 3][].
+根据 [RFC 7230 Section 3][]，不允许更改套接字编码。
 
 <a id="ERR_HTTP_TRAILER_INVALID"></a>
 
-### `ERR_HTTP_TRAILER_INVALID`
+### `ERR_HTTP_TRAILER_INVALID```
 
-The `Trailer` header was set even though the transfer encoding does not support
-that.
+即使传输编码不支持，也设置了 `Trailer` 头部。
 
 <a id="ERR_ILLEGAL_CONSTRUCTOR"></a>
 
-### `ERR_ILLEGAL_CONSTRUCTOR`
+### `ERR_ILLEGAL_CONSTRUCTOR```
 
-An attempt was made to construct an object using a non-public constructor.
+尝试使用非公共构造函数构造对象。
 
 <a id="ERR_IMPORT_ATTRIBUTE_MISSING"></a>
 
@@ -1814,7 +1556,7 @@ added:
   - v21.1.0
 -->
 
-An import attribute is missing, preventing the specified module to be imported.
+缺少导入属性，导致无法导入指定模块。
 
 <a id="ERR_IMPORT_ATTRIBUTE_TYPE_INCOMPATIBLE"></a>
 
@@ -1825,8 +1567,7 @@ added:
   - v21.1.0
 -->
 
-An import `type` attribute was provided, but the specified module is of a
-different type.
+提供了导入 `type` 属性，但指定模块的类型不同。
 
 <a id="ERR_IMPORT_ATTRIBUTE_UNSUPPORTED"></a>
 
@@ -1839,191 +1580,171 @@ added:
   - v18.19.0
 -->
 
-An import attribute is not supported by this version of Node.js.
+此版本的 Node.js 不支持导入属性。
 
 <a id="ERR_INCOMPATIBLE_OPTION_PAIR"></a>
 
-### `ERR_INCOMPATIBLE_OPTION_PAIR`
+### `ERR_INCOMPATIBLE_OPTION_PAIR```
 
-An option pair is incompatible with each other and cannot be used at the same
-time.
+选项对彼此不兼容，不能同时使用。
 
 <a id="ERR_INPUT_TYPE_NOT_ALLOWED"></a>
 
-### `ERR_INPUT_TYPE_NOT_ALLOWED`
+### `ERR_INPUT_TYPE_NOT_ALLOWED```
 
-The `--input-type` flag was used to attempt to execute a file. This flag can
-only be used with input via `--eval`, `--print`, or `STDIN`.
+`--input-type` 标志用于尝试执行文件。此标志只能与通过 `--eval`、`--print` 或 `STDIN` 的输入一起使用。
 
 <a id="ERR_INSPECTOR_ALREADY_ACTIVATED"></a>
 
-### `ERR_INSPECTOR_ALREADY_ACTIVATED`
+### `ERR_INSPECTOR_ALREADY_ACTIVATED```
 
-While using the `node:inspector` module, an attempt was made to activate the
-inspector when it already started to listen on a port. Use `inspector.close()`
-before activating it on a different address.
+在使用 `node:inspector` 模块时，尝试在检查器已经开始监听端口时激活它。在另一个地址激活之前，使用 `inspector.close()`。
 
 <a id="ERR_INSPECTOR_ALREADY_CONNECTED"></a>
 
-### `ERR_INSPECTOR_ALREADY_CONNECTED`
+### `ERR_INSPECTOR_ALREADY_CONNECTED```
 
-While using the `node:inspector` module, an attempt was made to connect when the
-inspector was already connected.
+在使用 `node:inspector` 模块时，尝试在检查器已经连接时连接。
 
 <a id="ERR_INSPECTOR_CLOSED"></a>
 
-### `ERR_INSPECTOR_CLOSED`
+### `ERR_INSPECTOR_CLOSED```
 
-While using the `node:inspector` module, an attempt was made to use the
-inspector after the session had already closed.
+在使用 `node:inspector` 模块时，尝试在会话已经关闭后使用检查器。
 
 <a id="ERR_INSPECTOR_COMMAND"></a>
 
-### `ERR_INSPECTOR_COMMAND`
+### `ERR_INSPECTOR_COMMAND```
 
-An error occurred while issuing a command via the `node:inspector` module.
+通过 `node:inspector` 模块发出命令时发生错误。
 
 <a id="ERR_INSPECTOR_NOT_ACTIVE"></a>
 
-### `ERR_INSPECTOR_NOT_ACTIVE`
+### `ERR_INSPECTOR_NOT_ACTIVE```
 
-The `inspector` is not active when `inspector.waitForDebugger()` is called.
+调用 `inspector.waitForDebugger()` 时检查器未激活。
 
 <a id="ERR_INSPECTOR_NOT_AVAILABLE"></a>
 
-### `ERR_INSPECTOR_NOT_AVAILABLE`
+### `ERR_INSPECTOR_NOT_AVAILABLE```
 
-The `node:inspector` module is not available for use.
+`node:inspector` 模块不可用。
 
 <a id="ERR_INSPECTOR_NOT_CONNECTED"></a>
 
-### `ERR_INSPECTOR_NOT_CONNECTED`
+### `ERR_INSPECTOR_NOT_CONNECTED```
 
-While using the `node:inspector` module, an attempt was made to use the
-inspector before it was connected.
+在使用 `node:inspector` 模块时，尝试在检查器连接之前使用它。
 
 <a id="ERR_INSPECTOR_NOT_WORKER"></a>
 
-### `ERR_INSPECTOR_NOT_WORKER`
+### `ERR_INSPECTOR_NOT_WORKER```
 
-An API was called on the main thread that can only be used from
-the worker thread.
+在主线程上调用了只能从工作线程使用的 API。
 
 <a id="ERR_INTERNAL_ASSERTION"></a>
 
-### `ERR_INTERNAL_ASSERTION`
+### `ERR_INTERNAL_ASSERTION```
 
-There was a bug in Node.js or incorrect usage of Node.js internals.
-To fix the error, open an issue at <https://github.com/nodejs/node/issues>.
+Node.js 内部存在错误或错误使用。要修复错误，请在 <https://github.com/nodejs/node/issues> 开一个问题。
 
 <a id="ERR_INVALID_ADDRESS"></a>
 
-### `ERR_INVALID_ADDRESS`
+### `ERR_INVALID_ADDRESS```
 
-The provided address is not understood by the Node.js API.
+提供的地址不被 Node.js API 理解。
 
 <a id="ERR_INVALID_ADDRESS_FAMILY"></a>
 
-### `ERR_INVALID_ADDRESS_FAMILY`
+### `ERR_INVALID_ADDRESS_FAMILY```
 
-The provided address family is not understood by the Node.js API.
+提供的地址族不被 Node.js API 理解。
 
 <a id="ERR_INVALID_ARG_TYPE"></a>
 
-### `ERR_INVALID_ARG_TYPE`
+### `ERR_INVALID_ARG_TYPE```
 
-An argument of the wrong type was passed to a Node.js API.
+向 Node.js API 传递了错误类型的参数。
 
 <a id="ERR_INVALID_ARG_VALUE"></a>
 
-### `ERR_INVALID_ARG_VALUE`
+### `ERR_INVALID_ARG_VALUE```
 
-An invalid or unsupported value was passed for a given argument.
+为给定参数传递了无效或不支持的值。
 
 <a id="ERR_INVALID_ASYNC_ID"></a>
 
-### `ERR_INVALID_ASYNC_ID`
+### `ERR_INVALID_ASYNC_ID```
 
-An invalid `asyncId` or `triggerAsyncId` was passed using `AsyncHooks`. An id
-less than -1 should never happen.
+使用 `AsyncHooks` 传递了无效的 `asyncId` 或 `triggerAsyncId`。id 小于 -1 的情况不应发生。
 
 <a id="ERR_INVALID_BUFFER_SIZE"></a>
 
-### `ERR_INVALID_BUFFER_SIZE`
+### `ERR_INVALID_BUFFER_SIZE```
 
-A swap was performed on a `Buffer` but its size was not compatible with the
-operation.
+在 `Buffer` 上执行了交换，但其大小与操作不兼容。
 
 <a id="ERR_INVALID_CHAR"></a>
 
-### `ERR_INVALID_CHAR`
+### `ERR_INVALID_CHAR```
 
-Invalid characters were detected in headers.
+在头部中检测到无效字符。
 
 <a id="ERR_INVALID_CURSOR_POS"></a>
 
-### `ERR_INVALID_CURSOR_POS`
+### `ERR_INVALID_CURSOR_POS```
 
-A cursor on a given stream cannot be moved to a specified row without a
-specified column.
+无法在未指定列的情况下将给定流上的光标移动到指定行。
 
 <a id="ERR_INVALID_FD"></a>
 
-### `ERR_INVALID_FD`
+### `ERR_INVALID_FD```
 
-A file descriptor ('fd') was not valid (e.g. it was a negative value).
+文件描述符（'fd'）无效（例如，它是负值）。
 
 <a id="ERR_INVALID_FD_TYPE"></a>
 
-### `ERR_INVALID_FD_TYPE`
+### `ERR_INVALID_FD_TYPE```
 
-A file descriptor ('fd') type was not valid.
+文件描述符（'fd'）类型无效。
 
 <a id="ERR_INVALID_FILE_URL_HOST"></a>
 
-### `ERR_INVALID_FILE_URL_HOST`
+### `ERR_INVALID_FILE_URL_HOST```
 
-A Node.js API that consumes `file:` URLs (such as certain functions in the
-[`fs`][] module) encountered a file URL with an incompatible host. This
-situation can only occur on Unix-like systems where only `localhost` or an empty
-host is supported.
+使用 `file:` URL 的 Node.js API（例如 [`fs`][] 模块中的某些函数）遇到了具有不兼容主机的文件 URL。这种情况只能发生在类似 Unix 的系统上，其中只支持 `localhost` 或空主机。
 
 <a id="ERR_INVALID_FILE_URL_PATH"></a>
 
-### `ERR_INVALID_FILE_URL_PATH`
+### `ERR_INVALID_FILE_URL_PATH```
 
-A Node.js API that consumes `file:` URLs (such as certain functions in the
-[`fs`][] module) encountered a file URL with an incompatible path. The exact
-semantics for determining whether a path can be used is platform-dependent.
+使用 `file:` URL 的 Node.js API（例如 [`fs`][] 模块中的某些函数）遇到了具有不兼容路径的文件 URL。确定路径是否可用的确切语义取决于平台。
 
-The thrown error object includes an `input` property that contains the URL object
-of the invalid `file:` URL.
+抛出的错误对象包括一个 `input` 属性，其中包含无效 `file:` URL 的 URL 对象。
 
 <a id="ERR_INVALID_HANDLE_TYPE"></a>
 
-### `ERR_INVALID_HANDLE_TYPE`
+### `ERR_INVALID_HANDLE_TYPE```
 
-An attempt was made to send an unsupported "handle" over an IPC communication
-channel to a child process. See [`subprocess.send()`][] and [`process.send()`][]
-for more information.
+尝试通过 IPC 通信通道向子进程发送不受支持的“句柄”。有关更多信息，请参见 [`subprocess.send()`][] 和 [`process.send()`][]。
 
 <a id="ERR_INVALID_HTTP_TOKEN"></a>
 
-### `ERR_INVALID_HTTP_TOKEN`
+### `ERR_INVALID_HTTP_TOKEN```
 
-An invalid HTTP token was supplied.
+提供了无效的 HTTP token。
 
 <a id="ERR_INVALID_IP_ADDRESS"></a>
 
-### `ERR_INVALID_IP_ADDRESS`
+### `ERR_INVALID_IP_ADDRESS```
 
-An IP address is not valid.
+IP 地址无效。
 
 <a id="ERR_INVALID_MIME_SYNTAX"></a>
 
-### `ERR_INVALID_MIME_SYNTAX`
+### `ERR_INVALID_MIME_SYNTAX```
 
-The syntax of a MIME is not valid.
+MIME 的语法无效。
 
 <a id="ERR_INVALID_MODULE"></a>
 
@@ -2035,76 +1756,67 @@ added:
   - v14.18.0
 -->
 
-An attempt was made to load a module that does not exist or was otherwise not
-valid.
+尝试加载不存在或无效的模块。
 
 <a id="ERR_INVALID_MODULE_SPECIFIER"></a>
 
-### `ERR_INVALID_MODULE_SPECIFIER`
+### `ERR_INVALID_MODULE_SPECIFIER```
 
-The imported module string is an invalid URL, package name, or package subpath
-specifier.
+导入的模块字符串是无效的 URL、包名或包子路径说明符。
 
 <a id="ERR_INVALID_OBJECT_DEFINE_PROPERTY"></a>
 
-### `ERR_INVALID_OBJECT_DEFINE_PROPERTY`
+### `ERR_INVALID_OBJECT_DEFINE_PROPERTY```
 
-An error occurred while setting an invalid attribute on the property of
-an object.
+在设置对象属性的无效属性时发生错误。
 
 <a id="ERR_INVALID_PACKAGE_CONFIG"></a>
 
-### `ERR_INVALID_PACKAGE_CONFIG`
+### `ERR_INVALID_PACKAGE_CONFIG```
 
-An invalid [`package.json`][] file failed parsing.
+无效的 [`package.json`][] 文件解析失败。
 
 <a id="ERR_INVALID_PACKAGE_TARGET"></a>
 
-### `ERR_INVALID_PACKAGE_TARGET`
+### `ERR_INVALID_PACKAGE_TARGET```
 
-The `package.json` [`"exports"`][] field contains an invalid target mapping
-value for the attempted module resolution.
+`package.json` [`"exports"`][] 字段包含针对尝试的模块解析的无效目标映射值。
 
 <a id="ERR_INVALID_PROTOCOL"></a>
 
-### `ERR_INVALID_PROTOCOL`
+### `ERR_INVALID_PROTOCOL```
 
-An invalid `options.protocol` was passed to `http.request()`.
+向 `http.request()` 传递了无效的 `options.protocol`。
 
 <a id="ERR_INVALID_REPL_EVAL_CONFIG"></a>
 
-### `ERR_INVALID_REPL_EVAL_CONFIG`
+### `ERR_INVALID_REPL_EVAL_CONFIG```
 
-Both `breakEvalOnSigint` and `eval` options were set in the [`REPL`][] config,
-which is not supported.
+在 [`REPL`][] 配置中同时设置了 `breakEvalOnSigint` 和 `eval` 选项，这是不支持的。
 
 <a id="ERR_INVALID_REPL_INPUT"></a>
 
-### `ERR_INVALID_REPL_INPUT`
+### `ERR_INVALID_REPL_INPUT```
 
-The input may not be used in the [`REPL`][]. The conditions under which this
-error is used are described in the [`REPL`][] documentation.
+输入不能在 [`REPL`][] 中使用。使用此错误的条件在 [`REPL`][] 文档中描述。
 
 <a id="ERR_INVALID_RETURN_PROPERTY"></a>
 
-### `ERR_INVALID_RETURN_PROPERTY`
+### `ERR_INVALID_RETURN_PROPERTY```
 
-Thrown in case a function option does not provide a valid value for one of its
-returned object properties on execution.
+在函数选项执行时未为其返回的对象属性之一提供有效值时抛出。
 
 <a id="ERR_INVALID_RETURN_PROPERTY_VALUE"></a>
 
-### `ERR_INVALID_RETURN_PROPERTY_VALUE`
+### `ERR_INVALID_RETURN_PROPERTY_VALUE```
 
-Thrown in case a function option does not provide an expected value
-type for one of its returned object properties on execution.
+在函数选项执行时未为其返回的对象属性之一提供预期的值类型时抛出。
 
 <a id="ERR_INVALID_RETURN_VALUE"></a>
 
-### `ERR_INVALID_RETURN_VALUE`
+### `ERR_INVALID_RETURN_VALUE```
 
-Thrown in case a function option does not return an expected value
-type on execution, such as when a function is expected to return a promise.
+在函数选项执行时未返回预期的值类型时抛出，例如当函数预期返回 Promise 时。
 
 <a id="ERR_INVALID_STATE"></a>
 
@@ -2114,40 +1826,33 @@ type on execution, such as when a function is expected to return a promise.
 added: v15.0.0
 -->
 
-Indicates that an operation cannot be completed due to an invalid state.
-For instance, an object may have already been destroyed, or may be
-performing another operation.
+表示由于无效状态而无法完成操作。例如，对象可能已经被销毁，或者可能正在执行另一个操作。
 
 <a id="ERR_INVALID_SYNC_FORK_INPUT"></a>
 
-### `ERR_INVALID_SYNC_FORK_INPUT`
+### `ERR_INVALID_SYNC_FORK_INPUT```
 
-A `Buffer`, `TypedArray`, `DataView`, or `string` was provided as stdio input to
-an asynchronous fork. See the documentation for the [`child_process`][] module
-for more information.
+向异步 fork 提供了 `Buffer`、`TypedArray`、`DataView` 或 `string` 作为 stdio 输入。有关更多信息，请参见 [`child_process`][] 模块的文档。
 
 <a id="ERR_INVALID_THIS"></a>
 
-### `ERR_INVALID_THIS`
+### `ERR_INVALID_THIS```
 
-A Node.js API function was called with an incompatible `this` value.
+使用不兼容的 `this` 值调用了 Node.js API 函数。
 
 ```js
 const urlSearchParams = new URLSearchParams('foo=bar&baz=new');
 
 const buf = Buffer.alloc(1);
 urlSearchParams.has.call(buf, 'foo');
-// Throws a TypeError with code 'ERR_INVALID_THIS'
+// 抛出 TypeError，代码为 'ERR_INVALID_THIS'
 ```
 
 <a id="ERR_INVALID_TUPLE"></a>
 
-### `ERR_INVALID_TUPLE`
+### `ERR_INVALID_TUPLE```
 
-An element in the `iterable` provided to the [WHATWG][WHATWG URL API]
-[`URLSearchParams` constructor][`new URLSearchParams(iterable)`] did not
-represent a `[name, value]` tuple – that is, if an element is not iterable, or
-does not consist of exactly two elements.
+提供给 [WHATWG][WHATWG URL API] [`URLSearchParams` 构造函数][`new URLSearchParams(iterable)`] 的 `iterable` 中的元素不表示 `[name, value]` 元组——也就是说，如果元素不可迭代，或者不正好由两个元素组成。
 
 <a id="ERR_INVALID_TYPESCRIPT_SYNTAX"></a>
 
@@ -2165,74 +1870,61 @@ changes:
       description: This error is no longer thrown on valid yet unsupported syntax.
 -->
 
-The provided TypeScript syntax is not valid.
+提供的 TypeScript 语法无效。
 
 <a id="ERR_INVALID_URI"></a>
 
-### `ERR_INVALID_URI`
+### `ERR_INVALID_URI```
 
-An invalid URI was passed.
+传递了无效的 URI。
 
 <a id="ERR_INVALID_URL"></a>
 
-### `ERR_INVALID_URL`
+### `ERR_INVALID_URL```
 
-An invalid URL was passed to the [WHATWG][WHATWG URL API] [`URL`
-constructor][`new URL(input)`] or the legacy [`url.parse()`][] to be parsed.
-The thrown error object typically has an additional property `'input'` that
-contains the URL that failed to parse.
+向 [WHATWG][WHATWG URL API] [`URL` 构造函数][`new URL(input)`] 或传统的 [`url.parse()`][] 传递了无效的 URL 进行解析。抛出的错误对象通常有一个额外的属性 `'input'`，其中包含解析失败的 URL。
 
 <a id="ERR_INVALID_URL_PATTERN"></a>
 
-### `ERR_INVALID_URL_PATTERN`
+### `ERR_INVALID_URL_PATTERN```
 
-An invalid URLPattern was passed to the [WHATWG][WHATWG URL API]
-[`URLPattern` constructor][`new URLPattern(input)`] to be parsed.
+向 [WHATWG][WHATWG URL API] [`URLPattern` 构造函数][`new URLPattern(input)`] 传递了无效的 URLPattern 进行解析。
 
 <a id="ERR_INVALID_URL_SCHEME"></a>
 
-### `ERR_INVALID_URL_SCHEME`
+### `ERR_INVALID_URL_SCHEME```
 
-An attempt was made to use a URL of an incompatible scheme (protocol) for a
-specific purpose. It is only used in the [WHATWG URL API][] support in the
-[`fs`][] module (which only accepts URLs with `'file'` scheme), but may be used
-in other Node.js APIs as well in the future.
+尝试使用不兼容方案（协议）的 URL 用于特定目的。它仅在 [`fs`][] 模块中的 [WHATWG URL API][] 支持中使用（该模块仅接受具有 `'file'` 方案的 URL），但将来也可能在其他 Node.js API 中使用。
 
 <a id="ERR_IPC_CHANNEL_CLOSED"></a>
 
-### `ERR_IPC_CHANNEL_CLOSED`
+### `ERR_IPC_CHANNEL_CLOSED```
 
-An attempt was made to use an IPC communication channel that was already closed.
+尝试使用已经关闭的 IPC 通信通道。
 
 <a id="ERR_IPC_DISCONNECTED"></a>
 
-### `ERR_IPC_DISCONNECTED`
+### `ERR_IPC_DISCONNECTED```
 
-An attempt was made to disconnect an IPC communication channel that was already
-disconnected. See the documentation for the [`child_process`][] module
-for more information.
+尝试断开已经断开的 IPC 通信通道。有关更多信息，请参见 [`child_process`][] 模块的文档。
 
 <a id="ERR_IPC_ONE_PIPE"></a>
 
-### `ERR_IPC_ONE_PIPE`
+### `ERR_IPC_ONE_PIPE```
 
-An attempt was made to create a child Node.js process using more than one IPC
-communication channel. See the documentation for the [`child_process`][] module
-for more information.
+尝试使用多个 IPC 通信通道创建子 Node.js 进程。有关更多信息，请参见 [`child_process`][] 模块的文档。
 
 <a id="ERR_IPC_SYNC_FORK"></a>
 
-### `ERR_IPC_SYNC_FORK`
+### `ERR_IPC_SYNC_FORK```
 
-An attempt was made to open an IPC communication channel with a synchronously
-forked Node.js process. See the documentation for the [`child_process`][] module
-for more information.
+尝试与同步派生的 Node.js 进程打开 IPC 通信通道。有关更多信息，请参见 [`child_process`][] 模块的文档。
 
 <a id="ERR_IP_BLOCKED"></a>
 
-### `ERR_IP_BLOCKED`
+### `ERR_IP_BLOCKED```
 
-IP is blocked by `net.BlockList`.
+IP 被 `net.BlockList` 阻止。
 
 <a id="ERR_LOADER_CHAIN_INCOMPLETE"></a>
 
@@ -2244,8 +1936,7 @@ added:
   - v16.17.0
 -->
 
-An ESM loader hook returned without calling `next()` and without explicitly
-signaling a short circuit.
+ESM 加载器钩子返回时没有调用 `next()` 且没有明确发出短路信号。
 
 <a id="ERR_LOAD_SQLITE_EXTENSION"></a>
 
@@ -2257,14 +1948,13 @@ added:
   - v22.13.0
 -->
 
-An error occurred while loading a SQLite extension.
+加载 SQLite 扩展时发生错误。
 
 <a id="ERR_MEMORY_ALLOCATION_FAILED"></a>
 
-### `ERR_MEMORY_ALLOCATION_FAILED`
+### `ERR_MEMORY_ALLOCATION_FAILED```
 
-An attempt was made to allocate memory (usually in the C++ layer) but it
-failed.
+尝试分配内存（通常在 C++ 层）但失败。
 
 <a id="ERR_MESSAGE_TARGET_CONTEXT_UNAVAILABLE"></a>
 
@@ -2276,125 +1966,105 @@ added:
   - v12.19.0
 -->
 
-A message posted to a [`MessagePort`][] could not be deserialized in the target
-[vm][] `Context`. Not all Node.js objects can be successfully instantiated in
-any context at this time, and attempting to transfer them using `postMessage()`
-can fail on the receiving side in that case.
+发布到 [`MessagePort`][] 的消息无法在目标 [vm][] `Context` 中反序列化。目前，并非所有 Node.js 对象都可以在任何上下文中成功实例化，尝试使用 `postMessage()` 传输它们在这种情况下可能会在接收端失败。
 
 <a id="ERR_METHOD_NOT_IMPLEMENTED"></a>
 
-### `ERR_METHOD_NOT_IMPLEMENTED`
+### `ERR_METHOD_NOT_IMPLEMENTED```
 
-A method is required but not implemented.
+需要方法但未实现。
 
 <a id="ERR_MISSING_ARGS"></a>
 
-### `ERR_MISSING_ARGS`
+### `ERR_MISSING_ARGS```
 
-A required argument of a Node.js API was not passed. This is only used for
-strict compliance with the API specification (which in some cases may accept
-`func(undefined)` but not `func()`). In most native Node.js APIs,
-`func(undefined)` and `func()` are treated identically, and the
-[`ERR_INVALID_ARG_TYPE`][] error code may be used instead.
+未传递 Node.js API 的必需参数。这仅用于严格符合 API 规范（在某些情况下可能接受 `func(undefined)` 但不接受 `func()`）。在大多数原生 Node.js API 中，`func(undefined)` 和 `func()` 被视为相同，并且可能改用 [`ERR_INVALID_ARG_TYPE`][] 错误代码。
 
 <a id="ERR_MISSING_OPTION"></a>
 
-### `ERR_MISSING_OPTION`
+### `ERR_MISSING_OPTION```
 
-For APIs that accept options objects, some options might be mandatory. This code
-is thrown if a required option is missing.
+对于接受选项对象的 API，某些选项可能是强制性的。如果缺少必需选项，则抛出此代码。
 
 <a id="ERR_MISSING_PASSPHRASE"></a>
 
-### `ERR_MISSING_PASSPHRASE`
+### `ERR_MISSING_PASSPHRASE```
 
-An attempt was made to read an encrypted key without specifying a passphrase.
+尝试读取加密密钥但未指定密码。
 
 <a id="ERR_MISSING_PLATFORM_FOR_WORKER"></a>
 
-### `ERR_MISSING_PLATFORM_FOR_WORKER`
+### `ERR_MISSING_PLATFORM_FOR_WORKER```
 
-The V8 platform used by this instance of Node.js does not support creating
-Workers. This is caused by lack of embedder support for Workers. In particular,
-this error will not occur with standard builds of Node.js.
+此 Node.js 实例使用的 V8 平台不支持创建 Workers。这是由于缺少对 Workers 的嵌入器支持。特别是，标准构建的 Node.js 不会发生此错误。
 
 <a id="ERR_MODULE_LINK_MISMATCH"></a>
 
-### `ERR_MODULE_LINK_MISMATCH`
+### `ERR_MODULE_LINK_MISMATCH```
 
-A module can not be linked because the same module requests in it are not
-resolved to the same module.
+模块无法链接，因为其中的相同模块请求未解析为同一模块。
 
 <a id="ERR_MODULE_NOT_FOUND"></a>
 
-### `ERR_MODULE_NOT_FOUND`
+### `ERR_MODULE_NOT_FOUND```
 
-A module file could not be resolved by the ECMAScript modules loader while
-attempting an `import` operation or when loading the program entry point.
+在尝试 `import` 操作或加载程序入口点时，ECMAScript 模块加载器无法解析模块文件。
 
 <a id="ERR_MULTIPLE_CALLBACK"></a>
 
-### `ERR_MULTIPLE_CALLBACK`
+### `ERR_MULTIPLE_CALLBACK```
 
-A callback was called more than once.
+回调被多次调用。
 
-A callback is almost always meant to only be called once as the query
-can either be fulfilled or rejected but not both at the same time. The latter
-would be possible by calling a callback more than once.
+回调几乎总是意味着只被调用一次，因为查询要么被满足，要么被拒绝，但不能同时发生。后者可能通过多次调用回调而发生。
 
 <a id="ERR_NAPI_CONS_FUNCTION"></a>
 
-### `ERR_NAPI_CONS_FUNCTION`
+### `ERR_NAPI_CONS_FUNCTION```
 
-While using `Node-API`, a constructor passed was not a function.
+在使用 `Node-API` 时，传递的构造函数不是函数。
 
 <a id="ERR_NAPI_INVALID_DATAVIEW_ARGS"></a>
 
-### `ERR_NAPI_INVALID_DATAVIEW_ARGS`
+### `ERR_NAPI_INVALID_DATAVIEW_ARGS```
 
-While calling `napi_create_dataview()`, a given `offset` was outside the bounds
-of the dataview or `offset + length` was larger than a length of given `buffer`.
+调用 `napi_create_dataview()` 时，给定的 `offset` 超出 dataview 的边界，或 `offset + length` 大于给定 `buffer` 的长度。
 
 <a id="ERR_NAPI_INVALID_TYPEDARRAY_ALIGNMENT"></a>
 
-### `ERR_NAPI_INVALID_TYPEDARRAY_ALIGNMENT`
+### `ERR_NAPI_INVALID_TYPEDARRAY_ALIGNMENT```
 
-While calling `napi_create_typedarray()`, the provided `offset` was not a
-multiple of the element size.
+调用 `napi_create_typedarray()` 时，提供的 `offset` 不是元素大小的倍数。
 
 <a id="ERR_NAPI_INVALID_TYPEDARRAY_LENGTH"></a>
 
-### `ERR_NAPI_INVALID_TYPEDARRAY_LENGTH`
+### `ERR_NAPI_INVALID_TYPEDARRAY_LENGTH```
 
-While calling `napi_create_typedarray()`, `(length * size_of_element) +
-byte_offset` was larger than the length of given `buffer`.
+调用 `napi_create_typedarray()` 时，`(length * size_of_element) + byte_offset` 大于给定 `buffer` 的长度。
 
 <a id="ERR_NAPI_TSFN_CALL_JS"></a>
 
-### `ERR_NAPI_TSFN_CALL_JS`
+### `ERR_NAPI_TSFN_CALL_JS```
 
-An error occurred while invoking the JavaScript portion of the thread-safe
-function.
+调用线程安全函数的 JavaScript 部分时发生错误。
 
 <a id="ERR_NAPI_TSFN_GET_UNDEFINED"></a>
 
-### `ERR_NAPI_TSFN_GET_UNDEFINED`
+### `ERR_NAPI_TSFN_GET_UNDEFINED```
 
-An error occurred while attempting to retrieve the JavaScript `undefined`
-value.
+尝试检索 JavaScript `undefined` 值时发生错误。
 
 <a id="ERR_NON_CONTEXT_AWARE_DISABLED"></a>
 
-### `ERR_NON_CONTEXT_AWARE_DISABLED`
+### `ERR_NON_CONTEXT_AWARE_DISABLED```
 
-A non-context-aware native addon was loaded in a process that disallows them.
+在禁止非上下文感知原生插件的进程中加载了非上下文感知原生插件。
 
 <a id="ERR_NOT_BUILDING_SNAPSHOT"></a>
 
-### `ERR_NOT_BUILDING_SNAPSHOT`
+### `ERR_NOT_BUILDING_SNAPSHOT```
 
-An attempt was made to use operations that can only be used when building
-V8 startup snapshot even though Node.js isn't building one.
+尝试使用只能在构建 V8 启动快照时使用的操作，但 Node.js 并未构建快照。
 
 <a id="ERR_NOT_IN_SINGLE_EXECUTABLE_APPLICATION"></a>
 
@@ -2406,29 +2076,25 @@ added:
   - v20.12.0
 -->
 
-The operation cannot be performed when it's not in a single-executable
-application.
+当不在单可执行应用程序中时，无法执行该操作。
 
 <a id="ERR_NOT_SUPPORTED_IN_SNAPSHOT"></a>
 
-### `ERR_NOT_SUPPORTED_IN_SNAPSHOT`
+### `ERR_NOT_SUPPORTED_IN_SNAPSHOT```
 
-An attempt was made to perform operations that are not supported when
-building a startup snapshot.
+尝试执行在构建启动快照时不支持的操作。
 
 <a id="ERR_NO_CRYPTO"></a>
 
-### `ERR_NO_CRYPTO`
+### `ERR_NO_CRYPTO```
 
-An attempt was made to use crypto features while Node.js was not compiled with
-OpenSSL crypto support.
+尝试使用加密功能，但 Node.js 编译时未包含 OpenSSL 加密支持。
 
 <a id="ERR_NO_ICU"></a>
 
-### `ERR_NO_ICU`
+### `ERR_NO_ICU```
 
-An attempt was made to use features that require [ICU][], but Node.js was not
-compiled with ICU support.
+尝试使用需要 [ICU][] 的功能，但 Node.js 编译时未包含 ICU 支持。
 
 <a id="ERR_NO_TYPESCRIPT"></a>
 
@@ -2440,8 +2106,7 @@ added:
   - v22.12.0
 -->
 
-An attempt was made to use features that require [Native TypeScript support][], but Node.js was not
-compiled with TypeScript support.
+尝试使用需要 [原生 TypeScript 支持][Native TypeScript support] 的功能，但 Node.js 编译时未包含 TypeScript 支持。
 
 <a id="ERR_OPERATION_FAILED"></a>
 
@@ -2451,8 +2116,7 @@ compiled with TypeScript support.
 added: v15.0.0
 -->
 
-An operation failed. This is typically used to signal the general failure
-of an asynchronous operation.
+操作失败。这通常用于表示异步操作的一般失败。
 
 <a id="ERR_OPTIONS_BEFORE_BOOTSTRAPPING"></a>
 
@@ -2462,28 +2126,25 @@ of an asynchronous operation.
 added: v23.10.0
 -->
 
-An attempt was made to get options before the bootstrapping was completed.
+尝试在引导完成之前获取选项。
 
 <a id="ERR_OUT_OF_RANGE"></a>
 
-### `ERR_OUT_OF_RANGE`
+### `ERR_OUT_OF_RANGE```
 
-A given value is out of the accepted range.
+给定的值超出可接受范围。
 
 <a id="ERR_PACKAGE_IMPORT_NOT_DEFINED"></a>
 
-### `ERR_PACKAGE_IMPORT_NOT_DEFINED`
+### `ERR_PACKAGE_IMPORT_NOT_DEFINED```
 
-The `package.json` [`"imports"`][] field does not define the given internal
-package specifier mapping.
+`package.json` [`"imports"`][] 字段未定义给定的内部包说明符映射。
 
 <a id="ERR_PACKAGE_PATH_NOT_EXPORTED"></a>
 
-### `ERR_PACKAGE_PATH_NOT_EXPORTED`
+### `ERR_PACKAGE_PATH_NOT_EXPORTED```
 
-The `package.json` [`"exports"`][] field does not export the requested subpath.
-Because exports are encapsulated, private internal modules that are not exported
-cannot be imported through the package resolution, unless using an absolute URL.
+`package.json` [`"exports"`][] 字段未导出请求的子路径。由于导出是封装的，未导出的私有内部模块无法通过包解析导入，除非使用绝对 URL。
 
 <a id="ERR_PARSE_ARGS_INVALID_OPTION_VALUE"></a>
 
@@ -2495,9 +2156,7 @@ added:
   - v16.17.0
 -->
 
-When `strict` set to `true`, thrown by [`util.parseArgs()`][] if a {boolean}
-value is provided for an option of type {string}, or if a {string}
-value is provided for an option of type {boolean}.
+当 `strict` 设置为 `true` 时，如果为 {string} 类型的选项提供了 {boolean} 值，或为 {boolean} 类型的选项提供了 {string} 值，则由 [`util.parseArgs()`][] 抛出。
 
 <a id="ERR_PARSE_ARGS_UNEXPECTED_POSITIONAL"></a>
 
@@ -2509,8 +2168,7 @@ added:
   - v16.17.0
 -->
 
-Thrown by [`util.parseArgs()`][], when a positional argument is provided and
-`allowPositionals` is set to `false`.
+当提供了位置参数且 `allowPositionals` 设置为 `false` 时，由 [`util.parseArgs()`][] 抛出。
 
 <a id="ERR_PARSE_ARGS_UNKNOWN_OPTION"></a>
 
@@ -2522,41 +2180,37 @@ added:
   - v16.17.0
 -->
 
-When `strict` set to `true`, thrown by [`util.parseArgs()`][] if an argument
-is not configured in `options`.
+当 `strict` 设置为 `true` 时，如果参数未在 `options` 中配置，则由 [`util.parseArgs()`][] 抛出。
 
 <a id="ERR_PERFORMANCE_INVALID_TIMESTAMP"></a>
 
-### `ERR_PERFORMANCE_INVALID_TIMESTAMP`
+### `ERR_PERFORMANCE_INVALID_TIMESTAMP```
 
-An invalid timestamp value was provided for a performance mark or measure.
+为性能标记或测量提供了无效的时间戳值。
 
 <a id="ERR_PERFORMANCE_MEASURE_INVALID_OPTIONS"></a>
 
-### `ERR_PERFORMANCE_MEASURE_INVALID_OPTIONS`
+### `ERR_PERFORMANCE_MEASURE_INVALID_OPTIONS```
 
-Invalid options were provided for a performance measure.
+为性能测量提供了无效的选项。
 
 <a id="ERR_PROTO_ACCESS"></a>
 
-### `ERR_PROTO_ACCESS`
+### `ERR_PROTO_ACCESS```
 
-Accessing `Object.prototype.__proto__` has been forbidden using
-[`--disable-proto=throw`][]. [`Object.getPrototypeOf`][] and
-[`Object.setPrototypeOf`][] should be used to get and set the prototype of an
-object.
+使用 [`--disable-proto=throw`][] 禁止访问 `Object.prototype.__proto__`。应使用 [`Object.getPrototypeOf`][] 和 [`Object.setPrototypeOf`][] 来获取和设置对象的原型。
 
 <a id="ERR_PROXY_INVALID_CONFIG"></a>
 
-### `ERR_PROXY_INVALID_CONFIG`
+### `ERR_PROXY_INVALID_CONFIG```
 
-Failed to proxy a request because the proxy configuration is invalid.
+由于代理配置无效，无法代理请求。
 
 <a id="ERR_PROXY_TUNNEL"></a>
 
-### `ERR_PROXY_TUNNEL`
+### `ERR_PROXY_TUNNEL```
 
-Failed to establish proxy tunnel when `NODE_USE_ENV_PROXY` or `--use-env-proxy` is enabled.
+当启用 `NODE_USE_ENV_PROXY` 或 `--use-env-proxy` 时，无法建立代理隧道。
 
 <a id="ERR_QUIC_APPLICATION_ERROR"></a>
 
@@ -2570,7 +2224,7 @@ added:
 
 > Stability: 1 - Experimental
 
-A QUIC application error occurred.
+发生 QUIC 应用程序错误。
 
 <a id="ERR_QUIC_CONNECTION_FAILED"></a>
 
@@ -2584,7 +2238,7 @@ added:
 
 > Stability: 1 - Experimental
 
-Establishing a QUIC connection failed.
+建立 QUIC 连接失败。
 
 <a id="ERR_QUIC_ENDPOINT_CLOSED"></a>
 
@@ -2598,7 +2252,7 @@ added:
 
 > Stability: 1 - Experimental
 
-A QUIC Endpoint closed with an error.
+QUIC Endpoint 关闭并出现错误。
 
 <a id="ERR_QUIC_OPEN_STREAM_FAILED"></a>
 
@@ -2612,7 +2266,7 @@ added:
 
 > Stability: 1 - Experimental
 
-Opening a QUIC stream failed.
+打开 QUIC 流失败。
 
 <a id="ERR_QUIC_TRANSPORT_ERROR"></a>
 
@@ -2626,7 +2280,7 @@ added:
 
 > Stability: 1 - Experimental
 
-A QUIC transport error occurred.
+发生 QUIC 传输错误。
 
 <a id="ERR_QUIC_VERSION_NEGOTIATION_ERROR"></a>
 
@@ -2640,35 +2294,28 @@ added:
 
 > Stability: 1 - Experimental
 
-A QUIC session failed because version negotiation is required.
+QUIC 会话失败，因为需要版本协商。
 
 <a id="ERR_REQUIRE_ASYNC_MODULE"></a>
 
-### `ERR_REQUIRE_ASYNC_MODULE`
+### `ERR_REQUIRE_ASYNC_MODULE```
 
 > Stability: 1 - Experimental
 
-When trying to `require()` a [ES Module][], the module turns out to be asynchronous.
-That is, it contains top-level await.
+尝试 `require()` 一个 [ES 模块][ES Module] 时，该模块是异步的。也就是说，它包含顶级 await。
 
-To see where the top-level await is, use
-`--experimental-print-required-tla` (this would execute the modules
-before looking for the top-level awaits).
+要查看顶级 await 的位置，请使用 `--experimental-print-required-tla`（这将在查找顶级 await 之前执行模块）。
 
 <a id="ERR_REQUIRE_CYCLE_MODULE"></a>
 
-### `ERR_REQUIRE_CYCLE_MODULE`
+### `ERR_REQUIRE_CYCLE_MODULE```
 
 > Stability: 1 - Experimental
 
-When trying to `require()` a [ES Module][], a CommonJS to ESM or ESM to CommonJS edge
-participates in an immediate cycle.
-This is not allowed because ES Modules cannot be evaluated while they are
-already being evaluated.
+尝试 `require()` 一个 [ES 模块][ES Module] 时，CommonJS 到 ESM 或 ESM 到 CommonJS 的边参与了一个即时循环。
+这是不允许的，因为 ES 模块在已经正在评估时无法被评估。
 
-To avoid the cycle, the `require()` call involved in a cycle should not happen
-at the top-level of either an ES Module (via `createRequire()`) or a CommonJS
-module, and should be done lazily in an inner function.
+为了避免循环，参与循环的 `require()` 调用不应发生在 ES 模块（通过 `createRequire()`）或 CommonJS 模块的顶级，而应在内部函数中延迟完成。
 
 <a id="ERR_REQUIRE_ESM"></a>
 
@@ -2686,40 +2333,33 @@ changes:
 
 > Stability: 0 - Deprecated
 
-An attempt was made to `require()` an [ES Module][].
+尝试 `require()` 一个 [ES 模块][ES Module]。
 
-This error has been deprecated since `require()` now supports loading synchronous
-ES modules. When `require()` encounters an ES module that contains top-level
-`await`, it will throw [`ERR_REQUIRE_ASYNC_MODULE`][] instead.
+此错误已被弃用，因为 `require()` 现在支持加载同步 ES 模块。当 `require()` 遇到包含顶级 `await` 的 ES 模块时，它将抛出 [`ERR_REQUIRE_ASYNC_MODULE`][] 代替。
 
 <a id="ERR_SCRIPT_EXECUTION_INTERRUPTED"></a>
 
-### `ERR_SCRIPT_EXECUTION_INTERRUPTED`
+### `ERR_SCRIPT_EXECUTION_INTERRUPTED```
 
-Script execution was interrupted by `SIGINT` (For
-example, <kbd>Ctrl</kbd>+<kbd>C</kbd> was pressed.)
+脚本执行被 `SIGINT` 中断（例如，按下了 <kbd>Ctrl</kbd>+<kbd>C</kbd>）。
 
 <a id="ERR_SCRIPT_EXECUTION_TIMEOUT"></a>
 
-### `ERR_SCRIPT_EXECUTION_TIMEOUT`
+### `ERR_SCRIPT_EXECUTION_TIMEOUT```
 
-Script execution timed out, possibly due to bugs in the script being executed.
+脚本执行超时，可能是由于正在执行的脚本中存在错误。
 
 <a id="ERR_SERVER_ALREADY_LISTEN"></a>
 
-### `ERR_SERVER_ALREADY_LISTEN`
+### `ERR_SERVER_ALREADY_LISTEN```
 
-The [`server.listen()`][] method was called while a `net.Server` was already
-listening. This applies to all instances of `net.Server`, including HTTP, HTTPS,
-and HTTP/2 `Server` instances.
+在 `net.Server` 已经在监听时调用了 [`server.listen()`][] 方法。这适用于所有 `net.Server` 实例，包括 HTTP、HTTPS 和 HTTP/2 `Server` 实例。
 
 <a id="ERR_SERVER_NOT_RUNNING"></a>
 
-### `ERR_SERVER_NOT_RUNNING`
+### `ERR_SERVER_NOT_RUNNING```
 
-The [`server.close()`][] method was called when a `net.Server` was not
-running. This applies to all instances of `net.Server`, including HTTP, HTTPS,
-and HTTP/2 `Server` instances.
+在 `net.Server` 未运行时调用了 [`server.close()`][] 方法。这适用于所有 `net.Server` 实例，包括 HTTP、HTTPS 和 HTTP/2 `Server` 实例。
 
 <a id="ERR_SINGLE_EXECUTABLE_APPLICATION_ASSET_NOT_FOUND"></a>
 
@@ -2731,92 +2371,85 @@ added:
   - v20.12.0
 -->
 
-A key was passed to single executable application APIs to identify an asset,
-but no match could be found.
+向单可执行应用程序 API 传递了用于标识资源的键，但找不到匹配项。
 
 <a id="ERR_SOCKET_ALREADY_BOUND"></a>
 
-### `ERR_SOCKET_ALREADY_BOUND`
+### `ERR_SOCKET_ALREADY_BOUND```
 
-An attempt was made to bind a socket that has already been bound.
+尝试绑定已经绑定的套接字。
 
 <a id="ERR_SOCKET_BAD_BUFFER_SIZE"></a>
 
-### `ERR_SOCKET_BAD_BUFFER_SIZE`
+### `ERR_SOCKET_BAD_BUFFER_SIZE```
 
-An invalid (negative) size was passed for either the `recvBufferSize` or
-`sendBufferSize` options in [`dgram.createSocket()`][].
+在 [`dgram.createSocket()`][] 中为 `recvBufferSize` 或 `sendBufferSize` 选项传递了无效（负）大小。
 
 <a id="ERR_SOCKET_BAD_PORT"></a>
 
-### `ERR_SOCKET_BAD_PORT`
+### `ERR_SOCKET_BAD_PORT```
 
-An API function expecting a port >= 0 and < 65536 received an invalid value.
+期望端口 >= 0 且 < 65536 的 API 函数收到了无效值。
 
 <a id="ERR_SOCKET_BAD_TYPE"></a>
 
-### `ERR_SOCKET_BAD_TYPE`
+### `ERR_SOCKET_BAD_TYPE```
 
-An API function expecting a socket type (`udp4` or `udp6`) received an invalid
-value.
+期望套接字类型（`udp4` 或 `udp6`）的 API 函数收到了无效值。
 
 <a id="ERR_SOCKET_BUFFER_SIZE"></a>
 
-### `ERR_SOCKET_BUFFER_SIZE`
+### `ERR_SOCKET_BUFFER_SIZE```
 
-While using [`dgram.createSocket()`][], the size of the receive or send `Buffer`
-could not be determined.
+在使用 [`dgram.createSocket()`][] 时，无法确定接收或发送 `Buffer` 的大小。
 
 <a id="ERR_SOCKET_CLOSED"></a>
 
-### `ERR_SOCKET_CLOSED`
+### `ERR_SOCKET_CLOSED```
 
-An attempt was made to operate on an already closed socket.
+尝试对已经关闭的套接字进行操作。
 
 <a id="ERR_SOCKET_CLOSED_BEFORE_CONNECTION"></a>
 
-### `ERR_SOCKET_CLOSED_BEFORE_CONNECTION`
+### `ERR_SOCKET_CLOSED_BEFORE_CONNECTION```
 
-When calling [`net.Socket.write()`][] on a connecting socket and the socket was
-closed before the connection was established.
+在连接套接字上调用 [`net.Socket.write()`][] 时，套接字在连接建立之前关闭。
 
 <a id="ERR_SOCKET_CONNECTION_TIMEOUT"></a>
 
-### `ERR_SOCKET_CONNECTION_TIMEOUT`
+### `ERR_SOCKET_CONNECTION_TIMEOUT```
 
-The socket was unable to connect to any address returned by the DNS within the
-allowed timeout when using the family autoselection algorithm.
+在使用族自动选择算法时，套接字无法在允许的超时时间内连接到 DNS 返回的任何地址。
 
 <a id="ERR_SOCKET_DGRAM_IS_CONNECTED"></a>
 
-### `ERR_SOCKET_DGRAM_IS_CONNECTED`
+### `ERR_SOCKET_DGRAM_IS_CONNECTED```
 
-A [`dgram.connect()`][] call was made on an already connected socket.
+在已经连接的套接字上调用了 [`dgram.connect()`][]。
 
 <a id="ERR_SOCKET_DGRAM_NOT_CONNECTED"></a>
 
-### `ERR_SOCKET_DGRAM_NOT_CONNECTED`
+### `ERR_SOCKET_DGRAM_NOT_CONNECTED```
 
-A [`dgram.disconnect()`][] or [`dgram.remoteAddress()`][] call was made on a
-disconnected socket.
+在断开的套接字上调用了 [`dgram.disconnect()`][] 或 [`dgram.remoteAddress()`][]。
 
 <a id="ERR_SOCKET_DGRAM_NOT_RUNNING"></a>
 
-### `ERR_SOCKET_DGRAM_NOT_RUNNING`
+### `ERR_SOCKET_DGRAM_NOT_RUNNING```
 
-A call was made and the UDP subsystem was not running.
+进行了调用，但 UDP 子系统未运行。
 
 <a id="ERR_SOURCE_MAP_CORRUPT"></a>
 
-### `ERR_SOURCE_MAP_CORRUPT`
+### `ERR_SOURCE_MAP_CORRUPT```
 
-The source map could not be parsed because it does not exist, or is corrupt.
+无法解析源映射，因为它不存在或已损坏。
 
 <a id="ERR_SOURCE_MAP_MISSING_SOURCE"></a>
 
-### `ERR_SOURCE_MAP_MISSING_SOURCE`
+### `ERR_SOURCE_MAP_MISSING_SOURCE```
 
-A file imported from a source map was not found.
+未找到从源映射导入的文件。
 
 <a id="ERR_SOURCE_PHASE_NOT_DEFINED"></a>
 
@@ -2826,8 +2459,7 @@ A file imported from a source map was not found.
 added: v24.0.0
 -->
 
-The provided module import does not provide a source phase imports representation for source phase
-import syntax `import source x from 'x'` or `import.source(x)`.
+提供的模块导入未为源阶段导入语法 `import source x from 'x'` 或 `import.source(x)` 提供源阶段导入表示。
 
 <a id="ERR_SQLITE_ERROR"></a>
 
@@ -2837,75 +2469,67 @@ import syntax `import source x from 'x'` or `import.source(x)`.
 added: v22.5.0
 -->
 
-An error was returned from [SQLite][].
+从 [SQLite][] 返回错误。
 
 <a id="ERR_SRI_PARSE"></a>
 
-### `ERR_SRI_PARSE`
+### `ERR_SRI_PARSE```
 
-A string was provided for a Subresource Integrity check, but was unable to be
-parsed. Check the format of integrity attributes by looking at the
-[Subresource Integrity specification][].
+为子资源完整性检查提供了字符串，但无法解析。通过查看[子资源完整性规范][Subresource Integrity specification]检查完整性属性的格式。
 
 <a id="ERR_STREAM_ALREADY_FINISHED"></a>
 
-### `ERR_STREAM_ALREADY_FINISHED`
+### `ERR_STREAM_ALREADY_FINISHED```
 
-A stream method was called that cannot complete because the stream was
-finished.
+调用了无法完成的流方法，因为流已结束。
 
 <a id="ERR_STREAM_CANNOT_PIPE"></a>
 
-### `ERR_STREAM_CANNOT_PIPE`
+### `ERR_STREAM_CANNOT_PIPE```
 
-An attempt was made to call [`stream.pipe()`][] on a [`Writable`][] stream.
+尝试在 [`Writable`][] 流上调用 [`stream.pipe()`][]。
 
 <a id="ERR_STREAM_DESTROYED"></a>
 
-### `ERR_STREAM_DESTROYED`
+### `ERR_STREAM_DESTROYED```
 
-A stream method was called that cannot complete because the stream was
-destroyed using `stream.destroy()`.
+调用了无法完成的流方法，因为流已使用 `stream.destroy()` 销毁。
 
 <a id="ERR_STREAM_NULL_VALUES"></a>
 
-### `ERR_STREAM_NULL_VALUES`
+### `ERR_STREAM_NULL_VALUES```
 
-An attempt was made to call [`stream.write()`][] with a `null` chunk.
+尝试使用 `null` 块调用 [`stream.write()`][]。
 
 <a id="ERR_STREAM_PREMATURE_CLOSE"></a>
 
-### `ERR_STREAM_PREMATURE_CLOSE`
+### `ERR_STREAM_PREMATURE_CLOSE```
 
-An error returned by `stream.finished()` and `stream.pipeline()`, when a stream
-or a pipeline ends non gracefully with no explicit error.
+由 `stream.finished()` 和 `stream.pipeline()` 返回的错误，当流或管道非正常结束且没有显式错误时。
 
 <a id="ERR_STREAM_PUSH_AFTER_EOF"></a>
 
-### `ERR_STREAM_PUSH_AFTER_EOF`
+### `ERR_STREAM_PUSH_AFTER_EOF```
 
-An attempt was made to call [`stream.push()`][] after a `null`(EOF) had been
-pushed to the stream.
+在将 `null`(EOF) 推送到流后尝试调用 [`stream.push()`][]。
 
 <a id="ERR_STREAM_UNABLE_TO_PIPE"></a>
 
-### `ERR_STREAM_UNABLE_TO_PIPE`
+### `ERR_STREAM_UNABLE_TO_PIPE```
 
-An attempt was made to pipe to a closed or destroyed stream in a pipeline.
+尝试在管道中向已关闭或销毁的流进行管道传输。
 
 <a id="ERR_STREAM_UNSHIFT_AFTER_END_EVENT"></a>
 
-### `ERR_STREAM_UNSHIFT_AFTER_END_EVENT`
+### `ERR_STREAM_UNSHIFT_AFTER_END_EVENT```
 
-An attempt was made to call [`stream.unshift()`][] after the `'end'` event was
-emitted.
+在发出 `'end'` 事件后尝试调用 [`stream.unshift()`][]。
 
 <a id="ERR_STREAM_WRAP"></a>
 
-### `ERR_STREAM_WRAP`
+### `ERR_STREAM_WRAP```
 
-Prevents an abort if a string decoder was set on the Socket or if the decoder
-is in `objectMode`.
+如果在 Socket 上设置了字符串解码器，或者解码器处于 `objectMode`，则防止中止。
 
 ```js
 const Socket = require('node:net').Socket;
@@ -2916,86 +2540,69 @@ instance.setEncoding('utf8');
 
 <a id="ERR_STREAM_WRITE_AFTER_END"></a>
 
-### `ERR_STREAM_WRITE_AFTER_END`
+### `ERR_STREAM_WRITE_AFTER_END```
 
-An attempt was made to call [`stream.write()`][] after `stream.end()` has been
-called.
+在调用 `stream.end()` 后尝试调用 [`stream.write()`][]。
 
 <a id="ERR_STRING_TOO_LONG"></a>
 
-### `ERR_STRING_TOO_LONG`
+### `ERR_STRING_TOO_LONG```
 
-An attempt has been made to create a string longer than the maximum allowed
-length.
+尝试创建超过最大允许长度的字符串。
 
 <a id="ERR_SYNTHETIC"></a>
 
-### `ERR_SYNTHETIC`
+### `ERR_SYNTHETIC```
 
-An artificial error object used to capture the call stack for diagnostic
-reports.
+用于捕获诊断报告调用栈的人工错误对象。
 
 <a id="ERR_SYSTEM_ERROR"></a>
 
-### `ERR_SYSTEM_ERROR`
+### `ERR_SYSTEM_ERROR```
 
-An unspecified or non-specific system error has occurred within the Node.js
-process. The error object will have an `err.info` object property with
-additional details.
+在 Node.js 进程内发生了未指定或非特定的系统错误。错误对象将具有一个 `err.info` 对象属性，其中包含其他详细信息。
 
 <a id="ERR_TEST_FAILURE"></a>
 
-### `ERR_TEST_FAILURE`
+### `ERR_TEST_FAILURE```
 
-This error represents a failed test. Additional information about the failure
-is available via the `cause` property. The `failureType` property specifies
-what the test was doing when the failure occurred.
+此错误表示测试失败。有关失败的更多信息可通过 `cause` 属性获得。`failureType` 属性指定失败发生时测试正在执行的操作。
 
 <a id="ERR_TLS_ALPN_CALLBACK_INVALID_RESULT"></a>
 
-### `ERR_TLS_ALPN_CALLBACK_INVALID_RESULT`
+### `ERR_TLS_ALPN_CALLBACK_INVALID_RESULT```
 
-This error is thrown when an `ALPNCallback` returns a value that is not in the
-list of ALPN protocols offered by the client.
+当 `ALPNCallback` 返回的值不在客户端提供的 ALPN 协议列表中时抛出此错误。
 
 <a id="ERR_TLS_ALPN_CALLBACK_WITH_PROTOCOLS"></a>
 
-### `ERR_TLS_ALPN_CALLBACK_WITH_PROTOCOLS`
+### `ERR_TLS_ALPN_CALLBACK_WITH_PROTOCOLS```
 
-This error is thrown when creating a `TLSServer` if the TLS options include
-both `ALPNProtocols` and `ALPNCallback`. These options are mutually exclusive.
+如果在创建 `TLSServer` 时 TLS 选项同时包含 `ALPNProtocols` 和 `ALPNCallback`，则抛出此错误。这些选项是互斥的。
 
 <a id="ERR_TLS_CERT_ALTNAME_FORMAT"></a>
 
-### `ERR_TLS_CERT_ALTNAME_FORMAT`
+### `ERR_TLS_CERT_ALTNAME_FORMAT```
 
-This error is thrown by `checkServerIdentity` if a user-supplied
-`subjectaltname` property violates encoding rules. Certificate objects produced
-by Node.js itself always comply with encoding rules and will never cause
-this error.
+如果用户提供的 `subjectaltname` 属性违反编码规则，则由 `checkServerIdentity` 抛出。Node.js 本身生成的证书对象始终符合编码规则，永远不会导致此错误。
 
 <a id="ERR_TLS_CERT_ALTNAME_INVALID"></a>
 
-### `ERR_TLS_CERT_ALTNAME_INVALID`
+### `ERR_TLS_CERT_ALTNAME_INVALID```
 
-While using TLS, the host name/IP of the peer did not match any of the
-`subjectAltNames` in its certificate.
+在使用 TLS 时，对端的主机名/IP 与其证书中的任何 `subjectAltNames` 都不匹配。
 
 <a id="ERR_TLS_DH_PARAM_SIZE"></a>
 
-### `ERR_TLS_DH_PARAM_SIZE`
+### `ERR_TLS_DH_PARAM_SIZE```
 
-While using TLS, the parameter offered for the Diffie-Hellman (`DH`)
-key-agreement protocol is too small. By default, the key length must be greater
-than or equal to 1024 bits to avoid vulnerabilities, even though it is strongly
-recommended to use 2048 bits or larger for stronger security.
+在使用 TLS 时，为 Diffie-Hellman (`DH`) 密钥协商协议提供的参数太小。默认情况下，密钥长度必须大于或等于 1024 位以避免漏洞，尽管强烈建议使用 2048 位或更大以获得更强的安全性。
 
 <a id="ERR_TLS_HANDSHAKE_TIMEOUT"></a>
 
-### `ERR_TLS_HANDSHAKE_TIMEOUT`
+### `ERR_TLS_HANDSHAKE_TIMEOUT```
 
-A TLS/SSL handshake timed out. In this case, the server must also abort the
-connection.
+TLS/SSL 握手超时。在这种情况下，服务器也必须中止连接。
 
 <a id="ERR_TLS_INVALID_CONTEXT"></a>
 
@@ -3005,20 +2612,19 @@ connection.
 added: v13.3.0
 -->
 
-The context must be a `SecureContext`.
+上下文必须是 `SecureContext`。
 
 <a id="ERR_TLS_INVALID_PROTOCOL_METHOD"></a>
 
-### `ERR_TLS_INVALID_PROTOCOL_METHOD`
+### `ERR_TLS_INVALID_PROTOCOL_METHOD```
 
-The specified  `secureProtocol` method is invalid. It is  either unknown, or
-disabled because it is insecure.
+指定的 `secureProtocol` 方法无效。它要么未知，要么由于不安全而被禁用。
 
 <a id="ERR_TLS_INVALID_PROTOCOL_VERSION"></a>
 
-### `ERR_TLS_INVALID_PROTOCOL_VERSION`
+### `ERR_TLS_INVALID_PROTOCOL_VERSION```
 
-Valid TLS protocol versions are `'TLSv1'`, `'TLSv1.1'`, or `'TLSv1.2'`.
+有效的 TLS 协议版本是 `'TLSv1'`、`'TLSv1.1'` 或 `'TLSv1.2'`。
 
 <a id="ERR_TLS_INVALID_STATE"></a>
 
@@ -3030,180 +2636,160 @@ added:
  - v12.17.0
 -->
 
-The TLS socket must be connected and securely established. Ensure the 'secure'
-event is emitted before continuing.
+TLS 套接字必须已连接并安全建立。确保在继续之前发出 'secure' 事件。
 
 <a id="ERR_TLS_PROTOCOL_VERSION_CONFLICT"></a>
 
-### `ERR_TLS_PROTOCOL_VERSION_CONFLICT`
+### `ERR_TLS_PROTOCOL_VERSION_CONFLICT```
 
-Attempting to set a TLS protocol `minVersion` or `maxVersion` conflicts with an
-attempt to set the `secureProtocol` explicitly. Use one mechanism or the other.
+尝试设置 TLS 协议 `minVersion` 或 `maxVersion` 与显式设置 `secureProtocol` 的尝试冲突。使用一种机制或另一种。
 
 <a id="ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED"></a>
 
-### `ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED`
+### `ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED```
 
-Failed to set PSK identity hint. Hint may be too long.
+设置 PSK 身份提示失败。提示可能太长。
 
 <a id="ERR_TLS_RENEGOTIATION_DISABLED"></a>
 
-### `ERR_TLS_RENEGOTIATION_DISABLED`
+### `ERR_TLS_RENEGOTIATION_DISABLED```
 
-An attempt was made to renegotiate TLS on a socket instance with renegotiation
-disabled.
+尝试在禁用重新协商的套接字实例上重新协商 TLS。
 
 <a id="ERR_TLS_REQUIRED_SERVER_NAME"></a>
 
-### `ERR_TLS_REQUIRED_SERVER_NAME`
+### `ERR_TLS_REQUIRED_SERVER_NAME```
 
-While using TLS, the `server.addContext()` method was called without providing
-a host name in the first parameter.
+在使用 TLS 时，调用 `server.addContext()` 方法时未在第一个参数中提供主机名。
 
 <a id="ERR_TLS_SESSION_ATTACK"></a>
 
-### `ERR_TLS_SESSION_ATTACK`
+### `ERR_TLS_SESSION_ATTACK```
 
-An excessive amount of TLS renegotiations is detected, which is a potential
-vector for denial-of-service attacks.
+检测到过多的 TLS 重新协商，这是拒绝服务攻击的潜在载体。
 
 <a id="ERR_TLS_SNI_FROM_SERVER"></a>
 
-### `ERR_TLS_SNI_FROM_SERVER`
+### `ERR_TLS_SNI_FROM_SERVER```
 
-An attempt was made to issue Server Name Indication from a TLS server-side
-socket, which is only valid from a client.
+尝试从 TLS 服务器端套接字发出服务器名称指示，这仅对客户端有效。
 
 <a id="ERR_TRACE_EVENTS_CATEGORY_REQUIRED"></a>
 
-### `ERR_TRACE_EVENTS_CATEGORY_REQUIRED`
+### `ERR_TRACE_EVENTS_CATEGORY_REQUIRED```
 
-The `trace_events.createTracing()` method requires at least one trace event
-category.
+`trace_events.createTracing()` 方法需要至少一个跟踪事件类别。
 
 <a id="ERR_TRACE_EVENTS_UNAVAILABLE"></a>
 
-### `ERR_TRACE_EVENTS_UNAVAILABLE`
+### `ERR_TRACE_EVENTS_UNAVAILABLE```
 
-The `node:trace_events` module could not be loaded because Node.js was compiled
-with the `--without-v8-platform` flag.
+无法加载 `node:trace_events` 模块，因为 Node.js 是使用 `--without-v8-platform` 标志编译的。
 
 <a id="ERR_TRAILING_JUNK_AFTER_STREAM_END"></a>
 
-### `ERR_TRAILING_JUNK_AFTER_STREAM_END`
+### `ERR_TRAILING_JUNK_AFTER_STREAM_END```
 
-Trailing junk found after the end of the compressed stream.
-This error is thrown when extra, unexpected data is detected
-after the end of a compressed stream (for example, in zlib
-or gzip decompression).
+在压缩流末尾之后发现尾随垃圾。
+当在压缩流（例如，在 zlib 或 gzip 解压缩中）末尾检测到额外的意外数据时抛出此错误。
 
 <a id="ERR_TRANSFORM_ALREADY_TRANSFORMING"></a>
 
-### `ERR_TRANSFORM_ALREADY_TRANSFORMING`
+### `ERR_TRANSFORM_ALREADY_TRANSFORMING```
 
-A `Transform` stream finished while it was still transforming.
+`Transform` 流在仍在转换时结束。
 
 <a id="ERR_TRANSFORM_WITH_LENGTH_0"></a>
 
-### `ERR_TRANSFORM_WITH_LENGTH_0`
+### `ERR_TRANSFORM_WITH_LENGTH_0```
 
-A `Transform` stream finished with data still in the write buffer.
+`Transform` 流结束时写缓冲区中仍有数据。
 
 <a id="ERR_TTY_INIT_FAILED"></a>
 
-### `ERR_TTY_INIT_FAILED`
+### `ERR_TTY_INIT_FAILED```
 
-The initialization of a TTY failed due to a system error.
+由于系统错误，TTY 初始化失败。
 
 <a id="ERR_UNAVAILABLE_DURING_EXIT"></a>
 
-### `ERR_UNAVAILABLE_DURING_EXIT`
+### `ERR_UNAVAILABLE_DURING_EXIT```
 
-Function was called within a [`process.on('exit')`][] handler that shouldn't be
-called within [`process.on('exit')`][] handler.
+在 [`process.on('exit')`][] 处理程序中调用了不应在 [`process.on('exit')`][] 处理程序中调用的函数。
 
 <a id="ERR_UNCAUGHT_EXCEPTION_CAPTURE_ALREADY_SET"></a>
 
-### `ERR_UNCAUGHT_EXCEPTION_CAPTURE_ALREADY_SET`
+### `ERR_UNCAUGHT_EXCEPTION_CAPTURE_ALREADY_SET```
 
-[`process.setUncaughtExceptionCaptureCallback()`][] was called twice,
-without first resetting the callback to `null`.
+[`process.setUncaughtExceptionCaptureCallback()`][] 被调用了两次，但未首先将回调重置为 `null`。
 
-This error is designed to prevent accidentally overwriting a callback registered
-from another module.
+此错误旨在防止意外覆盖从另一个模块注册的回调。
 
 <a id="ERR_UNESCAPED_CHARACTERS"></a>
 
-### `ERR_UNESCAPED_CHARACTERS`
+### `ERR_UNESCAPED_CHARACTERS```
 
-A string that contained unescaped characters was received.
+收到了包含未转义字符的字符串。
 
 <a id="ERR_UNHANDLED_ERROR"></a>
 
-### `ERR_UNHANDLED_ERROR`
+### `ERR_UNHANDLED_ERROR```
 
-An unhandled error occurred (for instance, when an `'error'` event is emitted
-by an [`EventEmitter`][] but an `'error'` handler is not registered).
+发生未处理的错误（例如，当 [`EventEmitter`][] 发出 `'error'` 事件但未注册 `'error'` 处理程序时）。
 
 <a id="ERR_UNKNOWN_BUILTIN_MODULE"></a>
 
-### `ERR_UNKNOWN_BUILTIN_MODULE`
+### `ERR_UNKNOWN_BUILTIN_MODULE```
 
-Used to identify a specific kind of internal Node.js error that should not
-typically be triggered by user code. Instances of this error point to an
-internal bug within the Node.js binary itself.
+用于识别特定类型的内部 Node.js 错误，通常不应由用户代码触发。此错误的实例指向 Node.js 二进制文件本身的内部错误。
 
 <a id="ERR_UNKNOWN_CREDENTIAL"></a>
 
-### `ERR_UNKNOWN_CREDENTIAL`
+### `ERR_UNKNOWN_CREDENTIAL```
 
-A Unix group or user identifier that does not exist was passed.
+传递了不存在的 Unix 组或用户标识符。
 
 <a id="ERR_UNKNOWN_ENCODING"></a>
 
-### `ERR_UNKNOWN_ENCODING`
+### `ERR_UNKNOWN_ENCODING```
 
-An invalid or unknown encoding option was passed to an API.
+向 API 传递了无效或未知的编码选项。
 
 <a id="ERR_UNKNOWN_FILE_EXTENSION"></a>
 
-### `ERR_UNKNOWN_FILE_EXTENSION`
+### `ERR_UNKNOWN_FILE_EXTENSION```
 
-An attempt was made to load a module with an unknown or unsupported file
-extension.
+尝试加载具有未知或不支持文件扩展名的模块。
 
 <a id="ERR_UNKNOWN_MODULE_FORMAT"></a>
 
-### `ERR_UNKNOWN_MODULE_FORMAT`
+### `ERR_UNKNOWN_MODULE_FORMAT```
 
-An attempt was made to load a module with an unknown or unsupported format.
+尝试加载具有未知或不支持格式的模块。
 
 <a id="ERR_UNKNOWN_SIGNAL"></a>
 
-### `ERR_UNKNOWN_SIGNAL`
+### `ERR_UNKNOWN_SIGNAL```
 
-An invalid or unknown process signal was passed to an API expecting a valid
-signal (such as [`subprocess.kill()`][]).
+向期望有效信号的 API 传递了无效或未知的进程信号（例如 [`subprocess.kill()`][]）。
 
 <a id="ERR_UNSUPPORTED_DIR_IMPORT"></a>
 
-### `ERR_UNSUPPORTED_DIR_IMPORT`
+### `ERR_UNSUPPORTED_DIR_IMPORT```
 
-`import` a directory URL is unsupported. Instead,
-[self-reference a package using its name][] and [define a custom subpath][] in
-the [`"exports"`][] field of the [`package.json`][] file.
+`import` 目录 URL 不受支持。相反，使用[其名称自引用包][self-reference a package using its name]并在 [`package.json`][] 文件的 [`"exports"`][] 字段中[定义自定义子路径][define a custom subpath]。
 
 ```mjs
-import './'; // unsupported
-import './index.js'; // supported
-import 'package-name'; // supported
+import './'; // 不支持
+import './index.js'; // 支持
+import 'package-name'; // 支持
 ```
 
 <a id="ERR_UNSUPPORTED_ESM_URL_SCHEME"></a>
 
-### `ERR_UNSUPPORTED_ESM_URL_SCHEME`
+### `ERR_UNSUPPORTED_ESM_URL_SCHEME```
 
-`import` with URL schemes other than `file` and `data` is unsupported.
+不支持 `file` 和 `data` 以外的 URL 方案的 `import`。
 
 <a id="ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING"></a>
 
@@ -3213,22 +2799,20 @@ import 'package-name'; // supported
 added: v22.6.0
 -->
 
-Type stripping is not supported for files descendent of a `node_modules` directory.
+不支持对 `node_modules` 目录后代文件进行类型剥离。
 
 <a id="ERR_UNSUPPORTED_RESOLVE_REQUEST"></a>
 
-### `ERR_UNSUPPORTED_RESOLVE_REQUEST`
+### `ERR_UNSUPPORTED_RESOLVE_REQUEST```
 
-An attempt was made to resolve an invalid module referrer. This can happen when
-importing or calling `import.meta.resolve()` with either:
+尝试解析无效的模块引用者。这可能在以下情况下发生：
 
-* a bare specifier that is not a builtin module from a module whose URL scheme
-  is not `file`.
-* a [relative URL][] from a module whose URL scheme is not a [special scheme][].
+* 从 URL 方案不是 `file` 的模块导入或调用 `import.meta.resolve()` 时使用裸说明符。
+* 从 URL 方案不是[特殊方案][special scheme]的模块使用[相对 URL][relative URL]。
 
 ```mjs
 try {
-  // Trying to import the package 'bare-specifier' from a `data:` URL module:
+  // 尝试从 `data:` URL 模块导入包 'bare-specifier'：
   await import('data:text/javascript,import "bare-specifier"');
 } catch (e) {
   console.log(e.code); // ERR_UNSUPPORTED_RESOLVE_REQUEST
@@ -3245,95 +2829,90 @@ added:
   - v22.14.0
 -->
 
-The provided TypeScript syntax is unsupported.
-This could happen when using TypeScript syntax that requires
-transformation with [type-stripping][].
+提供的 TypeScript 语法不受支持。
+这可能在使用需要[类型剥离][type-stripping]进行转换的 TypeScript 语法时发生。
 
 <a id="ERR_USE_AFTER_CLOSE"></a>
 
-### `ERR_USE_AFTER_CLOSE`
+### `ERR_USE_AFTER_CLOSE```
 
-An attempt was made to use something that was already closed.
+尝试使用已经关闭的内容。
 
 <a id="ERR_VALID_PERFORMANCE_ENTRY_TYPE"></a>
 
-### `ERR_VALID_PERFORMANCE_ENTRY_TYPE`
+### `ERR_VALID_PERFORMANCE_ENTRY_TYPE```
 
-While using the Performance Timing API (`perf_hooks`), no valid performance
-entry types are found.
+在使用性能计时 API (`perf_hooks`) 时，未找到有效的性能条目类型。
 
 <a id="ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING"></a>
 
-### `ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`
+### `ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING```
 
-A dynamic import callback was not specified.
+未指定动态导入回调。
 
 <a id="ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG"></a>
 
-### `ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG`
+### `ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG```
 
-A dynamic import callback was invoked without `--experimental-vm-modules`.
+在没有 `--experimental-vm-modules` 的情况下调用了动态导入回调。
 
 <a id="ERR_VM_MODULE_ALREADY_LINKED"></a>
 
-### `ERR_VM_MODULE_ALREADY_LINKED`
+### `ERR_VM_MODULE_ALREADY_LINKED```
 
-The module attempted to be linked is not eligible for linking, because of one of
-the following reasons:
+尝试链接的模块不符合链接条件，原因如下：
 
-* It has already been linked (`linkingStatus` is `'linked'`)
-* It is being linked (`linkingStatus` is `'linking'`)
-* Linking has failed for this module (`linkingStatus` is `'errored'`)
+* 它已经被链接（`linkingStatus` 是 `'linked'`）
+* 它正在被链接（`linkingStatus` 是 `'linking'`）
+* 此模块的链接失败（`linkingStatus` 是 `'errored'`）
 
 <a id="ERR_VM_MODULE_CACHED_DATA_REJECTED"></a>
 
-### `ERR_VM_MODULE_CACHED_DATA_REJECTED`
+### `ERR_VM_MODULE_CACHED_DATA_REJECTED```
 
-The `cachedData` option passed to a module constructor is invalid.
+传递给模块构造函数的 `cachedData` 选项无效。
 
 <a id="ERR_VM_MODULE_CANNOT_CREATE_CACHED_DATA"></a>
 
-### `ERR_VM_MODULE_CANNOT_CREATE_CACHED_DATA`
+### `ERR_VM_MODULE_CANNOT_CREATE_CACHED_DATA```
 
-Cached data cannot be created for modules which have already been evaluated.
+无法为已经评估的模块创建缓存数据。
 
 <a id="ERR_VM_MODULE_DIFFERENT_CONTEXT"></a>
 
-### `ERR_VM_MODULE_DIFFERENT_CONTEXT`
+### `ERR_VM_MODULE_DIFFERENT_CONTEXT```
 
-The module being returned from the linker function is from a different context
-than the parent module. Linked modules must share the same context.
+从链接器函数返回的模块与父模块来自不同的上下文。链接的模块必须共享相同的上下文。
 
 <a id="ERR_VM_MODULE_LINK_FAILURE"></a>
 
-### `ERR_VM_MODULE_LINK_FAILURE`
+### `ERR_VM_MODULE_LINK_FAILURE```
 
-The module was unable to be linked due to a failure.
+由于失败，模块无法链接。
 
 <a id="ERR_VM_MODULE_NOT_MODULE"></a>
 
-### `ERR_VM_MODULE_NOT_MODULE`
+### `ERR_VM_MODULE_NOT_MODULE```
 
-The fulfilled value of a linking promise is not a `vm.Module` object.
+链接承诺的履行值不是 `vm.Module` 对象。
 
 <a id="ERR_VM_MODULE_STATUS"></a>
 
-### `ERR_VM_MODULE_STATUS`
+### `ERR_VM_MODULE_STATUS```
 
-The current module's status does not allow for this operation. The specific
-meaning of the error depends on the specific function.
+当前模块的状态不允许此操作。错误的具体含义取决于特定函数。
 
 <a id="ERR_WASI_ALREADY_STARTED"></a>
 
-### `ERR_WASI_ALREADY_STARTED`
+### `ERR_WASI_ALREADY_STARTED```
 
-The WASI instance has already started.
+WASI 实例已经启动。
 
 <a id="ERR_WASI_NOT_STARTED"></a>
 
-### `ERR_WASI_NOT_STARTED`
+### `ERR_WASI_NOT_STARTED```
 
-The WASI instance has not been started.
+WASI 实例尚未启动。
 
 <a id="ERR_WEBASSEMBLY_RESPONSE"></a>
 
@@ -3343,21 +2922,19 @@ The WASI instance has not been started.
 added: v18.1.0
 -->
 
-The `Response` that has been passed to `WebAssembly.compileStreaming` or to
-`WebAssembly.instantiateStreaming` is not a valid WebAssembly response.
+传递给 `WebAssembly.compileStreaming` 或 `WebAssembly.instantiateStreaming` 的 `Response` 不是有效的 WebAssembly 响应。
 
 <a id="ERR_WORKER_INIT_FAILED"></a>
 
-### `ERR_WORKER_INIT_FAILED`
+### `ERR_WORKER_INIT_FAILED```
 
-The `Worker` initialization failed.
+`Worker` 初始化失败。
 
 <a id="ERR_WORKER_INVALID_EXEC_ARGV"></a>
 
-### `ERR_WORKER_INVALID_EXEC_ARGV`
+### `ERR_WORKER_INVALID_EXEC_ARGV```
 
-The `execArgv` option passed to the `Worker` constructor contains
-invalid flags.
+传递给 `Worker` 构造函数的 `execArgv` 选项包含无效标志。
 
 <a id="ERR_WORKER_MESSAGING_ERRORED"></a>
 
@@ -3369,7 +2946,7 @@ added: v22.5.0
 
 > Stability: 1.1 - Active development
 
-The destination thread threw an error while processing a message sent via [`postMessageToThread()`][].
+目标线程在处理通过 [`postMessageToThread()`][] 发送的消息时抛出错误。
 
 <a id="ERR_WORKER_MESSAGING_FAILED"></a>
 
@@ -3381,7 +2958,7 @@ added: v22.5.0
 
 > Stability: 1.1 - Active development
 
-The thread requested in [`postMessageToThread()`][] is invalid or has no `workerMessage` listener.
+[`postMessageToThread()`][] 中请求的线程无效或没有 `workerMessage` 监听器。
 
 <a id="ERR_WORKER_MESSAGING_SAME_THREAD"></a>
 
@@ -3393,7 +2970,7 @@ added: v22.5.0
 
 > Stability: 1.1 - Active development
 
-The thread id requested in [`postMessageToThread()`][] is the current thread id.
+[`postMessageToThread()`][] 中请求的线程 ID 是当前线程 ID。
 
 <a id="ERR_WORKER_MESSAGING_TIMEOUT"></a>
 
@@ -3405,50 +2982,49 @@ added: v22.5.0
 
 > Stability: 1.1 - Active development
 
-Sending a message via [`postMessageToThread()`][] timed out.
+通过 [`postMessageToThread()`][] 发送消息超时。
 
 <a id="ERR_WORKER_NOT_RUNNING"></a>
 
-### `ERR_WORKER_NOT_RUNNING`
+### `ERR_WORKER_NOT_RUNNING```
 
-An operation failed because the `Worker` instance is not currently running.
+操作失败，因为 `Worker` 实例当前未运行。
 
 <a id="ERR_WORKER_OUT_OF_MEMORY"></a>
 
-### `ERR_WORKER_OUT_OF_MEMORY`
+### `ERR_WORKER_OUT_OF_MEMORY```
 
-The `Worker` instance terminated because it reached its memory limit.
+`Worker` 实例因达到其内存限制而终止。
 
 <a id="ERR_WORKER_PATH"></a>
 
-### `ERR_WORKER_PATH`
+### `ERR_WORKER_PATH```
 
-The path for the main script of a worker is neither an absolute path
-nor a relative path starting with `./` or `../`.
+工作器主脚本的路径既不是绝对路径，也不是以 `./` 或 `../` 开头的相对路径。
 
 <a id="ERR_WORKER_UNSERIALIZABLE_ERROR"></a>
 
-### `ERR_WORKER_UNSERIALIZABLE_ERROR`
+### `ERR_WORKER_UNSERIALIZABLE_ERROR```
 
-All attempts at serializing an uncaught exception from a worker thread failed.
+所有尝试序列化工作线程中未捕获异常的操作都失败了。
 
 <a id="ERR_WORKER_UNSUPPORTED_OPERATION"></a>
 
-### `ERR_WORKER_UNSUPPORTED_OPERATION`
+### `ERR_WORKER_UNSUPPORTED_OPERATION```
 
-The requested functionality is not supported in worker threads.
+请求的功能在工作线程中不受支持。
 
 <a id="ERR_ZLIB_INITIALIZATION_FAILED"></a>
 
-### `ERR_ZLIB_INITIALIZATION_FAILED`
+### `ERR_ZLIB_INITIALIZATION_FAILED```
 
-Creation of a [`zlib`][] object failed due to incorrect configuration.
+由于配置不正确，创建 [`zlib`][] 对象失败。
 
 <a id="ERR_ZSTD_INVALID_PARAM"></a>
 
-### `ERR_ZSTD_INVALID_PARAM`
+### `ERR_ZSTD_INVALID_PARAM```
 
-An invalid parameter key was passed during construction of a Zstd stream.
+在构建 Zstd 流期间传递了无效的参数键。
 
 <a id="HPE_CHUNK_EXTENSIONS_OVERFLOW"></a>
 
@@ -3461,9 +3037,7 @@ added:
  - v18.19.1
 -->
 
-Too much data was received for a chunk extensions. In order to protect against
-malicious or malconfigured clients, if more than 16 KiB of data is received
-then an `Error` with this code will be emitted.
+为块扩展接收了太多数据。为了保护免受恶意或配置错误的客户端的影响，如果接收到超过 16 KiB 的数据，则将发出带有此代码的 `Error`。
 
 <a id="HPE_HEADER_OVERFLOW"></a>
 
@@ -3479,22 +3053,18 @@ changes:
     description: Max header size in `http_parser` was set to 8 KiB.
 -->
 
-Too much HTTP header data was received. In order to protect against malicious or
-malconfigured clients, if more than `maxHeaderSize` of HTTP header data is received then
-HTTP parsing will abort without a request or response object being created, and
-an `Error` with this code will be emitted.
+接收了太多的 HTTP 头部数据。为了保护免受恶意或配置错误的客户端的影响，如果接收到超过 `maxHeaderSize` 的 HTTP 头部数据，则 HTTP 解析将中止，不会创建请求或响应对象，并将发出带有此代码的 `Error`。
 
 <a id="HPE_UNEXPECTED_CONTENT_LENGTH"></a>
 
-### `HPE_UNEXPECTED_CONTENT_LENGTH`
+### `HPE_UNEXPECTED_CONTENT_LENGTH```
 
-Server is sending both a `Content-Length` header and `Transfer-Encoding: chunked`.
+服务器同时发送 `Content-Length` 头部和 `Transfer-Encoding: chunked`。
 
-`Transfer-Encoding: chunked` allows the server to maintain an HTTP persistent
-connection for dynamically generated content.
-In this case, the `Content-Length` HTTP header cannot be used.
+`Transfer-Encoding: chunked` 允许服务器为动态生成的内容维护 HTTP 持久连接。
+在这种情况下，不能使用 `Content-Length` HTTP 头部。
 
-Use `Content-Length` or `Transfer-Encoding: chunked`.
+使用 `Content-Length` 或 `Transfer-Encoding: chunked`。
 
 <a id="MODULE_NOT_FOUND"></a>
 
@@ -3507,13 +3077,11 @@ changes:
     description: Added `requireStack` property.
 -->
 
-A module file could not be resolved by the CommonJS modules loader while
-attempting a [`require()`][] operation or when loading the program entry point.
+在尝试 [`require()`][] 操作或加载程序入口点时，CommonJS 模块加载器无法解析模块文件。
 
-## Legacy Node.js error codes
+## 传统 Node.js 错误代码
 
-> Stability: 0 - Deprecated. These error codes are either inconsistent, or have
-> been removed.
+> Stability: 0 - Deprecated. 这些错误代码要么不一致，要么已被移除。
 
 <a id="ERR_CANNOT_TRANSFER_OBJECT"></a>
 
@@ -3524,8 +3092,7 @@ added: v10.5.0
 removed: v12.5.0
 -->
 
-The value passed to `postMessage()` contained an object that is not supported
-for transferring.
+传递给 `postMessage()` 的值包含不支持传输的对象。
 
 <a id="ERR_CPU_USAGE"></a>
 
@@ -3535,7 +3102,7 @@ for transferring.
 removed: v15.0.0
 -->
 
-The native call from `process.cpuUsage` could not be processed.
+来自 `process.cpuUsage` 的本机调用无法处理。
 
 <a id="ERR_CRYPTO_HASH_DIGEST_NO_UTF16"></a>
 
@@ -3546,10 +3113,7 @@ added: v9.0.0
 removed: v12.12.0
 -->
 
-The UTF-16 encoding was used with [`hash.digest()`][]. While the
-`hash.digest()` method does allow an `encoding` argument to be passed in,
-causing the method to return a string rather than a `Buffer`, the UTF-16
-encoding (e.g. `ucs` or `utf16le`) is not supported.
+UTF-16 编码与 [`hash.digest()`][] 一起使用。虽然 `hash.digest()` 方法允许传递 `encoding` 参数，导致该方法返回字符串而不是 `Buffer`，但不支持 UTF-16 编码（例如 `ucs` 或 `utf16le`）。
 
 <a id="ERR_CRYPTO_SCRYPT_INVALID_PARAMETER"></a>
 
@@ -3559,9 +3123,7 @@ encoding (e.g. `ucs` or `utf16le`) is not supported.
 removed: v23.0.0
 -->
 
-An incompatible combination of options was passed to [`crypto.scrypt()`][] or
-[`crypto.scryptSync()`][]. New versions of Node.js use the error code
-[`ERR_INCOMPATIBLE_OPTION_PAIR`][] instead, which is consistent with other APIs.
+向 [`crypto.scrypt()`][] 或 [`crypto.scryptSync()`][] 传递了不兼容的选项组合。新版本的 Node.js 使用错误代码 [`ERR_INCOMPATIBLE_OPTION_PAIR`][] 代替，这与其他 API 一致。
 
 <a id="ERR_FS_INVALID_SYMLINK_TYPE"></a>
 
@@ -3571,8 +3133,7 @@ An incompatible combination of options was passed to [`crypto.scrypt()`][] or
 removed: v23.0.0
 -->
 
-An invalid symlink type was passed to the [`fs.symlink()`][] or
-[`fs.symlinkSync()`][] methods.
+向 [`fs.symlink()`][] 或 [`fs.symlinkSync()`][] 方法传递了无效的符号链接类型。
 
 <a id="ERR_HTTP2_FRAME_ERROR"></a>
 
@@ -3583,8 +3144,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when a failure occurs sending an individual frame on the HTTP/2
-session.
+在 HTTP/2 会话上发送单个帧时发生失败时使用。
 
 <a id="ERR_HTTP2_HEADERS_OBJECT"></a>
 
@@ -3595,7 +3155,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when an HTTP/2 Headers Object is expected.
+需要 HTTP/2 头部对象时使用。
 
 <a id="ERR_HTTP2_HEADER_REQUIRED"></a>
 
@@ -3606,7 +3166,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when a required header is missing in an HTTP/2 message.
+当 HTTP/2 消息中缺少必需头部时使用。
 
 <a id="ERR_HTTP2_INFO_HEADERS_AFTER_RESPOND"></a>
 
@@ -3617,8 +3177,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-HTTP/2 informational headers must only be sent _prior_ to calling the
-`Http2Stream.prototype.respond()` method.
+HTTP/2 信息头部必须仅在调用 `Http2Stream.prototype.respond()` 方法 _之前_ 发送。
 
 <a id="ERR_HTTP2_STREAM_CLOSED"></a>
 
@@ -3629,8 +3188,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when an action has been performed on an HTTP/2 Stream that has already
-been closed.
+在已经关闭的 HTTP/2 流上执行操作时使用。
 
 <a id="ERR_HTTP_INVALID_CHAR"></a>
 
@@ -3641,8 +3199,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when an invalid character is found in an HTTP response status message
-(reason phrase).
+在 HTTP 响应状态消息（原因短语）中发现无效字符时使用。
 
 <a id="ERR_IMPORT_ASSERTION_TYPE_FAILED"></a>
 
@@ -3655,7 +3212,7 @@ added:
 removed: v21.1.0
 -->
 
-An import assertion has failed, preventing the specified module to be imported.
+导入断言失败，阻止导入指定模块。
 
 <a id="ERR_IMPORT_ASSERTION_TYPE_MISSING"></a>
 
@@ -3668,7 +3225,7 @@ added:
 removed: v21.1.0
 -->
 
-An import assertion is missing, preventing the specified module to be imported.
+缺少导入断言，阻止导入指定模块。
 
 <a id="ERR_IMPORT_ASSERTION_TYPE_UNSUPPORTED"></a>
 
@@ -3681,7 +3238,7 @@ added:
 removed: v21.1.0
 -->
 
-An import attribute is not supported by this version of Node.js.
+此版本的 Node.js 不支持导入属性。
 
 <a id="ERR_INDEX_OUT_OF_RANGE"></a>
 
@@ -3692,7 +3249,7 @@ An import attribute is not supported by this version of Node.js.
   removed: v11.0.0
 -->
 
-A given index was out of the accepted range (e.g. negative offsets).
+给定的索引超出可接受范围（例如，负偏移）。
 
 <a id="ERR_INVALID_OPT_VALUE"></a>
 
@@ -3703,7 +3260,7 @@ added: v8.0.0
 removed: v15.0.0
 -->
 
-An invalid or unexpected value was passed in an options object.
+在选项对象中传递了无效或意外的值。
 
 <a id="ERR_INVALID_OPT_VALUE_ENCODING"></a>
 
@@ -3714,7 +3271,7 @@ added: v9.0.0
 removed: v15.0.0
 -->
 
-An invalid or unknown file encoding was passed.
+传递了无效或未知的文件编码。
 
 <a id="ERR_INVALID_PERFORMANCE_MARK"></a>
 
@@ -3725,8 +3282,7 @@ added: v8.5.0
 removed: v16.7.0
 -->
 
-While using the Performance Timing API (`perf_hooks`), a performance mark is
-invalid.
+在使用性能计时 API (`perf_hooks`) 时，性能标记无效。
 
 <a id="ERR_INVALID_TRANSFER_OBJECT"></a>
 
@@ -3740,7 +3296,7 @@ changes:
     description: A `DOMException` is thrown instead.
 -->
 
-An invalid transfer object was passed to `postMessage()`.
+向 `postMessage()` 传递了无效的传输对象。
 
 <a id="ERR_MANIFEST_ASSERT_INTEGRITY"></a>
 
@@ -3750,9 +3306,7 @@ An invalid transfer object was passed to `postMessage()`.
 removed: v22.2.0
 -->
 
-An attempt was made to load a resource, but the resource did not match the
-integrity defined by the policy manifest. See the documentation for policy
-manifests for more information.
+尝试加载资源，但资源与策略清单定义的完整性不匹配。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MANIFEST_DEPENDENCY_MISSING"></a>
 
@@ -3762,9 +3316,7 @@ manifests for more information.
 removed: v22.2.0
 -->
 
-An attempt was made to load a resource, but the resource was not listed as a
-dependency from the location that attempted to load it. See the documentation
-for policy manifests for more information.
+尝试加载资源，但资源未列为尝试加载它的位置的依赖项。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MANIFEST_INTEGRITY_MISMATCH"></a>
 
@@ -3774,10 +3326,7 @@ for policy manifests for more information.
 removed: v22.2.0
 -->
 
-An attempt was made to load a policy manifest, but the manifest had multiple
-entries for a resource which did not match each other. Update the manifest
-entries to match in order to resolve this error. See the documentation for
-policy manifests for more information.
+尝试加载策略清单，但清单中资源的多个条目不匹配。更新清单条目以匹配以解决此错误。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MANIFEST_INVALID_RESOURCE_FIELD"></a>
 
@@ -3787,9 +3336,7 @@ policy manifests for more information.
 removed: v22.2.0
 -->
 
-A policy manifest resource had an invalid value for one of its fields. Update
-the manifest entry to match in order to resolve this error. See the
-documentation for policy manifests for more information.
+策略清单资源的某个字段具有无效值。更新清单条目以匹配以解决此错误。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MANIFEST_INVALID_SPECIFIER"></a>
 
@@ -3799,9 +3346,7 @@ documentation for policy manifests for more information.
 removed: v22.2.0
 -->
 
-A policy manifest resource had an invalid value for one of its dependency
-mappings. Update the manifest entry to match to resolve this error. See the
-documentation for policy manifests for more information.
+策略清单资源的某个依赖映射具有无效值。更新清单条目以匹配以解决此错误。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MANIFEST_PARSE_POLICY"></a>
 
@@ -3811,8 +3356,7 @@ documentation for policy manifests for more information.
 removed: v22.2.0
 -->
 
-An attempt was made to load a policy manifest, but the manifest was unable to
-be parsed. See the documentation for policy manifests for more information.
+尝试加载策略清单，但无法解析清单。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MANIFEST_TDZ"></a>
 
@@ -3822,8 +3366,7 @@ be parsed. See the documentation for policy manifests for more information.
 removed: v22.2.0
 -->
 
-An attempt was made to read from a policy manifest, but the manifest
-initialization has not yet taken place. This is likely a bug in Node.js.
+尝试从策略清单读取，但清单初始化尚未发生。这可能是 Node.js 中的错误。
 
 <a id="ERR_MANIFEST_UNKNOWN_ONERROR"></a>
 
@@ -3833,8 +3376,7 @@ initialization has not yet taken place. This is likely a bug in Node.js.
 removed: v22.2.0
 -->
 
-A policy manifest was loaded, but had an unknown value for its "onerror"
-behavior. See the documentation for policy manifests for more information.
+加载了策略清单，但其 "onerror" 行为具有未知值。有关策略清单的更多信息，请参见文档。
 
 <a id="ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST"></a>
 
@@ -3844,9 +3386,7 @@ behavior. See the documentation for policy manifests for more information.
 removed: v15.0.0
 -->
 
-This error code was replaced by [`ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST`][]
-in Node.js v15.0.0, because it is no longer accurate as other types of
-transferable objects also exist now.
+此错误代码在 Node.js v15.0.0 中被 [`ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST`][] 替换，因为它不再准确，因为现在也存在其他类型的可传输对象。
 
 <a id="ERR_MISSING_TRANSFERABLE_IN_TRANSFER_LIST"></a>
 
@@ -3861,14 +3401,9 @@ changes:
     description: A `DOMException` is thrown instead.
 -->
 
-An object that needs to be explicitly listed in the `transferList` argument
-is in the object passed to a [`postMessage()`][] call, but is not provided
-in the `transferList` for that call. Usually, this is a `MessagePort`.
+需要显式列在 `transferList` 参数中的对象位于传递给 [`postMessage()`][] 调用的对象中，但未在该调用的 `transferList` 中提供。通常，这是一个 `MessagePort`。
 
-In Node.js versions prior to v15.0.0, the error code being used here was
-[`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`][]. However, the set of
-transferable object types has been expanded to cover more types than
-`MessagePort`.
+在 Node.js v15.0.0 之前的版本中，这里使用的错误代码是 [`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`][]。但是，可传输对象类型的集合已扩展以覆盖更多类型，而不仅仅是 `MessagePort`。
 
 <a id="ERR_NAPI_CONS_PROTOTYPE_OBJECT"></a>
 
@@ -3879,7 +3414,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used by the `Node-API` when `Constructor.prototype` is not an object.
+当 `Constructor.prototype` 不是对象时，由 `Node-API` 使用。
 
 <a id="ERR_NAPI_TSFN_START_IDLE_LOOP"></a>
 
@@ -3894,9 +3429,7 @@ removed:
   - v12.17.0
 -->
 
-On the main thread, values are removed from the queue associated with the
-thread-safe function in an idle loop. This error indicates that an error
-has occurred when attempting to start the loop.
+在主线程上，值在与线程安全函数关联的队列中的空闲循环中被移除。此错误表示尝试启动循环时发生错误。
 
 <a id="ERR_NAPI_TSFN_STOP_IDLE_LOOP"></a>
 
@@ -3911,15 +3444,13 @@ removed:
   - v12.17.0
 -->
 
-Once no more items are left in the queue, the idle loop must be suspended. This
-error indicates that the idle loop has failed to stop.
+一旦队列中没有更多项，必须暂停空闲循环。此错误表示空闲循环未能停止。
 
 <a id="ERR_NO_LONGER_SUPPORTED"></a>
 
-### `ERR_NO_LONGER_SUPPORTED`
+### `ERR_NO_LONGER_SUPPORTED```
 
-A Node.js API was called in an unsupported manner, such as
-`Buffer.write(string, encoding, offset[, length])`.
+以不支持的方式调用了 Node.js API，例如 `Buffer.write(string, encoding, offset[, length])`。
 
 <a id="ERR_OUTOFMEMORY"></a>
 
@@ -3930,8 +3461,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used generically to identify that an operation caused an out of memory
-condition.
+通常用于标识操作导致内存不足的情况。
 
 <a id="ERR_PARSE_HISTORY_DATA"></a>
 
@@ -3942,7 +3472,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-The `node:repl` module was unable to parse data from the REPL history file.
+`node:repl` 模块无法从 REPL 历史文件中解析数据。
 
 <a id="ERR_SOCKET_CANNOT_SEND"></a>
 
@@ -3953,7 +3483,7 @@ added: v9.0.0
 removed: v14.0.0
 -->
 
-Data could not be sent on a socket.
+无法在套接字上发送数据。
 
 <a id="ERR_STDERR_CLOSE"></a>
 
@@ -3969,8 +3499,7 @@ changes:
                  making this error obsolete.
 -->
 
-An attempt was made to close the `process.stderr` stream. By design, Node.js
-does not allow `stdout` or `stderr` streams to be closed by user code.
+尝试关闭 `process.stderr` 流。根据设计，Node.js 不允许用户代码关闭 `stdout` 或 `stderr` 流。
 
 <a id="ERR_STDOUT_CLOSE"></a>
 
@@ -3986,8 +3515,7 @@ changes:
                  making this error obsolete.
 -->
 
-An attempt was made to close the `process.stdout` stream. By design, Node.js
-does not allow `stdout` or `stderr` streams to be closed by user code.
+尝试关闭 `process.stdout` 流。根据设计，Node.js 不允许用户代码关闭 `stdout` 或 `stderr` 流。
 
 <a id="ERR_STREAM_READ_NOT_IMPLEMENTED"></a>
 
@@ -3998,27 +3526,25 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when an attempt is made to use a readable stream that has not implemented
-[`readable._read()`][].
+尝试使用未实现 [`readable._read()`][] 的可读流时使用。
 
 <a id="ERR_TAP_LEXER_ERROR"></a>
 
-### `ERR_TAP_LEXER_ERROR`
+### `ERR_TAP_LEXER_ERROR```
 
-An error representing a failing lexer state.
+表示失败词法分析器状态的错误。
 
 <a id="ERR_TAP_PARSER_ERROR"></a>
 
-### `ERR_TAP_PARSER_ERROR`
+### `ERR_TAP_PARSER_ERROR```
 
-An error representing a failing parser state. Additional information about
-the token causing the error is available via the `cause` property.
+表示失败解析器状态的错误。有关导致错误的 token 的更多信息可通过 `cause` 属性获得。
 
 <a id="ERR_TAP_VALIDATION_ERROR"></a>
 
-### `ERR_TAP_VALIDATION_ERROR`
+### `ERR_TAP_VALIDATION_ERROR```
 
-This error represents a failed TAP validation.
+此错误表示 TAP 验证失败。
 
 <a id="ERR_TLS_RENEGOTIATION_FAILED"></a>
 
@@ -4029,7 +3555,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when a TLS renegotiation request has failed in a non-specific way.
+当 TLS 重新协商请求以非特定方式失败时使用。
 
 <a id="ERR_TRANSFERRING_EXTERNALIZED_SHAREDARRAYBUFFER"></a>
 
@@ -4040,12 +3566,9 @@ added: v10.5.0
 removed: v14.0.0
 -->
 
-A `SharedArrayBuffer` whose memory is not managed by the JavaScript engine
-or by Node.js was encountered during serialization. Such a `SharedArrayBuffer`
-cannot be serialized.
+在序列化过程中遇到了内存不由 JavaScript 引擎或 Node.js 管理的 `SharedArrayBuffer`。此类 `SharedArrayBuffer` 无法序列化。
 
-This can only happen when native addons create `SharedArrayBuffer`s in
-"externalized" mode, or put existing `SharedArrayBuffer` into externalized mode.
+这只能在本机插件在“外部化”模式下创建 `SharedArrayBuffer`，或将现有 `SharedArrayBuffer` 置于外部化模式时发生。
 
 <a id="ERR_UNKNOWN_STDIN_TYPE"></a>
 
@@ -4056,9 +3579,7 @@ added: v8.0.0
 removed: v11.7.0
 -->
 
-An attempt was made to launch a Node.js process with an unknown `stdin` file
-type. This error is usually an indication of a bug within Node.js itself,
-although it is possible for user code to trigger it.
+尝试启动具有未知 `stdin` 文件类型的 Node.js 进程。此错误通常表示 Node.js 本身存在错误，尽管用户代码也可能触发它。
 
 <a id="ERR_UNKNOWN_STREAM_TYPE"></a>
 
@@ -4069,15 +3590,13 @@ added: v8.0.0
 removed: v11.7.0
 -->
 
-An attempt was made to launch a Node.js process with an unknown `stdout` or
-`stderr` file type. This error is usually an indication of a bug within Node.js
-itself, although it is possible for user code to trigger it.
+尝试启动具有未知 `stdout` 或 `stderr` 文件类型的 Node.js 进程。此错误通常表示 Node.js 本身存在错误，尽管用户代码也可能触发它。
 
 <a id="ERR_V8BREAKITERATOR"></a>
 
-### `ERR_V8BREAKITERATOR`
+### `ERR_V8BREAKITERATOR```
 
-The V8 `BreakIterator` API was used but the full ICU data set is not installed.
+使用了 V8 `BreakIterator` API，但未安装完整的 ICU 数据集。
 
 <a id="ERR_VALUE_OUT_OF_RANGE"></a>
 
@@ -4088,7 +3607,7 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when a given value is out of the accepted range.
+当给定值超出可接受范围时使用。
 
 <a id="ERR_VM_MODULE_LINKING_ERRORED"></a>
 
@@ -4101,13 +3620,13 @@ removed:
   - v16.17.0
 -->
 
-The linker function returned a module for which linking has failed.
+链接器函数返回了一个链接失败的模块。
 
 <a id="ERR_VM_MODULE_NOT_LINKED"></a>
 
-### `ERR_VM_MODULE_NOT_LINKED`
+### `ERR_VM_MODULE_NOT_LINKED```
 
-The module must be successfully linked before instantiation.
+在实例化之前必须成功链接模块。
 
 <a id="ERR_WORKER_UNSUPPORTED_EXTENSION"></a>
 
@@ -4118,8 +3637,7 @@ added: v11.0.0
 removed: v16.9.0
 -->
 
-The pathname used for the main script of a worker has an
-unknown file extension.
+工作器主脚本的路径名具有未知的文件扩展名。
 
 <a id="ERR_ZLIB_BINDING_CLOSED"></a>
 
@@ -4130,219 +3648,207 @@ added: v9.0.0
 removed: v10.0.0
 -->
 
-Used when an attempt is made to use a `zlib` object after it has already been
-closed.
+尝试在 `zlib` 对象已经关闭后使用它时使用。
 
 <a id="openssl-error-codes"></a>
 
-## OpenSSL Error Codes
+## OpenSSL 错误代码
 
 <a id="Time Validity Errors"></a>
 
-### Time Validity Errors
+### 时间有效性错误
 
 <a id="CERT_NOT_YET_VALID"></a>
 
 #### `CERT_NOT_YET_VALID`
 
-The certificate is not yet valid: the notBefore date is after the current time.
+证书尚未生效：notBefore 日期在当前时间之后。
 
 <a id="CERT_HAS_EXPIRED"></a>
 
 #### `CERT_HAS_EXPIRED`
 
-The certificate has expired: the notAfter date is before the current time.
+证书已过期：notAfter 日期在当前时间之前。
 
 <a id="CRL_NOT_YET_VALID"></a>
 
 #### `CRL_NOT_YET_VALID`
 
-The certificate revocation list (CRL) has a future issue date.
+证书吊销列表 (CRL) 具有未来的发布日期。
 
 <a id="CRL_HAS_EXPIRED"></a>
 
 #### `CRL_HAS_EXPIRED`
 
-The certificate revocation list (CRL) has expired.
+证书吊销列表 (CRL) 已过期。
 
 <a id="CERT_REVOKED"></a>
 
 #### `CERT_REVOKED`
 
-The certificate has been revoked; it is on a certificate revocation list (CRL).
+证书已被吊销；它在证书吊销列表 (CRL) 上。
 
 <a id="Trust or Chain Related Errors"></a>
 
-### Trust or Chain Related Errors
+### 信任或链相关错误
 
 <a id="UNABLE_TO_GET_ISSUER_CERT"></a>
 
 #### `UNABLE_TO_GET_ISSUER_CERT`
 
-The issuer certificate of a looked up certificate could not be found. This
-normally means the list of trusted certificates is not complete.
+查找证书的颁发者证书找不到。这通常意味着受信任证书列表不完整。
 
 <a id="UNABLE_TO_GET_ISSUER_CERT_LOCALLY"></a>
 
 #### `UNABLE_TO_GET_ISSUER_CERT_LOCALLY`
 
-The certificate’s issuer is not known. This is the case if the issuer is not
-included in the trusted certificate list.
+证书的颁发者未知。如果颁发者未包含在受信任证书列表中，则会出现这种情况。
 
 <a id="DEPTH_ZERO_SELF_SIGNED_CERT"></a>
 
 #### `DEPTH_ZERO_SELF_SIGNED_CERT`
 
-The passed certificate is self-signed and the same certificate cannot be found
-in the list of trusted certificates.
+传递的证书是自签名的，并且在受信任证书列表中找不到相同的证书。
 
 <a id="SELF_SIGNED_CERT_IN_CHAIN"></a>
 
 #### `SELF_SIGNED_CERT_IN_CHAIN`
 
-The certificate’s issuer is not known. This is the case if the issuer is not
-included in the trusted certificate list.
+证书的颁发者未知。如果颁发者未包含在受信任证书列表中，则会出现这种情况。
 
 <a id="CERT_CHAIN_TOO_LONG"></a>
 
 #### `CERT_CHAIN_TOO_LONG`
 
-The certificate chain length is greater than the maximum depth.
+证书链长度大于最大深度。
 
 <a id="UNABLE_TO_GET_CRL"></a>
 
 #### `UNABLE_TO_GET_CRL`
 
-The CRL reference by the certificate could not be found.
+证书引用的 CRL 找不到。
 
 <a id="UNABLE_TO_VERIFY_LEAF_SIGNATURE"></a>
 
 #### `UNABLE_TO_VERIFY_LEAF_SIGNATURE`
 
-No signatures could be verified because the chain contains only one certificate
-and it is not self signed.
+无法验证任何签名，因为链中只包含一个证书且它不是自签名的。
 
 <a id="CERT_UNTRUSTED"></a>
 
 #### `CERT_UNTRUSTED`
 
-The root certificate authority (CA) is not marked as trusted for the specified
-purpose.
+根证书颁发机构 (CA) 未标记为受信任用于指定目的。
 
 <a id="Basic Extension Errors"></a>
 
-### Basic Extension Errors
+### 基本扩展错误
 
 <a id="INVALID_CA"></a>
 
 #### `INVALID_CA`
 
-A CA certificate is invalid. Either it is not a CA or its extensions are not
-consistent with the supplied purpose.
+CA 证书无效。要么它不是 CA，要么其扩展与提供的目的不一致。
 
 <a id="PATH_LENGTH_EXCEEDED"></a>
 
 #### `PATH_LENGTH_EXCEEDED`
 
-The basicConstraints pathlength parameter has been exceeded.
+已超过 basicConstraints pathlength 参数。
 
 <a id="Name Related Errors"></a>
 
-### Name Related Errors
+### 名称相关错误
 
 <a id="HOSTNAME_MISMATCH"></a>
 
 #### `HOSTNAME_MISMATCH`
 
-Certificate does not match provided name.
+证书与提供的名称不匹配。
 
 <a id="Usage and Policy Errors"></a>
 
-### Usage and Policy Errors
+### 使用和策略错误
 
 <a id="INVALID_PURPOSE"></a>
 
 #### `INVALID_PURPOSE`
 
-The supplied certificate cannot be used for the specified purpose.
+提供的证书不能用于指定目的。
 
 <a id="CERT_REJECTED"></a>
 
 #### `CERT_REJECTED`
 
-The root CA is marked to reject the specified purpose.
+根 CA 被标记为拒绝指定目的。
 
 <a id="Formatting Errors"></a>
 
-### Formatting Errors
+### 格式化错误
 
 <a id="CERT_SIGNATURE_FAILURE"></a>
 
 #### `CERT_SIGNATURE_FAILURE`
 
-The signature of the certificate is invalid.
+证书的签名无效。
 
 <a id="CRL_SIGNATURE_FAILURE"></a>
 
 #### `CRL_SIGNATURE_FAILURE`
 
-The signature of the certificate revocation list (CRL) is invalid.
+证书吊销列表 (CRL) 的签名无效。
 
 <a id="ERROR_IN_CERT_NOT_BEFORE_FIELD"></a>
 
 #### `ERROR_IN_CERT_NOT_BEFORE_FIELD`
 
-The certificate notBefore field contains an invalid time.
+证书 notBefore 字段包含无效时间。
 
 <a id="ERROR_IN_CERT_NOT_AFTER_FIELD"></a>
 
 #### `ERROR_IN_CERT_NOT_AFTER_FIELD`
 
-The certificate notAfter field contains an invalid time.
+证书 notAfter 字段包含无效时间。
 
 <a id="ERROR_IN_CRL_LAST_UPDATE_FIELD"></a>
 
 #### `ERROR_IN_CRL_LAST_UPDATE_FIELD`
 
-The CRL lastUpdate field contains an invalid time.
+CRL lastUpdate 字段包含无效时间。
 
 <a id="ERROR_IN_CRL_NEXT_UPDATE_FIELD"></a>
 
 #### `ERROR_IN_CRL_NEXT_UPDATE_FIELD`
 
-The CRL nextUpdate field contains an invalid time.
+CRL nextUpdate 字段包含无效时间。
 
 <a id="UNABLE_TO_DECRYPT_CERT_SIGNATURE"></a>
 
 #### `UNABLE_TO_DECRYPT_CERT_SIGNATURE`
 
-The certificate signature could not be decrypted. This means that the actual
-signature value could not be determined rather than it not matching the expected
-value, this is only meaningful for RSA keys.
+证书签名无法解密。这意味着无法确定实际签名值，而不是它与期望值不匹配，这仅对 RSA 密钥有意义。
 
 <a id="UNABLE_TO_DECRYPT_CRL_SIGNATURE"></a>
 
 #### `UNABLE_TO_DECRYPT_CRL_SIGNATURE`
 
-The certificate revocation list (CRL) signature could not be decrypted: this
-means that the actual signature value could not be determined rather than it not
-matching the expected value.
+证书吊销列表 (CRL) 签名无法解密：这意味着无法确定实际签名值，而不是它与期望值不匹配。
 
 <a id="UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY"></a>
 
 #### `UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY`
 
-The public key in the certificate SubjectPublicKeyInfo could not be read.
+无法读取证书 SubjectPublicKeyInfo 中的公钥。
 
 <a id="Other OpenSSL Errors"></a>
 
-### Other OpenSSL Errors
+### 其他 OpenSSL 错误
 
 <a id="OUT_OF_MEM"></a>
 
 #### `OUT_OF_MEM`
 
-An error occurred trying to allocate memory. This should never happen.
+尝试分配内存时发生错误。这不应发生。
 
 [ES Module]: esm.md
 [ICU]: intl.md#internationalization-support
