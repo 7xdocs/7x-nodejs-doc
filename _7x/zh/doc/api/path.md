@@ -6,8 +6,7 @@
 
 <!-- source_link=lib/path.js -->
 
-The `node:path` module provides utilities for working with file and directory
-paths. It can be accessed using:
+`node:path` 模块提供了用于处理文件和目录路径的实用工具。可以通过以下方式访问：
 
 ```cjs
 const path = require('node:path');
@@ -17,54 +16,45 @@ const path = require('node:path');
 import path from 'node:path';
 ```
 
-## Windows vs. POSIX
+## Windows 与 POSIX
 
-The default operation of the `node:path` module varies based on the operating
-system on which a Node.js application is running. Specifically, when running on
-a Windows operating system, the `node:path` module will assume that
-Windows-style paths are being used.
+`node:path` 模块的默认操作根据 Node.js 应用程序运行的操作系统而有所不同。具体来说，在 Windows 操作系统上运行时，`node:path` 模块将假定使用的是 Windows 风格的路径。
 
-So using `path.basename()` might yield different results on POSIX and Windows:
+因此，在 POSIX 和 Windows 上使用 `path.basename()` 可能会产生不同的结果：
 
-On POSIX:
+在 POSIX 上：
 
 ```js
 path.basename('C:\\temp\\myfile.html');
 // Returns: 'C:\\temp\\myfile.html'
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 path.basename('C:\\temp\\myfile.html');
 // Returns: 'myfile.html'
 ```
 
-To achieve consistent results when working with Windows file paths on any
-operating system, use [`path.win32`][]:
+为了在任何操作系统上处理 Windows 文件路径时获得一致的结果，请使用 [`path.win32`][]：
 
-On POSIX and Windows:
+在 POSIX 和 Windows 上：
 
 ```js
 path.win32.basename('C:\\temp\\myfile.html');
 // Returns: 'myfile.html'
 ```
 
-To achieve consistent results when working with POSIX file paths on any
-operating system, use [`path.posix`][]:
+为了在任何操作系统上处理 POSIX 文件路径时获得一致的结果，请使用 [`path.posix`][]：
 
-On POSIX and Windows:
+在 POSIX 和 Windows 上：
 
 ```js
 path.posix.basename('/tmp/myfile.html');
 // Returns: 'myfile.html'
 ```
 
-On Windows Node.js follows the concept of per-drive working directory.
-This behavior can be observed when using a drive path without a backslash. For
-example, `path.resolve('C:\\')` can potentially return a different result than
-`path.resolve('C:')`. For more information, see
-[this MSDN page][MSDN-Rel-Path].
+在 Windows 上，Node.js 遵循每个驱动器工作目录的概念。当使用不带反斜杠的驱动器路径时，可以观察到这种行为。例如，`path.resolve('C:\\')` 可能返回与 `path.resolve('C:')` 不同的结果。更多信息，请参阅 [此 MSDN 页面][MSDN-Rel-Path]。
 
 ## `path.basename(path[, suffix])`
 
@@ -77,12 +67,10 @@ changes:
 -->
 
 * `path` {string}
-* `suffix` {string} An optional suffix to remove
+* `suffix` {string} 要移除的可选后缀
 * Returns: {string}
 
-The `path.basename()` method returns the last portion of a `path`, similar to
-the Unix `basename` command. Trailing [directory separators][`path.sep`] are
-ignored.
+`path.basename()` 方法返回 `path` 的最后一部分，类似于 Unix 的 `basename` 命令。尾随的[目录分隔符][`path.sep`]会被忽略。
 
 ```js
 path.basename('/foo/bar/baz/asdf/quux.html');
@@ -92,10 +80,7 @@ path.basename('/foo/bar/baz/asdf/quux.html', '.html');
 // Returns: 'quux'
 ```
 
-Although Windows usually treats file names, including file extensions, in a
-case-insensitive manner, this function does not. For example, `C:\\foo.html` and
-`C:\\foo.HTML` refer to the same file, but `basename` treats the extension as a
-case-sensitive string:
+尽管 Windows 通常以不区分大小写的方式处理文件名（包括文件扩展名），但此函数不会。例如，`C:\\foo.html` 和 `C:\\foo.HTML` 指向同一个文件，但 `basename` 将扩展名视为区分大小写的字符串：
 
 ```js
 path.win32.basename('C:\\foo.html', '.html');
@@ -105,8 +90,7 @@ path.win32.basename('C:\\foo.HTML', '.html');
 // Returns: 'foo.HTML'
 ```
 
-A [`TypeError`][] is thrown if `path` is not a string or if `suffix` is given
-and is not a string.
+如果 `path` 不是字符串，或者提供了 `suffix` 但它不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.delimiter`
 
@@ -114,14 +98,14 @@ and is not a string.
 added: v0.9.3
 -->
 
-* Type: {string}
+* 类型: {string}
 
-Provides the platform-specific path delimiter:
+提供特定于平台的路径定界符：
 
-* `;` for Windows
-* `:` for POSIX
+* Windows 上是 `;`
+* POSIX 上是 `:`
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
 console.log(process.env.PATH);
@@ -131,7 +115,7 @@ process.env.PATH.split(path.delimiter);
 // Returns: ['/usr/bin', '/bin', '/usr/sbin', '/sbin', '/usr/local/bin']
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 console.log(process.env.PATH);
@@ -154,16 +138,14 @@ changes:
 * `path` {string}
 * Returns: {string}
 
-The `path.dirname()` method returns the directory name of a `path`, similar to
-the Unix `dirname` command. Trailing directory separators are ignored, see
-[`path.sep`][].
+`path.dirname()` 方法返回 `path` 的目录名，类似于 Unix 的 `dirname` 命令。尾随的目录分隔符会被忽略，参见 [`path.sep`][]。
 
 ```js
 path.dirname('/foo/bar/baz/asdf/quux');
 // Returns: '/foo/bar/baz/asdf'
 ```
 
-A [`TypeError`][] is thrown if `path` is not a string.
+如果 `path` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.extname(path)`
 
@@ -178,11 +160,7 @@ changes:
 * `path` {string}
 * Returns: {string}
 
-The `path.extname()` method returns the extension of the `path`, from the last
-occurrence of the `.` (period) character to end of string in the last portion of
-the `path`. If there is no `.` in the last portion of the `path`, or if
-there are no `.` characters other than the first character of
-the basename of `path` (see `path.basename()`) , an empty string is returned.
+`path.extname()` 方法返回 `path` 的扩展名，即 `path` 的最后一部分中从最后一次出现 `.`（点）字符到字符串结尾的部分。如果 `path` 的最后一部分中没有 `.`，或者 `path` 的基本名称（参见 `path.basename()`）除了第一个字符之外没有 `.` 字符，则返回空字符串。
 
 ```js
 path.extname('index.html');
@@ -204,7 +182,7 @@ path.extname('.index.md');
 // Returns: '.md'
 ```
 
-A [`TypeError`][] is thrown if `path` is not a string.
+如果 `path` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.format(pathObject)`
 
@@ -216,7 +194,7 @@ changes:
     description: The dot will be added if it is not specified in `ext`.
 -->
 
-* `pathObject` {Object} Any JavaScript object having the following properties:
+* `pathObject` {Object} 任何具有以下属性的 JavaScript 对象：
   * `dir` {string}
   * `root` {string}
   * `base` {string}
@@ -224,21 +202,18 @@ changes:
   * `ext` {string}
 * Returns: {string}
 
-The `path.format()` method returns a path string from an object. This is the
-opposite of [`path.parse()`][].
+`path.format()` 方法从对象返回路径字符串。这与 [`path.parse()`][] 相反。
 
-When providing properties to the `pathObject` remember that there are
-combinations where one property has priority over another:
+当向 `pathObject` 提供属性时，请注意存在一些组合，其中一个属性优先于另一个：
 
-* `pathObject.root` is ignored if `pathObject.dir` is provided
-* `pathObject.ext` and `pathObject.name` are ignored if `pathObject.base` exists
+* 如果提供了 `pathObject.dir`，则 `pathObject.root` 被忽略
+* 如果存在 `pathObject.base`，则 `pathObject.ext` 和 `pathObject.name` 被忽略
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
-// If `dir`, `root` and `base` are provided,
-// `${dir}${path.sep}${base}`
-// will be returned. `root` is ignored.
+// 如果提供了 `dir`、`root` 和 `base`，
+// 将返回 `${dir}${path.sep}${base}`。`root` 被忽略。
 path.format({
   root: '/ignored',
   dir: '/home/user/dir',
@@ -246,9 +221,9 @@ path.format({
 });
 // Returns: '/home/user/dir/file.txt'
 
-// `root` will be used if `dir` is not specified.
-// If only `root` is provided or `dir` is equal to `root` then the
-// platform separator will not be included. `ext` will be ignored.
+// 如果未指定 `dir`，则将使用 `root`。
+// 如果仅提供了 `root` 或 `dir` 等于 `root`，则
+// 不会包含平台分隔符。`ext` 将被忽略。
 path.format({
   root: '/',
   base: 'file.txt',
@@ -256,7 +231,7 @@ path.format({
 });
 // Returns: '/file.txt'
 
-// `name` + `ext` will be used if `base` is not specified.
+// 如果未指定 `base`，则将使用 `name` + `ext`。
 path.format({
   root: '/',
   name: 'file',
@@ -264,7 +239,7 @@ path.format({
 });
 // Returns: '/file.txt'
 
-// The dot will be added if it is not specified in `ext`.
+// 如果 `ext` 中未指定点，则会自动添加。
 path.format({
   root: '/',
   name: 'file',
@@ -273,7 +248,7 @@ path.format({
 // Returns: '/file.txt'
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 path.format({
@@ -295,20 +270,20 @@ changes:
     description: Marking the API stable.
 -->
 
-* `path` {string} The path to glob-match against.
-* `pattern` {string} The glob to check the path against.
-* Returns: {boolean} Whether or not the `path` matched the `pattern`.
+* `path` {string} 要进行全局匹配的路径。
+* `pattern` {string} 要检查路径的全局模式。
+* Returns: {boolean} `path` 是否匹配 `pattern`。
 
-The `path.matchesGlob()` method determines if `path` matches the `pattern`.
+`path.matchesGlob()` 方法判断 `path` 是否匹配 `pattern`。
 
-For example:
+例如：
 
 ```js
 path.matchesGlob('/foo/bar', '/foo/*'); // true
 path.matchesGlob('/foo/bar*', 'foo/bird'); // false
 ```
 
-A [`TypeError`][] is thrown if `path` or `pattern` are not strings.
+如果 `path` 或 `pattern` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.isAbsolute(path)`
 
@@ -319,12 +294,11 @@ added: v0.11.2
 * `path` {string}
 * Returns: {boolean}
 
-The `path.isAbsolute()` method determines if the literal `path` is absolute.
-Therefore, it’s not safe for mitigating path traversals.
+`path.isAbsolute()` 方法判断给定的 `path` 是否是绝对路径。因此，它对于缓解路径遍历并不安全。
 
-If the given `path` is a zero-length string, `false` will be returned.
+如果给定的 `path` 是零长度字符串，则返回 `false`。
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
 path.isAbsolute('/foo/bar');   // true
@@ -334,7 +308,7 @@ path.isAbsolute('qux/');       // false
 path.isAbsolute('.');          // false
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 path.isAbsolute('//server');    // true
@@ -346,7 +320,7 @@ path.isAbsolute('bar/baz');     // false
 path.isAbsolute('.');           // false
 ```
 
-A [`TypeError`][] is thrown if `path` is not a string.
+如果 `path` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.join([...paths])`
 
@@ -354,15 +328,12 @@ A [`TypeError`][] is thrown if `path` is not a string.
 added: v0.1.16
 -->
 
-* `...paths` {string} A sequence of path segments
+* `...paths` {string} 路径段的序列
 * Returns: {string}
 
-The `path.join()` method joins all given `path` segments together using the
-platform-specific separator as a delimiter, then normalizes the resulting path.
+`path.join()` 方法使用平台特定的分隔符作为定界符将所有给定的 `path` 段连接在一起，然后对生成的路径进行规范化。
 
-Zero-length `path` segments are ignored. If the joined path string is a
-zero-length string then `'.'` will be returned, representing the current
-working directory.
+零长度的 `path` 段会被忽略。如果连接后的路径字符串是零长度字符串，则返回 `'.'`，表示当前工作目录。
 
 ```js
 path.join('/foo', 'bar', 'baz/asdf', 'quux', '..');
@@ -372,7 +343,7 @@ path.join('foo', {}, 'bar');
 // Throws 'TypeError: Path must be a string. Received {}'
 ```
 
-A [`TypeError`][] is thrown if any of the path segments is not a string.
+如果任何路径段不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.normalize(path)`
 
@@ -383,48 +354,36 @@ added: v0.1.23
 * `path` {string}
 * Returns: {string}
 
-The `path.normalize()` method normalizes the given `path`, resolving `'..'` and
-`'.'` segments.
+`path.normalize()` 方法对给定的 `path` 进行规范化，解析 `'..'` 和 `'.'` 段。
 
-When multiple, sequential path segment separation characters are found (e.g.
-`/` on POSIX and either `\` or `/` on Windows), they are replaced by a single
-instance of the platform-specific path segment separator (`/` on POSIX and
-`\` on Windows). Trailing separators are preserved.
+当找到多个连续的路径段分隔符（例如，POSIX 上的 `/` 以及 Windows 上的 `\` 或 `/`）时，它们将被替换为平台特定的路径段分隔符的单个实例（POSIX 上是 `/`，Windows 上是 `\`）。尾随的分隔符会保留。
 
-If the `path` is a zero-length string, `'.'` is returned, representing the
-current working directory.
+如果 `path` 是零长度字符串，则返回 `'.'`，表示当前工作目录。
 
-On POSIX, the types of normalization applied by this function do not strictly
-adhere to the POSIX specification. For example, this function will replace two
-leading forward slashes with a single slash as if it was a regular absolute
-path, whereas a few POSIX systems assign special meaning to paths beginning with
-exactly two forward slashes. Similarly, other substitutions performed by this
-function, such as removing `..` segments, may change how the underlying system
-resolves the path.
+在 POSIX 上，此函数应用的规范化类型并不严格遵循 POSIX 规范。例如，此函数会将两个前导斜杠替换为单个斜杠，就好像它是一个常规的绝对路径一样，而一些 POSIX 系统对以恰好两个斜杠开头的路径赋予了特殊含义。类似地，此函数执行的其他替换，例如移除 `..` 段，可能会改变底层系统解析路径的方式。
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
 path.normalize('/foo/bar//baz/asdf/quux/..');
 // Returns: '/foo/bar/baz/asdf'
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 path.normalize('C:\\temp\\\\foo\\bar\\..\\');
 // Returns: 'C:\\temp\\foo\\'
 ```
 
-Since Windows recognizes multiple path separators, both separators will be
-replaced by instances of the Windows preferred separator (`\`):
+由于 Windows 识别多个路径分隔符，两个分隔符都将被 Windows 首选分隔符 (`\`) 的实例替换：
 
 ```js
 path.win32.normalize('C:////temp\\\\/\\/\\/foo/bar');
 // Returns: 'C:\\temp\\foo\\bar'
 ```
 
-A [`TypeError`][] is thrown if `path` is not a string.
+如果 `path` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.parse(path)`
 
@@ -435,11 +394,9 @@ added: v0.11.15
 * `path` {string}
 * Returns: {Object}
 
-The `path.parse()` method returns an object whose properties represent
-significant elements of the `path`. Trailing directory separators are ignored,
-see [`path.sep`][].
+`path.parse()` 方法返回一个对象，其属性表示 `path` 的重要元素。尾随的目录分隔符会被忽略，参见 [`path.sep`][]。
 
-The returned object will have the following properties:
+返回的对象将具有以下属性：
 
 * `dir` {string}
 * `root` {string}
@@ -447,7 +404,7 @@ The returned object will have the following properties:
 * `name` {string}
 * `ext` {string}
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
 path.parse('/home/user/dir/file.txt');
@@ -466,10 +423,10 @@ path.parse('/home/user/dir/file.txt');
 │ root │              │ name │ ext │
 "  /    home/user/dir / file  .txt "
 └──────┴──────────────┴──────┴─────┘
-(All spaces in the "" line should be ignored. They are purely for formatting.)
+(所有 "" 行中的空格都应被忽略。它们仅用于格式化。)
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 path.parse('C:\\path\\dir\\file.txt');
@@ -488,10 +445,10 @@ path.parse('C:\\path\\dir\\file.txt');
 │ root │              │ name │ ext │
 " C:\      path\dir   \ file  .txt "
 └──────┴──────────────┴──────┴─────┘
-(All spaces in the "" line should be ignored. They are purely for formatting.)
+(所有 "" 行中的空格都应被忽略。它们仅用于格式化。)
 ```
 
-A [`TypeError`][] is thrown if `path` is not a string.
+如果 `path` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.posix`
 
@@ -503,12 +460,11 @@ changes:
     description: Exposed as `require('path/posix')`.
 -->
 
-* Type: {Object}
+* 类型: {Object}
 
-The `path.posix` property provides access to POSIX specific implementations
-of the `path` methods.
+`path.posix` 属性提供对 `path` 方法的 POSIX 特定实现的访问。
 
-The API is accessible via `require('node:path').posix` or `require('node:path/posix')`.
+该 API 可通过 `require('node:path').posix` 或 `require('node:path/posix')` 访问。
 
 ## `path.relative(from, to)`
 
@@ -525,28 +481,25 @@ changes:
 * `to` {string}
 * Returns: {string}
 
-The `path.relative()` method returns the relative path from `from` to `to` based
-on the current working directory. If `from` and `to` each resolve to the same
-path (after calling `path.resolve()` on each), a zero-length string is returned.
+`path.relative()` 方法根据当前工作目录返回从 `from` 到 `to` 的相对路径。如果 `from` 和 `to` 各自解析为相同的路径（在对每个路径调用 `path.resolve()` 之后），则返回零长度字符串。
 
-If a zero-length string is passed as `from` or `to`, the current working
-directory will be used instead of the zero-length strings.
+如果零长度字符串作为 `from` 或 `to` 传递，则将使用当前工作目录代替零长度字符串。
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
 path.relative('/data/orandea/test/aaa', '/data/orandea/impl/bbb');
 // Returns: '../../impl/bbb'
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 path.relative('C:\\orandea\\test\\aaa', 'C:\\orandea\\impl\\bbb');
 // Returns: '..\\..\\impl\\bbb'
 ```
 
-A [`TypeError`][] is thrown if either `from` or `to` is not a string.
+如果 `from` 或 `to` 不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.resolve([...paths])`
 
@@ -554,28 +507,20 @@ A [`TypeError`][] is thrown if either `from` or `to` is not a string.
 added: v0.3.4
 -->
 
-* `...paths` {string} A sequence of paths or path segments
+* `...paths` {string} 路径或路径段的序列
 * Returns: {string}
 
-The `path.resolve()` method resolves a sequence of paths or path segments into
-an absolute path.
+`path.resolve()` 方法将路径或路径段的序列解析为绝对路径。
 
-The given sequence of paths is processed from right to left, with each
-subsequent `path` prepended until an absolute path is constructed.
-For instance, given the sequence of path segments: `/foo`, `/bar`, `baz`,
-calling `path.resolve('/foo', '/bar', 'baz')` would return `/bar/baz`
-because `'baz'` is not an absolute path but `'/bar' + '/' + 'baz'` is.
+给定的路径序列从右到左处理，每个后续的 `path` 会被前置，直到构造出绝对路径。例如，给定路径段序列：`/foo`, `/bar`, `baz`，调用 `path.resolve('/foo', '/bar', 'baz')` 将返回 `/bar/baz`，因为 `'baz'` 不是绝对路径，但 `'/bar' + '/' + 'baz'` 是。
 
-If, after processing all given `path` segments, an absolute path has not yet
-been generated, the current working directory is used.
+如果在处理所有给定的 `path` 段之后，尚未生成绝对路径，则使用当前工作目录。
 
-The resulting path is normalized and trailing slashes are removed unless the
-path is resolved to the root directory.
+生成的路径会被规范化，并且除非路径解析为根目录，否则尾随斜杠会被移除。
 
-Zero-length `path` segments are ignored.
+零长度的 `path` 段会被忽略。
 
-If no `path` segments are passed, `path.resolve()` will return the absolute path
-of the current working directory.
+如果没有传递 `path` 段，`path.resolve()` 将返回当前工作目录的绝对路径。
 
 ```js
 path.resolve('/foo/bar', './baz');
@@ -585,11 +530,11 @@ path.resolve('/foo/bar', '/tmp/file/');
 // Returns: '/tmp/file'
 
 path.resolve('wwwroot', 'static_files/png/', '../gif/image.gif');
-// If the current working directory is /home/myself/node,
-// this returns '/home/myself/node/wwwroot/static_files/gif/image.gif'
+// 如果当前工作目录是 /home/myself/node，
+// 则返回 '/home/myself/node/wwwroot/static_files/gif/image.gif'
 ```
 
-A [`TypeError`][] is thrown if any of the arguments is not a string.
+如果任何参数不是字符串，则会抛出 [`TypeError`][]。
 
 ## `path.sep`
 
@@ -597,30 +542,28 @@ A [`TypeError`][] is thrown if any of the arguments is not a string.
 added: v0.7.9
 -->
 
-* Type: {string}
+* 类型: {string}
 
-Provides the platform-specific path segment separator:
+提供特定于平台的路径段分隔符：
 
-* `\` on Windows
-* `/` on POSIX
+* Windows 上是 `\`
+* POSIX 上是 `/`
 
-For example, on POSIX:
+例如，在 POSIX 上：
 
 ```js
 'foo/bar/baz'.split(path.sep);
 // Returns: ['foo', 'bar', 'baz']
 ```
 
-On Windows:
+在 Windows 上：
 
 ```js
 'foo\\bar\\baz'.split(path.sep);
 // Returns: ['foo', 'bar', 'baz']
 ```
 
-On Windows, both the forward slash (`/`) and backward slash (`\`) are accepted
-as path segment separators; however, the `path` methods only add backward
-slashes (`\`).
+在 Windows 上，正斜杠 (`/`) 和反斜杠 (`\`) 都被接受为路径段分隔符；但是，`path` 方法只添加反斜杠 (`\`)。
 
 ## `path.toNamespacedPath(path)`
 
@@ -631,12 +574,9 @@ added: v9.0.0
 * `path` {string}
 * Returns: {string}
 
-On Windows systems only, returns an equivalent [namespace-prefixed path][] for
-the given `path`. If `path` is not a string, `path` will be returned without
-modifications.
+仅在 Windows 系统上，返回给定 `path` 的等效[命名空间前缀路径][namespace-prefixed path]。如果 `path` 不是字符串，则 `path` 将不加修改地返回。
 
-This method is meaningful only on Windows systems. On POSIX systems, the
-method is non-operational and always returns `path` without modifications.
+此方法仅在 Windows 系统上有意义。在 POSIX 系统上，该方法是无效操作，并且总是返回未修改的 `path`。
 
 ## `path.win32`
 
@@ -648,12 +588,11 @@ changes:
     description: Exposed as `require('path/win32')`.
 -->
 
-* Type: {Object}
+* 类型: {Object}
 
-The `path.win32` property provides access to Windows-specific implementations
-of the `path` methods.
+`path.win32` 属性提供对 `path` 方法的 Windows 特定实现的访问。
 
-The API is accessible via `require('node:path').win32` or `require('node:path/win32')`.
+该 API 可通过 `require('node:path').win32` 或 `require('node:path/win32')` 访问。
 
 [MSDN-Rel-Path]: https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#fully-qualified-vs-relative-paths
 [`TypeError`]: errors.md#class-typeerror

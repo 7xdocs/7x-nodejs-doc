@@ -10,8 +10,8 @@ added: v23.8.0
 
 <!-- source_link=lib/quic.js -->
 
-The 'node:quic' module provides an implementation of the QUIC protocol.
-To access it, start Node.js with the `--experimental-quic` option and:
+`node:quic` 模块提供了对 QUIC 协议的实现。
+要访问它，请使用 `--experimental-quic` 选项启动 Node.js，然后：
 
 ```mjs
 import quic from 'node:quic';
@@ -21,7 +21,7 @@ import quic from 'node:quic';
 const quic = require('node:quic');
 ```
 
-The module is only available under the `node:` scheme.
+该模块仅在 `node:` 方案下可用。
 
 ## `quic.connect(address[, options])`
 
@@ -31,9 +31,9 @@ added: v23.8.0
 
 * `address` {string|net.SocketAddress}
 * `options` {quic.SessionOptions}
-* Returns: {Promise} a promise for a {quic.QuicSession}
+* 返回: {Promise} 一个用于 {quic.QuicSession} 的 Promise
 
-Initiate a new client-side session.
+发起一个新的客户端会话。
 
 ```mjs
 import { connect } from 'node:quic';
@@ -47,11 +47,7 @@ await client.createUnidirectionalStream({
 });
 ```
 
-By default, every call to `connect(...)` will create a new local
-`QuicEndpoint` instance bound to a new random local IP port. To
-specify the exact local address to use, or to multiplex multiple
-QUIC sessions over a single local port, pass the `endpoint` option
-with either a `QuicEndpoint` or `EndpointOptions` as the argument.
+默认情况下，每次调用 `connect(...)` 都会创建一个新的本地 `QuicEndpoint` 实例，该实例绑定到一个新的随机本地 IP 端口。要指定要使用的确切本地地址，或在单个本地端口上复用多个 QUIC 会话，请传递带有 `QuicEndpoint` 或 `EndpointOptions` 的 `endpoint` 选项作为参数。
 
 ```mjs
 import { QuicEndpoint, connect } from 'node:quic';
@@ -71,40 +67,28 @@ added: v23.8.0
 
 * `onsession` {quic.OnSessionCallback}
 * `options` {quic.SessionOptions}
-* Returns: {Promise} a promise for a {quic.QuicEndpoint}
+* 返回: {Promise} 一个用于 {quic.QuicEndpoint} 的 Promise
 
-Configures the endpoint to listen as a server. When a new session is initiated by
-a remote peer, the given `onsession` callback will be invoked with the created
-session.
+将端点配置为服务器进行监听。当远程对等端发起新会话时，将调用给定的 `onsession` 回调函数，并传入创建的会话。
 
 ```mjs
 import { listen } from 'node:quic';
 
 const endpoint = await listen((session) => {
-  // ... handle the session
+  // ... 处理会话
 });
 
-// Closing the endpoint allows any sessions open when close is called
-// to complete naturally while preventing new sessions from being
-// initiated. Once all existing sessions have finished, the endpoint
-// will be destroyed. The call returns a promise that is resolved once
-// the endpoint is destroyed.
+// 关闭端点允许在调用 close 时任何打开的会话自然完成，同时阻止新会话的启动。一旦所有现有会话完成，端点将被销毁。该调用返回一个 Promise，该 Promise 在端点被销毁时解决。
 await endpoint.close();
 ```
 
-By default, every call to `listen(...)` will create a new local
-`QuicEndpoint` instance bound to a new random local IP port. To
-specify the exact local address to use, or to multiplex multiple
-QUIC sessions over a single local port, pass the `endpoint` option
-with either a `QuicEndpoint` or `EndpointOptions` as the argument.
+默认情况下，每次调用 `listen(...)` 都会创建一个新的本地 `QuicEndpoint` 实例，该实例绑定到一个新的随机本地 IP 端口。要指定要使用的确切本地地址，或在单个本地端口上复用多个 QUIC 会话，请传递带有 `QuicEndpoint` 或 `EndpointOptions` 的 `endpoint` 选项作为参数。
 
-At most, any single `QuicEndpoint` can only be configured to listen as
-a server once.
+最多，任何单个 `QuicEndpoint` 只能配置为服务器监听一次。
 
-## Class: `QuicEndpoint`
+## 类: `QuicEndpoint`
 
-A `QuicEndpoint` encapsulates the local UDP-port binding for QUIC. It can be
-used as both a client and a server.
+`QuicEndpoint` 封装了 QUIC 的本地 UDP 端口绑定。它既可以用作客户端，也可以用作服务器。
 
 ### `new QuicEndpoint([options])`
 
@@ -120,11 +104,11 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {net.SocketAddress|undefined}
+* 类型: {net.SocketAddress|undefined}
 
-The local UDP socket address to which the endpoint is bound, if any.
+端点绑定到的本地 UDP 套接字地址（如果有）。
 
-If the endpoint is not currently bound then the value will be `undefined`. Read only.
+如果端点当前未绑定，则该值将为 `undefined`。只读。
 
 ### `endpoint.busy`
 
@@ -132,21 +116,19 @@ If the endpoint is not currently bound then the value will be `undefined`. Read 
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-When `endpoint.busy` is set to true, the endpoint will temporarily reject
-new sessions from being created. Read/write.
+当 `endpoint.busy` 设置为 true 时，端点将暂时拒绝创建新会话。可读/写。
 
 ```mjs
-// Mark the endpoint busy. New sessions will be prevented.
+// 标记端点繁忙。将阻止新会话。
 endpoint.busy = true;
 
-// Mark the endpoint free. New session will be allowed.
+// 标记端点空闲。将允许新会话。
 endpoint.busy = false;
 ```
 
-The `busy` property is useful when the endpoint is under heavy load and needs to
-temporarily reject new sessions while it catches up.
+当端点负载过重并需要暂时拒绝新会话以追赶时，`busy` 属性非常有用。
 
 ### `endpoint.close()`
 
@@ -154,12 +136,11 @@ temporarily reject new sessions while it catches up.
 added: v23.8.0
 -->
 
-* Returns: {Promise}
+* 返回: {Promise}
 
-Gracefully close the endpoint. The endpoint will close and destroy itself when
-all currently open sessions close. Once called, new sessions will be rejected.
+优雅地关闭端点。当所有当前打开的会话关闭时，端点将关闭并销毁自身。一旦调用，新会话将被拒绝。
 
-Returns a promise that is fulfilled when the endpoint is destroyed.
+返回一个 Promise，该 Promise 在端点被销毁时完成。
 
 ### `endpoint.closed`
 
@@ -167,10 +148,9 @@ Returns a promise that is fulfilled when the endpoint is destroyed.
 added: v23.8.0
 -->
 
-* Type: {Promise}
+* 类型: {Promise}
 
-A promise that is fulfilled when the endpoint is destroyed. This will be the same promise that is
-returned by the `endpoint.close()` function. Read only.
+一个在端点被销毁时完成的 Promise。这将与 `endpoint.close()` 函数返回的 Promise 相同。只读。
 
 ### `endpoint.closing`
 
@@ -178,10 +158,9 @@ returned by the `endpoint.close()` function. Read only.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True if `endpoint.close()` has been called and closing the endpoint has not yet completed.
-Read only.
+如果已调用 `endpoint.close()` 且端点关闭尚未完成，则为 true。只读。
 
 ### `endpoint.destroy([error])`
 
@@ -191,8 +170,7 @@ added: v23.8.0
 
 * `error` {any}
 
-Forcefully closes the endpoint by forcing all open sessions to be immediately
-closed.
+通过强制立即关闭所有打开的会话来强制关闭端点。
 
 ### `endpoint.destroyed`
 
@@ -200,9 +178,9 @@ closed.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True if `endpoint.destroy()` has been called. Read only.
+如果已调用 `endpoint.destroy()`，则为 true。只读。
 
 ### `endpoint.stats`
 
@@ -210,9 +188,9 @@ True if `endpoint.destroy()` has been called. Read only.
 added: v23.8.0
 -->
 
-* Type: {quic.QuicEndpoint.Stats}
+* 类型: {quic.QuicEndpoint.Stats}
 
-The statistics collected for an active session. Read only.
+为活动会话收集的统计信息。只读。
 
 ### `endpoint[Symbol.asyncDispose]()`
 
@@ -220,16 +198,15 @@ The statistics collected for an active session. Read only.
 added: v23.8.0
 -->
 
-Calls `endpoint.close()` and returns a promise that fulfills when the
-endpoint has closed.
+调用 `endpoint.close()` 并返回一个 Promise，该 Promise 在端点关闭时完成。
 
-## Class: `QuicEndpoint.Stats`
+## 类: `QuicEndpoint.Stats`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-A view of the collected statistics for an endpoint.
+端点收集统计信息的视图。
 
 ### `endpointStats.createdAt`
 
@@ -237,7 +214,7 @@ A view of the collected statistics for an endpoint.
 added: v23.8.0
 -->
 
-* Type: {bigint} A timestamp indicating the moment the endpoint was created. Read only.
+* 类型: {bigint} 指示端点创建时间的时间戳。只读。
 
 ### `endpointStats.destroyedAt`
 
@@ -245,7 +222,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} A timestamp indicating the moment the endpoint was destroyed. Read only.
+* 类型: {bigint} 指示端点销毁时间的时间戳。只读。
 
 ### `endpointStats.bytesReceived`
 
@@ -253,7 +230,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of bytes received by this endpoint. Read only.
+* 类型: {bigint} 此端点接收的总字节数。只读。
 
 ### `endpointStats.bytesSent`
 
@@ -261,7 +238,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of bytes sent by this endpoint. Read only.
+* 类型: {bigint} 此端点发送的总字节数。只读。
 
 ### `endpointStats.packetsReceived`
 
@@ -269,7 +246,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of QUIC packets successfully received by this endpoint. Read only.
+* 类型: {bigint} 此端点成功接收的 QUIC 数据包总数。只读。
 
 ### `endpointStats.packetsSent`
 
@@ -277,7 +254,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of QUIC packets successfully sent by this endpoint. Read only.
+* 类型: {bigint} 此端点成功发送的 QUIC 数据包总数。只读。
 
 ### `endpointStats.serverSessions`
 
@@ -285,7 +262,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of peer-initiated sessions received by this endpoint. Read only.
+* 类型: {bigint} 此端点接收的对等端发起的会话总数。只读。
 
 ### `endpointStats.clientSessions`
 
@@ -293,7 +270,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of sessions initiated by this endpoint. Read only.
+* 类型: {bigint} 此端点发起的会话总数。只读。
 
 ### `endpointStats.serverBusyCount`
 
@@ -301,8 +278,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of times an initial packet was rejected due to the
-  endpoint being marked busy. Read only.
+* 类型: {bigint} 由于端点标记为繁忙而拒绝初始数据包的总次数。只读。
 
 ### `endpointStats.retryCount`
 
@@ -310,7 +286,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of QUIC retry attempts on this endpoint. Read only.
+* 类型: {bigint} 此端点上的 QUIC 重试尝试总数。只读。
 
 ### `endpointStats.versionNegotiationCount`
 
@@ -318,7 +294,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number sessions rejected due to QUIC version mismatch. Read only.
+* 类型: {bigint} 由于 QUIC 版本不匹配而拒绝的会话总数。只读。
 
 ### `endpointStats.statelessResetCount`
 
@@ -326,7 +302,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of stateless resets handled by this endpoint. Read only.
+* 类型: {bigint} 此端点处理的无状态重置总数。只读。
 
 ### `endpointStats.immediateCloseCount`
 
@@ -334,15 +310,15 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint} The total number of sessions that were closed before handshake completed. Read only.
+* 类型: {bigint} 在握手完成之前关闭的会话总数。只读。
 
-## Class: `QuicSession`
+## 类: `QuicSession`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-A `QuicSession` represents the local side of a QUIC connection.
+`QuicSession` 表示 QUIC 连接的本地端。
 
 ### `session.close()`
 
@@ -350,12 +326,9 @@ A `QuicSession` represents the local side of a QUIC connection.
 added: v23.8.0
 -->
 
-* Returns: {Promise}
+* 返回: {Promise}
 
-Initiate a graceful close of the session. Existing streams will be allowed
-to complete but no new streams will be opened. Once all streams have closed,
-the session will be destroyed. The returned promise will be fulfilled once
-the session has been destroyed.
+启动会话的优雅关闭。现有流将被允许完成，但不会打开新流。一旦所有流关闭，会话将被销毁。返回的 Promise 将在会话被销毁后完成。
 
 ### `session.closed`
 
@@ -363,9 +336,9 @@ the session has been destroyed.
 added: v23.8.0
 -->
 
-* Type: {Promise}
+* 类型: {Promise}
 
-A promise that is fulfilled once the session is destroyed.
+一个在会话被销毁时完成的 Promise。
 
 ### `session.destroy([error])`
 
@@ -375,8 +348,7 @@ added: v23.8.0
 
 * `error` {any}
 
-Immediately destroy the session. All streams will be destroys and the
-session will be closed.
+立即销毁会话。所有流将被销毁，会话将被关闭。
 
 ### `session.destroyed`
 
@@ -384,9 +356,9 @@ session will be closed.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True if `session.destroy()` has been called. Read only.
+如果已调用 `session.destroy()`，则为 true。只读。
 
 ### `session.endpoint`
 
@@ -394,9 +366,9 @@ True if `session.destroy()` has been called. Read only.
 added: v23.8.0
 -->
 
-* Type: {quic.QuicEndpoint}
+* 类型: {quic.QuicEndpoint}
 
-The endpoint that created this session. Read only.
+创建此会话的端点。只读。
 
 ### `session.onstream`
 
@@ -404,9 +376,9 @@ The endpoint that created this session. Read only.
 added: v23.8.0
 -->
 
-* Type: {quic.OnStreamCallback}
+* 类型: {quic.OnStreamCallback}
 
-The callback to invoke when a new stream is initiated by a remote peer. Read/write.
+当远程对等端发起新流时要调用的回调函数。可读/写。
 
 ### `session.ondatagram`
 
@@ -414,9 +386,9 @@ The callback to invoke when a new stream is initiated by a remote peer. Read/wri
 added: v23.8.0
 -->
 
-* Type: {quic.OnDatagramCallback}
+* 类型: {quic.OnDatagramCallback}
 
-The callback to invoke when a new datagram is received from a remote peer. Read/write.
+当从远程对等端接收到新数据报时要调用的回调函数。可读/写。
 
 ### `session.ondatagramstatus`
 
@@ -424,9 +396,9 @@ The callback to invoke when a new datagram is received from a remote peer. Read/
 added: v23.8.0
 -->
 
-* Type: {quic.OnDatagramStatusCallback}
+* 类型: {quic.OnDatagramStatusCallback}
 
-The callback to invoke when the status of a datagram is updated. Read/write.
+当数据报的状态更新时要调用的回调函数。可读/写。
 
 ### `session.onpathvalidation`
 
@@ -434,9 +406,9 @@ The callback to invoke when the status of a datagram is updated. Read/write.
 added: v23.8.0
 -->
 
-* Type: {quic.OnPathValidationCallback}
+* 类型: {quic.OnPathValidationCallback}
 
-The callback to invoke when the path validation is updated. Read/write.
+当路径验证更新时要调用的回调函数。可读/写。
 
 ### `session.onsessionticket`
 
@@ -444,9 +416,9 @@ The callback to invoke when the path validation is updated. Read/write.
 added: v23.8.0
 -->
 
-* Type: {quic.OnSessionTicketCallback}
+* 类型: {quic.OnSessionTicketCallback}
 
-The callback to invoke when a new session ticket is received. Read/write.
+当接收到新会话票证时要调用的回调函数。可读/写。
 
 ### `session.onversionnegotiation`
 
@@ -454,9 +426,9 @@ The callback to invoke when a new session ticket is received. Read/write.
 added: v23.8.0
 -->
 
-* Type: {quic.OnVersionNegotiationCallback}
+* 类型: {quic.OnVersionNegotiationCallback}
 
-The callback to invoke when a version negotiation is initiated. Read/write.
+当启动版本协商时要调用的回调函数。可读/写。
 
 ### `session.onhandshake`
 
@@ -464,9 +436,9 @@ The callback to invoke when a version negotiation is initiated. Read/write.
 added: v23.8.0
 -->
 
-* Type: {quic.OnHandshakeCallback}
+* 类型: {quic.OnHandshakeCallback}
 
-The callback to invoke when the TLS handshake is completed. Read/write.
+当 TLS 握手完成时要调用的回调函数。可读/写。
 
 ### `session.createBidirectionalStream([options])`
 
@@ -477,10 +449,9 @@ added: v23.8.0
 * `options` {Object}
   * `body` {ArrayBuffer | ArrayBufferView | Blob}
   * `sendOrder` {number}
-* Returns: {Promise} for a {quic.QuicStream}
+* 返回: {Promise} 用于 {quic.QuicStream} 的 Promise
 
-Open a new bidirectional stream. If the `body` option is not specified,
-the outgoing stream will be half-closed.
+打开一个新的双向流。如果未指定 `body` 选项，则出站流将半关闭。
 
 ### `session.createUnidirectionalStream([options])`
 
@@ -491,10 +462,9 @@ added: v23.8.0
 * `options` {Object}
   * `body` {ArrayBuffer | ArrayBufferView | Blob}
   * `sendOrder` {number}
-* Returns: {Promise} for a {quic.QuicStream}
+* 返回: {Promise} 用于 {quic.QuicStream} 的 Promise
 
-Open a new unidirectional stream. If the `body` option is not specified,
-the outgoing stream will be closed.
+打开一个新的单向流。如果未指定 `body` 选项，则出站流将关闭。
 
 ### `session.path`
 
@@ -502,11 +472,11 @@ the outgoing stream will be closed.
 added: v23.8.0
 -->
 
-* Type: {Object|undefined}
+* 类型: {Object|undefined}
   * `local` {net.SocketAddress}
   * `remote` {net.SocketAddress}
 
-The local and remote socket addresses associated with the session. Read only.
+与会话关联的本地和远程套接字地址。只读。
 
 ### `session.sendDatagram(datagram)`
 
@@ -515,11 +485,10 @@ added: v23.8.0
 -->
 
 * `datagram` {string|ArrayBufferView}
-* Returns: {bigint}
+* 返回: {bigint}
 
-Sends an unreliable datagram to the remote peer, returning the datagram ID.
-If the datagram payload is specified as an `ArrayBufferView`, then ownership of
-that view will be transfered to the underlying stream.
+向远程对等端发送一个不可靠的数据报，返回数据报 ID。
+如果将数据报有效负载指定为 `ArrayBufferView`，则该视图的所有权将转移给底层流。
 
 ### `session.stats`
 
@@ -527,9 +496,9 @@ that view will be transfered to the underlying stream.
 added: v23.8.0
 -->
 
-* Type: {quic.QuicSession.Stats}
+* 类型: {quic.QuicSession.Stats}
 
-Return the current statistics for the session. Read only.
+返回会话的当前统计信息。只读。
 
 ### `session.updateKey()`
 
@@ -537,7 +506,7 @@ Return the current statistics for the session. Read only.
 added: v23.8.0
 -->
 
-Initiate a key update for the session.
+启动会话的密钥更新。
 
 ### `session[Symbol.asyncDispose]()`
 
@@ -545,10 +514,9 @@ Initiate a key update for the session.
 added: v23.8.0
 -->
 
-Calls `session.close()` and returns a promise that fulfills when the
-session has closed.
+调用 `session.close()` 并返回一个 Promise，该 Promise 在会话关闭时完成。
 
-## Class: `QuicSession.Stats`
+## 类: `QuicSession.Stats`
 
 <!-- YAML
 added: v23.8.0
@@ -560,7 +528,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.closingAt`
 
@@ -568,7 +536,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.handshakeCompletedAt`
 
@@ -576,7 +544,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.handshakeConfirmedAt`
 
@@ -584,7 +552,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.bytesReceived`
 
@@ -592,7 +560,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.bytesSent`
 
@@ -600,7 +568,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.bidiInStreamCount`
 
@@ -608,7 +576,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.bidiOutStreamCount`
 
@@ -616,7 +584,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.uniInStreamCount`
 
@@ -624,7 +592,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.uniOutStreamCount`
 
@@ -632,7 +600,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.maxBytesInFlights`
 
@@ -640,7 +608,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.bytesInFlight`
 
@@ -648,7 +616,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.blockCount`
 
@@ -656,7 +624,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.cwnd`
 
@@ -664,7 +632,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.latestRtt`
 
@@ -672,7 +640,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.minRtt`
 
@@ -680,7 +648,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.rttVar`
 
@@ -688,7 +656,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.smoothedRtt`
 
@@ -696,7 +664,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.ssthresh`
 
@@ -704,7 +672,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.datagramsReceived`
 
@@ -712,7 +680,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.datagramsSent`
 
@@ -720,7 +688,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.datagramsAcknowledged`
 
@@ -728,7 +696,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `sessionStats.datagramsLost`
 
@@ -736,9 +704,9 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
-## Class: `QuicStream`
+## 类: `QuicStream`
 
 <!-- YAML
 added: v23.8.0
@@ -750,9 +718,9 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {Promise}
+* 类型: {Promise}
 
-A promise that is fulfilled when the stream is fully closed.
+一个在流完全关闭时完成的 Promise。
 
 ### `stream.destroy([error])`
 
@@ -762,7 +730,7 @@ added: v23.8.0
 
 * `error` {any}
 
-Immediately and abruptly destroys the stream.
+立即并突然销毁流。
 
 ### `stream.destroyed`
 
@@ -770,9 +738,9 @@ Immediately and abruptly destroys the stream.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True if `stream.destroy()` has been called.
+如果已调用 `stream.destroy()`，则为 true。
 
 ### `stream.direction`
 
@@ -780,9 +748,9 @@ True if `stream.destroy()` has been called.
 added: v23.8.0
 -->
 
-* Type: {string} One of either `'bidi'` or `'uni'`.
+* 类型: {string} 为 `'bidi'` 或 `'uni'` 之一。
 
-The directionality of the stream. Read only.
+流的定向性。只读。
 
 ### `stream.id`
 
@@ -790,9 +758,9 @@ The directionality of the stream. Read only.
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
-The stream ID. Read only.
+流 ID。只读。
 
 ### `stream.onblocked`
 
@@ -800,9 +768,9 @@ The stream ID. Read only.
 added: v23.8.0
 -->
 
-* Type: {quic.OnBlockedCallback}
+* 类型: {quic.OnBlockedCallback}
 
-The callback to invoke when the stream is blocked. Read/write.
+当流被阻塞时要调用的回调函数。可读/写。
 
 ### `stream.onreset`
 
@@ -810,9 +778,9 @@ The callback to invoke when the stream is blocked. Read/write.
 added: v23.8.0
 -->
 
-* Type: {quic.OnStreamErrorCallback}
+* 类型: {quic.OnStreamErrorCallback}
 
-The callback to invoke when the stream is reset. Read/write.
+当流被重置时要调用的回调函数。可读/写。
 
 ### `stream.readable`
 
@@ -820,7 +788,7 @@ The callback to invoke when the stream is reset. Read/write.
 added: v23.8.0
 -->
 
-* Type: {ReadableStream}
+* 类型: {ReadableStream}
 
 ### `stream.session`
 
@@ -828,9 +796,9 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {quic.QuicSession}
+* 类型: {quic.QuicSession}
 
-The session that created this stream. Read only.
+创建此流的会话。只读。
 
 ### `stream.stats`
 
@@ -838,11 +806,11 @@ The session that created this stream. Read only.
 added: v23.8.0
 -->
 
-* Type: {quic.QuicStream.Stats}
+* 类型: {quic.QuicStream.Stats}
 
-The current statistics for the stream. Read only.
+流的当前统计信息。只读。
 
-## Class: `QuicStream.Stats`
+## 类: `QuicStream.Stats`
 
 <!-- YAML
 added: v23.8.0
@@ -854,7 +822,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.bytesReceived`
 
@@ -862,7 +830,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.bytesSent`
 
@@ -870,7 +838,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.createdAt`
 
@@ -878,7 +846,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.destroyedAt`
 
@@ -886,7 +854,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.finalSize`
 
@@ -894,7 +862,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.isConnected`
 
@@ -902,7 +870,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.maxOffset`
 
@@ -910,7 +878,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.maxOffsetAcknowledged`
 
@@ -918,7 +886,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.maxOffsetReceived`
 
@@ -926,7 +894,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.openedAt`
 
@@ -934,7 +902,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
 ### `streamStats.receivedAt`
 
@@ -942,19 +910,19 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint}
+* 类型: {bigint}
 
-## Types
+## 类型
 
-### Type: `EndpointOptions`
+### 类型: `EndpointOptions`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-* Type: {Object}
+* 类型: {Object}
 
-The endpoint configuration options passed when constructing a new `QuicEndpoint` instance.
+构造新的 `QuicEndpoint` 实例时传递的端点配置选项。
 
 #### `endpointOptions.address`
 
@@ -962,9 +930,9 @@ The endpoint configuration options passed when constructing a new `QuicEndpoint`
 added: v23.8.0
 -->
 
-* Type: {net.SocketAddress | string} The local UDP address and port the endpoint should bind to.
+* 类型: {net.SocketAddress | string} 端点应绑定到的本地 UDP 地址和端口。
 
-If not specified the endpoint will bind to IPv4 `localhost` on a random port.
+如果未指定，端点将绑定到随机端口上的 IPv4 `localhost`。
 
 #### `endpointOptions.addressLRUSize`
 
@@ -972,12 +940,9 @@ If not specified the endpoint will bind to IPv4 `localhost` on a random port.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-The endpoint maintains an internal cache of validated socket addresses as a
-performance optimization. This option sets the maximum number of addresses
-that are cache. This is an advanced option that users typically won't have
-need to specify.
+端点维护一个经过验证的套接字地址的内部缓存作为性能优化。此选项设置缓存地址的最大数量。这是一个高级选项，用户通常不需要指定。
 
 #### `endpointOptions.ipv6Only`
 
@@ -985,9 +950,9 @@ need to specify.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-When `true`, indicates that the endpoint should bind only to IPv6 addresses.
+当为 `true` 时，表示端点应仅绑定到 IPv6 地址。
 
 #### `endpointOptions.maxConnectionsPerHost`
 
@@ -995,9 +960,9 @@ When `true`, indicates that the endpoint should bind only to IPv6 addresses.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum number of concurrent sessions allowed per remote peer address.
+指定每个远程对等端地址允许的最大并发会话数。
 
 #### `endpointOptions.maxConnectionsTotal`
 
@@ -1005,9 +970,9 @@ Specifies the maximum number of concurrent sessions allowed per remote peer addr
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum total number of concurrent sessions.
+指定最大并发会话总数。
 
 #### `endpointOptions.maxRetries`
 
@@ -1015,9 +980,9 @@ Specifies the maximum total number of concurrent sessions.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum number of QUIC retry attempts allowed per remote peer address.
+指定每个远程对等端地址允许的最大 QUIC 重试尝试次数。
 
 #### `endpointOptions.maxStatelessResetsPerHost`
 
@@ -1025,9 +990,9 @@ Specifies the maximum number of QUIC retry attempts allowed per remote peer addr
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum number of stateless resets that are allowed per remote peer address.
+指定每个远程对等端地址允许的无状态重置最大次数。
 
 #### `endpointOptions.retryTokenExpiration`
 
@@ -1035,9 +1000,9 @@ Specifies the maximum number of stateless resets that are allowed per remote pee
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the length of time a QUIC retry token is considered valid.
+指定 QUIC 重试令牌被视为有效的时间长度。
 
 #### `endpointOptions.resetTokenSecret`
 
@@ -1045,9 +1010,9 @@ Specifies the length of time a QUIC retry token is considered valid.
 added: v23.8.0
 -->
 
-* Type: {ArrayBufferView}
+* 类型: {ArrayBufferView}
 
-Specifies the 16-byte secret used to generate QUIC retry tokens.
+指定用于生成 QUIC 重试令牌的 16 字节密钥。
 
 #### `endpointOptions.tokenExpiration`
 
@@ -1055,9 +1020,9 @@ Specifies the 16-byte secret used to generate QUIC retry tokens.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the length of time a QUIC token is considered valid.
+指定 QUIC 令牌被视为有效的时间长度。
 
 #### `endpointOptions.tokenSecret`
 
@@ -1065,9 +1030,9 @@ Specifies the length of time a QUIC token is considered valid.
 added: v23.8.0
 -->
 
-* Type: {ArrayBufferView}
+* 类型: {ArrayBufferView}
 
-Specifies the 16-byte secret used to generate QUIC tokens.
+指定用于生成 QUIC 令牌的 16 字节密钥。
 
 #### `endpointOptions.udpReceiveBufferSize`
 
@@ -1075,7 +1040,7 @@ Specifies the 16-byte secret used to generate QUIC tokens.
 added: v23.8.0
 -->
 
-* Type: {number}
+* 类型: {number}
 
 #### `endpointOptions.udpSendBufferSize`
 
@@ -1083,7 +1048,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {number}
+* 类型: {number}
 
 #### `endpointOptions.udpTTL`
 
@@ -1091,7 +1056,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {number}
+* 类型: {number}
 
 #### `endpointOptions.validateAddress`
 
@@ -1099,12 +1064,11 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-When `true`, requires that the endpoint validate peer addresses using retry packets
-while establishing a new connection.
+当为 `true` 时，要求端点在建立新连接时使用重试数据包验证对等端地址。
 
-### Type: `SessionOptions`
+### 类型: `SessionOptions`
 
 <!-- YAML
 added: v23.8.0
@@ -1116,9 +1080,9 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-The ALPN protocol identifier.
+ALPN 协议标识符。
 
 #### `sessionOptions.ca`
 
@@ -1126,9 +1090,9 @@ The ALPN protocol identifier.
 added: v23.8.0
 -->
 
-* Type: {ArrayBuffer|ArrayBufferView|ArrayBuffer\[]|ArrayBufferView\[]}
+* 类型: {ArrayBuffer|ArrayBufferView|ArrayBuffer\[]|ArrayBufferView\[]}
 
-The CA certificates to use for sessions.
+用于会话的 CA 证书。
 
 #### `sessionOptions.cc`
 
@@ -1136,12 +1100,11 @@ The CA certificates to use for sessions.
 added: v23.8.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-Specifies the congestion control algorithm that will be used
-. Must be set to one of either `'reno'`, `'cubic'`, or `'bbr'`.
+指定要使用的拥塞控制算法。必须设置为 `'reno'`、`'cubic'` 或 `'bbr'` 之一。
 
-This is an advanced option that users typically won't have need to specify.
+这是一个高级选项，用户通常不需要指定。
 
 #### `sessionOptions.certs`
 
@@ -1149,9 +1112,9 @@ This is an advanced option that users typically won't have need to specify.
 added: v23.8.0
 -->
 
-* Type: {ArrayBuffer|ArrayBufferView|ArrayBuffer\[]|ArrayBufferView\[]}
+* 类型: {ArrayBuffer|ArrayBufferView|ArrayBuffer\[]|ArrayBufferView\[]}
 
-The TLS certificates to use for sessions.
+用于会话的 TLS 证书。
 
 #### `sessionOptions.ciphers`
 
@@ -1159,9 +1122,9 @@ The TLS certificates to use for sessions.
 added: v23.8.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-The list of supported TLS 1.3 cipher algorithms.
+支持的 TLS 1.3 密码算法列表。
 
 #### `sessionOptions.crl`
 
@@ -1169,9 +1132,9 @@ The list of supported TLS 1.3 cipher algorithms.
 added: v23.8.0
 -->
 
-* Type: {ArrayBuffer|ArrayBufferView|ArrayBuffer\[]|ArrayBufferView\[]}
+* 类型: {ArrayBuffer|ArrayBufferView|ArrayBuffer\[]|ArrayBufferView\[]}
 
-The CRL to use for sessions.
+用于会话的 CRL。
 
 #### `sessionOptions.groups`
 
@@ -1179,9 +1142,9 @@ The CRL to use for sessions.
 added: v23.8.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-The list of support TLS 1.3 cipher groups.
+支持的 TLS 1.3 密码组列表。
 
 #### `sessionOptions.keylog`
 
@@ -1189,9 +1152,9 @@ The list of support TLS 1.3 cipher groups.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True to enable TLS keylogging output.
+为 true 则启用 TLS 密钥日志输出。
 
 #### `sessionOptions.keys`
 
@@ -1199,9 +1162,9 @@ True to enable TLS keylogging output.
 added: v23.8.0
 -->
 
-* Type: {KeyObject|CryptoKey|KeyObject\[]|CryptoKey\[]}
+* 类型: {KeyObject|CryptoKey|KeyObject\[]|CryptoKey\[]}
 
-The TLS crypto keys to use for sessions.
+用于会话的 TLS 加密密钥。
 
 #### `sessionOptions.maxPayloadSize`
 
@@ -1209,9 +1172,9 @@ The TLS crypto keys to use for sessions.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum UDP packet payload size.
+指定最大 UDP 数据包有效负载大小。
 
 #### `sessionOptions.maxStreamWindow`
 
@@ -1219,9 +1182,9 @@ Specifies the maximum UDP packet payload size.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum stream flow-control window size.
+指定最大流流量控制窗口大小。
 
 #### `sessionOptions.maxWindow`
 
@@ -1229,9 +1192,9 @@ Specifies the maximum stream flow-control window size.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum session flow-control window size.
+指定最大会话流量控制窗口大小。
 
 #### `sessionOptions.minVersion`
 
@@ -1239,10 +1202,9 @@ Specifies the maximum session flow-control window size.
 added: v23.8.0
 -->
 
-* Type: {number}
+* 类型: {number}
 
-The minimum QUIC version number to allow. This is an advanced option that users
-typically won't have need to specify.
+允许的最小 QUIC 版本号。这是一个高级选项，用户通常不需要指定。
 
 #### `sessionOptions.preferredAddressPolicy`
 
@@ -1250,10 +1212,9 @@ typically won't have need to specify.
 added: v23.8.0
 -->
 
-* Type: {string} One of `'use'`, `'ignore'`, or `'default'`.
+* 类型: {string} 为 `'use'`、`'ignore'` 或 `'default'` 之一。
 
-When the remote peer advertises a preferred address, this option specifies whether
-to use it or ignore it.
+当远程对等端通告首选地址时，此选项指定是使用它还是忽略它。
 
 #### `sessionOptions.qlog`
 
@@ -1261,9 +1222,9 @@ to use it or ignore it.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True if qlog output should be enabled.
+为 true 则启用 qlog 输出。
 
 #### `sessionOptions.sessionTicket`
 
@@ -1271,7 +1232,7 @@ True if qlog output should be enabled.
 added: v23.8.0
 -->
 
-* Type: {ArrayBufferView} A session ticket to use for 0RTT session resumption.
+* 类型: {ArrayBufferView} 用于 0RTT 会话恢复的会话票证。
 
 #### `sessionOptions.handshakeTimeout`
 
@@ -1279,10 +1240,9 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum number of milliseconds a TLS handshake is permitted to take
-to complete before timing out.
+指定 TLS 握手允许完成的最大毫秒数，超时则失败。
 
 #### `sessionOptions.sni`
 
@@ -1290,9 +1250,9 @@ to complete before timing out.
 added: v23.8.0
 -->
 
-* Type: {string}
+* 类型: {string}
 
-The peer server name to target.
+目标对等端服务器名称。
 
 #### `sessionOptions.tlsTrace`
 
@@ -1300,9 +1260,9 @@ The peer server name to target.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True to enable TLS tracing output.
+为 true 则启用 TLS 跟踪输出。
 
 #### `sessionOptions.transportParams`
 
@@ -1310,9 +1270,9 @@ True to enable TLS tracing output.
 added: v23.8.0
 -->
 
-* Type: {quic.TransportParams}
+* 类型: {quic.TransportParams}
 
-The QUIC transport parameters to use for the session.
+用于会话的 QUIC 传输参数。
 
 #### `sessionOptions.unacknowledgedPacketThreshold`
 
@@ -1320,9 +1280,9 @@ The QUIC transport parameters to use for the session.
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-Specifies the maximum number of unacknowledged packets a session should allow.
+指定会话应允许的未确认数据包的最大数量。
 
 #### `sessionOptions.verifyClient`
 
@@ -1330,9 +1290,9 @@ Specifies the maximum number of unacknowledged packets a session should allow.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True to require verification of TLS client certificate.
+为 true 则要求验证 TLS 客户端证书。
 
 #### `sessionOptions.verifyPrivateKey`
 
@@ -1340,9 +1300,9 @@ True to require verification of TLS client certificate.
 added: v23.8.0
 -->
 
-* Type: {boolean}
+* 类型: {boolean}
 
-True to require private key verification.
+为 true 则要求验证私钥。
 
 #### `sessionOptions.version`
 
@@ -1350,12 +1310,11 @@ True to require private key verification.
 added: v23.8.0
 -->
 
-* Type: {number}
+* 类型: {number}
 
-The QUIC version number to use. This is an advanced option that users typically
-won't have need to specify.
+要使用的 QUIC 版本号。这是一个高级选项，用户通常不需要指定。
 
-### Type: `TransportParams`
+### 类型: `TransportParams`
 
 <!-- YAML
 added: v23.8.0
@@ -1367,7 +1326,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {net.SocketAddress} The preferred IPv4 address to advertise.
+* 类型: {net.SocketAddress} 要通告的首选 IPv4 地址。
 
 #### `transportParams.preferredAddressIpv6`
 
@@ -1375,7 +1334,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {net.SocketAddress} The preferred IPv6 address to advertise.
+* 类型: {net.SocketAddress} 要通告的首选 IPv6 地址。
 
 #### `transportParams.initialMaxStreamDataBidiLocal`
 
@@ -1383,7 +1342,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.initialMaxStreamDataBidiRemote`
 
@@ -1391,7 +1350,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.initialMaxStreamDataUni`
 
@@ -1399,7 +1358,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.initialMaxData`
 
@@ -1407,7 +1366,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.initialMaxStreamsBidi`
 
@@ -1415,7 +1374,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.initialMaxStreamsUni`
 
@@ -1423,7 +1382,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.maxIdleTimeout`
 
@@ -1431,7 +1390,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.activeConnectionIDLimit`
 
@@ -1439,7 +1398,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.ackDelayExponent`
 
@@ -1447,7 +1406,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.maxAckDelay`
 
@@ -1455,7 +1414,7 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
 #### `transportParams.maxDatagramFrameSize`
 
@@ -1463,11 +1422,11 @@ added: v23.8.0
 added: v23.8.0
 -->
 
-* Type: {bigint|number}
+* 类型: {bigint|number}
 
-## Callbacks
+## 回调函数
 
-### Callback: `OnSessionCallback`
+### 回调: `OnSessionCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1476,9 +1435,9 @@ added: v23.8.0
 * `this` {quic.QuicEndpoint}
 * `session` {quic.QuicSession}
 
-The callback function that is invoked when a new session is initiated by a remote peer.
+当远程对等端发起新会话时调用的回调函数。
 
-### Callback: `OnStreamCallback`
+### 回调: `OnStreamCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1487,7 +1446,7 @@ added: v23.8.0
 * `this` {quic.QuicSession}
 * `stream` {quic.QuicStream}
 
-### Callback: `OnDatagramCallback`
+### 回调: `OnDatagramCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1497,7 +1456,7 @@ added: v23.8.0
 * `datagram` {Uint8Array}
 * `early` {boolean}
 
-### Callback: `OnDatagramStatusCallback`
+### 回调: `OnDatagramStatusCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1505,23 +1464,23 @@ added: v23.8.0
 
 * `this` {quic.QuicSession}
 * `id` {bigint}
-* `status` {string} One of either `'lost'` or `'acknowledged'`.
+* `status` {string} 为 `'lost'` 或 `'acknowledged'` 之一。
 
-### Callback: `OnPathValidationCallback`
+### 回调: `OnPathValidationCallback`
 
 <!-- YAML
 added: v23.8.0
 -->
 
 * `this` {quic.QuicSession}
-* `result` {string} One of either `'success'`, `'failure'`, or `'aborted'`.
+* `result` {string} 为 `'success'`、`'failure'` 或 `'aborted'` 之一。
 * `newLocalAddress` {net.SocketAddress}
 * `newRemoteAddress` {net.SocketAddress}
 * `oldLocalAddress` {net.SocketAddress}
 * `oldRemoteAddress` {net.SocketAddress}
 * `preferredAddress` {boolean}
 
-### Callback: `OnSessionTicketCallback`
+### 回调: `OnSessionTicketCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1530,7 +1489,7 @@ added: v23.8.0
 * `this` {quic.QuicSession}
 * `ticket` {Object}
 
-### Callback: `OnVersionNegotiationCallback`
+### 回调: `OnVersionNegotiationCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1541,7 +1500,7 @@ added: v23.8.0
 * `requestedVersions` {number\[]}
 * `supportedVersions` {number\[]}
 
-### Callback: `OnHandshakeCallback`
+### 回调: `OnHandshakeCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1556,7 +1515,7 @@ added: v23.8.0
 * `validationErrorCode` {number}
 * `earlyDataAccepted` {boolean}
 
-### Callback: `OnBlockedCallback`
+### 回调: `OnBlockedCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1564,7 +1523,7 @@ added: v23.8.0
 
 * `this` {quic.QuicStream}
 
-### Callback: `OnStreamErrorCallback`
+### 回调: `OnStreamErrorCallback`
 
 <!-- YAML
 added: v23.8.0
@@ -1573,9 +1532,9 @@ added: v23.8.0
 * `this` {quic.QuicStream}
 * `error` {any}
 
-## Diagnostic Channels
+## 诊断通道
 
-### Channel: `quic.endpoint.created`
+### 通道: `quic.endpoint.created`
 
 <!-- YAML
 added: v23.8.0
@@ -1584,7 +1543,7 @@ added: v23.8.0
 * `endpoint` {quic.QuicEndpoint}
 * `config` {quic.EndpointOptions}
 
-### Channel: `quic.endpoint.listen`
+### 通道: `quic.endpoint.listen`
 
 <!-- YAML
 added: v23.8.0
@@ -1593,7 +1552,7 @@ added: v23.8.0
 * `endpoint` {quic.QuicEndpoint}
 * `optoins` {quic.SessionOptions}
 
-### Channel: `quic.endpoint.closing`
+### 通道: `quic.endpoint.closing`
 
 <!-- YAML
 added: v23.8.0
@@ -1602,7 +1561,7 @@ added: v23.8.0
 * `endpoint` {quic.QuicEndpoint}
 * `hasPendingError` {boolean}
 
-### Channel: `quic.endpoint.closed`
+### 通道: `quic.endpoint.closed`
 
 <!-- YAML
 added: v23.8.0
@@ -1610,7 +1569,7 @@ added: v23.8.0
 
 * `endpoint` {quic.QuicEndpoint}
 
-### Channel: `quic.endpoint.error`
+### 通道: `quic.endpoint.error`
 
 <!-- YAML
 added: v23.8.0
@@ -1619,7 +1578,7 @@ added: v23.8.0
 * `endpoint` {quic.QuicEndpoint}
 * `error` {any}
 
-### Channel: `quic.endpoint.busy.change`
+### 通道: `quic.endpoint.busy.change`
 
 <!-- YAML
 added: v23.8.0
@@ -1628,85 +1587,85 @@ added: v23.8.0
 * `endpoint` {quic.QuicEndpoint}
 * `busy` {boolean}
 
-### Channel: `quic.session.created.client`
+### 通道: `quic.session.created.client`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.created.server`
+### 通道: `quic.session.created.server`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.open.stream`
+### 通道: `quic.session.open.stream`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.received.stream`
+### 通道: `quic.session.received.stream`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.send.datagram`
+### 通道: `quic.session.send.datagram`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.update.key`
+### 通道: `quic.session.update.key`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.closing`
+### 通道: `quic.session.closing`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.closed`
+### 通道: `quic.session.closed`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.receive.datagram`
+### 通道: `quic.session.receive.datagram`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.receive.datagram.status`
+### 通道: `quic.session.receive.datagram.status`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.path.validation`
+### 通道: `quic.session.path.validation`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.ticket`
+### 通道: `quic.session.ticket`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.version.negotiation`
+### 通道: `quic.session.version.negotiation`
 
 <!-- YAML
 added: v23.8.0
 -->
 
-### Channel: `quic.session.handshake`
+### 通道: `quic.session.handshake`
 
 <!-- YAML
 added: v23.8.0

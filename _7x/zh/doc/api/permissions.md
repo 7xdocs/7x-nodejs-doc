@@ -2,31 +2,19 @@
 
 <!--introduced_in=v20.0.0-->
 
-Permissions can be used to control what system resources the
-Node.js process has access to or what actions the process can take
-with those resources.
+权限可用于控制 Node.js 进程可以访问哪些系统资源，或者进程可以使用这些资源执行哪些操作。
 
-* [Process-based permissions](#process-based-permissions) control the Node.js
-  process's access to resources.
-  The resource can be entirely allowed or denied, or actions related to it can
-  be controlled. For example, file system reads can be allowed while denying
-  writes.
-  This feature does not protect against malicious code. According to the Node.js
-  [Security Policy][], Node.js trusts any code it is asked to run.
+* [基于进程的权限](#process-based-permissions) 控制 Node.js 进程对资源的访问。
+  资源可以被完全允许或拒绝，或者可以控制与其相关的操作。例如，可以允许文件系统读取同时拒绝写入。
+  此功能不能防范恶意代码。根据 Node.js [安全政策][Security Policy]，Node.js 信任任何要求其运行的代码。
 
-The permission model implements a "seat belt" approach, which prevents trusted
-code from unintentionally changing files or using resources that access has
-not explicitly been granted to. It does not provide security guarantees in the
-presence of malicious code. Malicious code can bypass the permission model and
-execute arbitrary code without the restrictions imposed by the permission
-model.
+权限模型实现了"安全带"方法，防止受信任的代码无意中更改文件或使用未明确授予访问权限的资源。它在存在恶意代码的情况下不提供安全保证。恶意代码可以绕过权限模型，并在不受权限模型限制的情况下执行任意代码。
 
-If you find a potential security vulnerability, please refer to our
-[Security Policy][].
+如果您发现潜在的安全漏洞，请参考我们的[安全政策][Security Policy]。
 
-## Process-based permissions
+## 基于进程的权限
 
-### Permission Model
+### 权限模型
 
 <!-- YAML
 added: v20.0.0
@@ -40,18 +28,12 @@ changes:
 
 > Stability: 2 - Stable
 
-The Node.js Permission Model is a mechanism for restricting access to specific
-resources during execution.
-The API exists behind a flag [`--permission`][] which when enabled,
-will restrict access to all available permissions.
+Node.js 权限模型是一种在执行期间限制对特定资源访问的机制。
+该 API 存在于 [`--permission`][] 标志之后，当启用该标志时，将限制对所有可用权限的访问。
 
-The available permissions are documented by the [`--permission`][]
-flag.
+可用权限由 [`--permission`][] 标志记录。
 
-When starting Node.js with `--permission`,
-the ability to access the file system through the `fs` module, spawn processes,
-use `node:worker_threads`, use native addons, use WASI, and enable the runtime inspector
-will be restricted.
+当使用 `--permission` 启动 Node.js 时，通过 `fs` 模块访问文件系统、生成进程、使用 `node:worker_threads`、使用原生插件、使用 WASI 以及启用运行时调试器的能力将受到限制。
 
 ```console
 $ node --permission index.js
@@ -64,21 +46,18 @@ Error: Access to this API has been restricted
 }
 ```
 
-Allowing access to spawning a process and creating worker threads can be done
-using the [`--allow-child-process`][] and [`--allow-worker`][] respectively.
+允许生成进程和创建工作线程可以分别使用 [`--allow-child-process`][] 和 [`--allow-worker`][]。
 
-To allow native addons when using permission model, use the [`--allow-addons`][]
-flag. For WASI, use the [`--allow-wasi`][] flag.
+在使用权限模型时允许原生插件，请使用 [`--allow-addons`][] 标志。对于 WASI，使用 [`--allow-wasi`][] 标志。
 
-#### Runtime API
+#### 运行时 API
 
-When enabling the Permission Model through the [`--permission`][]
-flag a new property `permission` is added to the `process` object.
-This property contains one function:
+当通过 [`--permission`][] 标志启用权限模型时，会在 `process` 对象上添加一个新的属性 `permission`。
+此属性包含一个函数：
 
 ##### `permission.has(scope[, reference])`
 
-API call to check permissions at runtime ([`permission.has()`][])
+用于在运行时检查权限的 API 调用 ([`permission.has()`][])
 
 ```js
 process.permission.has('fs.write'); // true
@@ -88,137 +67,105 @@ process.permission.has('fs.read'); // true
 process.permission.has('fs.read', '/home/rafaelgss/protected-folder'); // false
 ```
 
-#### File System Permissions
+#### 文件系统权限
 
-The Permission Model, by default, restricts access to the file system through the `node:fs` module.
-It does not guarantee that users will not be able to access the file system through other means,
-such as through the `node:sqlite` module.
+默认情况下，权限模型通过 `node:fs` 模块限制对文件系统的访问。
+它不保证用户无法通过其他方式访问文件系统，例如通过 `node:sqlite` 模块。
 
-To allow access to the file system, use the [`--allow-fs-read`][] and
-[`--allow-fs-write`][] flags:
+要允许访问文件系统，请使用 [`--allow-fs-read`][] 和 [`--allow-fs-write`][] 标志：
 
 ```console
 $ node --permission --allow-fs-read=* --allow-fs-write=* index.js
 Hello world!
 ```
 
-By default the entrypoints of your application are included
-in the allowed file system read list. For example:
+默认情况下，您的应用程序的入口点包含在允许的文件系统读取列表中。例如：
 
 ```console
 $ node --permission index.js
 ```
 
-* `index.js` will be included in the allowed file system read list
+* `index.js` 将被包含在允许的文件系统读取列表中
 
 ```console
 $ node -r /path/to/custom-require.js --permission index.js.
 ```
 
-* `/path/to/custom-require.js` will be included in the allowed file system read
-  list.
-* `index.js` will be included in the allowed file system read list.
+* `/path/to/custom-require.js` 将被包含在允许的文件系统读取列表中。
+* `index.js` 将被包含在允许的文件系统读取列表中。
 
-The valid arguments for both flags are:
+这两个标志的有效参数是：
 
-* `*` - To allow all `FileSystemRead` or `FileSystemWrite` operations,
-  respectively.
-* Relative paths to the current working directory.
-* Absolute paths.
+* `*` - 分别允许所有 `FileSystemRead` 或 `FileSystemWrite` 操作。
+* 相对于当前工作目录的路径。
+* 绝对路径。
 
-Example:
+示例：
 
-* `--allow-fs-read=*` - It will allow all `FileSystemRead` operations.
-* `--allow-fs-write=*` - It will allow all `FileSystemWrite` operations.
-* `--allow-fs-write=/tmp/` - It will allow `FileSystemWrite` access to the `/tmp/`
-  folder.
-* `--allow-fs-read=/tmp/ --allow-fs-read=/home/.gitignore` - It allows `FileSystemRead` access
-  to the `/tmp/` folder **and** the `/home/.gitignore` path.
+* `--allow-fs-read=*` - 它将允许所有 `FileSystemRead` 操作。
+* `--allow-fs-write=*` - 它将允许所有 `FileSystemWrite` 操作。
+* `--allow-fs-write=/tmp/` - 它将允许对 `/tmp/` 文件夹的 `FileSystemWrite` 访问。
+* `--allow-fs-read=/tmp/ --allow-fs-read=/home/.gitignore` - 它允许对 `/tmp/` 文件夹 **和** `/home/.gitignore` 路径的 `FileSystemRead` 访问。
 
-Wildcards are supported too:
+也支持通配符：
 
-* `--allow-fs-read=/home/test*` will allow read access to everything
-  that matches the wildcard. e.g: `/home/test/file1` or `/home/test2`
+* `--allow-fs-read=/home/test*` 将允许读取访问匹配通配符的所有内容。例如：`/home/test/file1` 或 `/home/test2`
 
-After passing a wildcard character (`*`) all subsequent characters will
-be ignored. For example: `/home/*.js` will work similar to `/home/*`.
+传递通配符 (`*`) 后，所有后续字符将被忽略。例如：`/home/*.js` 将类似于 `/home/*` 工作。
 
-When the permission model is initialized, it will automatically add a wildcard
-(\*) if the specified directory exists. For example, if `/home/test/files`
-exists, it will be treated as `/home/test/files/*`. However, if the directory
-does not exist, the wildcard will not be added, and access will be limited to
-`/home/test/files`. If you want to allow access to a folder that does not exist
-yet, make sure to explicitly include the wildcard:
-`/my-path/folder-do-not-exist/*`.
+当权限模型初始化时，如果指定的目录存在，它将自动添加一个通配符 (\*)。例如，如果 `/home/test/files` 存在，它将被视为 `/home/test/files/*`。但是，如果目录不存在，则不会添加通配符，访问将仅限于 `/home/test/files`。如果您想允许访问尚不存在的文件夹，请确保明确包含通配符：`/my-path/folder-do-not-exist/*`。
 
-#### Using the Permission Model with `npx`
+#### 将权限模型与 `npx` 一起使用
 
-If you're using [`npx`][] to execute a Node.js script, you can enable the
-Permission Model by passing the `--node-options` flag. For example:
+如果您使用 [`npx`][] 执行 Node.js 脚本，您可以通过传递 `--node-options` 标志来启用权限模型。例如：
 
 ```bash
 npx --node-options="--permission" package-name
 ```
 
-This sets the `NODE_OPTIONS` environment variable for all Node.js processes
-spawned by [`npx`][], without affecting the `npx` process itself.
+这将为 [`npx`][] 生成的所有 Node.js 进程设置 `NODE_OPTIONS` 环境变量，而不影响 `npx` 进程本身。
 
-**FileSystemRead Error with `npx`**
+**使用 `npx` 时的 FileSystemRead 错误**
 
-The above command will likely throw a `FileSystemRead` invalid access error
-because Node.js requires file system read access to locate and execute the
-package. To avoid this:
+上述命令可能会抛出 `FileSystemRead` 无效访问错误，因为 Node.js 需要文件系统读取访问权限来定位和执行包。为避免这种情况：
 
-1. **Using a Globally Installed Package**
-   Grant read access to the global `node_modules` directory by running:
+1. **使用全局安装的包**
+   通过运行以下命令授予对全局 `node_modules` 目录的读取访问权限：
 
    ```bash
    npx --node-options="--permission --allow-fs-read=$(npm prefix -g)" package-name
    ```
 
-2. **Using the `npx` Cache**
-   If you are installing the package temporarily or relying on the `npx` cache,
-   grant read access to the npm cache directory:
+2. **使用 `npx` 缓存**
+   如果您是临时安装包或依赖 `npx` 缓存，请授予对 npm 缓存目录的读取访问权限：
 
    ```bash
    npx --node-options="--permission --allow-fs-read=$(npm config get cache)" package-name
    ```
 
-Any arguments you would normally pass to `node` (e.g., `--allow-*` flags) can
-also be passed through the `--node-options` flag. This flexibility makes it
-easy to configure permissions as needed when using `npx`.
+您通常传递给 `node` 的任何参数（例如，`--allow-*` 标志）也可以通过 `--node-options` 标志传递。这种灵活性使得在使用 `npx` 时可以根据需要轻松配置权限。
 
-#### Permission Model constraints
+#### 权限模型约束
 
-There are constraints you need to know before using this system:
+在使用此系统之前，您需要了解一些约束：
 
-* The model does not inherit to a worker thread.
-* When using the Permission Model the following features will be restricted:
-  * Native modules
-  * Child process
-  * Worker Threads
-  * Inspector protocol
-  * File system access
+* 该模型不会继承到工作线程。
+* 使用权限模型时，以下功能将受到限制：
+  * 原生模块
+  * 子进程
+  * 工作线程
+  * 调试器协议
+  * 文件系统访问
   * WASI
-* The Permission Model is initialized after the Node.js environment is set up.
-  However, certain flags such as `--env-file` or `--openssl-config` are designed
-  to read files before environment initialization. As a result, such flags are
-  not subject to the rules of the Permission Model. The same applies for V8
-  flags that can be set via runtime through `v8.setFlagsFromString`.
-* OpenSSL engines cannot be requested at runtime when the Permission
-  Model is enabled, affecting the built-in crypto, https, and tls modules.
-* Run-Time Loadable Extensions cannot be loaded when the Permission Model is
-  enabled, affecting the sqlite module.
-* Using existing file descriptors via the `node:fs` module bypasses the
-  Permission Model.
+* 权限模型在 Node.js 环境设置完成后初始化。
+  但是，某些标志（如 `--env-file` 或 `--openssl-config`）设计为在环境初始化之前读取文件。因此，这些标志不受权限模型规则的约束。这同样适用于可以通过运行时通过 `v8.setFlagsFromString` 设置的 V8 标志。
+* 启用权限模型时，无法在运行时请求 OpenSSL 引擎，这会影响内置的 crypto、https 和 tls 模块。
+* 启用权限模型时无法加载运行时可加载扩展，这会影响 sqlite 模块。
+* 通过 `node:fs` 模块使用现有文件描述符会绕过权限模型。
 
-#### Limitations and Known Issues
+#### 限制和已知问题
 
-* Symbolic links will be followed even to locations outside of the set of paths
-  that access has been granted to. Relative symbolic links may allow access to
-  arbitrary files and directories. When starting applications with the
-  permission model enabled, you must ensure that no paths to which access has
-  been granted contain relative symbolic links.
+* 符号链接将被跟踪，即使指向访问权限已被授予的路径集之外的位置。相对符号链接可能允许访问任意文件和目录。在启用权限模型启动应用程序时，您必须确保没有已被授予访问权限的路径包含相对符号链接。
 
 [Security Policy]: https://github.com/nodejs/node/blob/main/SECURITY.md
 [`--allow-addons`]: cli.md#--allow-addons

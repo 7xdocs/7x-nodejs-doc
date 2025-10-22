@@ -43,69 +43,39 @@ changes:
       `"type"` field.
 -->
 
-## Introduction
+## 简介
 
-A package is a folder tree described by a `package.json` file. The package
-consists of the folder containing the `package.json` file and all subfolders
-until the next folder containing another `package.json` file, or a folder
-named `node_modules`.
+一个包是由 `package.json` 文件描述的文件夹树。包由包含 `package.json` 文件的文件夹及其所有子文件夹组成，直到下一个包含另一个 `package.json` 文件的文件夹，或者一个名为 `node_modules` 的文件夹。
 
-This page provides guidance for package authors writing `package.json` files
-along with a reference for the [`package.json`][] fields defined by Node.js.
+本页为编写 `package.json` 文件的包作者提供指导，并作为 Node.js 定义的 [`package.json`][] 字段的参考。
 
-## Determining module system
+## 确定模块系统
 
-### Introduction
+### 简介
 
-Node.js will treat the following as [ES modules][] when passed to `node` as the
-initial input, or when referenced by `import` statements or `import()`
-expressions:
+当以下情况被传递给 `node` 作为初始输入，或被 `import` 语句或 `import()` 表达式引用时，Node.js 会将它们视为 [ES 模块][]：
 
-* Files with an `.mjs` extension.
+* 具有 `.mjs` 扩展名的文件。
 
-* Files with a `.js` extension when the nearest parent `package.json` file
-  contains a top-level [`"type"`][] field with a value of `"module"`.
+* 当最近的父级 `package.json` 文件包含顶级 [`"type"`][] 字段且值为 `"module"` 时，具有 `.js` 扩展名的文件。
 
-* Strings passed in as an argument to `--eval`, or piped to `node` via `STDIN`,
-  with the flag `--input-type=module`.
+* 通过 `--eval` 参数传递的字符串，或通过 `STDIN` 管道传输给 `node` 的字符串，且带有 `--input-type=module` 标志。
 
-* Code containing syntax only successfully parsed as [ES modules][], such as
-  `import` or `export` statements or `import.meta`, with no explicit marker of
-  how it should be interpreted. Explicit markers are `.mjs` or `.cjs`
-  extensions, `package.json` `"type"` fields with either `"module"` or
-  `"commonjs"` values, or the `--input-type` flag. Dynamic `import()`
-  expressions are supported in either CommonJS or ES modules and would not force
-  a file to be treated as an ES module. See [Syntax detection][].
+* 包含只能作为 [ES 模块][] 成功解析的语法的代码，例如 `import` 或 `export` 语句或 `import.meta`，但没有明确的标记说明应如何解释。明确的标记包括 `.mjs` 或 `.cjs` 扩展名、`package.json` `"type"` 字段（值为 `"module"` 或 `"commonjs"`）或 `--input-type` 标志。动态 `import()` 表达式在 CommonJS 或 ES 模块中都受支持，不会强制文件被视为 ES 模块。参见 [语法检测][]。
 
-Node.js will treat the following as [CommonJS][] when passed to `node` as the
-initial input, or when referenced by `import` statements or `import()`
-expressions:
+当以下情况被传递给 `node` 作为初始输入，或被 `import` 语句或 `import()` 表达式引用时，Node.js 会将它们视为 [CommonJS][]：
 
-* Files with a `.cjs` extension.
+* 具有 `.cjs` 扩展名的文件。
 
-* Files with a `.js` extension when the nearest parent `package.json` file
-  contains a top-level field [`"type"`][] with a value of `"commonjs"`.
+* 当最近的父级 `package.json` 文件包含顶级字段 [`"type"`][] 且值为 `"commonjs"` 时，具有 `.js` 扩展名的文件。
 
-* Strings passed in as an argument to `--eval` or `--print`, or piped to `node`
-  via `STDIN`, with the flag `--input-type=commonjs`.
+* 通过 `--eval` 或 `--print` 参数传递的字符串，或通过 `STDIN` 管道传输给 `node` 的字符串，且带有 `--input-type=commonjs` 标志。
 
-* Files with a `.js` extension with no parent `package.json` file or where the
-  nearest parent `package.json` file lacks a `type` field, and where the code
-  can evaluate successfully as CommonJS. In other words, Node.js tries to run
-  such "ambiguous" files as CommonJS first, and will retry evaluating them as ES
-  modules if the evaluation as CommonJS fails because the parser found ES module
-  syntax.
+* 没有父级 `package.json` 文件，或者最近的父级 `package.json` 文件缺少 `type` 字段，并且代码可以作为 CommonJS 成功求值的 `.js` 扩展名文件。换句话说，Node.js 会首先尝试将这些“模糊”文件作为 CommonJS 运行，如果作为 CommonJS 求值失败（因为解析器找到了 ES 模块语法），则会重新尝试将它们作为 ES 模块求值。
 
-Writing ES module syntax in "ambiguous" files incurs a performance cost, and
-therefore it is encouraged that authors be explicit wherever possible. In
-particular, package authors should always include the [`"type"`][] field in
-their `package.json` files, even in packages where all sources are CommonJS.
-Being explicit about the `type` of the package will future-proof the package in
-case the default type of Node.js ever changes, and it will also make things
-easier for build tools and loaders to determine how the files in the package
-should be interpreted.
+在“模糊”文件中编写 ES 模块语法会产生性能成本，因此鼓励作者尽可能明确。特别是，包作者应始终在其 `package.json` 文件中包含 [`"type"`][] 字段，即使包中的所有源代码都是 CommonJS。明确指定包的 `type` 将使包在未来 Node.js 的默认类型发生变化时具有前瞻性，并且也会使构建工具和加载器更容易确定应如何解释包中的文件。
 
-### Syntax detection
+### 语法检测
 
 <!-- YAML
 added:
@@ -121,133 +91,98 @@ changes:
 
 > Stability: 1.2 - Release candidate
 
-Node.js will inspect the source code of ambiguous input to determine whether it
-contains ES module syntax; if such syntax is detected, the input will be treated
-as an ES module.
+Node.js 将检查模糊输入的源代码，以确定其是否包含 ES 模块语法；如果检测到此类语法，输入将被视为 ES 模块。
 
-Ambiguous input is defined as:
+模糊输入定义为：
 
-* Files with a `.js` extension or no extension; and either no controlling
-  `package.json` file or one that lacks a `type` field.
-* String input (`--eval` or `STDIN`) when `--input-type`is not specified.
+* 具有 `.js` 扩展名或无扩展名的文件；并且没有控制性 `package.json` 文件或缺少 `type` 字段的控制性 `package.json` 文件。
+* 未指定 `--input-type` 时的字符串输入（`--eval` 或 `STDIN`）。
 
-ES module syntax is defined as syntax that would throw when evaluated as
-CommonJS. This includes the following:
+ES 模块语法定义为在作为 CommonJS 求值时会抛出错误的语法。这包括以下内容：
 
-* `import` statements (but _not_ `import()` expressions, which are valid in
-  CommonJS).
-* `export` statements.
-* `import.meta` references.
-* `await` at the top level of a module.
-* Lexical redeclarations of the CommonJS wrapper variables (`require`, `module`,
-  `exports`, `__dirname`, `__filename`).
+* `import` 语句（但 _不是_ `import()` 表达式，它们在 CommonJS 中有效）。
+* `export` 语句。
+* `import.meta` 引用。
+* 模块顶层的 `await`。
+* CommonJS 包装器变量（`require`、`module`、`exports`、`__dirname`、`__filename`）的词法重新声明。
 
-### Modules loaders
+### 模块加载器
 
-Node.js has two systems for resolving a specifier and loading modules.
+Node.js 有两个系统用于解析说明符和加载模块。
 
-There is the CommonJS module loader:
+CommonJS 模块加载器：
 
-* It is fully synchronous.
-* It is responsible for handling `require()` calls.
-* It is monkey patchable.
-* It supports [folders as modules][].
-* When resolving a specifier, if no exact match is found, it will try to add
-  extensions (`.js`, `.json`, and finally `.node`) and then attempt to resolve
-  [folders as modules][].
-* It treats `.json` as JSON text files.
-* `.node` files are interpreted as compiled addon modules loaded with
-  `process.dlopen()`.
-* It treats all files that lack `.json` or `.node` extensions as JavaScript
-  text files.
-* It can only be used to [load ECMAScript modules from CommonJS modules][] if
-  the module graph is synchronous (that contains no top-level `await`).
-  When used to load a JavaScript text file that is not an ECMAScript module,
-  the file will be loaded as a CommonJS module.
+* 它是完全同步的。
+* 负责处理 `require()` 调用。
+* 它是可猴子补丁的。
+* 支持 [文件夹作为模块][]。
+* 解析说明符时，如果没有找到精确匹配，它会尝试添加扩展名（`.js`、`.json`，最后是 `.node`），然后尝试解析 [文件夹作为模块][]。
+* 它将 `.json` 视为 JSON 文本文件。
+* `.node` 文件被解释为使用 `process.dlopen()` 加载的编译插件模块。
+* 它将所有缺少 `.json` 或 `.node` 扩展名的文件视为 JavaScript 文本文件。
+* 如果模块图是同步的（即不包含顶级 `await`），它只能用于 [从 CommonJS 模块加载 ECMAScript 模块][]。当用于加载不是 ECMAScript 模块的 JavaScript 文本文件时，该文件将作为 CommonJS 模块加载。
 
-There is the ECMAScript module loader:
+ECMAScript 模块加载器：
 
-* It is asynchronous, unless it's being used to load modules for `require()`.
-* It is responsible for handling `import` statements and `import()` expressions.
-* It is not monkey patchable, can be customized using [loader hooks][].
-* It does not support folders as modules, directory indexes (e.g.
-  `'./startup/index.js'`) must be fully specified.
-* It does no extension searching. A file extension must be provided
-  when the specifier is a relative or absolute file URL.
-* It can load JSON modules, but an import type attribute is required.
-* It accepts only `.js`, `.mjs`, and `.cjs` extensions for JavaScript text
-  files.
-* It can be used to load JavaScript CommonJS modules. Such modules
-  are passed through the `cjs-module-lexer` to try to identify named exports,
-  which are available if they can be determined through static analysis.
-  Imported CommonJS modules have their URLs converted to absolute
-  paths and are then loaded via the CommonJS module loader.
+* 它是异步的，除非用于为 `require()` 加载模块。
+* 负责处理 `import` 语句和 `import()` 表达式。
+* 不可猴子补丁，可以使用 [加载器钩子][] 进行自定义。
+* 不支持文件夹作为模块，必须完全指定目录索引（例如 `'./startup/index.js'`）。
+* 不进行扩展名搜索。当说明符是相对或绝对文件 URL 时，必须提供文件扩展名。
+* 可以加载 JSON 模块，但需要导入类型属性。
+* 对于 JavaScript 文本文件，只接受 `.js`、`.mjs` 和 `.cjs` 扩展名。
+* 可用于加载 JavaScript CommonJS 模块。此类模块通过 `cjs-module-lexer` 传递，以尝试识别命名导出（如果可以通过静态分析确定）。导入的 CommonJS 模块的 URL 会转换为绝对路径，然后通过 CommonJS 模块加载器加载。
 
-### `package.json` and file extensions
+### `package.json` 和文件扩展名
 
-Within a package, the [`package.json`][] [`"type"`][] field defines how
-Node.js should interpret `.js` files. If a `package.json` file does not have a
-`"type"` field, `.js` files are treated as [CommonJS][].
+在包内，[`package.json`][] 的 [`"type"`][] 字段定义了 Node.js 应如何解释 `.js` 文件。如果 `package.json` 文件没有 `"type"` 字段，则 `.js` 文件被视为 [CommonJS][]。
 
-A `package.json` `"type"` value of `"module"` tells Node.js to interpret `.js`
-files within that package as using [ES module][] syntax.
+`package.json` 的 `"type"` 值为 `"module"` 告诉 Node.js 将该包内的 `.js` 文件解释为使用 [ES 模块][] 语法。
 
-The `"type"` field applies not only to initial entry points (`node my-app.js`)
-but also to files referenced by `import` statements and `import()` expressions.
+`"type"` 字段不仅适用于初始入口点（`node my-app.js`），也适用于 `import` 语句和 `import()` 表达式引用的文件。
 
 ```js
-// my-app.js, treated as an ES module because there is a package.json
-// file in the same folder with "type": "module".
+// my-app.js，被视为 ES 模块，因为同一文件夹中有一个 package.json
+// 文件，其中包含 "type": "module"。
 
 import './startup/init.js';
-// Loaded as ES module since ./startup contains no package.json file,
-// and therefore inherits the "type" value from one level up.
+// 作为 ES 模块加载，因为 ./startup 不包含 package.json 文件，
+// 因此继承上一级的 "type" 值。
 
 import 'commonjs-package';
-// Loaded as CommonJS since ./node_modules/commonjs-package/package.json
-// lacks a "type" field or contains "type": "commonjs".
+// 作为 CommonJS 加载，因为 ./node_modules/commonjs-package/package.json
+// 缺少 "type" 字段或包含 "type": "commonjs"。
 
 import './node_modules/commonjs-package/index.js';
-// Loaded as CommonJS since ./node_modules/commonjs-package/package.json
-// lacks a "type" field or contains "type": "commonjs".
+// 作为 CommonJS 加载，因为 ./node_modules/commonjs-package/package.json
+// 缺少 "type" 字段或包含 "type": "commonjs"。
 ```
 
-Files ending with `.mjs` are always loaded as [ES modules][] regardless of
-the nearest parent `package.json`.
+以 `.mjs` 结尾的文件总是作为 [ES 模块][] 加载，无论最近的父级 `package.json` 如何。
 
-Files ending with `.cjs` are always loaded as [CommonJS][] regardless of the
-nearest parent `package.json`.
+以 `.cjs` 结尾的文件总是作为 [CommonJS][] 加载，无论最近的父级 `package.json` 如何。
 
 ```js
 import './legacy-file.cjs';
-// Loaded as CommonJS since .cjs is always loaded as CommonJS.
+// 作为 CommonJS 加载，因为 .cjs 总是作为 CommonJS 加载。
 
 import 'commonjs-package/src/index.mjs';
-// Loaded as ES module since .mjs is always loaded as ES module.
+// 作为 ES 模块加载，因为 .mjs 总是作为 ES 模块加载。
 ```
 
-The `.mjs` and `.cjs` extensions can be used to mix types within the same
-package:
+`.mjs` 和 `.cjs` 扩展名可用于在同一包中混合类型：
 
-* Within a `"type": "module"` package, Node.js can be instructed to
-  interpret a particular file as [CommonJS][] by naming it with a `.cjs`
-  extension (since both `.js` and `.mjs` files are treated as ES modules within
-  a `"module"` package).
+* 在 `"type": "module"` 包中，可以通过使用 `.cjs` 扩展名命名特定文件来指示 Node.js 将其解释为 [CommonJS][]（因为在此类包中，`.js` 和 `.mjs` 文件都被视为 ES 模块）。
 
-* Within a `"type": "commonjs"` package, Node.js can be instructed to
-  interpret a particular file as an [ES module][] by naming it with an `.mjs`
-  extension (since both `.js` and `.cjs` files are treated as CommonJS within a
-  `"commonjs"` package).
+* 在 `"type": "commonjs"` 包中，可以通过使用 `.mjs` 扩展名命名特定文件来指示 Node.js 将其解释为 [ES 模块][]（因为在此类包中，`.js` 和 `.cjs` 文件都被视为 CommonJS）。
 
-### `--input-type` flag
+### `--input-type` 标志
 
 <!-- YAML
 added: v12.0.0
 -->
 
-Strings passed in as an argument to `--eval` (or `-e`), or piped to `node` via
-`STDIN`, are treated as [ES modules][] when the `--input-type=module` flag
-is set.
+当设置 `--input-type=module` 标志时，通过 `--eval`（或 `-e`）参数传递的字符串，或通过 `STDIN` 管道传输给 `node` 的字符串，将被视为 [ES 模块][]。
 
 ```bash
 node --input-type=module --eval "import { sep } from 'node:path'; console.log(sep);"
@@ -255,47 +190,23 @@ node --input-type=module --eval "import { sep } from 'node:path'; console.log(se
 echo "import { sep } from 'node:path'; console.log(sep);" | node --input-type=module
 ```
 
-For completeness there is also `--input-type=commonjs`, for explicitly running
-string input as CommonJS. This is the default behavior if `--input-type` is
-unspecified.
+为了完整性，还有 `--input-type=commonjs`，用于明确将字符串输入作为 CommonJS 运行。如果未指定 `--input-type`，这是默认行为。
 
-## Package entry points
+## 包入口点
 
-In a package's `package.json` file, two fields can define entry points for a
-package: [`"main"`][] and [`"exports"`][]. Both fields apply to both ES module
-and CommonJS module entry points.
+在包的 `package.json` 文件中，有两个字段可以定义包的入口点：[`"main"`][] 和 [`"exports"`][]。这两个字段都适用于 ES 模块和 CommonJS 模块入口点。
 
-The [`"main"`][] field is supported in all versions of Node.js, but its
-capabilities are limited: it only defines the main entry point of the package.
+[`"main"`][] 字段在 Node.js 的所有版本中都受支持，但其功能有限：它只定义包的主入口点。
 
-The [`"exports"`][] provides a modern alternative to [`"main"`][] allowing
-multiple entry points to be defined, conditional entry resolution support
-between environments, and **preventing any other entry points besides those
-defined in [`"exports"`][]**. This encapsulation allows module authors to
-clearly define the public interface for their package.
+[`"exports"`][] 提供了 [`"main"`][] 的现代替代方案，允许定义多个入口点，支持环境之间的条件入口解析，并 **防止使用 [`"exports"`][] 中定义的入口点之外的任何其他入口点**。这种封装使模块作者能够明确定义其包的公共接口。
 
-For new packages targeting the currently supported versions of Node.js, the
-[`"exports"`][] field is recommended. For packages supporting Node.js 10 and
-below, the [`"main"`][] field is required. If both [`"exports"`][] and
-[`"main"`][] are defined, the [`"exports"`][] field takes precedence over
-[`"main"`][] in supported versions of Node.js.
+对于针对当前支持的 Node.js 版本的新包，推荐使用 [`"exports"`][] 字段。对于支持 Node.js 10 及以下版本的包，[`"main"`][] 字段是必需的。如果同时定义了 [`"exports"`][] 和 [`"main"`][]，在受支持的 Node.js 版本中，[`"exports"`][] 字段优先于 [`"main"`][]。
 
-[Conditional exports][] can be used within [`"exports"`][] to define different
-package entry points per environment, including whether the package is
-referenced via `require` or via `import`. For more information about supporting
-both CommonJS and ES modules in a single package please consult
-[the dual CommonJS/ES module packages section][].
+[条件导出][] 可以在 [`"exports"`][] 中使用，以根据环境定义不同的包入口点，包括包是通过 `require` 还是通过 `import` 引用。有关在单个包中同时支持 CommonJS 和 ES 模块的更多信息，请参阅 [双 CommonJS/ES 模块包部分][]。
 
-Existing packages introducing the [`"exports"`][] field will prevent consumers
-of the package from using any entry points that are not defined, including the
-[`package.json`][] (e.g. `require('your-package/package.json')`). **This will
-likely be a breaking change.**
+现有包引入 [`"exports"`][] 字段将阻止包的消费者使用任何未定义的入口点，包括 [`package.json`][]（例如 `require('your-package/package.json')`）。**这很可能是一个破坏性变更。**
 
-To make the introduction of [`"exports"`][] non-breaking, ensure that every
-previously supported entry point is exported. It is best to explicitly specify
-entry points so that the package's public API is well-defined. For example,
-a project that previously exported `main`, `lib`,
-`feature`, and the `package.json` could use the following `package.exports`:
+为了使 [`"exports"`][] 的引入非破坏性，请确保导出每个先前受支持的入口点。最好明确指定入口点，以便明确定义包的公共 API。例如，一个先前导出 `main`、`lib`、`feature` 和 `package.json` 的项目可以使用以下 `package.exports`：
 
 ```json
 {
@@ -313,8 +224,7 @@ a project that previously exported `main`, `lib`,
 }
 ```
 
-Alternatively a project could choose to export entire folders both with and
-without extensioned subpaths using export patterns:
+或者，项目可以选择使用导出模式导出整个文件夹，包括带扩展名和不带扩展名的子路径：
 
 ```json
 {
@@ -332,9 +242,7 @@ without extensioned subpaths using export patterns:
 }
 ```
 
-With the above providing backwards-compatibility for any minor package versions,
-a future major change for the package can then properly restrict the exports
-to only the specific feature exports exposed:
+通过以上方式为任何次要包版本提供向后兼容性，包的下一个主要变更可以适当地将导出限制为仅暴露的特定功能导出：
 
 ```json
 {
@@ -347,9 +255,9 @@ to only the specific feature exports exposed:
 }
 ```
 
-### Main entry point export
+### 主入口点导出
 
-When writing a new package, it is recommended to use the [`"exports"`][] field:
+编写新包时，建议使用 [`"exports"`][] 字段：
 
 ```json
 {
@@ -357,21 +265,11 @@ When writing a new package, it is recommended to use the [`"exports"`][] field:
 }
 ```
 
-When the [`"exports"`][] field is defined, all subpaths of the package are
-encapsulated and no longer available to importers. For example,
-`require('pkg/subpath.js')` throws an [`ERR_PACKAGE_PATH_NOT_EXPORTED`][]
-error.
+当定义了 [`"exports"`][] 字段时，包的所有子路径都被封装，导入器不再可用。例如，`require('pkg/subpath.js')` 会抛出 [`ERR_PACKAGE_PATH_NOT_EXPORTED`][] 错误。
 
-This encapsulation of exports provides more reliable guarantees
-about package interfaces for tools and when handling semver upgrades for a
-package. It is not a strong encapsulation since a direct require of any
-absolute subpath of the package such as
-`require('/path/to/node_modules/pkg/subpath.js')` will still load `subpath.js`.
+这种导出的封装为工具和处理包的 semver 升级提供了更可靠的包接口保证。它不是强封装，因为直接 require 包的任何绝对子路径，例如 `require('/path/to/node_modules/pkg/subpath.js')`，仍然会加载 `subpath.js`。
 
-All currently supported versions of Node.js and modern build tools support the
-`"exports"` field. For projects using an older version of Node.js or a related
-build tool, compatibility can be achieved by including the `"main"` field
-alongside `"exports"` pointing to the same module:
+所有当前支持的 Node.js 版本和现代构建工具都支持 `"exports"` 字段。对于使用旧版本 Node.js 或相关构建工具的项目，可以通过同时包含指向同一模块的 `"main"` 字段和 `"exports"` 来实现兼容性：
 
 ```json
 {
@@ -380,15 +278,13 @@ alongside `"exports"` pointing to the same module:
 }
 ```
 
-### Subpath exports
+### 子路径导出
 
 <!-- YAML
 added: v12.7.0
 -->
 
-When using the [`"exports"`][] field, custom subpaths can be defined along
-with the main entry point by treating the main entry point as the
-`"."` subpath:
+使用 [`"exports"`][] 字段时，可以通过将主入口点视为 `"."` 子路径来定义自定义子路径以及主入口点：
 
 ```json
 {
@@ -399,101 +295,79 @@ with the main entry point by treating the main entry point as the
 }
 ```
 
-Now only the defined subpath in [`"exports"`][] can be imported by a consumer:
+现在，只有 [`"exports"`][] 中定义的子路径可以被消费者导入：
 
 ```js
 import submodule from 'es-module-package/submodule.js';
-// Loads ./node_modules/es-module-package/src/submodule.js
+// 加载 ./node_modules/es-module-package/src/submodule.js
 ```
 
-While other subpaths will error:
+而其他子路径将报错：
 
 ```js
 import submodule from 'es-module-package/private-module.js';
-// Throws ERR_PACKAGE_PATH_NOT_EXPORTED
+// 抛出 ERR_PACKAGE_PATH_NOT_EXPORTED
 ```
 
-#### Extensions in subpaths
+#### 子路径中的扩展名
 
-Package authors should provide either extensioned (`import 'pkg/subpath.js'`) or
-extensionless (`import 'pkg/subpath'`) subpaths in their exports. This ensures
-that there is only one subpath for each exported module so that all dependents
-import the same consistent specifier, keeping the package contract clear for
-consumers and simplifying package subpath completions.
+包作者应在其导出中提供带扩展名（`import 'pkg/subpath.js'`）或不带扩展名（`import 'pkg/subpath'`）的子路径。这确保了每个导出模块只有一个子路径，以便所有依赖项导入相同一致的说明符，保持包契约对消费者清晰，并简化包子路径补全。
 
-Traditionally, packages tended to use the extensionless style, which has the
-benefits of readability and of masking the true path of the file within the
-package.
+传统上，包倾向于使用无扩展名风格，其优点是可读性和隐藏包内文件的真实路径。
 
-With [import maps][] now providing a standard for package resolution in browsers
-and other JavaScript runtimes, using the extensionless style can result in
-bloated import map definitions. Explicit file extensions can avoid this issue by
-enabling the import map to utilize a [packages folder mapping][] to map multiple
-subpaths where possible instead of a separate map entry per package subpath
-export. This also mirrors the requirement of using [the full specifier path][]
-in relative and absolute import specifiers.
+随着 [导入映射][] 现在为浏览器和其他 JavaScript 运行时中的包解析提供了标准，使用无扩展名风格可能导致导入映射定义臃肿。显式文件扩展名可以通过使导入映射能够利用 [包文件夹映射][] 来映射多个子路径（如果可能），而不是每个包子路径导出都有一个单独的映射条目，从而避免此问题。这也反映了在相对和绝对导入说明符中使用 [完整说明符路径][] 的要求。
 
-#### Path Rules and Validation for Export Targets
+#### 导出目标的路径规则和验证
 
-When defining paths as targets in the [`"exports"`][] field, Node.js enforces
-several rules to ensure security, predictability, and proper encapsulation.
-Understanding these rules is crucial for authors publishing packages.
+在 [`"exports"`][] 字段中定义路径作为目标时，Node.js 强制执行若干规则以确保安全性、可预测性和适当的封装。理解这些规则对于发布包的作者至关重要。
 
-##### Targets must be relative URLs
+##### 目标必须是相对 URL
 
-All target paths in the [`"exports"`][] map (the values associated with export
-keys) must be relative URL strings starting with `./`.
+[`"exports"`][] 映射中的所有目标路径（与导出键关联的值）必须是以 `./` 开头的相对 URL 字符串。
 
 ```json
 // package.json
 {
   "name": "my-package",
   "exports": {
-    ".": "./dist/main.js",          // Correct
-    "./feature": "./lib/feature.js", // Correct
-    // "./origin-relative": "/dist/main.js", // Incorrect: Must start with ./
-    // "./absolute": "file:///dev/null", // Incorrect: Must start with ./
-    // "./outside": "../common/util.js" // Incorrect: Must start with ./
+    ".": "./dist/main.js",          // 正确
+    "./feature": "./lib/feature.js", // 正确
+    // "./origin-relative": "/dist/main.js", // 错误：必须以 ./ 开头
+    // "./absolute": "file:///dev/null", // 错误：必须以 ./ 开头
+    // "./outside": "../common/util.js" // 错误：必须以 ./ 开头
   }
 }
 ```
 
-Reasons for this behavior include:
+此行为的原因包括：
 
-* **Security:** Prevents exporting arbitrary files from outside the
-  package's own directory.
-* **Encapsulation:** Ensures all exported paths are resolved relative to
-  the package root, making the package self-contained.
+* **安全性：** 防止从包自身目录外部导出任意文件。
+* **封装：** 确保所有导出路径都相对于包根目录解析，使包自包含。
 
-##### No path traversal or invalid segments
+##### 不允许路径遍历或无效段
 
-Export targets must not resolve to a location outside the package's root
-directory. Additionally, path segments like `.` (single dot), `..` (double dot),
-or `node_modules` (and their URL-encoded equivalents) are generally disallowed
-within the `target` string after the initial `./` and in any `subpath` part
-substituted into a target pattern.
+导出目标不得解析到包根目录之外的位置。此外，在初始 `./` 之后的 `target` 字符串中以及替换到目标模式中的任何 `subpath` 部分中，通常不允许使用路径段，如 `.`（单点）、`..`（双点）或 `node_modules`（及其 URL 编码等效项）。
 
 ```json
 // package.json
 {
   "name": "my-package",
   "exports": {
-    // ".": "./dist/../../elsewhere/file.js", // Invalid: path traversal
-    // ".": "././dist/main.js",             // Invalid: contains "." segment
-    // ".": "./dist/../dist/main.js",       // Invalid: contains ".." segment
-    // "./utils/./helper.js": "./utils/helper.js" // Key has invalid segment
+    // ".": "./dist/../../elsewhere/file.js", // 无效：路径遍历
+    // ".": "././dist/main.js",             // 无效：包含 "." 段
+    // ".": "./dist/../dist/main.js",       // 无效：包含 ".." 段
+    // "./utils/./helper.js": "./utils/helper.js" // 键包含无效段
   }
 }
 ```
 
-### Exports sugar
+### 导出语法糖
 
 <!-- YAML
 added: v12.11.0
 -->
 
-If the `"."` export is the only export, the [`"exports"`][] field provides sugar
-for this case being the direct [`"exports"`][] field value.
+如果 `"."` 导出是唯一的导出，[`"exports"`][] 字段为此情况提供了语法糖，即直接的 [`"exports"`][] 字段值。
 
 ```json
 {
@@ -503,7 +377,7 @@ for this case being the direct [`"exports"`][] field value.
 }
 ```
 
-can be written:
+可以写成：
 
 ```json
 {
@@ -511,7 +385,7 @@ can be written:
 }
 ```
 
-### Subpath imports
+### 子路径导入
 
 <!-- YAML
 added:
@@ -519,15 +393,11 @@ added:
   - v12.19.0
 -->
 
-In addition to the [`"exports"`][] field, there is a package `"imports"` field
-to create private mappings that only apply to import specifiers from within the
-package itself.
+除了 [`"exports"`][] 字段，还有一个包 `"imports"` 字段用于创建私有映射，这些映射仅适用于从包本身内部的导入说明符。
 
-Entries in the `"imports"` field must always start with `#` to ensure they are
-disambiguated from external package specifiers.
+`"imports"` 字段中的条目必须始终以 `#` 开头，以确保它们与外部包说明符区分开。
 
-For example, the imports field can be used to gain the benefits of conditional
-exports for internal modules:
+例如，导入字段可用于为内部模块获得条件导出的好处：
 
 ```json
 // package.json
@@ -544,17 +414,13 @@ exports for internal modules:
 }
 ```
 
-where `import '#dep'` does not get the resolution of the external package
-`dep-node-native` (including its exports in turn), and instead gets the local
-file `./dep-polyfill.js` relative to the package in other environments.
+其中 `import '#dep'` 不会获取外部包 `dep-node-native` 的解析（包括其导出），而是在其他环境中获取相对于包的本地文件 `./dep-polyfill.js`。
 
-Unlike the `"exports"` field, the `"imports"` field permits mapping to external
-packages.
+与 `"exports"` 字段不同，`"imports"` 字段允许映射到外部包。
 
-The resolution rules for the imports field are otherwise analogous to the
-exports field.
+导入字段的解析规则在其他方面与导出字段类似。
 
-### Subpath patterns
+### 子路径模式
 
 <!-- YAML
 added:
@@ -573,12 +439,9 @@ changes:
     description: Support pattern trailers.
 -->
 
-For packages with a small number of exports or imports, we recommend
-explicitly listing each exports subpath entry. But for packages that have
-large numbers of subpaths, this might cause `package.json` bloat and
-maintenance issues.
+对于具有少量导出或导入的包，我们建议显式列出每个导出的子路径条目。但对于具有大量子路径的包，这可能导致 `package.json` 臃肿和维护问题。
 
-For these use cases, subpath export patterns can be used instead:
+对于这些用例，可以使用子路径导出模式：
 
 ```json
 // ./node_modules/es-module-package/package.json
@@ -592,34 +455,26 @@ For these use cases, subpath export patterns can be used instead:
 }
 ```
 
-**`*` maps expose nested subpaths as it is a string replacement syntax
-only.**
+**`*` 映射公开嵌套子路径，因为它只是一种字符串替换语法。**
 
-All instances of `*` on the right hand side will then be replaced with this
-value, including if it contains any `/` separators.
+右侧的所有 `*` 实例将被替换为此值，包括它包含任何 `/` 分隔符。
 
 ```js
 import featureX from 'es-module-package/features/x.js';
-// Loads ./node_modules/es-module-package/src/features/x.js
+// 加载 ./node_modules/es-module-package/src/features/x.js
 
 import featureY from 'es-module-package/features/y/y.js';
-// Loads ./node_modules/es-module-package/src/features/y/y.js
+// 加载 ./node_modules/es-module-package/src/features/y/y.js
 
 import internalZ from '#internal/z.js';
-// Loads ./node_modules/es-module-package/src/internal/z.js
+// 加载 ./node_modules/es-module-package/src/internal/z.js
 ```
 
-This is a direct static matching and replacement without any special handling
-for file extensions. Including the `"*.js"` on both sides of the mapping
-restricts the exposed package exports to only JS files.
+这是一种直接的静态匹配和替换，没有对文件扩展名进行特殊处理。在映射两侧包含 `"*.js"` 将包的公开导出限制为仅 JS 文件。
 
-The property of exports being statically enumerable is maintained with exports
-patterns since the individual exports for a package can be determined by
-treating the right hand side target pattern as a `**` glob against the list of
-files within the package. Because `node_modules` paths are forbidden in exports
-targets, this expansion is dependent on only the files of the package itself.
+导出的静态可枚举属性通过导出模式得以维护，因为可以通过将右侧目标模式视为针对包内文件列表的 `**`  glob 来确定包的单个导出。由于 `node_modules` 路径在导出目标中被禁止，此扩展仅依赖于包自身的文件。
 
-To exclude private subfolders from patterns, `null` targets can be used:
+要从模式中排除私有子文件夹，可以使用 `null` 目标：
 
 ```json
 // ./node_modules/es-module-package/package.json
@@ -633,13 +488,13 @@ To exclude private subfolders from patterns, `null` targets can be used:
 
 ```js
 import featureInternal from 'es-module-package/features/private-internal/m.js';
-// Throws: ERR_PACKAGE_PATH_NOT_EXPORTED
+// 抛出：ERR_PACKAGE_PATH_NOT_EXPORTED
 
 import featureX from 'es-module-package/features/x.js';
-// Loads ./node_modules/es-module-package/src/features/x.js
+// 加载 ./node_modules/es-module-package/src/features/x.js
 ```
 
-### Conditional exports
+### 条件导出
 
 <!-- YAML
 added:
@@ -653,11 +508,9 @@ changes:
     description: Unflag conditional exports.
 -->
 
-Conditional exports provide a way to map to different paths depending on
-certain conditions. They are supported for both CommonJS and ES module imports.
+条件导出提供了一种根据某些条件映射到不同路径的方法。它们同时支持 CommonJS 和 ES 模块导入。
 
-For example, a package that wants to provide different ES module exports for
-`require()` and `import` can be written:
+例如，一个想要为 `require()` 和 `import` 提供不同 ES 模块导出的包可以这样写：
 
 ```json
 // package.json
@@ -670,48 +523,22 @@ For example, a package that wants to provide different ES module exports for
 }
 ```
 
-Node.js implements the following conditions, listed in order from most
-specific to least specific as conditions should be defined:
+Node.js 实现了以下条件，按从最具体到最不具体的顺序列出，因为条件应按此顺序定义：
 
-* `"node-addons"` - similar to `"node"` and matches for any Node.js environment.
-  This condition can be used to provide an entry point which uses native C++
-  addons as opposed to an entry point which is more universal and doesn't rely
-  on native addons. This condition can be disabled via the
-  [`--no-addons` flag][].
-* `"node"` - matches for any Node.js environment. Can be a CommonJS or ES
-  module file. _In most cases explicitly calling out the Node.js platform is
-  not necessary._
-* `"import"` - matches when the package is loaded via `import` or
-  `import()`, or via any top-level import or resolve operation by the
-  ECMAScript module loader. Applies regardless of the module format of the
-  target file. _Always mutually exclusive with `"require"`._
-* `"require"` - matches when the package is loaded via `require()`. The
-  referenced file should be loadable with `require()` although the condition
-  matches regardless of the module format of the target file. Expected
-  formats include CommonJS, JSON, native addons, and ES modules. _Always mutually
-  exclusive with `"import"`._
-* `"module-sync"` - matches no matter the package is loaded via `import`,
-  `import()` or `require()`. The format is expected to be ES modules that does
-  not contain top-level await in its module graph - if it does,
-  `ERR_REQUIRE_ASYNC_MODULE` will be thrown when the module is `require()`-ed.
-* `"default"` - the generic fallback that always matches. Can be a CommonJS
-  or ES module file. _This condition should always come last._
+* `"node-addons"` - 类似于 `"node"`，匹配任何 Node.js 环境。此条件可用于提供使用本地 C++ 插件的入口点，而不是更通用且不依赖本地插件的入口点。此条件可以通过 [`--no-addons` 标志][] 禁用。
+* `"node"` - 匹配任何 Node.js 环境。可以是 CommonJS 或 ES 模块文件。_在大多数情况下，明确指明 Node.js 平台是不必要的。_
+* `"import"` - 当包通过 `import` 或 `import()` 加载，或通过 ECMAScript 模块加载器的任何顶级导入或解析操作时匹配。无论目标文件的模块格式如何，都适用。_始终与 `"require"` 互斥。_
+* `"require"` - 当包通过 `require()` 加载时匹配。引用的文件应该可以使用 `require()` 加载，尽管无论目标文件的模块格式如何，条件都会匹配。预期格式包括 CommonJS、JSON、本地插件和 ES 模块。_始终与 `"import"` 互斥。_
+* `"module-sync"` - 无论包是通过 `import`、`import()` 还是 `require()` 加载，都匹配。格式预期是不在其模块图中包含顶级 await 的 ES 模块 - 如果包含，当模块被 `require()` 时，将抛出 `ERR_REQUIRE_ASYNC_MODULE`。
+* `"default"` - 始终匹配的通用回退。可以是 CommonJS 或 ES 模块文件。_此条件应始终放在最后。_
 
-Within the [`"exports"`][] object, key order is significant. During condition
-matching, earlier entries have higher priority and take precedence over later
-entries. _The general rule is that conditions should be from most specific to
-least specific in object order_.
+在 [`"exports"`][] 对象中，键的顺序很重要。在条件匹配期间，较早的条目具有更高的优先级，并优先于较晚的条目。_一般规则是条件在对象顺序中应从最具体到最不具体_。
 
-Using the `"import"` and `"require"` conditions can lead to some hazards,
-which are further explained in [the dual CommonJS/ES module packages section][].
+使用 `"import"` 和 `"require"` 条件可能导致一些隐患，这些隐患在 [双 CommonJS/ES 模块包部分][] 中有进一步解释。
 
-The `"node-addons"` condition can be used to provide an entry point which
-uses native C++ addons. However, this condition can be disabled via the
-[`--no-addons` flag][]. When using `"node-addons"`, it's recommended to treat
-`"default"` as an enhancement that provides a more universal entry point, e.g.
-using WebAssembly instead of a native addon.
+`"node-addons"` 条件可用于提供使用本地 C++ 插件的入口点。但是，此条件可以通过 [`--no-addons` 标志][] 禁用。使用 `"node-addons"` 时，建议将 `"default"` 视为提供更通用入口点的增强功能，例如使用 WebAssembly 而不是本地插件。
 
-Conditional exports can also be extended to exports subpaths, for example:
+条件导出也可以扩展到导出子路径，例如：
 
 ```json
 {
@@ -725,24 +552,15 @@ Conditional exports can also be extended to exports subpaths, for example:
 }
 ```
 
-Defines a package where `require('pkg/feature.js')` and
-`import 'pkg/feature.js'` could provide different implementations between
-Node.js and other JS environments.
+定义了一个包，其中 `require('pkg/feature.js')` 和 `import 'pkg/feature.js'` 可以在 Node.js 和其他 JS 环境之间提供不同的实现。
 
-When using environment branches, always include a `"default"` condition where
-possible. Providing a `"default"` condition ensures that any unknown JS
-environments are able to use this universal implementation, which helps avoid
-these JS environments from having to pretend to be existing environments in
-order to support packages with conditional exports. For this reason, using
-`"node"` and `"default"` condition branches is usually preferable to using
-`"node"` and `"browser"` condition branches.
+使用环境分支时，始终尽可能包含 `"default"` 条件。提供 `"default"` 条件确保任何未知的 JS 环境都能够使用此通用实现，这有助于避免这些 JS 环境为了支持具有条件导出的包而必须伪装成现有环境。因此，使用 `"node"` 和 `"default"` 条件分支通常优于使用 `"node"` 和 `"browser"` 条件分支。
 
-### Nested conditions
+### 嵌套条件
 
-In addition to direct mappings, Node.js also supports nested condition objects.
+除了直接映射，Node.js 还支持嵌套条件对象。
 
-For example, to define a package that only has dual mode entry points for
-use in Node.js but not the browser:
+例如，定义一个仅在 Node.js 中具有双模式入口点但不适用于浏览器的包：
 
 ```json
 {
@@ -756,12 +574,9 @@ use in Node.js but not the browser:
 }
 ```
 
-Conditions continue to be matched in order as with flat conditions. If
-a nested condition does not have any mapping it will continue checking
-the remaining conditions of the parent condition. In this way nested
-conditions behave analogously to nested JavaScript `if` statements.
+条件的匹配顺序与平面条件相同。如果嵌套条件没有任何映射，它将继续检查父条件的剩余条件。通过这种方式，嵌套条件的行为类似于嵌套的 JavaScript `if` 语句。
 
-### Resolving user conditions
+### 解析用户条件
 
 <!-- YAML
 added:
@@ -769,81 +584,52 @@ added:
   - v12.19.0
 -->
 
-When running Node.js, custom user conditions can be added with the
-`--conditions` flag:
+运行 Node.js 时，可以使用 `--conditions` 标志添加自定义用户条件：
 
 ```bash
 node --conditions=development index.js
 ```
 
-which would then resolve the `"development"` condition in package imports and
-exports, while resolving the existing `"node"`, `"node-addons"`, `"default"`,
-`"import"`, and `"require"` conditions as appropriate.
+然后将在包导入和导出中解析 `"development"` 条件，同时根据需要解析现有的 `"node"`、`"node-addons"`、`"default"`、`"import"` 和 `"require"` 条件。
 
-Any number of custom conditions can be set with repeat flags.
+可以使用重复标志设置任意数量的自定义条件。
 
-Typical conditions should only contain alphanumerical characters,
-using ":", "-", or "=" as separators if necessary. Anything else may run
-into compability issues outside of node.
+典型条件应仅包含字母数字字符，必要时使用 ":"、"-" 或 "=" 作为分隔符。其他任何内容可能在 node 之外遇到兼容性问题。
 
-In node, conditions have very few restrictions, but specifically these include:
+在 node 中，条件限制很少，但具体包括：
 
-1. They must contain at least one character.
-2. They cannot start with "." since they may appear in places that also
-   allow relative paths.
-3. They cannot contain "," since they may be parsed as a comma-separated
-   list by some CLI tools.
-4. They cannot be integer property keys like "10" since that can have
-   unexpected effects on property key ordering for JS objects.
+1. 它们必须包含至少一个字符。
+2. 它们不能以 "." 开头，因为它们可能出现在也允许相对路径的位置。
+3. 它们不能包含 ","，因为它们可能被某些 CLI 工具解析为逗号分隔列表。
+4. 它们不能是整数属性键，如 "10"，因为这可能对 JS 对象的属性键排序产生意外影响。
 
-### Community Conditions Definitions
+### 社区条件定义
 
-Condition strings other than the `"import"`, `"require"`, `"node"`, `"module-sync"`,
-`"node-addons"` and `"default"` conditions
-[implemented in Node.js core](#conditional-exports) are ignored by default.
+除了 Node.js 核心 [实现的](#conditional-exports) `"import"`、`"require"`、`"node"`、`"module-sync"`、`"node-addons"` 和 `"default"` 条件之外的条件字符串默认被忽略。
 
-Other platforms may implement other conditions and user conditions can be
-enabled in Node.js via the [`--conditions` / `-C` flag][].
+其他平台可能实现其他条件，用户条件可以在 Node.js 中通过 [`--conditions` / `-C` 标志][] 启用。
 
-Since custom package conditions require clear definitions to ensure correct
-usage, a list of common known package conditions and their strict definitions
-is provided below to assist with ecosystem coordination.
+由于自定义包条件需要清晰的定义以确保正确使用，下面提供了一个常见已知包条件及其严格定义的列表，以协助生态系统协调。
 
-* `"types"` - can be used by typing systems to resolve the typing file for
-  the given export. _This condition should always be included first._
-* `"browser"` - any web browser environment.
-* `"development"` - can be used to define a development-only environment
-  entry point, for example to provide additional debugging context such as
-  better error messages when running in a development mode. _Must always be
-  mutually exclusive with `"production"`._
-* `"production"` - can be used to define a production environment entry
-  point. _Must always be mutually exclusive with `"development"`._
+* `"types"` - 可以被类型系统用于解析给定导出的类型文件。_此条件应始终首先包含。_
+* `"browser"` - 任何 Web 浏览器环境。
+* `"development"` - 可用于定义仅开发环境的入口点，例如在开发模式下运行时提供额外的调试上下文，如更好的错误消息。_必须始终与 `"production"` 互斥。_
+* `"production"` - 可用于定义生产环境入口点。_必须始终与 `"development"` 互斥。_
 
-For other runtimes, platform-specific condition key definitions are maintained
-by the [WinterCG][] in the [Runtime Keys][] proposal specification.
+对于其他运行时，平台特定的条件键定义由 [WinterCG][] 在 [运行时键][] 提案规范中维护。
 
-New conditions definitions may be added to this list by creating a pull request
-to the [Node.js documentation for this section][]. The requirements for listing
-a new condition definition here are that:
+新的条件定义可以通过为此 [Node.js 文档部分][] 创建拉取请求添加到本列表。在此列出新条件定义的要求是：
 
-* The definition should be clear and unambiguous for all implementers.
-* The use case for why the condition is needed should be clearly justified.
-* There should exist sufficient existing implementation usage.
-* The condition name should not conflict with another condition definition or
-  condition in wide usage.
-* The listing of the condition definition should provide a coordination
-  benefit to the ecosystem that wouldn't otherwise be possible. For example,
-  this would not necessarily be the case for company-specific or
-  application-specific conditions.
-* The condition should be such that a Node.js user would expect it to be in
-  Node.js core documentation. The `"types"` condition is a good example: It
-  doesn't really belong in the [Runtime Keys][] proposal but is a good fit
-  here in the Node.js docs.
+* 定义应对所有实现者清晰明确。
+* 应明确说明需要此条件的原因。
+* 应有足够的现有实现使用。
+* 条件名称不应与另一个条件定义或广泛使用的条件冲突。
+* 条件定义的列表应提供生态系统其他方式无法实现的协调好处。例如，对于公司特定或应用程序特定的条件，情况可能不一定如此。
+* 条件应使 Node.js 用户期望它在 Node.js 核心文档中。`"types"` 条件是一个很好的例子：它并不真正属于 [运行时键][] 提案，但很适合放在 Node.js 文档中。
 
-The above definitions may be moved to a dedicated conditions registry in due
-course.
+上述定义可能会在适当的时候移至专用的条件注册表。
 
-### Self-referencing a package using its name
+### 使用名称自引用包
 
 <!-- YAML
 added:
@@ -857,9 +643,7 @@ changes:
     description: Unflag self-referencing a package using its name.
 -->
 
-Within a package, the values defined in the package's
-`package.json` [`"exports"`][] field can be referenced via the package's name.
-For example, assuming the `package.json` is:
+在包内，包 `package.json` 中定义的 [`"exports"`][] 字段的值可以通过包的名称引用。例如，假设 `package.json` 是：
 
 ```json
 // package.json
@@ -872,37 +656,32 @@ For example, assuming the `package.json` is:
 }
 ```
 
-Then any module _in that package_ can reference an export in the package itself:
+然后 _该包中_ 的任何模块都可以引用包本身的导出：
 
 ```js
 // ./a-module.mjs
-import { something } from 'a-package'; // Imports "something" from ./index.mjs.
+import { something } from 'a-package'; // 从 ./index.mjs 导入 "something"。
 ```
 
-Self-referencing is available only if `package.json` has [`"exports"`][], and
-will allow importing only what that [`"exports"`][] (in the `package.json`)
-allows. So the code below, given the previous package, will generate a runtime
-error:
+仅当 `package.json` 具有 [`"exports"`][] 时，自引用才可用，并且将仅允许导入该 [`"exports"`][]（在 `package.json` 中）允许的内容。因此，给定先前的包，下面的代码将生成运行时错误：
 
 ```js
 // ./another-module.mjs
 
-// Imports "another" from ./m.mjs. Fails because
-// the "package.json" "exports" field
-// does not provide an export named "./m.mjs".
+// 从 ./m.mjs 导入 "another"。失败，因为
+// "package.json" "exports" 字段
+// 未提供名为 "./m.mjs" 的导出。
 import { another } from 'a-package/m.mjs';
 ```
 
-Self-referencing is also available when using `require`, both in an ES module,
-and in a CommonJS one. For example, this code will also work:
+自引用在 ES 模块和 CommonJS 模块中使用 `require` 时也可用。例如，此代码也将工作：
 
 ```cjs
 // ./a-module.js
-const { something } = require('a-package/foo.js'); // Loads from ./foo.js.
+const { something } = require('a-package/foo.js'); // 从 ./foo.js 加载。
 ```
 
-Finally, self-referencing also works with scoped packages. For example, this
-code will also work:
+最后，自引用也适用于作用域包。例如，此代码也将工作：
 
 ```json
 // package.json
@@ -927,28 +706,21 @@ $ node other.js
 42
 ```
 
-## Dual CommonJS/ES module packages
+## 双 CommonJS/ES 模块包
 
-See [the package examples repository][] for details.
+有关详细信息，请参阅 [包示例仓库][]。
 
-## Node.js `package.json` field definitions
+## Node.js `package.json` 字段定义
 
-This section describes the fields used by the Node.js runtime. Other tools (such
-as [npm](https://docs.npmjs.com/cli/v8/configuring-npm/package-json)) use
-additional fields which are ignored by Node.js and not documented here.
+本节描述了 Node.js 运行时使用的字段。其他工具（如 [npm](https://docs.npmjs.com/cli/v8/configuring-npm/package-json)）使用其他字段，这些字段被 Node.js 忽略且未在此记录。
 
-The following fields in `package.json` files are used in Node.js:
+`package.json` 文件中以下字段在 Node.js 中使用：
 
-* [`"name"`][] - Relevant when using named imports within a package. Also used
-  by package managers as the name of the package.
-* [`"main"`][] - The default module when loading the package, if exports is not
-  specified, and in versions of Node.js prior to the introduction of exports.
-* [`"type"`][] - The package type determining whether to load `.js` files as
-  CommonJS or ES modules.
-* [`"exports"`][] - Package exports and conditional exports. When present,
-  limits which submodules can be loaded from within the package.
-* [`"imports"`][] - Package imports, for use by modules within the package
-  itself.
+* [`"name"`][] - 在包内使用命名导入时相关。也被包管理器用作包的名称。
+* [`"main"`][] - 如果未指定 exports，则在加载包时的默认模块，以及在引入 exports 之前的 Node.js 版本中。
+* [`"type"`][] - 包类型，确定是将 `.js` 文件加载为 CommonJS 还是 ES 模块。
+* [`"exports"`][] - 包导出和条件导出。存在时，限制可以从包内加载哪些子模块。
+* [`"imports"`][] - 包导入，供包本身内的模块使用。
 
 ### `"name"`
 
@@ -964,7 +736,7 @@ changes:
     description: Remove the `--experimental-resolve-self` option.
 -->
 
-* Type: {string}
+* 类型：{string}
 
 ```json
 {
@@ -972,12 +744,9 @@ changes:
 }
 ```
 
-The `"name"` field defines your package's name. Publishing to the
-_npm_ registry requires a name that satisfies
-[certain requirements](https://docs.npmjs.com/files/package.json#name).
+`"name"` 字段定义了包的名称。发布到 _npm_ 注册表需要一个满足 [特定要求](https://docs.npmjs.com/files/package.json#name) 的名称。
 
-The `"name"` field can be used in addition to the [`"exports"`][] field to
-[self-reference][] a package using its name.
+`"name"` 字段可以与 [`"exports"`][] 字段一起使用，以 [自引用][] 包使用其名称。
 
 ### `"main"`
 
@@ -985,7 +754,7 @@ The `"name"` field can be used in addition to the [`"exports"`][] field to
 added: v0.4.0
 -->
 
-* Type: {string}
+* 类型：{string}
 
 ```json
 {
@@ -993,17 +762,14 @@ added: v0.4.0
 }
 ```
 
-The `"main"` field defines the entry point of a package when imported by name
-via a `node_modules` lookup.  Its value is a path.
+`"main"` 字段定义了通过 `node_modules` 查找按名称导入包时的入口点。其值是一个路径。
 
-When a package has an [`"exports"`][] field, this will take precedence over the
-`"main"` field when importing the package by name.
+当包具有 [`"exports"`][] 字段时，在按名称导入包时，此字段将优先于 `"main"` 字段。
 
-It also defines the script that is used when the [package directory is loaded
-via `require()`](modules.md#folders-as-modules).
+它还定义了当 [通过 `require()` 加载包目录](modules.md#folders-as-modules) 时使用的脚本。
 
 ```cjs
-// This resolves to ./path/to/directory/index.js.
+// 这将解析为 ./path/to/directory/index.js。
 require('./path/to/directory');
 ```
 
@@ -1019,18 +785,13 @@ changes:
     description: Unflag `--experimental-modules`.
 -->
 
-* Type: {string}
+* 类型：{string}
 
-The `"type"` field defines the module format that Node.js uses for all
-`.js` files that have that `package.json` file as their nearest parent.
+`"type"` 字段定义了 Node.js 用于所有 `.js` 文件的模块格式，这些文件以该 `package.json` 文件作为其最近的父级。
 
-Files ending with `.js` are loaded as ES modules when the nearest parent
-`package.json` file contains a top-level field `"type"` with a value of
-`"module"`.
+当最近的父级 `package.json` 文件包含顶级字段 `"type"` 且值为 `"module"` 时，以 `.js` 结尾的文件将作为 ES 模块加载。
 
-The nearest parent `package.json` is defined as the first `package.json` found
-when searching in the current folder, that folder's parent, and so on up
-until a node\_modules folder or the volume root is reached.
+最近的父级 `package.json` 定义为在当前文件夹、该文件夹的父级等中搜索时找到的第一个 `package.json`，直到到达 node\_modules 文件夹或卷根目录。
 
 ```json
 // package.json
@@ -1040,25 +801,20 @@ until a node\_modules folder or the volume root is reached.
 ```
 
 ```bash
-# In same folder as preceding package.json
-node my-app.js # Runs as ES module
+# 在与前述 package.json 相同的文件夹中
+node my-app.js # 作为 ES 模块运行
 ```
 
-If the nearest parent `package.json` lacks a `"type"` field, or contains
-`"type": "commonjs"`, `.js` files are treated as [CommonJS][]. If the volume
-root is reached and no `package.json` is found, `.js` files are treated as
-[CommonJS][].
+如果最近的父级 `package.json` 缺少 `"type"` 字段，或包含 `"type": "commonjs"`，则 `.js` 文件被视为 [CommonJS][]。如果到达卷根目录且未找到 `package.json`，则 `.js` 文件被视为 [CommonJS][]。
 
-`import` statements of `.js` files are treated as ES modules if the nearest
-parent `package.json` contains `"type": "module"`.
+如果最近的父级 `package.json` 包含 `"type": "module"`，则 `.js` 文件的 `import` 语句被视为 ES 模块。
 
 ```js
-// my-app.js, part of the same example as above
-import './startup.js'; // Loaded as ES module because of package.json
+// my-app.js，与上述示例相同的一部分
+import './startup.js'; // 由于 package.json 作为 ES 模块加载
 ```
 
-Regardless of the value of the `"type"` field, `.mjs` files are always treated
-as ES modules and `.cjs` files are always treated as CommonJS.
+无论 `"type"` 字段的值如何，`.mjs` 文件始终被视为 ES 模块，`.cjs` 文件始终被视为 CommonJS。
 
 ### `"exports"`
 
@@ -1092,7 +848,7 @@ changes:
     description: Implement conditional exports.
 -->
 
-* Type: {Object|string|string\[]}
+* 类型：{Object|string|string\[]}
 
 ```json
 {
@@ -1100,18 +856,11 @@ changes:
 }
 ```
 
-The `"exports"` field allows defining the [entry points][] of a package when
-imported by name loaded either via a `node_modules` lookup or a
-[self-reference][] to its own name. It is supported in Node.js 12+ as an
-alternative to the [`"main"`][] that can support defining [subpath exports][]
-and [conditional exports][] while encapsulating internal unexported modules.
+`"exports"` 字段允许定义包的 [入口点][]，当通过 `node_modules` 查找或通过 [自引用][] 其自身名称加载时。它在 Node.js 12+ 中受支持，作为 [`"main"`][] 的替代方案，可以支持定义 [子路径导出][] 和 [条件导出][]，同时封装内部未导出模块。
 
-[Conditional Exports][] can also be used within `"exports"` to define different
-package entry points per environment, including whether the package is
-referenced via `require` or via `import`.
+[条件导出][] 也可以在 `"exports"` 中使用，以根据环境定义不同的包入口点，包括包是通过 `require` 还是通过 `import` 引用。
 
-All paths defined in the `"exports"` must be relative file URLs starting with
-`./`.
+`"exports"` 中定义的所有路径必须是以 `./` 开头的相对文件 URL。
 
 ### `"imports"`
 
@@ -1121,7 +870,7 @@ added:
  - v12.19.0
 -->
 
-* Type: {Object}
+* 类型：{Object}
 
 ```json
 // package.json
@@ -1138,38 +887,38 @@ added:
 }
 ```
 
-Entries in the imports field must be strings starting with `#`.
+导入字段中的条目必须是以 `#` 开头的字符串。
 
-Package imports permit mapping to external packages.
+包导入允许映射到外部包。
 
-This field defines [subpath imports][] for the current package.
+此字段定义了当前包的 [子路径导入][]。
 
 [CommonJS]: modules.md
-[Conditional exports]: #conditional-exports
+[条件导出]: #conditional-exports
 [ES module]: esm.md
-[ES modules]: esm.md
-[Node.js documentation for this section]: https://github.com/nodejs/node/blob/HEAD/doc/api/packages.md#conditions-definitions
-[Runtime Keys]: https://runtime-keys.proposal.wintercg.org/
-[Syntax detection]: #syntax-detection
+[ES 模块]: esm.md
+[Node.js 文档部分]: https://github.com/nodejs/node/blob/HEAD/doc/api/packages.md#conditions-definitions
+[运行时键]: https://runtime-keys.proposal.wintercg.org/
+[语法检测]: #syntax-detection
 [WinterCG]: https://wintercg.org/
 [`"exports"`]: #exports
 [`"imports"`]: #imports
 [`"main"`]: #main
 [`"name"`]: #name
 [`"type"`]: #type
-[`--conditions` / `-C` flag]: #resolving-user-conditions
-[`--no-addons` flag]: cli.md#--no-addons
+[`--conditions` / `-C` 标志]: #resolving-user-conditions
+[`--no-addons` 标志]: cli.md#--no-addons
 [`ERR_PACKAGE_PATH_NOT_EXPORTED`]: errors.md#err_package_path_not_exported
 [`package.json`]: #nodejs-packagejson-field-definitions
-[entry points]: #package-entry-points
-[folders as modules]: modules.md#folders-as-modules
-[import maps]: https://github.com/WICG/import-maps
-[load ECMAScript modules from CommonJS modules]: modules.md#loading-ecmascript-modules-using-require
-[loader hooks]: esm.md#loaders
-[packages folder mapping]: https://github.com/WICG/import-maps#packages-via-trailing-slashes
-[self-reference]: #self-referencing-a-package-using-its-name
-[subpath exports]: #subpath-exports
-[subpath imports]: #subpath-imports
-[the dual CommonJS/ES module packages section]: #dual-commonjses-module-packages
-[the full specifier path]: esm.md#mandatory-file-extensions
-[the package examples repository]: https://github.com/nodejs/package-examples
+[入口点]: #package-entry-points
+[文件夹作为模块]: modules.md#folders-as-modules
+[导入映射]: https://github.com/WICG/import-maps
+[从 CommonJS 模块加载 ECMAScript 模块]: modules.md#loading-ecmascript-modules-using-require
+[加载器钩子]: esm.md#loaders
+[包文件夹映射]: https://github.com/WICG/import-maps#packages-via-trailing-slashes
+[自引用]: #self-referencing-a-package-using-its-name
+[子路径导出]: #subpath-exports
+[子路径导入]: #subpath-imports
+[双 CommonJS/ES 模块包部分]: #dual-commonjses-module-packages
+[完整说明符路径]: esm.md#mandatory-file-extensions
+[包示例仓库]: https://github.com/nodejs/package-examples

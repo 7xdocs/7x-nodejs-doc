@@ -6,9 +6,7 @@
 
 <!-- source_link=lib/string_decoder.js -->
 
-The `node:string_decoder` module provides an API for decoding `Buffer` objects
-into strings in a manner that preserves encoded multi-byte UTF-8 and UTF-16
-characters. It can be accessed using:
+`node:string_decoder` 模块提供了一个 API，用于将以编码的多字节 UTF-8 和 UTF-16 字符方式存储的 `Buffer` 对象解码为字符串。可以通过以下方式访问：
 
 ```mjs
 import { StringDecoder } from 'node:string_decoder';
@@ -18,7 +16,7 @@ import { StringDecoder } from 'node:string_decoder';
 const { StringDecoder } = require('node:string_decoder');
 ```
 
-The following example shows the basic use of the `StringDecoder` class.
+以下示例展示了 `StringDecoder` 类的基本用法。
 
 ```mjs
 import { StringDecoder } from 'node:string_decoder';
@@ -26,10 +24,10 @@ import { Buffer } from 'node:buffer';
 const decoder = new StringDecoder('utf8');
 
 const cent = Buffer.from([0xC2, 0xA2]);
-console.log(decoder.write(cent)); // Prints: ¢
+console.log(decoder.write(cent)); // Prints: Â˘
 
 const euro = Buffer.from([0xE2, 0x82, 0xAC]);
-console.log(decoder.write(euro)); // Prints: €
+console.log(decoder.write(euro)); // Prints: â‚¬
 ```
 
 ```cjs
@@ -37,19 +35,15 @@ const { StringDecoder } = require('node:string_decoder');
 const decoder = new StringDecoder('utf8');
 
 const cent = Buffer.from([0xC2, 0xA2]);
-console.log(decoder.write(cent)); // Prints: ¢
+console.log(decoder.write(cent)); // Prints: Â˘
 
 const euro = Buffer.from([0xE2, 0x82, 0xAC]);
-console.log(decoder.write(euro)); // Prints: €
+console.log(decoder.write(euro)); // Prints: â‚¬
 ```
 
-When a `Buffer` instance is written to the `StringDecoder` instance, an
-internal buffer is used to ensure that the decoded string does not contain
-any incomplete multibyte characters. These are held in the buffer until the
-next call to `stringDecoder.write()` or until `stringDecoder.end()` is called.
+当向 `StringDecoder` 实例写入 `Buffer` 实例时，会使用一个内部缓冲区来确保解码后的字符串不包含任何不完整的多字节字符。这些字符会保留在缓冲区中，直到下一次调用 `stringDecoder.write()` 或调用 `stringDecoder.end()`。
 
-In the following example, the three UTF-8 encoded bytes of the European Euro
-symbol (`€`) are written over three separate operations:
+在下面的示例中，欧洲欧元符号 (`€`) 的三个 UTF-8 编码字节分三次单独的写入操作完成：
 
 ```mjs
 import { StringDecoder } from 'node:string_decoder';
@@ -70,7 +64,7 @@ decoder.write(Buffer.from([0x82]));
 console.log(decoder.end(Buffer.from([0xAC]))); // Prints: €
 ```
 
-## Class: `StringDecoder`
+## 类：`StringDecoder`
 
 ### `new StringDecoder([encoding])`
 
@@ -78,10 +72,9 @@ console.log(decoder.end(Buffer.from([0xAC]))); // Prints: €
 added: v0.1.99
 -->
 
-* `encoding` {string} The character [encoding][] the `StringDecoder` will use.
-  **Default:** `'utf8'`.
+* `encoding` {string} `StringDecoder` 将要使用的字符[编码][]。**默认值:** `'utf8'`。
 
-Creates a new `StringDecoder` instance.
+创建一个新的 `StringDecoder` 实例。
 
 ### `stringDecoder.end([buffer])`
 
@@ -89,16 +82,13 @@ Creates a new `StringDecoder` instance.
 added: v0.9.3
 -->
 
-* `buffer` {string|Buffer|TypedArray|DataView} The bytes to decode.
-* Returns: {string}
+* `buffer` {string|Buffer|TypedArray|DataView} 要解码的字节。
+* 返回: {string}
 
-Returns any remaining input stored in the internal buffer as a string. Bytes
-representing incomplete UTF-8 and UTF-16 characters will be replaced with
-substitution characters appropriate for the character encoding.
+返回内部缓冲区中存储的任何剩余输入作为字符串。表示不完整的 UTF-8 和 UTF-16 字符的字节将被替换为适用于字符编码的替换字符。
 
-If the `buffer` argument is provided, one final call to `stringDecoder.write()`
-is performed before returning the remaining input.
-After `end()` is called, the `stringDecoder` object can be reused for new input.
+如果提供了 `buffer` 参数，则在返回剩余输入之前会执行一次最终的 `stringDecoder.write()` 调用。
+在调用 `end()` 之后，`stringDecoder` 对象可以被重新用于新的输入。
 
 ### `stringDecoder.write(buffer)`
 
@@ -111,12 +101,9 @@ changes:
                  character instead of one for each individual byte.
 -->
 
-* `buffer` {string|Buffer|TypedArray|DataView} The bytes to decode.
-* Returns: {string}
+* `buffer` {string|Buffer|TypedArray|DataView} 要解码的字节。
+* 返回: {string}
 
-Returns a decoded string, ensuring that any incomplete multibyte characters at
-the end of the `Buffer`, or `TypedArray`, or `DataView` are omitted from the
-returned string and stored in an internal buffer for the next call to
-`stringDecoder.write()` or `stringDecoder.end()`.
+返回一个解码后的字符串，确保位于 `Buffer`、`TypedArray` 或 `DataView` 末尾的任何不完整多字节字符从返回的字符串中省略，并存储在内部缓冲区中，用于下一次调用 `stringDecoder.write()` 或 `stringDecoder.end()`。
 
 [encoding]: buffer.md#buffers-and-character-encodings
