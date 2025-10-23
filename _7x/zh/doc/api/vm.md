@@ -1,4 +1,4 @@
-# VM (executing JavaScript)
+# VM (执行 JavaScript)
 
 <!--introduced_in=v0.10.0-->
 
@@ -8,22 +8,15 @@
 
 <!-- source_link=lib/vm.js -->
 
-The `node:vm` module enables compiling and running code within V8 Virtual
-Machine contexts.
+`node:vm` 模块支持在 V8 虚拟机上下文中编译和运行代码。
 
-<strong class="critical">The `node:vm` module is not a security
-mechanism. Do not use it to run untrusted code.</strong>
+<strong class="critical">`node:vm` 模块不是安全机制。不要用它来运行不受信任的代码。</strong>
 
-JavaScript code can be compiled and run immediately or
-compiled, saved, and run later.
+JavaScript 代码可以被编译并立即运行，或者编译、保存，然后稍后运行。
 
-A common use case is to run the code in a different V8 Context. This means
-invoked code has a different global object than the invoking code.
+一个常见的用例是在不同的 V8 上下文中运行代码。这意味着被调用的代码具有与调用代码不同的全局对象。
 
-One can provide the context by [_contextifying_][contextified] an
-object. The invoked code treats any property in the context like a
-global variable. Any changes to global variables caused by the invoked
-code are reflected in the context object.
+可以通过将对象 [_contextifying_][contextified] 来提供上下文。被调用的代码将上下文中的任何属性视为全局变量。被调用代码导致的全局变量的任何更改都会反映在上下文对象中。
 
 ```js
 const vm = require('node:vm');
@@ -31,27 +24,26 @@ const vm = require('node:vm');
 const x = 1;
 
 const context = { x: 2 };
-vm.createContext(context); // Contextify the object.
+vm.createContext(context); // 上下文化对象。
 
 const code = 'x += 40; var y = 17;';
-// `x` and `y` are global variables in the context.
-// Initially, x has the value 2 because that is the value of context.x.
+// `x` 和 `y` 是上下文中的全局变量。
+// 最初，x 的值为 2，因为这是 context.x 的值。
 vm.runInContext(code, context);
 
 console.log(context.x); // 42
 console.log(context.y); // 17
 
-console.log(x); // 1; y is not defined.
+console.log(x); // 1; y 未定义。
 ```
 
-## Class: `vm.Script`
+## 类：`vm.Script`
 
 <!-- YAML
 added: v0.3.1
 -->
 
-Instances of the `vm.Script` class contain precompiled scripts that can be
-executed in specific contexts.
+`vm.Script` 类的实例包含预编译的脚本，这些脚本可以在特定的上下文中执行。
 
 ### `new vm.Script(code[, options])`
 
@@ -80,39 +72,20 @@ changes:
                  supported now.
 -->
 
-* `code` {string} The JavaScript code to compile.
+* `code` {string} 要编译的 JavaScript 代码。
 * `options` {Object|string}
-  * `filename` {string} Specifies the filename used in stack traces produced
-    by this script. **Default:** `'evalmachine.<anonymous>'`.
-  * `lineOffset` {number} Specifies the line number offset that is displayed
-    in stack traces produced by this script. **Default:** `0`.
-  * `columnOffset` {number} Specifies the first-line column number offset that
-    is displayed in stack traces produced by this script. **Default:** `0`.
-  * `cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or
-    `TypedArray`, or `DataView` with V8's code cache data for the supplied
-    source. When supplied, the `cachedDataRejected` value will be set to
-    either `true` or `false` depending on acceptance of the data by V8.
-  * `produceCachedData` {boolean} When `true` and no `cachedData` is present, V8
-    will attempt to produce code cache data for `code`. Upon success, a
-    `Buffer` with V8's code cache data will be produced and stored in the
-    `cachedData` property of the returned `vm.Script` instance.
-    The `cachedDataProduced` value will be set to either `true` or `false`
-    depending on whether code cache data is produced successfully.
-    This option is **deprecated** in favor of `script.createCachedData()`.
-    **Default:** `false`.
+  * `filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。
+  * `lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。
+  * `columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。
+  * `cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。当提供时，`cachedDataRejected` 值将被设置为 `true` 或 `false`，取决于 V8 对数据的接受情况。
+  * `produceCachedData` {boolean} 当为 `true` 且不存在 `cachedData` 时，V8 将尝试为 `code` 生成代码缓存数据。成功后，将生成一个包含 V8 代码缓存数据的 `Buffer` 并存储在返回的 `vm.Script` 实例的 `cachedData` 属性中。`cachedDataProduced` 值将根据代码缓存数据是否成功生成而设置为 `true` 或 `false`。此选项**已弃用**，推荐使用 `script.createCachedData()`。**默认值:** `false`。
   * `importModuleDynamically`
     {Function|vm.constants.USE\_MAIN\_CONTEXT\_DEFAULT\_LOADER}
-    Used to specify how the modules should be loaded during the evaluation
-    of this script when `import()` is called. This option is part of the
-    experimental modules API. We do not recommend using it in a production
-    environment. For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
+    用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
 
-If `options` is a string, then it specifies the filename.
+如果 `options` 是字符串，则它指定文件名。
 
-Creating a new `vm.Script` object compiles `code` but does not run it. The
-compiled `vm.Script` can be run later multiple times. The `code` is not bound to
-any global object; rather, it is bound before each run, just for that run.
+创建一个新的 `vm.Script` 对象会编译 `code` 但不会运行它。编译后的 `vm.Script` 可以在以后多次运行。`code` 不绑定到任何全局对象；相反，它在每次运行前绑定，仅针对该次运行。
 
 ### `script.cachedDataRejected`
 
@@ -120,11 +93,9 @@ any global object; rather, it is bound before each run, just for that run.
 added: v5.7.0
 -->
 
-* Type: {boolean|undefined}
+* 类型: {boolean|undefined}
 
-When `cachedData` is supplied to create the `vm.Script`, this value will be set
-to either `true` or `false` depending on acceptance of the data by V8.
-Otherwise the value is `undefined`.
+当向 `vm.Script` 提供 `cachedData` 时，此值将根据 V8 对数据的接受情况设置为 `true` 或 `false`。否则该值为 `undefined`。
 
 ### `script.createCachedData()`
 
@@ -132,21 +103,13 @@ Otherwise the value is `undefined`.
 added: v10.6.0
 -->
 
-* Returns: {Buffer}
+* 返回: {Buffer}
 
-Creates a code cache that can be used with the `Script` constructor's
-`cachedData` option. Returns a `Buffer`. This method may be called at any
-time and any number of times.
+创建一个代码缓存，可用于 `Script` 构造函数的 `cachedData` 选项。返回一个 `Buffer`。此方法可以在任何时候调用任意次数。
 
-The code cache of the `Script` doesn't contain any JavaScript observable
-states. The code cache is safe to be saved along side the script source and
-used to construct new `Script` instances multiple times.
+`Script` 的代码缓存不包含任何 JavaScript 可观察状态。代码缓存可以安全地与脚本源一起保存，并多次用于构建新的 `Script` 实例。
 
-Functions in the `Script` source can be marked as lazily compiled and they are
-not compiled at construction of the `Script`. These functions are going to be
-compiled when they are invoked the first time. The code cache serializes the
-metadata that V8 currently knows about the `Script` that it can use to speed up
-future compilations.
+`Script` 源中的函数可以被标记为延迟编译，它们在 `Script` 构造时不会被编译。这些函数将在首次调用时被编译。代码缓存序列化了 V8 当前已知的关于 `Script` 的元数据，它可以用来加速未来的编译。
 
 ```js
 const script = new vm.Script(`
@@ -158,13 +121,12 @@ const x = add(1, 2);
 `);
 
 const cacheWithoutAdd = script.createCachedData();
-// In `cacheWithoutAdd` the function `add()` is marked for full compilation
-// upon invocation.
+// 在 `cacheWithoutAdd` 中，函数 `add()` 被标记为在调用时完全编译。
 
 script.runInThisContext();
 
 const cacheWithAdd = script.createCachedData();
-// `cacheWithAdd` contains fully compiled function `add()`.
+// `cacheWithAdd` 包含完全编译的函数 `add()`。
 ```
 
 ### `script.runInContext(contextifiedObject[, options])`
@@ -177,29 +139,16 @@ changes:
     description: The `breakOnSigint` option is supported now.
 -->
 
-* `contextifiedObject` {Object} A [contextified][] object as returned by the
-  `vm.createContext()` method.
+* `contextifiedObject` {Object} 一个由 `vm.createContext()` 方法返回的 [contextified][] 对象。
 * `options` {Object}
-  * `displayErrors` {boolean} When `true`, if an [`Error`][] occurs
-    while compiling the `code`, the line of code causing the error is attached
-    to the stack trace. **Default:** `true`.
-  * `timeout` {integer} Specifies the number of milliseconds to execute `code`
-    before terminating execution. If execution is terminated, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-* Returns: {any} the result of the very last statement executed in the script.
+  * `displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。
+  * `timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+* 返回: {any} 脚本中执行的最后一个语句的结果。
 
-Runs the compiled code contained by the `vm.Script` object within the given
-`contextifiedObject` and returns the result. Running code does not have access
-to local scope.
+在给定的 `contextifiedObject` 中运行 `vm.Script` 对象包含的已编译代码，并返回结果。运行的代码无法访问局部作用域。
 
-The following example compiles code that increments a global variable, sets
-the value of another global variable, then execute the code multiple times.
-The globals are contained in the `context` object.
+以下示例编译了增加一个全局变量、设置另一个全局变量的值的代码，然后多次执行该代码。全局变量包含在 `context` 对象中。
 
 ```js
 const vm = require('node:vm');
@@ -217,12 +166,10 @@ for (let i = 0; i < 10; ++i) {
 }
 
 console.log(context);
-// Prints: { animal: 'cat', count: 12, name: 'kitty' }
+// 打印: { animal: 'cat', count: 12, name: 'kitty' }
 ```
 
-Using the `timeout` or `breakOnSigint` options will result in new event loops
-and corresponding threads being started, which have a non-zero performance
-overhead.
+使用 `timeout` 或 `breakOnSigint` 选项将导致启动新的事件循环和相应的线程，这会带来非零的性能开销。
 
 ### `script.runInNewContext([contextObject[, options]])`
 
@@ -246,55 +193,27 @@ changes:
 -->
 
 * `contextObject` {Object|vm.constants.DONT\_CONTEXTIFY|undefined}
-  Either [`vm.constants.DONT_CONTEXTIFY`][] or an object that will be [contextified][].
-  If `undefined`, an empty contextified object will be created for backwards compatibility.
+  可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。
 * `options` {Object}
-  * `displayErrors` {boolean} When `true`, if an [`Error`][] occurs
-    while compiling the `code`, the line of code causing the error is attached
-    to the stack trace. **Default:** `true`.
-  * `timeout` {integer} Specifies the number of milliseconds to execute `code`
-    before terminating execution. If execution is terminated, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-  * `contextName` {string} Human-readable name of the newly created context.
-    **Default:** `'VM Context i'`, where `i` is an ascending numerical index of
-    the created context.
-  * `contextOrigin` {string} [Origin][origin] corresponding to the newly
-    created context for display purposes. The origin should be formatted like a
-    URL, but with only the scheme, host, and port (if necessary), like the
-    value of the [`url.origin`][] property of a [`URL`][] object. Most notably,
-    this string should omit the trailing slash, as that denotes a path.
-    **Default:** `''`.
+  * `displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。
+  * `timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+  * `contextName` {string} 新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。
+  * `contextOrigin` {string} 对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。
   * `contextCodeGeneration` {Object}
-    * `strings` {boolean} If set to false any calls to `eval` or function
-      constructors (`Function`, `GeneratorFunction`, etc) will throw an
-      `EvalError`. **Default:** `true`.
-    * `wasm` {boolean} If set to false any attempt to compile a WebAssembly
-      module will throw a `WebAssembly.CompileError`. **Default:** `true`.
-  * `microtaskMode` {string} If set to `afterEvaluate`, microtasks (tasks
-    scheduled through `Promise`s and `async function`s) will be run immediately
-    after the script has run. They are included in the `timeout` and
-    `breakOnSigint` scopes in that case.
-* Returns: {any} the result of the very last statement executed in the script.
+    * `strings` {boolean} 如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。
+    * `wasm` {boolean} 如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。
+  * `microtaskMode` {string} 如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。
+* 返回: {any} 脚本中执行的最后一个语句的结果。
 
-This method is a shortcut to `script.runInContext(vm.createContext(options), options)`.
-It does several things at once:
+此方法是 `script.runInContext(vm.createContext(options), options)` 的快捷方式。它同时做了几件事：
 
-1. Creates a new context.
-2. If `contextObject` is an object, [contextifies][contextified] it with the new context.
-   If  `contextObject` is undefined, creates a new object and [contextifies][contextified] it.
-   If `contextObject` is [`vm.constants.DONT_CONTEXTIFY`][], don't [contextify][contextified] anything.
-3. Runs the compiled code contained by the `vm.Script` object within the created context. The code
-   does not have access to the scope in which this method is called.
-4. Returns the result.
+1. 创建一个新的上下文。
+2. 如果 `contextObject` 是一个对象，则使用新上下文对其进行 [contextified][]。如果 `contextObject` 是 undefined，则创建一个新对象并对其进行 [contextified][]。如果 `contextObject` 是 [`vm.constants.DONT_CONTEXTIFY`][]，则不 [contextify][] 任何东西。
+3. 在创建的上下文中运行 `vm.Script` 对象包含的已编译代码。代码无法访问此方法被调用的作用域。
+4. 返回结果。
 
-The following example compiles code that sets a global variable, then executes
-the code multiple times in different contexts. The globals are set on and
-contained within each individual `context`.
+以下示例编译了设置全局变量的代码，然后在不同的上下文中多次执行该代码。全局变量设置并包含在每个单独的 `context` 中。
 
 ```js
 const vm = require('node:vm');
@@ -307,11 +226,10 @@ contexts.forEach((context) => {
 });
 
 console.log(contexts);
-// Prints: [{ globalVar: 'set' }, { globalVar: 'set' }, { globalVar: 'set' }]
+// 打印: [{ globalVar: 'set' }, { globalVar: 'set' }, { globalVar: 'set' }]
 
-// This would throw if the context is created from a contextified object.
-// vm.constants.DONT_CONTEXTIFY allows creating contexts with ordinary
-// global objects that can be frozen.
+// 如果上下文是从上下文化对象创建的，这将抛出。
+// vm.constants.DONT_CONTEXTIFY 允许创建具有普通全局对象的上下文，这些对象可以被冻结。
 const freezeScript = new vm.Script('Object.freeze(globalThis); globalThis;');
 const frozenContext = freezeScript.runInNewContext(vm.constants.DONT_CONTEXTIFY);
 ```
@@ -327,25 +245,14 @@ changes:
 -->
 
 * `options` {Object}
-  * `displayErrors` {boolean} When `true`, if an [`Error`][] occurs
-    while compiling the `code`, the line of code causing the error is attached
-    to the stack trace. **Default:** `true`.
-  * `timeout` {integer} Specifies the number of milliseconds to execute `code`
-    before terminating execution. If execution is terminated, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-* Returns: {any} the result of the very last statement executed in the script.
+  * `displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。
+  * `timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+* 返回: {any} 脚本中执行的最后一个语句的结果。
 
-Runs the compiled code contained by the `vm.Script` within the context of the
-current `global` object. Running code does not have access to local scope, but
-_does_ have access to the current `global` object.
+在当前 `global` 对象的上下文中运行 `vm.Script` 包含的已编译代码。运行的代码无法访问局部作用域，但*可以*访问当前的 `global` 对象。
 
-The following example compiles code that increments a `global` variable then
-executes that code multiple times:
+以下示例编译了增加一个 `global` 变量的代码，然后多次执行该代码：
 
 ```js
 const vm = require('node:vm');
@@ -371,10 +278,9 @@ added:
   - v18.13.0
 -->
 
-* Type: {string|undefined}
+* 类型: {string|undefined}
 
-When the script is compiled from a source that contains a source map magic
-comment, this property will be set to the URL of the source map.
+当脚本从包含 source map 魔术注释的源编译时，此属性将设置为 source map 的 URL。
 
 ```mjs
 import vm from 'node:vm';
@@ -385,7 +291,7 @@ function myFunc() {}
 `);
 
 console.log(script.sourceMapURL);
-// Prints: sourcemap.json
+// 打印: sourcemap.json
 ```
 
 ```cjs
@@ -397,10 +303,10 @@ function myFunc() {}
 `);
 
 console.log(script.sourceMapURL);
-// Prints: sourcemap.json
+// 打印: sourcemap.json
 ```
 
-## Class: `vm.Module`
+## 类：`vm.Module`
 
 <!-- YAML
 added:
@@ -410,24 +316,15 @@ added:
 
 > Stability: 1 - Experimental
 
-This feature is only available with the `--experimental-vm-modules` command
-flag enabled.
+此功能仅在启用 `--experimental-vm-modules` 命令标志时可用。
 
-The `vm.Module` class provides a low-level interface for using
-ECMAScript modules in VM contexts. It is the counterpart of the `vm.Script`
-class that closely mirrors [Module Record][]s as defined in the ECMAScript
-specification.
+`vm.Module` 类提供了一个低级接口，用于在 VM 上下文中使用 ECMAScript 模块。它是 `vm.Script` 类的对应物，紧密反映了 ECMAScript 规范中定义的 [模块记录][]。
 
-Unlike `vm.Script` however, every `vm.Module` object is bound to a context from
-its creation.
+然而，与 `vm.Script` 不同，每个 `vm.Module` 对象从创建起就绑定到一个上下文。
 
-Using a `vm.Module` object requires three distinct steps: creation/parsing,
-linking, and evaluation. These three steps are illustrated in the following
-example.
+使用 `vm.Module` 对象需要三个不同的步骤：创建/解析、链接和评估。以下示例说明了这三个步骤。
 
-This implementation lies at a lower level than the [ECMAScript Module
-loader][]. There is also no way to interact with the Loader yet, though
-support is planned.
+此实现处于比 [ECMAScript 模块加载器][] 更低的级别。目前还没有办法与加载器交互，不过支持已在计划中。
 
 ```mjs
 import vm from 'node:vm';
@@ -437,15 +334,15 @@ const contextifiedObject = vm.createContext({
   print: console.log,
 });
 
-// Step 1
+// 步骤 1
 //
-// Create a Module by constructing a new `vm.SourceTextModule` object. This
-// parses the provided source text, throwing a `SyntaxError` if anything goes
-// wrong. By default, a Module is created in the top context. But here, we
-// specify `contextifiedObject` as the context this Module belongs to.
+// 通过构造一个新的 `vm.SourceTextModule` 对象来创建一个模块。这
+// 会解析提供的源文本，如果出现任何问题则会抛出 `SyntaxError`。
+// 默认情况下，模块在顶级上下文中创建。但在这里，我们
+// 指定 `contextifiedObject` 作为此模块所属的上下文。
 //
-// Here, we attempt to obtain the default export from the module "foo", and
-// put it into local binding "secret".
+// 这里，我们尝试从模块 "foo" 获取默认导出，并
+// 将其放入本地绑定 "secret"。
 
 const rootModule = new vm.SourceTextModule(`
   import s from 'foo';
@@ -453,20 +350,20 @@ const rootModule = new vm.SourceTextModule(`
   print(s);
 `, { context: contextifiedObject });
 
-// Step 2
+// 步骤 2
 //
-// "Link" the imported dependencies of this Module to it.
+// 将此模块的导入依赖"链接"到它。
 //
-// Obtain the requested dependencies of a SourceTextModule by
-// `sourceTextModule.moduleRequests` and resolve them.
+// 通过 `sourceTextModule.moduleRequests` 获取 SourceTextModule 的请求依赖项
+// 并解析它们。
 //
-// Even top-level Modules without dependencies must be explicitly linked. The
-// array passed to `sourceTextModule.linkRequests(modules)` can be
-// empty, however.
+// 即使没有依赖项的顶级模块也必须显式链接。传递
+// 给 `sourceTextModule.linkRequests(modules)` 的数组可以是
+// 空的。
 //
-// Note: This is a contrived example in that the resolveAndLinkDependencies
-// creates a new "foo" module every time it is called. In a full-fledged
-// module system, a cache would probably be used to avoid duplicated modules.
+// 注意：这是一个人为的例子，因为 resolveAndLinkDependencies
+// 每次被调用时都会创建一个新的 "foo" 模块。在完整的
+// 模块系统中，可能会使用缓存来避免重复模块。
 
 const moduleMap = new Map([
   ['root', rootModule],
@@ -474,20 +371,20 @@ const moduleMap = new Map([
 
 function resolveAndLinkDependencies(module) {
   const requestedModules = module.moduleRequests.map((request) => {
-    // In a full-fledged module system, the resolveAndLinkDependencies would
-    // resolve the module with the module cache key `[specifier, attributes]`.
-    // In this example, we just use the specifier as the key.
+    // 在完整的模块系统中，resolveAndLinkDependencies 会
+    // 使用模块缓存键 `[specifier, attributes]` 解析模块。
+    // 在这个例子中，我们只使用说明符作为键。
     const specifier = request.specifier;
 
     let requestedModule = moduleMap.get(specifier);
     if (requestedModule === undefined) {
       requestedModule = new vm.SourceTextModule(`
-        // The "secret" variable refers to the global variable we added to
-        // "contextifiedObject" when creating the context.
+        // "secret" 变量指的是我们在创建上下文时添加到
+        // "contextifiedObject" 的全局变量。
         export default secret;
       `, { context: referencingModule.context });
       moduleMap.set(specifier, linkedModule);
-      // Resolve the dependencies of the new module as well.
+      // 同时解析新模块的依赖项。
       resolveAndLinkDependencies(requestedModule);
     }
 
@@ -500,12 +397,12 @@ function resolveAndLinkDependencies(module) {
 resolveAndLinkDependencies(rootModule);
 rootModule.instantiate();
 
-// Step 3
+// 步骤 3
 //
-// Evaluate the Module. The evaluate() method returns a promise which will
-// resolve after the module has finished evaluating.
+// 评估模块。evaluate() 方法返回一个 promise，该 promise 将在
+// 模块评估完成后解析。
 
-// Prints 42.
+// 打印 42。
 await rootModule.evaluate();
 ```
 
@@ -518,15 +415,15 @@ const contextifiedObject = vm.createContext({
 });
 
 (async () => {
-  // Step 1
+  // 步骤 1
   //
-  // Create a Module by constructing a new `vm.SourceTextModule` object. This
-  // parses the provided source text, throwing a `SyntaxError` if anything goes
-  // wrong. By default, a Module is created in the top context. But here, we
-  // specify `contextifiedObject` as the context this Module belongs to.
+  // 通过构造一个新的 `vm.SourceTextModule` 对象来创建一个模块。这
+  // 会解析提供的源文本，如果出现任何问题则会抛出 `SyntaxError`。
+  // 默认情况下，模块在顶级上下文中创建。但在这里，我们
+  // 指定 `contextifiedObject` 作为此模块所属的上下文。
   //
-  // Here, we attempt to obtain the default export from the module "foo", and
-  // put it into local binding "secret".
+  // 这里，我们尝试从模块 "foo" 获取默认导出，并
+  // 将其放入本地绑定 "secret"。
 
   const rootModule = new vm.SourceTextModule(`
     import s from 'foo';
@@ -534,20 +431,20 @@ const contextifiedObject = vm.createContext({
     print(s);
   `, { context: contextifiedObject });
 
-  // Step 2
+  // 步骤 2
   //
-  // "Link" the imported dependencies of this Module to it.
+  // 将此模块的导入依赖"链接"到它。
   //
-  // Obtain the requested dependencies of a SourceTextModule by
-  // `sourceTextModule.moduleRequests` and resolve them.
+  // 通过 `sourceTextModule.moduleRequests` 获取 SourceTextModule 的请求依赖项
+  // 并解析它们。
   //
-  // Even top-level Modules without dependencies must be explicitly linked. The
-  // array passed to `sourceTextModule.linkRequests(modules)` can be
-  // empty, however.
+  // 即使没有依赖项的顶级模块也必须显式链接。传递
+  // 给 `sourceTextModule.linkRequests(modules)` 的数组可以是
+  // 空的。
   //
-  // Note: This is a contrived example in that the resolveAndLinkDependencies
-  // creates a new "foo" module every time it is called. In a full-fledged
-  // module system, a cache would probably be used to avoid duplicated modules.
+  // 注意：这是一个人为的例子，因为 resolveAndLinkDependencies
+  // 每次被调用时都会创建一个新的 "foo" 模块。在完整的
+  // 模块系统中，可能会使用缓存来避免重复模块。
 
   const moduleMap = new Map([
     ['root', rootModule],
@@ -555,20 +452,20 @@ const contextifiedObject = vm.createContext({
 
   function resolveAndLinkDependencies(module) {
     const requestedModules = module.moduleRequests.map((request) => {
-      // In a full-fledged module system, the resolveAndLinkDependencies would
-      // resolve the module with the module cache key `[specifier, attributes]`.
-      // In this example, we just use the specifier as the key.
+      // 在完整的模块系统中，resolveAndLinkDependencies 会
+      // 使用模块缓存键 `[specifier, attributes]` 解析模块。
+      // 在这个例子中，我们只使用说明符作为键。
       const specifier = request.specifier;
 
       let requestedModule = moduleMap.get(specifier);
       if (requestedModule === undefined) {
         requestedModule = new vm.SourceTextModule(`
-          // The "secret" variable refers to the global variable we added to
-          // "contextifiedObject" when creating the context.
+          // "secret" 变量指的是我们在创建上下文时添加到
+          // "contextifiedObject" 的全局变量。
           export default secret;
         `, { context: referencingModule.context });
         moduleMap.set(specifier, linkedModule);
-        // Resolve the dependencies of the new module as well.
+        // 同时解析新模块的依赖项。
         resolveAndLinkDependencies(requestedModule);
       }
 
@@ -581,62 +478,46 @@ const contextifiedObject = vm.createContext({
   resolveAndLinkDependencies(rootModule);
   rootModule.instantiate();
 
-  // Step 3
+  // 步骤 3
   //
-  // Evaluate the Module. The evaluate() method returns a promise which will
-  // resolve after the module has finished evaluating.
+  // 评估模块。evaluate() 方法返回一个 promise，该 promise 将在
+  // 模块评估完成后解析。
 
-  // Prints 42.
+  // 打印 42。
   await rootModule.evaluate();
 })();
 ```
 
 ### `module.error`
 
-* Type: {any}
+* 类型: {any}
 
-If the `module.status` is `'errored'`, this property contains the exception
-thrown by the module during evaluation. If the status is anything else,
-accessing this property will result in a thrown exception.
+如果 `module.status` 是 `'errored'`，此属性包含模块在评估期间抛出的异常。如果状态是其他任何值，访问此属性将导致抛出异常。
 
-The value `undefined` cannot be used for cases where there is not a thrown
-exception due to possible ambiguity with `throw undefined;`.
+值 `undefined` 不能用于没有抛出异常的情况，因为可能与 `throw undefined;` 产生歧义。
 
-Corresponds to the `[[EvaluationError]]` field of [Cyclic Module Record][]s
-in the ECMAScript specification.
+对应于 ECMAScript 规范中 [循环模块记录][] 的 `[[EvaluationError]]` 字段。
 
 ### `module.evaluate([options])`
 
 * `options` {Object}
-  * `timeout` {integer} Specifies the number of milliseconds to evaluate
-    before terminating execution. If execution is interrupted, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-* Returns: {Promise} Fulfills with `undefined` upon success.
+  * `timeout` {integer} 指定在终止执行前评估的毫秒数。如果执行被中断，将抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+* 返回: {Promise} 成功时使用 `undefined` 完成。
 
-Evaluate the module.
+评估模块。
 
-This must be called after the module has been linked; otherwise it will reject.
-It could be called also when the module has already been evaluated, in which
-case it will either do nothing if the initial evaluation ended in success
-(`module.status` is `'evaluated'`) or it will re-throw the exception that the
-initial evaluation resulted in (`module.status` is `'errored'`).
+这必须在模块链接后调用；否则它将拒绝。它也可以在模块已经被评估时调用，在这种情况下，如果初始评估成功结束（`module.status` 是 `'evaluated'`），它将不执行任何操作，或者它将重新抛出初始评估导致的异常（`module.status` 是 `'errored'`）。
 
-This method cannot be called while the module is being evaluated
-(`module.status` is `'evaluating'`).
+当模块正在评估时（`module.status` 是 `'evaluating'`）不能调用此方法。
 
-Corresponds to the [Evaluate() concrete method][] field of [Cyclic Module
-Record][]s in the ECMAScript specification.
+对应于 ECMAScript 规范中 [循环模块记录][] 的 [Evaluate() 具体方法][] 字段。
 
 ### `module.identifier`
 
-* Type: {string}
+* 类型: {string}
 
-The identifier of the current module, as set in the constructor.
+当前模块的标识符，在构造函数中设置。
 
 ### `module.link(linker)`
 
@@ -652,102 +533,76 @@ changes:
 -->
 
 * `linker` {Function}
-  * `specifier` {string} The specifier of the requested module:
+  * `specifier` {string} 请求模块的说明符：
     ```mjs
     import foo from 'foo';
-    //              ^^^^^ the module specifier
+    //              ^^^^^ 模块说明符
     ```
 
-  * `referencingModule` {vm.Module} The `Module` object `link()` is called on.
+  * `referencingModule` {vm.Module} 调用 `link()` 的 `Module` 对象。
 
   * `extra` {Object}
-    * `attributes` {Object} The data from the attribute:
+    * `attributes` {Object} 来自属性的数据：
       ```mjs
       import foo from 'foo' with { name: 'value' };
-      //                         ^^^^^^^^^^^^^^^^^ the attribute
+      //                         ^^^^^^^^^^^^^^^^^ 属性
       ```
-      Per ECMA-262, hosts are expected to trigger an error if an
-      unsupported attribute is present.
-    * `assert` {Object} Alias for `extra.attributes`.
+      根据 ECMA-262，如果存在不受支持的属性，宿主应触发错误。
+    * `assert` {Object} `extra.attributes` 的别名。
 
-  * Returns: {vm.Module|Promise}
-* Returns: {Promise}
+  * 返回: {vm.Module|Promise}
+* 返回: {Promise}
 
-Link module dependencies. This method must be called before evaluation, and
-can only be called once per module.
+链接模块依赖项。此方法必须在评估之前调用，并且每个模块只能调用一次。
 
-Use [`sourceTextModule.linkRequests(modules)`][] and
-[`sourceTextModule.instantiate()`][] to link modules either synchronously or
-asynchronously.
+使用 [`sourceTextModule.linkRequests(modules)`][] 和 [`sourceTextModule.instantiate()`][] 来同步或异步链接模块。
 
-The function is expected to return a `Module` object or a `Promise` that
-eventually resolves to a `Module` object. The returned `Module` must satisfy the
-following two invariants:
+该函数预期返回一个 `Module` 对象或最终解析为 `Module` 对象的 `Promise`。返回的 `Module` 必须满足以下两个不变条件：
 
-* It must belong to the same context as the parent `Module`.
-* Its `status` must not be `'errored'`.
+* 它必须与父 `Module` 属于同一上下文。
+* 它的 `status` 不能是 `'errored'`。
 
-If the returned `Module`'s `status` is `'unlinked'`, this method will be
-recursively called on the returned `Module` with the same provided `linker`
-function.
+如果返回的 `Module` 的 `status` 是 `'unlinked'`，则将在返回的 `Module` 上递归调用此方法，并使用相同的提供的 `linker` 函数。
 
-`link()` returns a `Promise` that will either get resolved when all linking
-instances resolve to a valid `Module`, or rejected if the linker function either
-throws an exception or returns an invalid `Module`.
+`link()` 返回一个 `Promise`，该 Promise 将在所有链接实例解析为有效的 `Module` 时解析，或者在链接器函数抛出异常或返回无效的 `Module` 时拒绝。
 
-The linker function roughly corresponds to the implementation-defined
-[HostResolveImportedModule][] abstract operation in the ECMAScript
-specification, with a few key differences:
+链接器函数大致对应于 ECMAScript 规范中实现定义的 [HostResolveImportedModule][] 抽象操作，但有一些关键区别：
 
-* The linker function is allowed to be asynchronous while
-  [HostResolveImportedModule][] is synchronous.
+* 链接器函数允许是异步的，而 [HostResolveImportedModule][] 是同步的。
 
-The actual [HostResolveImportedModule][] implementation used during module
-linking is one that returns the modules linked during linking. Since at
-that point all modules would have been fully linked already, the
-[HostResolveImportedModule][] implementation is fully synchronous per
-specification.
+模块链接期间使用的实际 [HostResolveImportedModule][] 实现是返回在链接期间链接的模块的实现。因为在那个时候所有模块都已经完全链接，所以 [HostResolveImportedModule][] 实现根据规范是完全同步的。
 
-Corresponds to the [Link() concrete method][] field of [Cyclic Module
-Record][]s in the ECMAScript specification.
+对应于 ECMAScript 规范中 [循环模块记录][] 的 [Link() 具体方法][] 字段。
 
 ### `module.namespace`
 
-* Type: {Object}
+* 类型: {Object}
 
-The namespace object of the module. This is only available after linking
-(`module.link()`) has completed.
+模块的命名空间对象。这仅在链接（`module.link()`）完成后可用。
 
-Corresponds to the [GetModuleNamespace][] abstract operation in the ECMAScript
-specification.
+对应于 ECMAScript 规范中的 [GetModuleNamespace][] 抽象操作。
 
 ### `module.status`
 
-* Type: {string}
+* 类型: {string}
 
-The current status of the module. Will be one of:
+模块的当前状态。将是以下之一：
 
-* `'unlinked'`: `module.link()` has not yet been called.
+* `'unlinked'`：尚未调用 `module.link()`。
 
-* `'linking'`: `module.link()` has been called, but not all Promises returned
-  by the linker function have been resolved yet.
+* `'linking'`：已调用 `module.link()`，但链接器函数返回的 Promise 尚未全部解析。
 
-* `'linked'`: The module has been linked successfully, and all of its
-  dependencies are linked, but `module.evaluate()` has not yet been called.
+* `'linked'`：模块已成功链接，其所有依赖项都已链接，但尚未调用 `module.evaluate()`。
 
-* `'evaluating'`: The module is being evaluated through a `module.evaluate()` on
-  itself or a parent module.
+* `'evaluating'`：模块正在通过自身或父模块的 `module.evaluate()` 进行评估。
 
-* `'evaluated'`: The module has been successfully evaluated.
+* `'evaluated'`：模块已成功评估。
 
-* `'errored'`: The module has been evaluated, but an exception was thrown.
+* `'errored'`：模块已评估，但抛出了异常。
 
-Other than `'errored'`, this status string corresponds to the specification's
-[Cyclic Module Record][]'s `[[Status]]` field. `'errored'` corresponds to
-`'evaluated'` in the specification, but with `[[EvaluationError]]` set to a
-value that is not `undefined`.
+除了 `'errored'`，此状态字符串对应于规范中的 [循环模块记录][] 的 `[[Status]]` 字段。`'errored'` 对应于规范中的 `'evaluated'`，但 `[[EvaluationError]]` 设置为不是 `undefined` 的值。
 
-## Class: `vm.SourceTextModule`
+## 类：`vm.SourceTextModule`
 
 <!-- YAML
 added: v9.6.0
@@ -755,13 +610,11 @@ added: v9.6.0
 
 > Stability: 1 - Experimental
 
-This feature is only available with the `--experimental-vm-modules` command
-flag enabled.
+此功能仅在启用 `--experimental-vm-modules` 命令标志时可用。
 
-* Extends: {vm.Module}
+* 扩展: {vm.Module}
 
-The `vm.SourceTextModule` class provides the [Source Text Module Record][] as
-defined in the ECMAScript specification.
+`vm.SourceTextModule` 类提供了 ECMAScript 规范中定义的 [源文本模块记录][]。
 
 ### `new vm.SourceTextModule(code[, options])`
 
@@ -775,39 +628,21 @@ changes:
                  `importModuleDynamically` parameter.
 -->
 
-* `code` {string} JavaScript Module code to parse
+* `code` {string} 要解析的 JavaScript 模块代码
 * `options`
-  * `identifier` {string} String used in stack traces.
-    **Default:** `'vm:module(i)'` where `i` is a context-specific ascending
-    index.
-  * `cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or
-    `TypedArray`, or `DataView` with V8's code cache data for the supplied
-    source. The `code` must be the same as the module from which this
-    `cachedData` was created.
-  * `context` {Object} The [contextified][] object as returned by the
-    `vm.createContext()` method, to compile and evaluate this `Module` in.
-    If no context is specified, the module is evaluated in the current
-    execution context.
-  * `lineOffset` {integer} Specifies the line number offset that is displayed
-    in stack traces produced by this `Module`. **Default:** `0`.
-  * `columnOffset` {integer} Specifies the first-line column number offset that
-    is displayed in stack traces produced by this `Module`. **Default:** `0`.
-  * `initializeImportMeta` {Function} Called during evaluation of this `Module`
-    to initialize the `import.meta`.
+  * `identifier` {string} 在堆栈跟踪中使用的字符串。**默认值:** `'vm:module(i)'`，其中 `i` 是特定于上下文的递增索引。
+  * `cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。`code` 必须与生成此 `cachedData` 的模块相同。
+  * `context` {Object} 由 `vm.createContext()` 方法返回的 [contextified][] 对象，用于编译和评估此 `Module`。如果未指定上下文，模块将在当前执行上下文中进行评估。
+  * `lineOffset` {integer} 指定此 `Module` 产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。
+  * `columnOffset` {integer} 指定此 `Module` 产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。
+  * `initializeImportMeta` {Function} 在此 `Module` 评估期间调用以初始化 `import.meta`。
     * `meta` {import.meta}
     * `module` {vm.SourceTextModule}
-  * `importModuleDynamically` {Function} Used to specify the
-    how the modules should be loaded during the evaluation of this module
-    when `import()` is called. This option is part of the experimental
-    modules API. We do not recommend using it in a production environment.
-    For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
+  * `importModuleDynamically` {Function} 用于指定在此模块评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
 
-Creates a new `SourceTextModule` instance.
+创建一个新的 `SourceTextModule` 实例。
 
-Properties assigned to the `import.meta` object that are objects may
-allow the module to access information outside the specified `context`. Use
-`vm.runInContext()` to create objects in a specific context.
+分配给 `import.meta` 对象的属性如果是对象，可能允许模块访问指定 `context` 之外的信息。使用 `vm.runInContext()` 在特定上下文中创建对象。
 
 ```mjs
 import vm from 'node:vm';
@@ -818,23 +653,23 @@ const module = new vm.SourceTextModule(
   'Object.getPrototypeOf(import.meta.prop).secret = secret;',
   {
     initializeImportMeta(meta) {
-      // Note: this object is created in the top context. As such,
-      // Object.getPrototypeOf(import.meta.prop) points to the
-      // Object.prototype in the top context rather than that in
-      // the contextified object.
+      // 注意：此对象是在顶级上下文中创建的。因此，
+      // Object.getPrototypeOf(import.meta.prop) 指向的是
+      // 顶级上下文中的 Object.prototype，而不是
+      // contextifiedObject 中的那个。
       meta.prop = {};
     },
   });
-// The module has an empty `moduleRequests` array.
+// 该模块有一个空的 `moduleRequests` 数组。
 module.linkRequests([]);
 module.instantiate();
 await module.evaluate();
 
-// Now, Object.prototype.secret will be equal to 42.
+// 现在，Object.prototype.secret 将等于 42。
 //
-// To fix this problem, replace
+// 要解决此问题，请将上面的
 //     meta.prop = {};
-// above with
+// 替换为
 //     meta.prop = vm.runInContext('{}', contextifiedObject);
 ```
 
@@ -846,22 +681,22 @@ const contextifiedObject = vm.createContext({ secret: 42 });
     'Object.getPrototypeOf(import.meta.prop).secret = secret;',
     {
       initializeImportMeta(meta) {
-        // Note: this object is created in the top context. As such,
-        // Object.getPrototypeOf(import.meta.prop) points to the
-        // Object.prototype in the top context rather than that in
-        // the contextified object.
+        // 注意：此对象是在顶级上下文中创建的。因此，
+        // Object.getPrototypeOf(import.meta.prop) 指向的是
+        // 顶级上下文中的 Object.prototype，而不是
+        // contextifiedObject 中的那个。
         meta.prop = {};
       },
     });
-  // The module has an empty `moduleRequests` array.
+  // 该模块有一个空的 `moduleRequests` 数组。
   module.linkRequests([]);
   module.instantiate();
   await module.evaluate();
-  // Now, Object.prototype.secret will be equal to 42.
+  // 现在，Object.prototype.secret 将等于 42。
   //
-  // To fix this problem, replace
+  // 要解决此问题，请将上面的
   //     meta.prop = {};
-  // above with
+  // 替换为
   //     meta.prop = vm.runInContext('{}', contextifiedObject);
 })();
 ```
@@ -874,30 +709,22 @@ added:
  - v12.17.0
 -->
 
-* Returns: {Buffer}
+* 返回: {Buffer}
 
-Creates a code cache that can be used with the `SourceTextModule` constructor's
-`cachedData` option. Returns a `Buffer`. This method may be called any number
-of times before the module has been evaluated.
+创建一个代码缓存，可用于 `SourceTextModule` 构造函数的 `cachedData` 选项。返回一个 `Buffer`。此方法可以在模块评估之前调用任意次数。
 
-The code cache of the `SourceTextModule` doesn't contain any JavaScript
-observable states. The code cache is safe to be saved along side the script
-source and used to construct new `SourceTextModule` instances multiple times.
+`SourceTextModule` 的代码缓存不包含任何 JavaScript 可观察状态。代码缓存可以安全地与脚本源一起保存，并多次用于构建新的 `SourceTextModule` 实例。
 
-Functions in the `SourceTextModule` source can be marked as lazily compiled
-and they are not compiled at construction of the `SourceTextModule`. These
-functions are going to be compiled when they are invoked the first time. The
-code cache serializes the metadata that V8 currently knows about the
-`SourceTextModule` that it can use to speed up future compilations.
+`SourceTextModule` 源中的函数可以被标记为延迟编译，它们在 `SourceTextModule` 构造时不会被编译。这些函数将在首次调用时被编译。代码缓存序列化了 V8 当前已知的关于 `SourceTextModule` 的元数据，它可以用来加速未来的编译。
 
 ```js
-// Create an initial module
+// 创建一个初始模块
 const module = new vm.SourceTextModule('const a = 1;');
 
-// Create cached data from this module
+// 从此模块创建缓存数据
 const cachedData = module.createCachedData();
 
-// Create a new module using the cached data. The code must be the same.
+// 使用缓存数据创建一个新模块。代码必须相同。
 const module2 = new vm.SourceTextModule('const a = 1;', { cachedData });
 ```
 
@@ -910,15 +737,13 @@ changes:
     description: This is deprecated in favour of `sourceTextModule.moduleRequests`.
 -->
 
-> Stability: 0 - Deprecated: Use [`sourceTextModule.moduleRequests`][] instead.
+> Stability: 0 - Deprecated: 使用 [`sourceTextModule.moduleRequests`][] 代替。
 
-* Type: {string\[]}
+* 类型: {string\[]}
 
-The specifiers of all dependencies of this module. The returned array is frozen
-to disallow any changes to it.
+此模块所有依赖项的说明符。返回的数组被冻结以防止任何更改。
 
-Corresponds to the `[[RequestedModules]]` field of [Cyclic Module Record][]s in
-the ECMAScript specification.
+对应于 ECMAScript 规范中 [循环模块记录][] 的 `[[RequestedModules]]` 字段。
 
 ### `sourceTextModule.hasAsyncGraph()`
 
@@ -926,16 +751,13 @@ the ECMAScript specification.
 added: v24.9.0
 -->
 
-* Returns: {boolean}
+* 返回: {boolean}
 
-Iterates over the dependency graph and returns `true` if any module in its
-dependencies or this module itself contains top-level `await` expressions,
-otherwise returns `false`.
+遍历依赖图，如果其依赖项中的任何模块或此模块本身包含顶级 `await` 表达式，则返回 `true`，否则返回 `false`。
 
-The search may be slow if the graph is big enough.
+如果图足够大，搜索可能会很慢。
 
-This requires the module to be instantiated first. If the module is not
-instantiated yet, an error will be thrown.
+这要求模块首先被实例化。如果模块尚未实例化，将抛出错误。
 
 ### `sourceTextModule.hasTopLevelAwait()`
 
@@ -943,12 +765,11 @@ instantiated yet, an error will be thrown.
 added: v24.9.0
 -->
 
-* Returns: {boolean}
+* 返回: {boolean}
 
-Returns whether the module itself contains any top-level `await` expressions.
+返回模块本身是否包含任何顶级 `await` 表达式。
 
-This corresponds to the field `[[HasTLA]]` in [Cyclic Module Record][] in the
-ECMAScript specification.
+这对应于 ECMAScript 规范中 [循环模块记录][] 的 `[[HasTLA]]` 字段。
 
 ### `sourceTextModule.instantiate()`
 
@@ -956,17 +777,13 @@ ECMAScript specification.
 added: v24.8.0
 -->
 
-* Returns: {undefined}
+* 返回: {undefined}
 
-Instantiate the module with the linked requested modules.
+使用链接的请求模块实例化模块。
 
-This resolves the imported bindings of the module, including re-exported
-binding names. When there are any bindings that cannot be resolved,
-an error would be thrown synchronously.
+这解析了模块的导入绑定，包括重新导出的绑定名称。如果有任何无法解析的绑定，将同步抛出错误。
 
-If the requested modules include cyclic dependencies, the
-[`sourceTextModule.linkRequests(modules)`][] method must be called on all
-modules in the cycle before calling this method.
+如果请求的模块包括循环依赖，则必须在调用此方法之前对循环中的所有模块调用 [`sourceTextModule.linkRequests(modules)`][] 方法。
 
 ### `sourceTextModule.linkRequests(modules)`
 
@@ -974,19 +791,12 @@ modules in the cycle before calling this method.
 added: v24.8.0
 -->
 
-* `modules` {vm.Module\[]} Array of `vm.Module` objects that this module depends on.
-  The order of the modules in the array is the order of
-  [`sourceTextModule.moduleRequests`][].
-* Returns: {undefined}
+* `modules` {vm.Module\[]} 此模块依赖的 `vm.Module` 对象数组。数组中模块的顺序是 [`sourceTextModule.moduleRequests`][] 的顺序。
+* 返回: {undefined}
 
-Link module dependencies. This method must be called before evaluation, and
-can only be called once per module.
+链接模块依赖项。此方法必须在评估之前调用，并且每个模块只能调用一次。
 
-The order of the module instances in the `modules` array should correspond to the order of
-[`sourceTextModule.moduleRequests`][] being resolved. If two module requests have the same
-specifier and import attributes, they must be resolved with the same module instance or an
-`ERR_MODULE_LINK_MISMATCH` would be thrown. For example, when linking requests for this
-module:
+`modules` 数组中模块实例的顺序应对应于解析的 [`sourceTextModule.moduleRequests`][] 的顺序。如果两个模块请求具有相同的说明符和导入属性，它们必须使用相同的模块实例解析，否则将抛出 `ERR_MODULE_LINK_MISMATCH`。例如，当链接此模块的请求时：
 
 <!-- eslint-disable no-duplicate-imports -->
 
@@ -997,21 +807,15 @@ import source Foo from 'foo';
 
 <!-- eslint-enable no-duplicate-imports -->
 
-The `modules` array must contain two references to the same instance, because the two
-module requests are identical but in two phases.
+`modules` 数组必须包含对同一实例的两个引用，因为两个模块请求是相同的，但处于两个阶段。
 
-If the module has no dependencies, the `modules` array can be empty.
+如果模块没有依赖项，`modules` 数组可以为空。
 
-Users can use `sourceTextModule.moduleRequests` to implement the host-defined
-[HostLoadImportedModule][] abstract operation in the ECMAScript specification,
-and using `sourceTextModule.linkRequests()` to invoke specification defined
-[FinishLoadingImportedModule][], on the module with all dependencies in a batch.
+用户可以使用 `sourceTextModule.moduleRequests` 来实现 ECMAScript 规范中宿主定义的 [HostLoadImportedModule][] 抽象操作，并使用 `sourceTextModule.linkRequests()` 在具有所有依赖项的模块上调用规范定义的 [FinishLoadingImportedModule][]。
 
-It's up to the creator of the `SourceTextModule` to determine if the resolution
-of the dependencies is synchronous or asynchronous.
+由 `SourceTextModule` 的创建者决定依赖项的解析是同步还是异步。
 
-After each module in the `modules` array is linked, call
-[`sourceTextModule.instantiate()`][].
+在 `modules` 数组中的每个模块链接后，调用 [`sourceTextModule.instantiate()`][]。
 
 ### `sourceTextModule.moduleRequests`
 
@@ -1019,12 +823,11 @@ After each module in the `modules` array is linked, call
 added: v24.4.0
 -->
 
-* Type: {ModuleRequest\[]} Dependencies of this module.
+* 类型: {ModuleRequest\[]} 此模块的依赖项。
 
-The requested import dependencies of this module. The returned array is frozen
-to disallow any changes to it.
+此模块请求的导入依赖项。返回的数组被冻结以防止任何更改。
 
-For example, given a source text:
+例如，给定一个源文本：
 
 <!-- eslint-disable no-duplicate-imports -->
 
@@ -1038,7 +841,7 @@ import source Module from 'wasm-mod.wasm';
 
 <!-- eslint-enable no-duplicate-imports -->
 
-The value of the `sourceTextModule.moduleRequests` will be:
+`sourceTextModule.moduleRequests` 的值将是：
 
 ```js
 [
@@ -1070,7 +873,7 @@ The value of the `sourceTextModule.moduleRequests` will be:
 ];
 ```
 
-## Class: `vm.SyntheticModule`
+## 类：`vm.SyntheticModule`
 
 <!-- YAML
 added:
@@ -1080,15 +883,11 @@ added:
 
 > Stability: 1 - Experimental
 
-This feature is only available with the `--experimental-vm-modules` command
-flag enabled.
+此功能仅在启用 `--experimental-vm-modules` 命令标志时可用。
 
-* Extends: {vm.Module}
+* 扩展: {vm.Module}
 
-The `vm.SyntheticModule` class provides the [Synthetic Module Record][] as
-defined in the WebIDL specification. The purpose of synthetic modules is to
-provide a generic interface for exposing non-JavaScript sources to ECMAScript
-module graphs.
+`vm.SyntheticModule` 类提供了 WebIDL 规范中定义的 [合成模块记录][]。合成模块的目的是为向 ECMAScript 模块图暴露非 JavaScript 源提供通用接口。
 
 ```js
 const vm = require('node:vm');
@@ -1099,7 +898,7 @@ const module = new vm.SyntheticModule(['default'], function() {
   this.setExport('default', obj);
 });
 
-// Use `module` in linking...
+// 在链接中使用 `module`...
 ```
 
 ### `new vm.SyntheticModule(exportNames, evaluateCallback[, options])`
@@ -1110,21 +909,15 @@ added:
  - v12.16.0
 -->
 
-* `exportNames` {string\[]} Array of names that will be exported from the
-  module.
-* `evaluateCallback` {Function} Called when the module is evaluated.
+* `exportNames` {string\[]} 将从模块导出的名称数组。
+* `evaluateCallback` {Function} 在模块评估时调用。
 * `options`
-  * `identifier` {string} String used in stack traces.
-    **Default:** `'vm:module(i)'` where `i` is a context-specific ascending
-    index.
-  * `context` {Object} The [contextified][] object as returned by the
-    `vm.createContext()` method, to compile and evaluate this `Module` in.
+  * `identifier` {string} 在堆栈跟踪中使用的字符串。**默认值:** `'vm:module(i)'`，其中 `i` 是特定于上下文的递增索引。
+  * `context` {Object} 由 `vm.createContext()` 方法返回的 [contextified][] 对象，用于编译和评估此 `Module`。
 
-Creates a new `SyntheticModule` instance.
+创建一个新的 `SyntheticModule` 实例。
 
-Objects assigned to the exports of this instance may allow importers of
-the module to access information outside the specified `context`. Use
-`vm.runInContext()` to create objects in a specific context.
+分配给此实例导出的对象可能允许模块的导入者访问指定 `context` 之外的信息。使用 `vm.runInContext()` 在特定上下文中创建对象。
 
 ### `syntheticModule.setExport(name, value)`
 
@@ -1139,10 +932,10 @@ changes:
                  calling this method.
 -->
 
-* `name` {string} Name of the export to set.
-* `value` {any} The value to set the export to.
+* `name` {string} 要设置的导出名称。
+* `value` {any} 设置导出的值。
 
-This method sets the module export binding slots with the given value.
+此方法使用给定值设置模块导出绑定槽。
 
 ```mjs
 import vm from 'node:vm';
@@ -1167,20 +960,18 @@ const vm = require('node:vm');
 })();
 ```
 
-## Type: `ModuleRequest`
+## 类型：`ModuleRequest`
 
 <!-- YAML
 added: v24.4.0
 -->
 
-* Type: {Object}
-  * `specifier` {string} The specifier of the requested module.
-  * `attributes` {Object} The `"with"` value passed to the
-    [WithClause][] in a [ImportDeclaration][], or an empty object if no value was
-    provided.
-  * `phase` {string} The phase of the requested module (`"source"` or `"evaluation"`).
+* 类型: {Object}
+  * `specifier` {string} 请求模块的说明符。
+  * `attributes` {Object} 传递给 [ImportDeclaration][] 中 [WithClause][] 的 `"with"` 值，如果未提供值则为空对象。
+  * `phase` {string} 请求模块的阶段（`"source"` 或 `"evaluation"`）。
 
-A `ModuleRequest` represents the request to import a module with given import attributes and phase.
+`ModuleRequest` 表示请求导入具有给定导入属性和阶段的模块。
 
 ## `vm.compileFunction(code[, params[, options]])`
 
@@ -1220,39 +1011,22 @@ changes:
     description: The `importModuleDynamically` option is now supported.
 -->
 
-* `code` {string} The body of the function to compile.
-* `params` {string\[]} An array of strings containing all parameters for the
-  function.
+* `code` {string} 要编译的函数体。
+* `params` {string\[]} 包含函数所有参数的字符串数组。
 * `options` {Object}
-  * `filename` {string} Specifies the filename used in stack traces produced
-    by this script. **Default:** `''`.
-  * `lineOffset` {number} Specifies the line number offset that is displayed
-    in stack traces produced by this script. **Default:** `0`.
-  * `columnOffset` {number} Specifies the first-line column number offset that
-    is displayed in stack traces produced by this script. **Default:** `0`.
-  * `cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or
-    `TypedArray`, or `DataView` with V8's code cache data for the supplied
-    source. This must be produced by a prior call to [`vm.compileFunction()`][]
-    with the same `code` and `params`.
-  * `produceCachedData` {boolean} Specifies whether to produce new cache data.
-    **Default:** `false`.
-  * `parsingContext` {Object} The [contextified][] object in which the said
-    function should be compiled in.
-  * `contextExtensions` {Object\[]} An array containing a collection of context
-    extensions (objects wrapping the current scope) to be applied while
-    compiling. **Default:** `[]`.
+  * `filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `''`。
+  * `lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。
+  * `columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。
+  * `cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。这必须由之前对 [`vm.compileFunction()`][] 的调用产生，使用相同的 `code` 和 `params`。
+  * `produceCachedData` {boolean} 指定是否生成新的缓存数据。**默认值:** `false`。
+  * `parsingContext` {Object} 应在其中编译所述函数的 [contextified][] 对象。
+  * `contextExtensions` {Object\[]} 包含一组上下文扩展（包装当前作用域的对象）的数组，在编译时应用。**默认值:** `[]`。
   * `importModuleDynamically`
     {Function|vm.constants.USE\_MAIN\_CONTEXT\_DEFAULT\_LOADER}
-    Used to specify the how the modules should be loaded during the evaluation of
-    this function when `import()` is called. This option is part of the
-    experimental modules API. We do not recommend using it in a production
-    environment. For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
-* Returns: {Function}
+    用于指定在此函数评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
+* 返回: {Function}
 
-Compiles the given code into the provided context (if no context is
-supplied, the current context is used), and returns it wrapped inside a
-function with the given `params`.
+将给定的代码编译到提供的上下文中（如果未提供上下文，则使用当前上下文），并将其包装在具有给定 `params` 的函数中返回。
 
 ## `vm.constants`
 
@@ -1262,9 +1036,9 @@ added:
   - v20.12.0
 -->
 
-* Type: {Object}
+* 类型: {Object}
 
-Returns an object containing commonly used constants for VM operations.
+返回一个包含 VM 操作常用常量的对象。
 
 ### `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`
 
@@ -1276,12 +1050,9 @@ added:
 
 > Stability: 1.1 - Active development
 
-A constant that can be used as the `importModuleDynamically` option to
-`vm.Script` and `vm.compileFunction()` so that Node.js uses the default
-ESM loader from the main context to load the requested module.
+一个常量，可用作 `vm.Script` 和 `vm.compileFunction()` 的 `importModuleDynamically` 选项，以便 Node.js 使用主上下文的默认 ESM 加载器来加载请求的模块。
 
-For detailed information, see
-[Support of dynamic `import()` in compilation APIs][].
+详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
 
 ## `vm.createContext([contextObject[, options]])`
 
@@ -1316,44 +1087,20 @@ changes:
 -->
 
 * `contextObject` {Object|vm.constants.DONT\_CONTEXTIFY|undefined}
-  Either [`vm.constants.DONT_CONTEXTIFY`][] or an object that will be [contextified][].
-  If `undefined`, an empty contextified object will be created for backwards compatibility.
+  可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。
 * `options` {Object}
-  * `name` {string} Human-readable name of the newly created context.
-    **Default:** `'VM Context i'`, where `i` is an ascending numerical index of
-    the created context.
-  * `origin` {string} [Origin][origin] corresponding to the newly created
-    context for display purposes. The origin should be formatted like a URL,
-    but with only the scheme, host, and port (if necessary), like the value of
-    the [`url.origin`][] property of a [`URL`][] object. Most notably, this
-    string should omit the trailing slash, as that denotes a path.
-    **Default:** `''`.
+  * `name` {string} 新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。
+  * `origin` {string} 对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。
   * `codeGeneration` {Object}
-    * `strings` {boolean} If set to false any calls to `eval` or function
-      constructors (`Function`, `GeneratorFunction`, etc) will throw an
-      `EvalError`. **Default:** `true`.
-    * `wasm` {boolean} If set to false any attempt to compile a WebAssembly
-      module will throw a `WebAssembly.CompileError`. **Default:** `true`.
-  * `microtaskMode` {string} If set to `afterEvaluate`, microtasks (tasks
-    scheduled through `Promise`s and `async function`s) will be run immediately
-    after a script has run through [`script.runInContext()`][].
-    They are included in the `timeout` and `breakOnSigint` scopes in that case.
+    * `strings` {boolean} 如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。
+    * `wasm` {boolean} 如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。
+  * `microtaskMode` {string} 如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本通过 [`script.runInContext()`][] 运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。
   * `importModuleDynamically`
     {Function|vm.constants.USE\_MAIN\_CONTEXT\_DEFAULT\_LOADER}
-    Used to specify the how the modules should be loaded when `import()` is
-    called in this context without a referrer script or module. This option is
-    part of the experimental modules API. We do not recommend using it in a
-    production environment. For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
-* Returns: {Object} contextified object.
+    用于指定在此上下文中调用 `import()` 而没有引用脚本或模块时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
+* 返回: {Object} 上下文化对象。
 
-If the given `contextObject` is an object, the `vm.createContext()` method will [prepare that
-object][contextified] and return a reference to it so that it can be used in
-calls to [`vm.runInContext()`][] or [`script.runInContext()`][]. Inside such
-scripts, the global object will be wrapped by the `contextObject`, retaining all of its
-existing properties but also having the built-in objects and functions any
-standard [global object][] has. Outside of scripts run by the vm module, global
-variables will remain unchanged.
+如果给定的 `contextObject` 是一个对象，`vm.createContext()` 方法将[准备该对象][contextified]并返回对其的引用，以便可以在调用 [`vm.runInContext()`][] 或 [`script.runInContext()`][] 时使用。在此类脚本内部，全局对象将被 `contextObject` 包装，保留其所有现有属性，同时也拥有任何标准[全局对象][]所具有的内置对象和函数。在 vm 模块运行的脚本之外，全局变量将保持不变。
 
 ```js
 const vm = require('node:vm');
@@ -1366,28 +1113,19 @@ vm.createContext(context);
 vm.runInContext('globalVar *= 2;', context);
 
 console.log(context);
-// Prints: { globalVar: 2 }
+// 打印: { globalVar: 2 }
 
 console.log(global.globalVar);
-// Prints: 3
+// 打印: 3
 ```
 
-If `contextObject` is omitted (or passed explicitly as `undefined`), a new,
-empty [contextified][] object will be returned.
+如果省略 `contextObject`（或显式传递为 `undefined`），将返回一个新的空的 [contextified][] 对象。
 
-When the global object in the newly created context is [contextified][], it has some quirks
-compared to ordinary global objects. For example, it cannot be frozen. To create a context
-without the contextifying quirks, pass [`vm.constants.DONT_CONTEXTIFY`][] as the `contextObject`
-argument. See the documentation of [`vm.constants.DONT_CONTEXTIFY`][] for details.
+当新创建上下文中的全局对象被 [contextified][] 时，与普通全局对象相比，它有一些怪癖。例如，它不能被冻结。要创建一个没有上下文化怪癖的上下文，请将 [`vm.constants.DONT_CONTEXTIFY`][] 作为 `contextObject` 参数传递。有关详细信息，请参阅 [`vm.constants.DONT_CONTEXTIFY`][] 的文档。
 
-The `vm.createContext()` method is primarily useful for creating a single
-context that can be used to run multiple scripts. For instance, if emulating a
-web browser, the method can be used to create a single context representing a
-window's global object, then run all `<script>` tags together within that
-context.
+`vm.createContext()` 方法主要用于创建单个上下文，该上下文可用于运行多个脚本。例如，如果模拟 Web 浏览器，该方法可用于创建表示窗口全局对象的单个上下文，然后在该上下文中一起运行所有 `<script>` 标签。
 
-The provided `name` and `origin` of the context are made visible through the
-Inspector API.
+提供的上下文的 `name` 和 `origin` 通过 Inspector API 可见。
 
 ## `vm.isContext(object)`
 
@@ -1396,11 +1134,9 @@ added: v0.11.7
 -->
 
 * `object` {Object}
-* Returns: {boolean}
+* 返回: {boolean}
 
-Returns `true` if the given `object` object has been [contextified][] using
-[`vm.createContext()`][], or if it's the global object of a context created
-using [`vm.constants.DONT_CONTEXTIFY`][].
+如果给定的 `object` 对象已使用 [`vm.createContext()`][] 进行 [contextified][]，或者它是使用 [`vm.constants.DONT_CONTEXTIFY`][] 创建的上下文的全局对象，则返回 `true`。
 
 ## `vm.measureMemory([options])`
 
@@ -1410,41 +1146,24 @@ added: v13.10.0
 
 > Stability: 1 - Experimental
 
-Measure the memory known to V8 and used by all contexts known to the
-current V8 isolate, or the main context.
+测量 V8 已知的并由当前 V8 隔离器已知的所有上下文或主上下文使用的内存。
 
-* `options` {Object} Optional.
-  * `mode` {string} Either `'summary'` or `'detailed'`. In summary mode,
-    only the memory measured for the main context will be returned. In
-    detailed mode, the memory measured for all contexts known to the
-    current V8 isolate will be returned.
-    **Default:** `'summary'`
-  * `execution` {string} Either `'default'` or `'eager'`. With default
-    execution, the promise will not resolve until after the next scheduled
-    garbage collection starts, which may take a while (or never if the program
-    exits before the next GC). With eager execution, the GC will be started
-    right away to measure the memory.
-    **Default:** `'default'`
-* Returns: {Promise} If the memory is successfully measured, the promise will
-  resolve with an object containing information about the memory usage.
-  Otherwise it will be rejected with an `ERR_CONTEXT_NOT_INITIALIZED` error.
+* `options` {Object} 可选。
+  * `mode` {string} `'summary'` 或 `'detailed'`。在摘要模式下，仅返回为主上下文测量的内存。在详细模式下，将返回为当前 V8 隔离器已知的所有上下文测量的内存。**默认值:** `'summary'`
+  * `execution` {string} `'default'` 或 `'eager'`。使用默认执行，promise 直到下一个计划的垃圾回收开始后才会解析，这可能需要一段时间（或者如果程序在下一个 GC 之前退出，则永远不会解析）。使用急切执行，将立即启动 GC 来测量内存。**默认值:** `'default'`
+* 返回: {Promise} 如果内存测量成功，promise 将使用包含内存使用信息的对象解析。否则它将因 `ERR_CONTEXT_NOT_INITIALIZED` 错误而被拒绝。
 
-The format of the object that the returned Promise may resolve with is
-specific to the V8 engine and may change from one version of V8 to the next.
+Promise 可能解析的对象的格式特定于 V8 引擎，并且可能从一个版本的 V8 更改为下一个版本。
 
-The returned result is different from the statistics returned by
-`v8.getHeapSpaceStatistics()` in that `vm.measureMemory()` measure the
-memory reachable by each V8 specific contexts in the current instance of
-the V8 engine, while the result of `v8.getHeapSpaceStatistics()` measure
-the memory occupied by each heap space in the current V8 instance.
+返回的结果与 `v8.getHeapSpaceStatistics()` 返回的统计信息不同，因为 `vm.measureMemory()` 测量当前 V8 实例中每个 V8 特定上下文可访问的内存，而 `v8.getHeapSpaceStatistics()` 的结果测量当前 V8 实例中每个堆空间占用的内存。
 
 ```js
 const vm = require('node:vm');
-// Measure the memory used by the main context.
+// 测量主上下文使用的内存。
 vm.measureMemory({ mode: 'summary' })
-  // This is the same as vm.measureMemory()
+  // 这与 vm.measureMemory() 相同
   .then((result) => {
-    // The current format is:
+    // 当前格式是：
     // {
     //   total: {
     //      jsMemoryEstimate: 2418479, jsMemoryRange: [ 2418479, 2745799 ]
@@ -1456,8 +1175,7 @@ vm.measureMemory({ mode: 'summary' })
 const context = vm.createContext({ a: 1 });
 vm.measureMemory({ mode: 'detailed', execution: 'eager' })
   .then((result) => {
-    // Reference the context here so that it won't be GC'ed
-    // until the measurement is complete.
+    // 在此处引用上下文，以便在测量完成之前不会被 GC 回收。
     console.log(context.a);
     // {
     //   total: {
@@ -1501,47 +1219,25 @@ changes:
     description: The `breakOnSigint` option is supported now.
 -->
 
-* `code` {string} The JavaScript code to compile and run.
-* `contextifiedObject` {Object} The [contextified][] object that will be used
-  as the `global` when the `code` is compiled and run.
+* `code` {string} 要编译和运行的 JavaScript 代码。
+* `contextifiedObject` {Object} 在编译和运行 `code` 时将用作 `global` 的 [contextified][] 对象。
 * `options` {Object|string}
-  * `filename` {string} Specifies the filename used in stack traces produced
-    by this script. **Default:** `'evalmachine.<anonymous>'`.
-  * `lineOffset` {number} Specifies the line number offset that is displayed
-    in stack traces produced by this script. **Default:** `0`.
-  * `columnOffset` {number} Specifies the first-line column number offset that
-    is displayed in stack traces produced by this script. **Default:** `0`.
-  * `displayErrors` {boolean} When `true`, if an [`Error`][] occurs
-    while compiling the `code`, the line of code causing the error is attached
-    to the stack trace. **Default:** `true`.
-  * `timeout` {integer} Specifies the number of milliseconds to execute `code`
-    before terminating execution. If execution is terminated, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-  * `cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or
-    `TypedArray`, or `DataView` with V8's code cache data for the supplied
-    source.
+  * `filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。
+  * `lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。
+  * `columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。
+  * `displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。
+  * `timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+  * `cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。
   * `importModuleDynamically`
     {Function|vm.constants.USE\_MAIN\_CONTEXT\_DEFAULT\_LOADER}
-    Used to specify the how the modules should be loaded during the evaluation
-    of this script when `import()` is called. This option is part of the
-    experimental modules API. We do not recommend using it in a production
-    environment. For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
+    用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
 
-The `vm.runInContext()` method compiles `code`, runs it within the context of
-the `contextifiedObject`, then returns the result. Running code does not have
-access to the local scope. The `contextifiedObject` object _must_ have been
-previously [contextified][] using the [`vm.createContext()`][] method.
+`vm.runInContext()` 方法编译 `code`，在 `contextifiedObject` 的上下文中运行它，然后返回结果。运行的代码无法访问局部作用域。`contextifiedObject` 对象*必须*先前已使用 [`vm.createContext()`][] 方法进行 [contextified][]。
 
-If `options` is a string, then it specifies the filename.
+如果 `options` 是字符串，则它指定文件名。
 
-The following example compiles and executes different scripts using a single
-[contextified][] object:
+以下示例使用单个 [contextified][] 对象编译和执行不同的脚本：
 
 ```js
 const vm = require('node:vm');
@@ -1553,7 +1249,7 @@ for (let i = 0; i < 10; ++i) {
   vm.runInContext('globalVar *= 2;', contextObject);
 }
 console.log(contextObject);
-// Prints: { globalVar: 1024 }
+// 打印: { globalVar: 1024 }
 ```
 
 ## `vm.runInNewContext(code[, contextObject[, options]])`
@@ -1589,76 +1285,39 @@ changes:
     description: The `breakOnSigint` option is supported now.
 -->
 
-* `code` {string} The JavaScript code to compile and run.
+* `code` {string} 要编译和运行的 JavaScript 代码。
 * `contextObject` {Object|vm.constants.DONT\_CONTEXTIFY|undefined}
-  Either [`vm.constants.DONT_CONTEXTIFY`][] or an object that will be [contextified][].
-  If `undefined`, an empty contextified object will be created for backwards compatibility.
+  可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。
 * `options` {Object|string}
-  * `filename` {string} Specifies the filename used in stack traces produced
-    by this script. **Default:** `'evalmachine.<anonymous>'`.
-  * `lineOffset` {number} Specifies the line number offset that is displayed
-    in stack traces produced by this script. **Default:** `0`.
-  * `columnOffset` {number} Specifies the first-line column number offset that
-    is displayed in stack traces produced by this script. **Default:** `0`.
-  * `displayErrors` {boolean} When `true`, if an [`Error`][] occurs
-    while compiling the `code`, the line of code causing the error is attached
-    to the stack trace. **Default:** `true`.
-  * `timeout` {integer} Specifies the number of milliseconds to execute `code`
-    before terminating execution. If execution is terminated, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-  * `contextName` {string} Human-readable name of the newly created context.
-    **Default:** `'VM Context i'`, where `i` is an ascending numerical index of
-    the created context.
-  * `contextOrigin` {string} [Origin][origin] corresponding to the newly
-    created context for display purposes. The origin should be formatted like a
-    URL, but with only the scheme, host, and port (if necessary), like the
-    value of the [`url.origin`][] property of a [`URL`][] object. Most notably,
-    this string should omit the trailing slash, as that denotes a path.
-    **Default:** `''`.
+  * `filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。
+  * `lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。
+  * `columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。
+  * `displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。
+  * `timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+  * `contextName` {string} 新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。
+  * `contextOrigin` {string} 对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。
   * `contextCodeGeneration` {Object}
-    * `strings` {boolean} If set to false any calls to `eval` or function
-      constructors (`Function`, `GeneratorFunction`, etc) will throw an
-      `EvalError`. **Default:** `true`.
-    * `wasm` {boolean} If set to false any attempt to compile a WebAssembly
-      module will throw a `WebAssembly.CompileError`. **Default:** `true`.
-  * `cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or
-    `TypedArray`, or `DataView` with V8's code cache data for the supplied
-    source.
+    * `strings` {boolean} 如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。
+    * `wasm` {boolean} 如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。
+  * `cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。
   * `importModuleDynamically`
     {Function|vm.constants.USE\_MAIN\_CONTEXT\_DEFAULT\_LOADER}
-    Used to specify the how the modules should be loaded during the evaluation
-    of this script when `import()` is called. This option is part of the
-    experimental modules API. We do not recommend using it in a production
-    environment. For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
-  * `microtaskMode` {string} If set to `afterEvaluate`, microtasks (tasks
-    scheduled through `Promise`s and `async function`s) will be run immediately
-    after the script has run. They are included in the `timeout` and
-    `breakOnSigint` scopes in that case.
-* Returns: {any} the result of the very last statement executed in the script.
+    用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
+  * `microtaskMode` {string} 如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。
+* 返回: {any} 脚本中执行的最后一个语句的结果。
 
-This method is a shortcut to
-`(new vm.Script(code, options)).runInContext(vm.createContext(options), options)`.
-If `options` is a string, then it specifies the filename.
+此方法是 `(new vm.Script(code, options)).runInContext(vm.createContext(options), options)` 的快捷方式。如果 `options` 是字符串，则它指定文件名。
 
-It does several things at once:
+它同时做了几件事：
 
-1. Creates a new context.
-2. If `contextObject` is an object, [contextifies][contextified] it with the new context.
-   If  `contextObject` is undefined, creates a new object and [contextifies][contextified] it.
-   If `contextObject` is [`vm.constants.DONT_CONTEXTIFY`][], don't [contextify][contextified] anything.
-3. Compiles the code as a`vm.Script`
-4. Runs the compield code within the created context. The code does not have access to the scope in
-   which this method is called.
-5. Returns the result.
+1. 创建一个新的上下文。
+2. 如果 `contextObject` 是一个对象，则使用新上下文对其进行 [contextified][]。如果 `contextObject` 是 undefined，则创建一个新对象并对其进行 [contextified][]。如果 `contextObject` 是 [`vm.constants.DONT_CONTEXTIFY`][]，则不 [contextify][] 任何东西。
+3. 将代码编译为 `vm.Script`
+4. 在创建的上下文中运行已编译的代码。代码无法访问此方法被调用的作用域。
+5. 返回结果。
 
-The following example compiles and executes code that increments a global
-variable and sets a new one. These globals are contained in the `contextObject`.
+以下示例编译并执行增加全局变量并设置新变量的代码。这些全局变量包含在 `contextObject` 中。
 
 ```js
 const vm = require('node:vm');
@@ -1670,11 +1329,10 @@ const contextObject = {
 
 vm.runInNewContext('count += 1; name = "kitty"', contextObject);
 console.log(contextObject);
-// Prints: { animal: 'cat', count: 3, name: 'kitty' }
+// 打印: { animal: 'cat', count: 3, name: 'kitty' }
 
-// This would throw if the context is created from a contextified object.
-// vm.constants.DONT_CONTEXTIFY allows creating contexts with ordinary global objects that
-// can be frozen.
+// 如果上下文是从上下文化对象创建的，这将抛出。
+// vm.constants.DONT_CONTEXTIFY 允许创建具有普通全局对象的上下文，这些对象可以被冻结。
 const frozenContext = vm.runInNewContext('Object.freeze(globalThis); globalThis;', vm.constants.DONT_CONTEXTIFY);
 ```
 
@@ -1700,45 +1358,25 @@ changes:
     description: The `breakOnSigint` option is supported now.
 -->
 
-* `code` {string} The JavaScript code to compile and run.
+* `code` {string} 要编译和运行的 JavaScript 代码。
 * `options` {Object|string}
-  * `filename` {string} Specifies the filename used in stack traces produced
-    by this script. **Default:** `'evalmachine.<anonymous>'`.
-  * `lineOffset` {number} Specifies the line number offset that is displayed
-    in stack traces produced by this script. **Default:** `0`.
-  * `columnOffset` {number} Specifies the first-line column number offset that
-    is displayed in stack traces produced by this script. **Default:** `0`.
-  * `displayErrors` {boolean} When `true`, if an [`Error`][] occurs
-    while compiling the `code`, the line of code causing the error is attached
-    to the stack trace. **Default:** `true`.
-  * `timeout` {integer} Specifies the number of milliseconds to execute `code`
-    before terminating execution. If execution is terminated, an [`Error`][]
-    will be thrown. This value must be a strictly positive integer.
-  * `breakOnSigint` {boolean} If `true`, receiving `SIGINT`
-    (<kbd>Ctrl</kbd>+<kbd>C</kbd>) will terminate execution and throw an
-    [`Error`][]. Existing handlers for the event that have been attached via
-    `process.on('SIGINT')` are disabled during script execution, but continue to
-    work after that. **Default:** `false`.
-  * `cachedData` {Buffer|TypedArray|DataView} Provides an optional `Buffer` or
-    `TypedArray`, or `DataView` with V8's code cache data for the supplied
-    source.
+  * `filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。
+  * `lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。
+  * `columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。
+  * `displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。
+  * `timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。
+  * `breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。
+  * `cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。
   * `importModuleDynamically`
     {Function|vm.constants.USE\_MAIN\_CONTEXT\_DEFAULT\_LOADER}
-    Used to specify the how the modules should be loaded during the evaluation
-    of this script when `import()` is called. This option is part of the
-    experimental modules API. We do not recommend using it in a production
-    environment. For detailed information, see
-    [Support of dynamic `import()` in compilation APIs][].
-* Returns: {any} the result of the very last statement executed in the script.
+    用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。
+* 返回: {any} 脚本中执行的最后一个语句的结果。
 
-`vm.runInThisContext()` compiles `code`, runs it within the context of the
-current `global` and returns the result. Running code does not have access to
-local scope, but does have access to the current `global` object.
+`vm.runInThisContext()` 编译 `code`，在当前 `global` 的上下文中运行它，并返回结果。运行的代码无法访问局部作用域，但可以访问当前的 `global` 对象。
 
-If `options` is a string, then it specifies the filename.
+如果 `options` 是字符串，则它指定文件名。
 
-The following example illustrates using both `vm.runInThisContext()` and
-the JavaScript [`eval()`][] function to run the same code:
+以下示例说明了使用 `vm.runInThisContext()` 和 JavaScript [`eval()`][] 函数运行相同的代码：
 
 <!-- eslint-disable prefer-const -->
 
@@ -1748,28 +1386,20 @@ let localVar = 'initial value';
 
 const vmResult = vm.runInThisContext('localVar = "vm";');
 console.log(`vmResult: '${vmResult}', localVar: '${localVar}'`);
-// Prints: vmResult: 'vm', localVar: 'initial value'
+// 打印: vmResult: 'vm', localVar: 'initial value'
 
 const evalResult = eval('localVar = "eval";');
 console.log(`evalResult: '${evalResult}', localVar: '${localVar}'`);
-// Prints: evalResult: 'eval', localVar: 'eval'
+// 打印: evalResult: 'eval', localVar: 'eval'
 ```
 
-Because `vm.runInThisContext()` does not have access to the local scope,
-`localVar` is unchanged. In contrast, a direct `eval()` call _does_ have access
-to the local scope, so the value `localVar` is changed. In this way
-`vm.runInThisContext()` is much like an [indirect `eval()` call][], e.g.
-`(0,eval)('code')`.
+因为 `vm.runInThisContext()` 无法访问局部作用域，`localVar`  unchanged。相反，直接的 `eval()` 调用*可以*访问局部作用域，因此值 `localVar` 被更改。这样，`vm.runInThisContext()` 非常像[间接的 `eval()` 调用][]，例如 `(0,eval)('code')`。
 
-## Example: Running an HTTP server within a VM
+## 示例：在 VM 中运行 HTTP 服务器
 
-When using either [`script.runInThisContext()`][] or
-[`vm.runInThisContext()`][], the code is executed within the current V8 global
-context. The code passed to this VM context will have its own isolated scope.
+当使用 [`script.runInThisContext()`][] 或 [`vm.runInThisContext()`][] 时，代码在当前 V8 全局上下文中执行。传递给此 VM 上下文的代码将具有其自己独立的作用域。
 
-In order to run a simple web server using the `node:http` module the code passed
-to the context must either call `require('node:http')` on its own, or have a
-reference to the `node:http` module passed to it. For instance:
+为了使用 `node:http` 模块运行一个简单的 Web 服务器，传递给上下文的代码必须自己调用 `require('node:http')`，或者具有传递给它的 `node:http` 模块的引用。例如：
 
 ```js
 'use strict';
@@ -1790,38 +1420,25 @@ const code = `
 vm.runInThisContext(code)(require);
 ```
 
-The `require()` in the above case shares the state with the context it is
-passed from. This may introduce risks when untrusted code is executed, e.g.
-altering objects in the context in unwanted ways.
+上述情况中的 `require()` 与它传递自的上下文共享状态。当执行不受信任的代码时，这可能会引入风险，例如以不希望的方式更改上下文中的对象。
 
-## What does it mean to "contextify" an object?
+## "上下文化"一个对象是什么意思？
 
-All JavaScript executed within Node.js runs within the scope of a "context".
-According to the [V8 Embedder's Guide][]:
+在 Node.js 中执行的所有 JavaScript 都在一个"上下文"的作用域内运行。根据 [V8 嵌入者指南][]：
 
-> In V8, a context is an execution environment that allows separate, unrelated,
-> JavaScript applications to run in a single instance of V8. You must explicitly
-> specify the context in which you want any JavaScript code to be run.
+> 在 V8 中，上下文是一个执行环境，允许独立的、不相关的 JavaScript 应用程序在 V8 的单个实例中运行。您必须明确指定希望任何 JavaScript 代码运行的上下文。
 
-When the method `vm.createContext()` is called with an object, the `contextObject` argument
-will be used to wrap the global object of a new instance of a V8 Context
-(if `contextObject` is `undefined`, a new object will be created from the current context
-before its contextified). This V8 Context provides the `code` run using the `node:vm`
-module's methods with an isolated global environment within which it can operate.
-The process of creating the V8 Context and associating it with the `contextObject`
-in the outer context is what this document refers to as "contextifying" the object.
+当使用对象调用 `vm.createContext()` 方法时，`contextObject` 参数将用于包装 V8 上下文新实例的全局对象（如果 `contextObject` 是 `undefined`，将在上下文化之前从当前上下文创建一个新对象）。此 V8 上下文为使用 `node:vm` 模块方法运行的 `code` 提供了一个隔离的全局环境，使其可以在其中操作。创建 V8 上下文并将其与外部上下文中的 `contextObject` 关联的过程就是本文档所指的"上下文化"对象。
 
-The contextifying would introduce some quirks to the `globalThis` value in the context.
-For example, it cannot be frozen, and it is not reference equal to the `contextObject`
-in the outer context.
+上下文化会给上下文中的 `globalThis` 值带来一些怪癖。例如，它不能被冻结，并且它与外部上下文中的 `contextObject` 不是引用相等的。
 
 ```js
 const vm = require('node:vm');
 
-// An undefined `contextObject` option makes the global object contextified.
+// 未定义的 `contextObject` 选项使全局对象被上下文化。
 const context = vm.createContext();
 console.log(vm.runInContext('globalThis', context) === context);  // false
-// A contextified global object cannot be frozen.
+// 被上下文化的全局对象不能被冻结。
 try {
   vm.runInContext('Object.freeze(globalThis);', context);
 } catch (e) {
@@ -1830,21 +1447,16 @@ try {
 console.log(vm.runInContext('globalThis.foo = 1; foo;', context));  // 1
 ```
 
-To create a context with an ordinary global object and get access to a global proxy in
-the outer context with fewer quirks, specify `vm.constants.DONT_CONTEXTIFY` as the
-`contextObject` argument.
+要创建一个具有普通全局对象并在外部上下文中访问全局代理且怪癖较少的上下文，请将 `vm.constants.DONT_CONTEXTIFY` 指定为 `contextObject` 参数。
 
 ### `vm.constants.DONT_CONTEXTIFY`
 
-This constant, when used as the `contextObject` argument in vm APIs, instructs Node.js to create
-a context without wrapping its global object with another object in a Node.js-specific manner.
-As a result, the `globalThis` value inside the new context would behave more closely to an ordinary
-one.
+当在 vm API 中用作 `contextObject` 参数时，此常量指示 Node.js 创建一个上下文，而不以 Node.js 特定的方式用另一个对象包装其全局对象。因此，新上下文内部的 `globalThis` 值的行为更接近于普通对象。
 
 ```js
 const vm = require('node:vm');
 
-// Use vm.constants.DONT_CONTEXTIFY to freeze the global object.
+// 使用 vm.constants.DONT_CONTEXTIFY 冻结全局对象。
 const context = vm.createContext(vm.constants.DONT_CONTEXTIFY);
 vm.runInContext('Object.freeze(globalThis);', context);
 try {
@@ -1854,27 +1466,24 @@ try {
 }
 ```
 
-When `vm.constants.DONT_CONTEXTIFY` is used as the `contextObject` argument to [`vm.createContext()`][],
-the returned object is a proxy-like object to the global object in the newly created context with
-fewer Node.js-specific quirks. It is reference equal to the `globalThis` value in the new context,
-can be modified from outside the context, and can be used to access built-ins in the new context directly.
+当 `vm.constants.DONT_CONTEXTIFY` 用作 [`vm.createContext()`][] 的 `contextObject` 参数时，返回的对象是一个代理类对象，指向新创建上下文中的全局对象，具有较少的 Node.js 特定怪癖。它与新上下文中的 `globalThis` 值是引用相等的，可以从外部修改，并可用于直接访问新上下文中的内置对象。
 
 ```js
 const vm = require('node:vm');
 
 const context = vm.createContext(vm.constants.DONT_CONTEXTIFY);
 
-// Returned object is reference equal to globalThis in the new context.
+// 返回的对象与新上下文中的 globalThis 引用相等。
 console.log(vm.runInContext('globalThis', context) === context);  // true
 
-// Can be used to access globals in the new context directly.
+// 可用于直接访问新上下文中的全局变量。
 console.log(context.Array);  // [Function: Array]
 vm.runInContext('foo = 1;', context);
 console.log(context.foo);  // 1
 context.bar = 1;
 console.log(vm.runInContext('bar;', context));  // 1
 
-// Can be frozen and it affects the inner context.
+// 可以被冻结，并且它会影响内部上下文。
 Object.freeze(context);
 try {
   vm.runInContext('baz = 1; baz;', context);
@@ -1883,17 +1492,11 @@ try {
 }
 ```
 
-## Timeout interactions with asynchronous tasks and Promises
+## 超时与异步任务和 Promise 的交互
 
-`Promise`s and `async function`s can schedule tasks run by the JavaScript
-engine asynchronously. By default, these tasks are run after all JavaScript
-functions on the current stack are done executing.
-This allows escaping the functionality of the `timeout` and
-`breakOnSigint` options.
+`Promise` 和 `async function` 可以安排由 JavaScript 引擎异步运行的任务。默认情况下，这些任务在当前堆栈上的所有 JavaScript 函数执行完毕后运行。这允许逃脱 `timeout` 和 `breakOnSigint` 选项的功能。
 
-For example, the following code executed by `vm.runInNewContext()` with a
-timeout of 5 milliseconds schedules an infinite loop to run after a promise
-resolves. The scheduled loop is never interrupted by the timeout:
+例如，以下由 `vm.runInNewContext()` 执行的代码，超时为 5 毫秒，在 promise 解析后安排一个无限循环运行。计划的循环永远不会被超时中断：
 
 ```js
 const vm = require('node:vm');
@@ -1908,12 +1511,11 @@ vm.runInNewContext(
   { loop, console },
   { timeout: 5 },
 );
-// This is printed *before* 'entering loop' (!)
+// 这在 'entering loop' 之前打印 (!)
 console.log('done executing');
 ```
 
-This can be addressed by passing `microtaskMode: 'afterEvaluate'` to the code
-that creates the `Context`:
+可以通过将 `microtaskMode: 'afterEvaluate'` 传递给创建 `Context` 的代码来解决这个问题：
 
 ```js
 const vm = require('node:vm');
@@ -1929,71 +1531,46 @@ vm.runInNewContext(
 );
 ```
 
-In this case, the microtask scheduled through `promise.then()` will be run
-before returning from `vm.runInNewContext()`, and will be interrupted
-by the `timeout` functionality. This applies only to code running in a
-`vm.Context`, so e.g. [`vm.runInThisContext()`][] does not take this option.
+在这种情况下，通过 `promise.then()` 安排的微任务将在从 `vm.runInNewContext()` 返回之前运行，并将被 `timeout` 功能中断。这仅适用于在 `vm.Context` 中运行的代码，因此例如 [`vm.runInThisContext()`][] 不接受此选项。
 
-Promise callbacks are entered into the microtask queue of the context in which
-they were created. For example, if `() => loop()` is replaced with just `loop`
-in the above example, then `loop` will be pushed into the global microtask
-queue, because it is a function from the outer (main) context, and thus will
-also be able to escape the timeout.
+Promise 回调被放入它们创建时所在上下文的微任务队列中。例如，如果在上面的示例中将 `() => loop()` 替换为 `loop`，那么 `loop` 将被推入全局微任务队列，因为它是来自外部（主）上下文的函数，因此也将能够逃脱超时。
 
-If asynchronous scheduling functions such as `process.nextTick()`,
-`queueMicrotask()`, `setTimeout()`, `setImmediate()`, etc. are made available
-inside a `vm.Context`, functions passed to them will be added to global queues,
-which are shared by all contexts. Therefore, callbacks passed to those functions
-are not controllable through the timeout either.
+如果异步调度函数如 `process.nextTick()`、`queueMicrotask()`、`setTimeout()`、`setImmediate()` 等在 `vm.Context` 内部可用，传递给它们的函数将被添加到全局队列中，这些队列由所有上下文共享。因此，传递给这些函数的回调也不受超时控制。
 
-### When `microtaskMode` is `'afterEvaluate'`, beware sharing Promises between Contexts
+### 当 `microtaskMode` 是 `'afterEvaluate'` 时，注意在上下文之间共享 Promise
 
-In `'afterEvaluate'` mode, the `Context` has its own microtask queue, separate
-from the global microtask queue used by the outer (main) context. While this
-mode is necessary to enforce `timeout` and enable `breakOnSigint` with
-asynchronous tasks, it also makes sharing promises between contexts challenging.
+在 `'afterEvaluate'` 模式下，`Context` 有自己的微任务队列，与外部（主）上下文使用的全局微任务队列分开。虽然此模式对于强制执行 `timeout` 和启用 `breakOnSigint` 与异步任务是必要的，但它也使得在上下文之间共享 Promise 具有挑战性。
 
-In the example below, a promise is created in the inner context and shared with
-the outer context. When the outer context `await` on the promise, the execution
-flow of the outer context is disrupted in a surprising way: the log statement
-is never executed.
+在下面的示例中，一个 promise 在内部上下文中创建并与外部上下文共享。当外部上下文 `await` 该 promise 时，外部上下文的执行流程以一种令人惊讶的方式被破坏：日志语句永远不会执行。
 
 ```mjs
 import * as vm from 'node:vm';
 
 const inner_context = vm.createContext({}, { microtaskMode: 'afterEvaluate' });
 
-// runInContext() returns a Promise created in the inner context.
+// runInContext() 返回在内部上下文中创建的 Promise。
 const inner_promise = vm.runInContext(
   'Promise.resolve()',
   context,
 );
 
-// As part of performing `await`, the JavaScript runtime must enqueue a task
-// on the microtask queue of the context where `inner_promise` was created.
-// A task is added on the inner microtask queue, but **it will not be run
-// automatically**: this task will remain pending indefinitely.
+// 作为执行 `await` 的一部分，JavaScript 运行时必须将一个任务
+// 排入 `inner_promise` 创建时所在上下文的微任务队列。
+// 一个任务被添加到内部微任务队列，但**它不会自动运行**：此任务将无限期保持挂起。
 //
-// Since the outer microtask queue is empty, execution in the outer module
-// falls through, and the log statement below is never executed.
+// 由于外部微任务队列为空，外部模块中的执行
+// 会落空，下面的日志语句永远不会执行。
 await inner_promise;
 
 console.log('this will NOT be printed');
 ```
 
-To successfully share promises between contexts with different microtask queues,
-it is necessary to ensure that tasks on the inner microtask queue will be run
-**whenever** the outer context enqueues a task on the inner microtask queue.
+为了在不同微任务队列的上下文之间成功共享 promise，有必要确保每当外部上下文将任务排入内部微任务队列时，内部微任务队列上的任务将被运行。
 
-The tasks on the microtask queue of a given context are run whenever
-`runInContext()` or `SourceTextModule.evaluate()` are invoked on a script or
-module using this context. In our example, the normal execution flow can be
-restored by scheduling a second call to `runInContext()` _before_ `await
-inner_promise`.
+每当在此上下文上调用脚本或模块的 `runInContext()` 或 `SourceTextModule.evaluate()` 时，给定上下文的微任务队列上的任务就会运行。在我们的示例中，可以通过在 `await inner_promise` 之前安排第二次调用 `runInContext()` 来恢复正常的执行流程。
 
 ```mjs
-// Schedule `runInContext()` to manually drain the inner context microtask
-// queue; it will run after the `await` statement below.
+// 安排 `runInContext()` 以手动清空内部上下文微任务队列；它将在下面的 `await` 语句之后运行。
 setImmediate(() => {
   vm.runInContext('', context);
 });
@@ -2003,15 +1580,11 @@ await inner_promise;
 console.log('OK');
 ```
 
-**Note:** Strictly speaking, in this mode, `node:vm` departs from the letter of
-the ECMAScript specification for [enqueing jobs][], by allowing asynchronous
-tasks from different contexts to run in a different order than they were
-enqueued.
+**注意：** 严格来说，在这种模式下，`node:vm` 偏离了 ECMAScript 规范中[排队作业][]的字面意义，允许来自不同上下文的异步任务以与它们排队顺序不同的顺序运行。
 
-## Support of dynamic `import()` in compilation APIs
+## 编译 API 中对动态 `import()` 的支持
 
-The following APIs support an `importModuleDynamically` option to enable dynamic
-`import()` in code compiled by the vm module.
+以下 API 支持 `importModuleDynamically` 选项，以在 vm 模块编译的代码中启用动态 `import()`。
 
 * `new vm.Script`
 * `vm.compileFunction()`
@@ -2021,29 +1594,19 @@ The following APIs support an `importModuleDynamically` option to enable dynamic
 * `vm.runInNewContext()`
 * `vm.createContext()`
 
-This option is still part of the experimental modules API. We do not recommend
-using it in a production environment.
+此选项仍然是实验性模块 API 的一部分。我们不建议在生产环境中使用它。
 
-### When the `importModuleDynamically` option is not specified or undefined
+### 当未指定 `importModuleDynamically` 选项或为 undefined 时
 
-If this option is not specified, or if it's `undefined`, code containing
-`import()` can still be compiled by the vm APIs, but when the compiled code is
-executed and it actually calls `import()`, the result will reject with
-[`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`][].
+如果未指定此选项，或者它是 `undefined`，包含 `import()` 的代码仍然可以由 vm API 编译，但当编译的代码执行并实际调用 `import()` 时，结果将因 [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`][] 而拒绝。
 
-### When `importModuleDynamically` is `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`
+### 当 `importModuleDynamically` 是 `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` 时
 
-This option is currently not supported for `vm.SourceTextModule`.
+此选项目前不支持 `vm.SourceTextModule`。
 
-With this option, when an `import()` is initiated in the compiled code, Node.js
-would use the default ESM loader from the main context to load the requested
-module and return it to the code being executed.
+使用此选项，当在编译的代码中发起 `import()` 时，Node.js 将使用主上下文的默认 ESM 加载器来加载请求的模块，并将其返回给正在执行的代码。
 
-This gives access to Node.js built-in modules such as `fs` or `http`
-to the code being compiled. If the code is executed in a different context,
-be aware that the objects created by modules loaded from the main context
-are still from the main context and not `instanceof` built-in classes in the
-new context.
+这使得正在编译的代码可以访问 Node.js 内置模块，如 `fs` 或 `http`。如果代码在不同的上下文中执行，请注意从主上下文加载的模块创建的对象仍然来自主上下文，而不是新上下文中内置类的 `instanceof`。
 
 ```cjs
 const { Script, constants } = require('node:vm');
@@ -2051,8 +1614,7 @@ const script = new Script(
   'import("node:fs").then(({readFile}) => readFile instanceof Function)',
   { importModuleDynamically: constants.USE_MAIN_CONTEXT_DEFAULT_LOADER });
 
-// false: URL loaded from the main context is not an instance of the Function
-// class in the new context.
+// false：从主上下文加载的 URL 不是新上下文中 Function 类的实例。
 script.runInNewContext().then(console.log);
 ```
 
@@ -2063,27 +1625,24 @@ const script = new Script(
   'import("node:fs").then(({readFile}) => readFile instanceof Function)',
   { importModuleDynamically: constants.USE_MAIN_CONTEXT_DEFAULT_LOADER });
 
-// false: URL loaded from the main context is not an instance of the Function
-// class in the new context.
+// false：从主上下文加载的 URL 不是新上下文中 Function 类的实例。
 script.runInNewContext().then(console.log);
 ```
 
-This option also allows the script or function to load user modules:
+此选项还允许脚本或函数加载用户模块：
 
 ```mjs
 import { Script, constants } from 'node:vm';
 import { resolve } from 'node:path';
 import { writeFileSync } from 'node:fs';
 
-// Write test.js and test.txt to the directory where the current script
-// being run is located.
+// 将 test.js 和 test.txt 写入当前正在运行的脚本所在的目录。
 writeFileSync(resolve(import.meta.dirname, 'test.mjs'),
               'export const filename = "./test.json";');
 writeFileSync(resolve(import.meta.dirname, 'test.json'),
               '{"hello": "world"}');
 
-// Compile a script that loads test.mjs and then test.json
-// as if the script is placed in the same directory.
+// 编译一个脚本，该脚本加载 test.mjs，然后 test.json，就像脚本放在同一目录中一样。
 const script = new Script(
   `(async function() {
     const { filename } = await import('./test.mjs');
@@ -2103,15 +1662,13 @@ const { Script, constants } = require('node:vm');
 const { resolve } = require('node:path');
 const { writeFileSync } = require('node:fs');
 
-// Write test.js and test.txt to the directory where the current script
-// being run is located.
+// 将 test.js 和 test.txt 写入当前正在运行的脚本所在的目录。
 writeFileSync(resolve(__dirname, 'test.mjs'),
               'export const filename = "./test.json";');
 writeFileSync(resolve(__dirname, 'test.json'),
               '{"hello": "world"}');
 
-// Compile a script that loads test.mjs and then test.json
-// as if the script is placed in the same directory.
+// 编译一个脚本，该脚本加载 test.mjs，然后 test.json，就像脚本放在同一目录中一样。
 const script = new Script(
   `(async function() {
     const { filename } = await import('./test.mjs');
@@ -2126,60 +1683,32 @@ const script = new Script(
 script.runInThisContext().then(console.log);
 ```
 
-There are a few caveats with loading user modules using the default loader
-from the main context:
+使用主上下文的默认加载器加载用户模块有一些注意事项：
 
-1. The module being resolved would be relative to the `filename` option passed
-   to `vm.Script` or `vm.compileFunction()`. The resolution can work with a
-   `filename` that's either an absolute path or a URL string.  If `filename` is
-   a string that's neither an absolute path or a URL, or if it's undefined,
-   the resolution will be relative to the current working directory
-   of the process. In the case of `vm.createContext()`, the resolution is always
-   relative to the current working directory since this option is only used when
-   there isn't a referrer script or module.
-2. For any given `filename` that resolves to a specific path, once the process
-   manages to load a particular module from that path, the result may be cached,
-   and subsequent load of the same module from the same path would return the
-   same thing. If the `filename` is a URL string, the cache would not be hit
-   if it has different search parameters. For `filename`s that are not URL
-   strings, there is currently no way to bypass the caching behavior.
+1. 被解析的模块将相对于传递给 `vm.Script` 或 `vm.compileFunction()` 的 `filename` 选项。解析可以使用绝对路径或 URL 字符串的 `filename`。如果 `filename` 既不是绝对路径也不是 URL 的字符串，或者它是 undefined，解析将相对于进程的当前工作目录。对于 `vm.createContext()`，解析始终相对于当前工作目录，因为此选项仅在不存在引用脚本或模块时使用。
+2. 对于任何解析为特定路径的 `filename`，一旦进程成功从该路径加载特定模块，结果可能会被缓存，随后从同一路径加载相同模块将返回相同的内容。如果 `filename` 是 URL 字符串，如果它具有不同的搜索参数，则缓存将不会被命中。对于不是 URL 字符串的 `filename`，目前无法绕过缓存行为。
 
-### When `importModuleDynamically` is a function
+### 当 `importModuleDynamically` 是一个函数时
 
-When `importModuleDynamically` is a function, it will be invoked when `import()`
-is called in the compiled code for users to customize how the requested module
-should be compiled and evaluated. Currently, the Node.js instance must be
-launched with the `--experimental-vm-modules` flag for this option to work. If
-the flag isn't set, this callback will be ignored. If the code evaluated
-actually calls to `import()`, the result will reject with
-[`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG`][].
+当 `importModuleDynamically` 是一个函数时，它将在编译的代码中调用 `import()` 时被调用，以便用户自定义应如何编译和评估请求的模块。目前，必须使用 `--experimental-vm-modules` 标志启动 Node.js 实例才能使此选项工作。如果未设置该标志，此回调将被忽略。如果评估的代码实际调用 `import()`，结果将因 [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG`][] 而拒绝。
 
-The callback `importModuleDynamically(specifier, referrer, importAttributes)`
-has the following signature:
+回调 `importModuleDynamically(specifier, referrer, importAttributes)` 具有以下签名：
 
-* `specifier` {string} specifier passed to `import()`
+* `specifier` {string} 传递给 `import()` 的说明符
 * `referrer` {vm.Script|Function|vm.SourceTextModule|Object}
-  The referrer is the compiled `vm.Script` for `new vm.Script`,
-  `vm.runInThisContext`, `vm.runInContext` and `vm.runInNewContext`. It's the
-  compiled `Function` for `vm.compileFunction`, the compiled
-  `vm.SourceTextModule` for `new vm.SourceTextModule`, and the context `Object`
-  for `vm.createContext()`.
-* `importAttributes` {Object} The `"with"` value passed to the
-  [`optionsExpression`][] optional parameter, or an empty object if no value was
-  provided.
-* `phase` {string} The phase of the dynamic import (`"source"` or `"evaluation"`).
-* Returns: {Module Namespace Object|vm.Module} Returning a `vm.Module` is
-  recommended in order to take advantage of error tracking, and to avoid issues
-  with namespaces that contain `then` function exports.
+  引用者是 `new vm.Script`、`vm.runInThisContext`、`vm.runInContext` 和 `vm.runInNewContext` 的已编译 `vm.Script`。它是 `vm.compileFunction` 的已编译 `Function`，`new vm.SourceTextModule` 的已编译 `vm.SourceTextModule`，以及 `vm.createContext()` 的上下文 `Object`。
+* `importAttributes` {Object} 传递给 [`optionsExpression`][] 可选参数的 `"with"` 值，如果未提供值则为空对象。
+* `phase` {string} 动态导入的阶段（`"source"` 或 `"evaluation"`）。
+* 返回: {Module Namespace Object|vm.Module} 返回 `vm.Module` 是推荐的，以便利用错误跟踪，并避免包含 `then` 函数导出的命名空间出现问题。
 
 ```mjs
-// This script must be run with --experimental-vm-modules.
+// 此脚本必须使用 --experimental-vm-modules 运行。
 import { Script, SyntheticModule } from 'node:vm';
 
 const script = new Script('import("foo.json", { with: { type: "json" } })', {
   async importModuleDynamically(specifier, referrer, importAttributes) {
     console.log(specifier);  // 'foo.json'
-    console.log(referrer);   // The compiled script
+    console.log(referrer);   // 已编译的脚本
     console.log(importAttributes);  // { type: 'json' }
     const m = new SyntheticModule(['bar'], () => { });
     await m.link(() => { });
@@ -2192,14 +1721,14 @@ console.log(result);  //  { bar: { hello: 'world' } }
 ```
 
 ```cjs
-// This script must be run with --experimental-vm-modules.
+// 此脚本必须使用 --experimental-vm-modules 运行。
 const { Script, SyntheticModule } = require('node:vm');
 
 (async function main() {
   const script = new Script('import("foo.json", { with: { type: "json" } })', {
     async importModuleDynamically(specifier, referrer, importAttributes) {
       console.log(specifier);  // 'foo.json'
-      console.log(referrer);   // The compiled script
+      console.log(referrer);   // 已编译的脚本
       console.log(importAttributes);  // { type: 'json' }
       const m = new SyntheticModule(['bar'], () => { });
       await m.link(() => { });
@@ -2212,20 +1741,20 @@ const { Script, SyntheticModule } = require('node:vm');
 })();
 ```
 
-[Cyclic Module Record]: https://tc39.es/ecma262/#sec-cyclic-module-records
-[ECMAScript Module Loader]: esm.md#modules-ecmascript-modules
-[Evaluate() concrete method]: https://tc39.es/ecma262/#sec-moduleevaluation
+[循环模块记录]: https://tc39.es/ecma262/#sec-cyclic-module-records
+[ECMAScript 模块加载器]: esm.md#modules-ecmascript-modules
+[Evaluate() 具体方法]: https://tc39.es/ecma262/#sec-moduleevaluation
 [FinishLoadingImportedModule]: https://tc39.es/ecma262/#sec-FinishLoadingImportedModule
 [GetModuleNamespace]: https://tc39.es/ecma262/#sec-getmodulenamespace
 [HostLoadImportedModule]: https://tc39.es/ecma262/#sec-HostLoadImportedModule
 [HostResolveImportedModule]: https://tc39.es/ecma262/#sec-hostresolveimportedmodule
 [ImportDeclaration]: https://tc39.es/ecma262/#prod-ImportDeclaration
-[Link() concrete method]: https://tc39.es/ecma262/#sec-moduledeclarationlinking
-[Module Record]: https://tc39.es/ecma262/#sec-abstract-module-records
-[Source Text Module Record]: https://tc39.es/ecma262/#sec-source-text-module-records
-[Support of dynamic `import()` in compilation APIs]: #support-of-dynamic-import-in-compilation-apis
-[Synthetic Module Record]: https://tc39.es/ecma262/#sec-synthetic-module-records
-[V8 Embedder's Guide]: https://v8.dev/docs/embed#contexts
+[Link() 具体方法]: https://tc39.es/ecma262/#sec-moduledeclarationlinking
+[模块记录]: https://tc39.es/ecma262/#sec-abstract-module-records
+[源文本模块记录]: https://tc39.es/ecma262/#sec-source-text-module-records
+[编译 API 中对动态 `import()` 的支持]: #support-of-dynamic-import-in-compilation-apis
+[合成模块记录]: https://tc39.es/ecma262/#sec-synthetic-module-records
+[V8 嵌入者指南]: https://v8.dev/docs/embed#contexts
 [WithClause]: https://tc39.es/ecma262/#prod-WithClause
 [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG`]: errors.md#err_vm_dynamic_import_callback_missing_flag
 [`ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING`]: errors.md#err_vm_dynamic_import_callback_missing
@@ -2245,7 +1774,7 @@ const { Script, SyntheticModule } = require('node:vm');
 [`vm.runInContext()`]: #vmrunincontextcode-contextifiedobject-options
 [`vm.runInThisContext()`]: #vmruninthiscontextcode-options
 [contextified]: #what-does-it-mean-to-contextify-an-object
-[enqueing jobs]: https://tc39.es/ecma262/#sec-hostenqueuepromisejob
-[global object]: https://tc39.es/ecma262/#sec-global-object
-[indirect `eval()` call]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#direct_and_indirect_eval
+[排队作业]: https://tc39.es/ecma262/#sec-hostenqueuepromisejob
+[全局对象]: https://tc39.es/ecma262/#sec-global-object
+[间接的 `eval()` 调用]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#direct_and_indirect_eval
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin

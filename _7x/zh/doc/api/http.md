@@ -806,7 +806,6 @@ changes:
 
 ### `request.destroy([error])`
 
-
 <!-- YAML
 added: v0.3.0
 changes:
@@ -1470,7 +1469,6 @@ changes:
                  to be destroyed if a client sends an Upgrade header.
 -->
 
-
 - `request` {http.IncomingMessage} HTTP 请求的参数，如 [`'request'`][] 事件中所示
 - `socket` {stream.Duplex} 服务器和客户端之间的网络 socket
 - `head` {Buffer} 升级流的第一个数据包（可能为空）
@@ -1829,12 +1827,12 @@ added:
 <!-- YAML
 added: v0.1.90
 changes:
-  - version: v15.0.0
-    pr-url: https://github.com/nodejs/node/pull/33155
-    description: `data` 参数现在可以是 `Uint8Array`。
-  - version: v10.0.0
-    pr-url: https://github.com/nodejs/node/pull/18780
-    description: 此方法现在返回对 `ServerResponse` 的引用。
+ - version: v15.0.0
+   pr-url: https://github.com/nodejs/node/pull/33155
+   description: The `data` parameter can now be a `Uint8Array`.
+ - version: v10.0.0
+   pr-url: https://github.com/nodejs/node/pull/18780
+   description: 此方法现在返回对 `ServerResponse` 的引用。
 -->
 
 - `data` {string|Buffer|Uint8Array}
@@ -2162,7 +2160,7 @@ added: v0.1.29
 changes:
   - version: v15.0.0
     pr-url: https://github.com/nodejs/node/pull/33155
-    description: `chunk` 参数现在可以是 `Uint8Array`。
+    description: The `chunk` parameter can now be a `Uint8Array`.
 -->
 
 - `chunk` {string|Buffer|Uint8Array}
@@ -2316,7 +2314,7 @@ changes:
      - v13.1.0
      - v12.16.0
     pr-url: https://github.com/nodejs/node/pull/30135
-    description: `readableHighWaterMark` 值反映 socket 的值。
+    description:  The `readableHighWaterMark` value mirrors that of the socket.
 -->
 
 - 扩展：{stream.Readable}
@@ -2786,7 +2784,7 @@ added: v0.1.90
 changes:
   - version: v15.0.0
     pr-url: https://github.com/nodejs/node/pull/33155
-    description: `chunk` 参数现在可以是 `Uint8Array`。
+    description: The `chunk` parameter can now be a `Uint8Array`.
   - version: v0.11.6
     description: 添加 `callback` 参数。
 -->
@@ -3056,7 +3054,7 @@ added: v0.1.29
 changes:
   - version: v15.0.0
     pr-url: https://github.com/nodejs/node/pull/33155
-    description: `chunk` 参数现在可以是 `Uint8Array`。
+    description: The `chunk` parameter can now be a `Uint8Array`.
   - version: v0.11.6
     description: 添加了 `callback` 参数。
 -->
@@ -3112,7 +3110,7 @@ changes:
     description: 现在支持 `requestTimeout`、`headersTimeout`、`keepAliveTimeout` 和 `connectionsCheckingInterval` 选项。
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/42163
-    description: `noDelay` 选项现在默认为 `true`。
+    description: The `noDelay` option now defaults to `true`.
   - version:
     - v17.7.0
     - v16.15.0
@@ -3262,10 +3260,11 @@ added: v0.3.6
 changes:
   - version: v10.9.0
     pr-url: https://github.com/nodejs/node/pull/21616
-    description: `url` 参数现在可以与单独的 `options` 对象一起传递。
+    description: The `url` parameter can now be passed along with a separate
+                 `options` object.
   - version: v7.5.0
     pr-url: https://github.com/nodejs/node/pull/10638
-    description: `options` 参数可以是 WHATWG `URL` 对象。
+    description: The `options` parameter can be a WHATWG `URL` object.
 -->
 
 - `url` {string | URL}
@@ -3390,10 +3389,11 @@ changes:
     description: 现在支持 `maxHeaderSize` 选项。
   - version: v10.9.0
     pr-url: https://github.com/nodejs/node/pull/21616
-    description: `url` 参数现在可以与单独的 `options` 对象一起传递。
+    description: The `url` parameter can now be passed along with a separate
+                 `options` object.
   - version: v7.5.0
     pr-url: https://github.com/nodejs/node/pull/10638
-    description: `options` 参数可以是 WHATWG `URL` 对象。
+    description: The `options` parameter can be a WHATWG `URL` object.
 -->
 
 - `url` {string | URL}
