@@ -1,0 +1,1263 @@
+{
+  "type": "module",
+  "source": "doc/api/diagnostics_channel.md",
+  "modules": [
+    {
+      "textRaw": "Diagnostics Channel",
+      "name": "diagnostics_channel",
+      "meta": {
+        "added": [
+          "v15.1.0",
+          "v14.17.0"
+        ],
+        "changes": [
+          {
+            "version": [
+              "v19.2.0",
+              "v18.13.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/45290",
+            "description": "diagnostics_channel is now Stable."
+          }
+        ]
+      },
+      "introduced_in": "v15.1.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/diagnostics_channel.js\">lib/diagnostics_channel.js</a></p>\n<p><code>node:diagnostics_channel</code> 模块提供了一个 API 来创建命名通道，用于诊断目的报告任意消息数据。</p>\n<p>可以通过以下方式访问：</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n</code></pre>\n<p>模块开发者若想报告诊断消息，可以创建一个或多个顶层通道来报告消息。也可以在运行时获取通道，但由于这样做会产生额外开销，因此不鼓励。为了方便，通道可以被导出，但只要知道通道名称，就可以在任何地方获取。</p>\n<p>如果你打算让你的模块产生供他人使用的诊断数据，建议你包含使用了哪些命名通道以及消息数据结构的文档。通道名称通常应包含模块名称，以避免与其他模块的数据发生冲突。</p>",
+      "modules": [
+        {
+          "textRaw": "公共 API",
+          "name": "公共_api",
+          "modules": [
+            {
+              "textRaw": "概述",
+              "name": "概述",
+              "desc": "<p>以下是公共 API 的简单概述。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\n// 获取一个可重用的通道对象\nconst channel = diagnostics_channel.channel('my-channel');\n\nfunction onMessage(message, name) {\n  // 接收数据\n}\n\n// 订阅通道\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\n// 检查通道是否有活跃订阅者\nif (channel.hasSubscribers) {\n  // 发布数据到通道\n  channel.publish({\n    some: 'data',\n  });\n}\n\n// 取消订阅通道\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\n// 获取一个可重用的通道对象\nconst channel = diagnostics_channel.channel('my-channel');\n\nfunction onMessage(message, name) {\n  // 接收数据\n}\n\n// 订阅通道\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\n// 检查通道是否有活跃订阅者\nif (channel.hasSubscribers) {\n  // 发布数据到通道\n  channel.publish({\n    some: 'data',\n  });\n}\n\n// 取消订阅通道\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>",
+              "methods": [
+                {
+                  "textRaw": "`diagnostics_channel.hasSubscribers(name)`",
+                  "type": "method",
+                  "name": "hasSubscribers",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string|symbol} 通道名称",
+                          "name": "name",
+                          "type": "string|symbol",
+                          "desc": "通道名称"
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 是否有活跃订阅者",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "是否有活跃订阅者"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>检查指定名称的通道是否有活跃订阅者。如果你要发送的消息准备成本很高，这个 API 会很有帮助。</p>\n<p>此 API 是可选的，但在尝试从性能非常敏感的代码发布消息时很有用。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nif (diagnostics_channel.hasSubscribers('my-channel')) {\n  // 有订阅者，准备并发布消息\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nif (diagnostics_channel.hasSubscribers('my-channel')) {\n  // 有订阅者，准备并发布消息\n}\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.channel(name)`",
+                  "type": "method",
+                  "name": "channel",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string|symbol} 通道名称",
+                          "name": "name",
+                          "type": "string|symbol",
+                          "desc": "通道名称"
+                        },
+                        {
+                          "textRaw": "返回: {Channel} 命名通道对象",
+                          "name": "返回",
+                          "type": "Channel",
+                          "desc": "命名通道对象"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>这是想要发布到命名通道的主要入口点。它产生一个通道对象，该对象经过优化以尽可能减少发布时的开销。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.subscribe(name, onMessage)`",
+                  "type": "method",
+                  "name": "subscribe",
+                  "meta": {
+                    "added": [
+                      "v18.7.0",
+                      "v16.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string|symbol} 通道名称",
+                          "name": "name",
+                          "type": "string|symbol",
+                          "desc": "通道名称"
+                        },
+                        {
+                          "textRaw": "`onMessage` {Function} 接收通道消息的处理程序",
+                          "name": "onMessage",
+                          "type": "Function",
+                          "desc": "接收通道消息的处理程序",
+                          "options": [
+                            {
+                              "textRaw": "`message` {any} 消息数据",
+                              "name": "message",
+                              "type": "any",
+                              "desc": "消息数据"
+                            },
+                            {
+                              "textRaw": "`name` {string|symbol} 通道名称",
+                              "name": "name",
+                              "type": "string|symbol",
+                              "desc": "通道名称"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>注册一个消息处理程序来订阅此通道。每当有消息发布到通道时，此消息处理程序将同步运行。消息处理程序中抛出的任何错误都将触发 <a href=\"process.html#event-uncaughtexception\"><code>'uncaughtException'</code></a>。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\ndiagnostics_channel.subscribe('my-channel', (message, name) => {\n  // 接收数据\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\ndiagnostics_channel.subscribe('my-channel', (message, name) => {\n  // 接收数据\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.unsubscribe(name, onMessage)`",
+                  "type": "method",
+                  "name": "unsubscribe",
+                  "meta": {
+                    "added": [
+                      "v18.7.0",
+                      "v16.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string|symbol} 通道名称",
+                          "name": "name",
+                          "type": "string|symbol",
+                          "desc": "通道名称"
+                        },
+                        {
+                          "textRaw": "`onMessage` {Function} 要移除的先前订阅的处理程序",
+                          "name": "onMessage",
+                          "type": "Function",
+                          "desc": "要移除的先前订阅的处理程序"
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 如果找到处理程序则为 `true`，否则为 `false`。",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "如果找到处理程序则为 `true`，否则为 `false`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>移除先前使用 <a href=\"#diagnostics_channelsubscribename-onmessage\"><code>diagnostics_channel.subscribe(name, onMessage)</code></a> 注册到此通道的消息处理程序。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nfunction onMessage(message, name) {\n  // 接收数据\n}\n\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nfunction onMessage(message, name) {\n  // 接收数据\n}\n\ndiagnostics_channel.subscribe('my-channel', onMessage);\n\ndiagnostics_channel.unsubscribe('my-channel', onMessage);\n</code></pre>"
+                },
+                {
+                  "textRaw": "`diagnostics_channel.tracingChannel(nameOrChannels)`",
+                  "type": "method",
+                  "name": "tracingChannel",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`nameOrChannels` {string|TracingChannel} 通道名称或包含所有 [TracingChannel Channels][] 的对象",
+                          "name": "nameOrChannels",
+                          "type": "string|TracingChannel",
+                          "desc": "通道名称或包含所有 [TracingChannel Channels][] 的对象"
+                        },
+                        {
+                          "textRaw": "返回: {TracingChannel} 用于跟踪的通道集合",
+                          "name": "返回",
+                          "type": "TracingChannel",
+                          "desc": "用于跟踪的通道集合"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>为给定的 <a href=\"#tracingchannel-channels\">TracingChannel Channels</a> 创建一个 <a href=\"#class-tracingchannel\"><code>TracingChannel</code></a> 包装器。如果给定名称，则相应的跟踪通道将以 <code>tracing:${name}:${eventType}</code> 的形式创建，其中 <code>eventType</code> 对应于 <a href=\"#tracingchannel-channels\">TracingChannel Channels</a> 的类型。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channelsByName = diagnostics_channel.tracingChannel('my-channel');\n\n// 或者...\n\nconst channelsByCollection = diagnostics_channel.tracingChannel({\n  start: diagnostics_channel.channel('tracing:my-channel:start'),\n  end: diagnostics_channel.channel('tracing:my-channel:end'),\n  asyncStart: diagnostics_channel.channel('tracing:my-channel:asyncStart'),\n  asyncEnd: diagnostics_channel.channel('tracing:my-channel:asyncEnd'),\n  error: diagnostics_channel.channel('tracing:my-channel:error'),\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channelsByName = diagnostics_channel.tracingChannel('my-channel');\n\n// 或者...\n\nconst channelsByCollection = diagnostics_channel.tracingChannel({\n  start: diagnostics_channel.channel('tracing:my-channel:start'),\n  end: diagnostics_channel.channel('tracing:my-channel:end'),\n  asyncStart: diagnostics_channel.channel('tracing:my-channel:asyncStart'),\n  asyncEnd: diagnostics_channel.channel('tracing:my-channel:asyncEnd'),\n  error: diagnostics_channel.channel('tracing:my-channel:error'),\n});\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "概述"
+            },
+            {
+              "textRaw": "类：`Channel`",
+              "name": "类：`channel`",
+              "meta": {
+                "added": [
+                  "v15.1.0",
+                  "v14.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>Channel</code> 类表示数据管道中的单个命名通道。它用于跟踪订阅者，并在有订阅者存在时发布消息。它作为一个独立的对象存在，以避免在发布时查找通道，从而实现非常快的发布速度，并允许大量使用而产生非常小的成本。通道是使用 <a href=\"#diagnostics_channelchannelname\"><code>diagnostics_channel.channel(name)</code></a> 创建的，不支持直接使用 <code>new Channel(name)</code> 构造通道。</p>",
+              "properties": [
+                {
+                  "textRaw": "`hasSubscribers` 返回: {boolean} 是否有活跃订阅者",
+                  "type": "boolean",
+                  "name": "返回",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>检查此通道是否有活跃订阅者。如果你要发送的消息准备成本很高，这个 API 会很有帮助。</p>\n<p>此 API 是可选的，但在尝试从性能非常敏感的代码发布消息时很有用。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nif (channel.hasSubscribers) {\n  // 有订阅者，准备并发布消息\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nif (channel.hasSubscribers) {\n  // 有订阅者，准备并发布消息\n}\n</code></pre>",
+                  "shortDesc": "是否有活跃订阅者"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`channel.publish(message)`",
+                  "type": "method",
+                  "name": "publish",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`message` {any} 发送给通道订阅者的消息",
+                          "name": "message",
+                          "type": "any",
+                          "desc": "发送给通道订阅者的消息"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>向通道的任何订阅者发布消息。这将同步触发消息处理程序，因此它们将在同一上下文中执行。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.publish({\n  some: 'message',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.publish({\n  some: 'message',\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`channel.subscribe(onMessage)`",
+                  "type": "method",
+                  "name": "subscribe",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v24.8.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/59758",
+                        "description": "Deprecation revoked."
+                      },
+                      {
+                        "version": [
+                          "v18.7.0",
+                          "v16.17.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/44943",
+                        "description": "Documentation-only deprecation."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`onMessage` {Function} 接收通道消息的处理程序",
+                          "name": "onMessage",
+                          "type": "Function",
+                          "desc": "接收通道消息的处理程序",
+                          "options": [
+                            {
+                              "textRaw": "`message` {any} 消息数据",
+                              "name": "message",
+                              "type": "any",
+                              "desc": "消息数据"
+                            },
+                            {
+                              "textRaw": "`name` {string|symbol} 通道名称",
+                              "name": "name",
+                              "type": "string|symbol",
+                              "desc": "通道名称"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>注册一个消息处理程序来订阅此通道。每当有消息发布到通道时，此消息处理程序将同步运行。消息处理程序中抛出的任何错误都将触发 <a href=\"process.html#event-uncaughtexception\"><code>'uncaughtException'</code></a>。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.subscribe((message, name) => {\n  // 接收数据\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.subscribe((message, name) => {\n  // 接收数据\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`channel.unsubscribe(onMessage)`",
+                  "type": "method",
+                  "name": "unsubscribe",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v24.8.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/59758",
+                        "description": "Deprecation revoked."
+                      },
+                      {
+                        "version": [
+                          "v18.7.0",
+                          "v16.17.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/44943",
+                        "description": "Documentation-only deprecation."
+                      },
+                      {
+                        "version": [
+                          "v17.1.0",
+                          "v16.14.0",
+                          "v14.19.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/40433",
+                        "description": "Added return value. Added to channels without subscribers."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`onMessage` {Function} 要移除的先前订阅的处理程序",
+                          "name": "onMessage",
+                          "type": "Function",
+                          "desc": "要移除的先前订阅的处理程序"
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 如果找到处理程序则为 `true`，否则为 `false`。",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "如果找到处理程序则为 `true`，否则为 `false`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>移除先前使用 <a href=\"#channelsubscribeonmessage\"><code>channel.subscribe(onMessage)</code></a> 注册到此通道的消息处理程序。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nfunction onMessage(message, name) {\n  // 接收数据\n}\n\nchannel.subscribe(onMessage);\n\nchannel.unsubscribe(onMessage);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nfunction onMessage(message, name) {\n  // 接收数据\n}\n\nchannel.subscribe(onMessage);\n\nchannel.unsubscribe(onMessage);\n</code></pre>"
+                },
+                {
+                  "textRaw": "`channel.bindStore(store[, transform])`",
+                  "type": "method",
+                  "name": "bindStore",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`store` {AsyncLocalStorage} 要绑定上下文数据的存储",
+                          "name": "store",
+                          "type": "AsyncLocalStorage",
+                          "desc": "要绑定上下文数据的存储"
+                        },
+                        {
+                          "textRaw": "`transform` {Function} 在设置存储上下文之前转换上下文数据",
+                          "name": "transform",
+                          "type": "Function",
+                          "desc": "在设置存储上下文之前转换上下文数据"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>当调用 <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> 时，给定的上下文数据将应用于绑定到通道的任何存储。如果存储已经被绑定，先前的 <code>transform</code> 函数将被新的替换。可以省略 <code>transform</code> 函数，将给定的上下文数据直接设置为上下文。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store, (data) => {\n  return { data };\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store, (data) => {\n  return { data };\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`channel.unbindStore(store)`",
+                  "type": "method",
+                  "name": "unbindStore",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`store` {AsyncLocalStorage} 要从通道解绑的存储。",
+                          "name": "store",
+                          "type": "AsyncLocalStorage",
+                          "desc": "要从通道解绑的存储。"
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 如果找到存储则为 `true`，否则为 `false`。",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "如果找到存储则为 `true`，否则为 `false`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>移除先前使用 <a href=\"#channelbindstorestore-transform\"><code>channel.bindStore(store)</code></a> 注册到此通道的消息处理程序。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store);\nchannel.unbindStore(store);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store);\nchannel.unbindStore(store);\n</code></pre>"
+                },
+                {
+                  "textRaw": "`channel.runStores(context, fn[, thisArg[, ...args]])`",
+                  "type": "method",
+                  "name": "runStores",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`context` {any} 发送给订阅者并绑定到存储的消息",
+                          "name": "context",
+                          "type": "any",
+                          "desc": "发送给订阅者并绑定到存储的消息"
+                        },
+                        {
+                          "textRaw": "`fn` {Function} 在进入的存储上下文中运行的处理程序",
+                          "name": "fn",
+                          "type": "Function",
+                          "desc": "在进入的存储上下文中运行的处理程序"
+                        },
+                        {
+                          "textRaw": "`thisArg` {any} 函数调用的接收器。",
+                          "name": "thisArg",
+                          "type": "any",
+                          "desc": "函数调用的接收器。"
+                        },
+                        {
+                          "textRaw": "`...args` {any} 传递给函数的可选参数。",
+                          "name": "...args",
+                          "type": "any",
+                          "desc": "传递给函数的可选参数。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在给定函数的持续时间内，将给定的数据应用于绑定到通道的任何 AsyncLocalStorage 实例，然后在该数据应用于存储的范围内发布到通道。</p>\n<p>如果给定了 <a href=\"#channelbindstorestore-transform\"><code>channel.bindStore(store)</code></a> 一个转换函数，它将在消息数据成为存储的上下文值之前应用于转换消息数据。在需要上下文链接的情况下，可以从转换函数内部访问先前的存储上下文。</p>\n<p>应用于存储的上下文应该可以在从给定函数期间开始的任何异步代码中访问，但是在某些情况下可能会发生 [上下文丢失][]。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store, (message) => {\n  const parent = store.getStore();\n  return new Span(message, parent);\n});\nchannel.runStores({ some: 'message' }, () => {\n  store.getStore(); // Span({ some: 'message' })\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst store = new AsyncLocalStorage();\n\nconst channel = diagnostics_channel.channel('my-channel');\n\nchannel.bindStore(store, (message) => {\n  const parent = store.getStore();\n  return new Span(message, parent);\n});\nchannel.runStores({ some: 'message' }, () => {\n  store.getStore(); // Span({ some: 'message' })\n});\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`Channel`"
+            },
+            {
+              "textRaw": "类：`TracingChannel`",
+              "name": "类：`tracingchannel`",
+              "meta": {
+                "added": [
+                  "v19.9.0",
+                  "v18.19.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p><code>TracingChannel</code> 类是一个 <a href=\"#tracingchannel-channels\">TracingChannel Channels</a> 的集合，它们共同表达一个可跟踪的操作。它用于形式化和简化生成跟踪应用程序流事件的过程。<a href=\"#diagnostics_channeltracingchannelnameorchannels\"><code>diagnostics_channel.tracingChannel()</code></a> 用于构造 <code>TracingChannel</code>。与 <code>Channel</code> 一样，建议在文件的顶层创建并重用单个 <code>TracingChannel</code>，而不是动态创建它们。</p>",
+              "methods": [
+                {
+                  "textRaw": "`tracingChannel.subscribe(subscribers)`",
+                  "type": "method",
+                  "name": "subscribe",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`subscribers` {Object} [TracingChannel Channels][] 订阅者集合",
+                          "name": "subscribers",
+                          "type": "Object",
+                          "desc": "[TracingChannel Channels][] 订阅者集合",
+                          "options": [
+                            {
+                              "textRaw": "`start` {Function} [`start` event][] 订阅者",
+                              "name": "start",
+                              "type": "Function",
+                              "desc": "[`start` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`end` {Function} [`end` event][] 订阅者",
+                              "name": "end",
+                              "type": "Function",
+                              "desc": "[`end` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`asyncStart` {Function} [`asyncStart` event][] 订阅者",
+                              "name": "asyncStart",
+                              "type": "Function",
+                              "desc": "[`asyncStart` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`asyncEnd` {Function} [`asyncEnd` event][] 订阅者",
+                              "name": "asyncEnd",
+                              "type": "Function",
+                              "desc": "[`asyncEnd` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`error` {Function} [`error` event][] 订阅者",
+                              "name": "error",
+                              "type": "Function",
+                              "desc": "[`error` event][] 订阅者"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>辅助函数，将一组函数订阅到相应的通道。这与在每个通道上单独调用 <a href=\"#channelsubscribeonmessage\"><code>channel.subscribe(onMessage)</code></a> 相同。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.subscribe({\n  start(message) {\n    // 处理 start 消息\n  },\n  end(message) {\n    // 处理 end 消息\n  },\n  asyncStart(message) {\n    // 处理 asyncStart 消息\n  },\n  asyncEnd(message) {\n    // 处理 asyncEnd 消息\n  },\n  error(message) {\n    // 处理 error 消息\n  },\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.subscribe({\n  start(message) {\n    // 处理 start 消息\n  },\n  end(message) {\n    // 处理 end 消息\n  },\n  asyncStart(message) {\n    // 处理 asyncStart 消息\n  },\n  asyncEnd(message) {\n    // 处理 asyncEnd 消息\n  },\n  error(message) {\n    // 处理 error 消息\n  },\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`tracingChannel.unsubscribe(subscribers)`",
+                  "type": "method",
+                  "name": "unsubscribe",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`subscribers` {Object} [TracingChannel Channels][] 订阅者集合",
+                          "name": "subscribers",
+                          "type": "Object",
+                          "desc": "[TracingChannel Channels][] 订阅者集合",
+                          "options": [
+                            {
+                              "textRaw": "`start` {Function} [`start` event][] 订阅者",
+                              "name": "start",
+                              "type": "Function",
+                              "desc": "[`start` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`end` {Function} [`end` event][] 订阅者",
+                              "name": "end",
+                              "type": "Function",
+                              "desc": "[`end` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`asyncStart` {Function} [`asyncStart` event][] 订阅者",
+                              "name": "asyncStart",
+                              "type": "Function",
+                              "desc": "[`asyncStart` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`asyncEnd` {Function} [`asyncEnd` event][] 订阅者",
+                              "name": "asyncEnd",
+                              "type": "Function",
+                              "desc": "[`asyncEnd` event][] 订阅者"
+                            },
+                            {
+                              "textRaw": "`error` {Function} [`error` event][] 订阅者",
+                              "name": "error",
+                              "type": "Function",
+                              "desc": "[`error` event][] 订阅者"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 如果所有处理程序都成功取消订阅则为 `true`，否则为 `false`。",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "如果所有处理程序都成功取消订阅则为 `true`，否则为 `false`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>辅助函数，从相应的通道取消订阅一组函数。这与在每个通道上单独调用 <a href=\"#channelunsubscribeonmessage\"><code>channel.unsubscribe(onMessage)</code></a> 相同。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.unsubscribe({\n  start(message) {\n    // 处理 start 消息\n  },\n  end(message) {\n    // 处理 end 消息\n  },\n  asyncStart(message) {\n    // 处理 asyncStart 消息\n  },\n  asyncEnd(message) {\n    // 处理 asyncEnd 消息\n  },\n  error(message) {\n    // 处理 error 消息\n  },\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.unsubscribe({\n  start(message) {\n    // 处理 start 消息\n  },\n  end(message) {\n    // 处理 end 消息\n  },\n  asyncStart(message) {\n    // 处理 asyncStart 消息\n  },\n  asyncEnd(message) {\n    // 处理 asyncEnd 消息\n  },\n  error(message) {\n    // 处理 error 消息\n  },\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])`",
+                  "type": "method",
+                  "name": "traceSync",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`fn` {Function} 要围绕其进行跟踪的函数",
+                          "name": "fn",
+                          "type": "Function",
+                          "desc": "要围绕其进行跟踪的函数"
+                        },
+                        {
+                          "textRaw": "`context` {Object} 用于关联事件的共享对象",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "用于关联事件的共享对象"
+                        },
+                        {
+                          "textRaw": "`thisArg` {any} 函数调用的接收器",
+                          "name": "thisArg",
+                          "type": "any",
+                          "desc": "函数调用的接收器"
+                        },
+                        {
+                          "textRaw": "`...args` {any} 传递给函数的可选参数",
+                          "name": "...args",
+                          "type": "any",
+                          "desc": "传递给函数的可选参数"
+                        },
+                        {
+                          "textRaw": "返回: {any} 给定函数的返回值",
+                          "name": "返回",
+                          "type": "any",
+                          "desc": "给定函数的返回值"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>跟踪同步函数调用。这总是在执行前后产生 <a href=\"#startevent\"><code>start</code> event</a> 和 <a href=\"#endevent\"><code>end</code> event</a>，如果给定函数抛出错误，可能会产生 <a href=\"#errorevent\"><code>error</code> event</a>。这将在 <code>start</code> 通道上使用 <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> 运行给定函数，确保所有事件都应具有任何绑定的存储以匹配此跟踪上下文。</p>\n<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者将不会收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceSync(() => {\n  // 做一些事情\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceSync(() => {\n  // 做一些事情\n}, {\n  some: 'thing',\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])`",
+                  "type": "method",
+                  "name": "tracePromise",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`fn` {Function} 要围绕其进行跟踪的返回 Promise 的函数",
+                          "name": "fn",
+                          "type": "Function",
+                          "desc": "要围绕其进行跟踪的返回 Promise 的函数"
+                        },
+                        {
+                          "textRaw": "`context` {Object} 用于关联跟踪事件的共享对象",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "用于关联跟踪事件的共享对象"
+                        },
+                        {
+                          "textRaw": "`thisArg` {any} 函数调用的接收器",
+                          "name": "thisArg",
+                          "type": "any",
+                          "desc": "函数调用的接收器"
+                        },
+                        {
+                          "textRaw": "`...args` {any} 传递给函数的可选参数",
+                          "name": "...args",
+                          "type": "any",
+                          "desc": "传递给函数的可选参数"
+                        },
+                        {
+                          "textRaw": "返回: {Promise} 链接自给定函数返回的 promise",
+                          "name": "返回",
+                          "type": "Promise",
+                          "desc": "链接自给定函数返回的 promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>跟踪返回 promise 的函数调用。这总是在函数执行的同步部分前后产生 <a href=\"#startevent\"><code>start</code> event</a> 和 <a href=\"#endevent\"><code>end</code> event</a>，并在达到 promise 延续时产生 <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> 和 <a href=\"#asyncendevent\"><code>asyncEnd</code> event</a>。如果给定函数抛出错误或返回的 promise 被拒绝，它也可能产生 <a href=\"#errorevent\"><code>error</code> event</a>。这将在 <code>start</code> 通道上使用 <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> 运行给定函数，确保所有事件都应具有任何绑定的存储以匹配此跟踪上下文。</p>\n<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者将不会收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // 做一些事情\n}, {\n  some: 'thing',\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.tracePromise(async () => {\n  // 做一些事情\n}, {\n  some: 'thing',\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])`",
+                  "type": "method",
+                  "name": "traceCallback",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`fn` {Function} 要围绕其进行跟踪的使用回调的函数",
+                          "name": "fn",
+                          "type": "Function",
+                          "desc": "要围绕其进行跟踪的使用回调的函数"
+                        },
+                        {
+                          "textRaw": "`position` {number} 预期回调的从零开始的参数位置（如果传递 `undefined` 则默认为最后一个参数）",
+                          "name": "position",
+                          "type": "number",
+                          "desc": "预期回调的从零开始的参数位置（如果传递 `undefined` 则默认为最后一个参数）"
+                        },
+                        {
+                          "textRaw": "`context` {Object} 用于关联跟踪事件的共享对象（如果传递 `undefined` 则默认为 `{}`）",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "用于关联跟踪事件的共享对象（如果传递 `undefined` 则默认为 `{}`）"
+                        },
+                        {
+                          "textRaw": "`thisArg` {any} 函数调用的接收器",
+                          "name": "thisArg",
+                          "type": "any",
+                          "desc": "函数调用的接收器"
+                        },
+                        {
+                          "textRaw": "`...args` {any} 传递给函数的参数（必须包括回调）",
+                          "name": "...args",
+                          "type": "any",
+                          "desc": "传递给函数的参数（必须包括回调）"
+                        },
+                        {
+                          "textRaw": "返回: {any} 给定函数的返回值",
+                          "name": "返回",
+                          "type": "any",
+                          "desc": "给定函数的返回值"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>跟踪接收回调的函数调用。回调应遵循通常使用的 error-first 约定。这总是在函数执行的同步部分前后产生 <a href=\"#startevent\"><code>start</code> event</a> 和 <a href=\"#endevent\"><code>end</code> event</a>，并在回调执行前后产生 <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a> 和 <a href=\"#asyncendevent\"><code>asyncEnd</code> event</a>。如果给定函数抛出或传递给回调的第一个参数被设置，它也可能产生 <a href=\"#errorevent\"><code>error</code> event</a>。这将在 <code>start</code> 通道上使用 <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> 运行给定函数，确保所有事件都应具有任何绑定的存储以匹配此跟踪上下文。</p>\n<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者将不会收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceCallback((arg1, callback) => {\n  // 做一些事情\n  callback(null, 'result');\n}, 1, {\n  some: 'thing',\n}, thisArg, arg1, callback);\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nchannels.traceCallback((arg1, callback) => {\n  // 做一些事情\n  callback(null, 'result');\n}, 1, {\n  some: 'thing',\n}, thisArg, arg1, callback);\n</code></pre>\n<p>回调也将使用 <a href=\"#channelrunstorescontext-fn-thisarg-args\"><code>channel.runStores(context, ...)</code></a> 运行，这在某些情况下可以实现上下文丢失恢复。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\nconst myStore = new AsyncLocalStorage();\n\n// start 通道将初始存储数据设置为某个值\n// 并将该存储数据值存储在跟踪上下文对象上\nchannels.start.bindStore(myStore, (data) => {\n  const span = new Span(data);\n  data.span = span;\n  return span;\n});\n\n// 然后 asyncStart 可以从之前存储的数据中恢复\nchannels.asyncStart.bindStore(myStore, (data) => {\n  return data.span;\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\nconst myStore = new AsyncLocalStorage();\n\n// start 通道将初始存储数据设置为某个值\n// 并将该存储数据值存储在跟踪上下文对象上\nchannels.start.bindStore(myStore, (data) => {\n  const span = new Span(data);\n  data.span = span;\n  return span;\n});\n\n// 然后 asyncStart 可以从之前存储的数据中恢复\nchannels.asyncStart.bindStore(myStore, (data) => {\n  return data.span;\n});\n</code></pre>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`hasSubscribers` 返回: {boolean} 如果任何单个通道有订阅者则为 `true`，否则为 `false`。",
+                  "type": "boolean",
+                  "name": "返回",
+                  "meta": {
+                    "added": [
+                      "v22.0.0",
+                      "v20.13.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>这是 <a href=\"#class-tracingchannel\"><code>TracingChannel</code></a> 实例上可用的辅助方法，用于检查任何 <a href=\"#tracingchannel-channels\">TracingChannel Channels</a> 是否有订阅者。如果其中任何一个至少有一个订阅者，则返回 <code>true</code>，否则返回 <code>false</code>。</p>\n<pre><code class=\"language-mjs\">import diagnostics_channel from 'node:diagnostics_channel';\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nif (channels.hasSubscribers) {\n  // 做一些事情\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const diagnostics_channel = require('node:diagnostics_channel');\n\nconst channels = diagnostics_channel.tracingChannel('my-channel');\n\nif (channels.hasSubscribers) {\n  // 做一些事情\n}\n</code></pre>",
+                  "shortDesc": "如果任何单个通道有订阅者则为 `true`，否则为 `false`。"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`TracingChannel`"
+            },
+            {
+              "textRaw": "TracingChannel Channels",
+              "name": "tracingchannel_channels",
+              "desc": "<p>TracingChannel 是几个 diagnostics_channel 的集合，代表单个可跟踪操作的执行生命周期中的特定点。行为分为五个 diagnostics_channel，包括 <code>start</code>、<code>end</code>、<code>asyncStart</code>、<code>asyncEnd</code> 和 <code>error</code>。单个可跟踪操作将在所有事件之间共享相同的事件对象，这有助于通过 weakmap 管理关联。</p>\n<p>这些事件对象将在任务\"完成\"时使用 <code>result</code> 或 <code>error</code> 值进行扩展。对于同步任务，<code>result</code> 将是返回值，<code>error</code> 将是函数抛出的任何东西。对于基于回调的异步函数，<code>result</code> 将是回调的第二个参数，而 <code>error</code> 要么是 <code>end</code> 事件中可见的抛出错误，要么是 <code>asyncStart</code> 或 <code>asyncEnd</code> 事件中的第一个回调参数。</p>\n<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者不应收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>\n<p>跟踪通道应遵循以下命名模式：</p>\n<ul>\n<li><code>tracing:module.class.method:start</code> 或 <code>tracing:module.function:start</code></li>\n<li><code>tracing:module.class.method:end</code> 或 <code>tracing:module.function:end</code></li>\n<li><code>tracing:module.class.method:asyncStart</code> 或 <code>tracing:module.function:asyncStart</code></li>\n<li><code>tracing:module.class.method:asyncEnd</code> 或 <code>tracing:module.function:asyncEnd</code></li>\n<li><code>tracing:module.class.method:error</code> 或 <code>tracing:module.function:error</code></li>\n</ul>",
+              "methods": [
+                {
+                  "textRaw": "`start(event)`",
+                  "type": "method",
+                  "name": "start",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "名称: `tracing:${name}:start`",
+                          "name": "名称",
+                          "desc": "`tracing:${name}:start`"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>start</code> 事件表示函数被调用的点。此时，事件数据可能包含函数参数或在函数执行开始时可用的任何内容。</p>"
+                },
+                {
+                  "textRaw": "`end(event)`",
+                  "type": "method",
+                  "name": "end",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "名称: `tracing:${name}:end`",
+                          "name": "名称",
+                          "desc": "`tracing:${name}:end`"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>end</code> 事件表示函数调用返回值的点。对于异步函数，这是返回 promise 的时候，而不是函数内部进行返回语句的时候。此时，如果被跟踪的函数是同步的，<code>result</code> 字段将设置为函数的返回值。或者，<code>error</code> 字段可能存在以表示任何抛出的错误。</p>\n<p>建议专门监听 <code>error</code> 事件来跟踪错误，因为一个可跟踪操作可能产生多个错误。例如，一个内部启动的异步任务可能失败，然后任务的同步部分抛出错误。</p>"
+                },
+                {
+                  "textRaw": "`asyncStart(event)`",
+                  "type": "method",
+                  "name": "asyncStart",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "名称: `tracing:${name}:asyncStart`",
+                          "name": "名称",
+                          "desc": "`tracing:${name}:asyncStart`"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>asyncStart</code> 事件表示到达可跟踪函数的回调或延续。此时，回调参数之类的东西可能可用，或者表达操作\"结果\"的任何其他内容。</p>\n<p>对于基于回调的函数，回调的第一个参数将被分配给 <code>error</code> 字段（如果不是 <code>undefined</code> 或 <code>null</code>），第二个参数将被分配给 <code>result</code> 字段。</p>\n<p>对于 promise，<code>resolve</code> 路径的参数将被分配给 <code>result</code>，<code>reject</code> 路径的参数将被分配给 <code>error</code>。</p>\n<p>建议专门监听 <code>error</code> 事件来跟踪错误，因为一个可跟踪操作可能产生多个错误。例如，一个内部启动的异步任务可能失败，然后任务的同步部分抛出错误。</p>"
+                },
+                {
+                  "textRaw": "`asyncEnd(event)`",
+                  "type": "method",
+                  "name": "asyncEnd",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "名称: `tracing:${name}:asyncEnd`",
+                          "name": "名称",
+                          "desc": "`tracing:${name}:asyncEnd`"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>asyncEnd</code> 事件表示异步函数的回调返回。在 <code>asyncStart</code> 事件之后，事件数据不太可能改变，但查看回调完成的点可能很有用。</p>"
+                },
+                {
+                  "textRaw": "`error(event)`",
+                  "type": "method",
+                  "name": "error",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "名称: `tracing:${name}:error`",
+                          "name": "名称",
+                          "desc": "`tracing:${name}:error`"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>error</code> 事件表示可跟踪函数同步或异步产生的任何错误。如果在被跟踪函数的同步部分抛出错误，错误将被分配给事件的 <code>error</code> 字段并触发 <code>error</code> 事件。如果通过回调或 promise 拒绝异步接收错误，它也将被分配给事件的 <code>error</code> 字段并触发 <code>error</code> 事件。</p>\n<p>单个可跟踪函数调用可能多次产生错误，因此在消费此事件时应考虑这一点。例如，如果内部触发了另一个失败的异步任务，然后函数的同步部分抛出错误，则将发出两个 <code>error</code> 事件，一个用于同步错误，一个用于异步错误。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "TracingChannel Channels"
+            },
+            {
+              "textRaw": "内置通道",
+              "name": "内置通道",
+              "modules": [
+                {
+                  "textRaw": "Console",
+                  "name": "console",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'console.log'`",
+                      "name": "事件:_`'console.log'`",
+                      "desc": "<ul>\n<li><code>args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any[]&gt;</a></li>\n</ul>\n<p>当 <code>console.log()</code> 被调用时触发。接收传递给 <code>console.log()</code> 的参数数组。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'console.log'`"
+                    },
+                    {
+                      "textRaw": "事件: `'console.info'`",
+                      "name": "事件:_`'console.info'`",
+                      "desc": "<ul>\n<li><code>args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any[]&gt;</a></li>\n</ul>\n<p>当 <code>console.info()</code> 被调用时触发。接收传递给 <code>console.info()</code> 的参数数组。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'console.info'`"
+                    },
+                    {
+                      "textRaw": "事件: `'console.debug'`",
+                      "name": "事件:_`'console.debug'`",
+                      "desc": "<ul>\n<li><code>args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any[]&gt;</a></li>\n</ul>\n<p>当 <code>console.debug()</code> 被调用时触发。接收传递给 <code>console.debug()</code> 的参数数组。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'console.debug'`"
+                    },
+                    {
+                      "textRaw": "事件: `'console.warn'`",
+                      "name": "事件:_`'console.warn'`",
+                      "desc": "<ul>\n<li><code>args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any[]&gt;</a></li>\n</ul>\n<p>当 <code>console.warn()</code> 被调用时触发。接收传递给 <code>console.warn()</code> 的参数数组。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'console.warn'`"
+                    },
+                    {
+                      "textRaw": "事件: `'console.error'`",
+                      "name": "事件:_`'console.error'`",
+                      "desc": "<ul>\n<li><code>args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any[]&gt;</a></li>\n</ul>\n<p>当 <code>console.error()</code> 被调用时触发。接收传递给 <code>console.error()</code> 的参数数组。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'console.error'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "Console"
+                },
+                {
+                  "textRaw": "HTTP",
+                  "name": "http",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'http.client.request.created'`",
+                      "name": "事件:_`'http.client.request.created'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpclientrequest\" class=\"type\">&lt;http.ClientRequest&gt;</a></li>\n</ul>\n<p>当客户端创建请求对象时触发。\n与 <code>http.client.request.start</code> 不同，此事件在请求发送之前触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.client.request.created'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http.client.request.start'`",
+                      "name": "事件:_`'http.client.request.start'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpclientrequest\" class=\"type\">&lt;http.ClientRequest&gt;</a></li>\n</ul>\n<p>当客户端开始请求时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.client.request.start'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http.client.request.error'`",
+                      "name": "事件:_`'http.client.request.error'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpclientrequest\" class=\"type\">&lt;http.ClientRequest&gt;</a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>当客户端请求期间发生错误时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.client.request.error'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http.client.response.finish'`",
+                      "name": "事件:_`'http.client.response.finish'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpclientrequest\" class=\"type\">&lt;http.ClientRequest&gt;</a></li>\n<li><code>response</code> <a href=\"http.html#class-httpincomingmessage\" class=\"type\">&lt;http.IncomingMessage&gt;</a></li>\n</ul>\n<p>当客户端收到响应时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.client.response.finish'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http.server.request.start'`",
+                      "name": "事件:_`'http.server.request.start'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpincomingmessage\" class=\"type\">&lt;http.IncomingMessage&gt;</a></li>\n<li><code>response</code> <a href=\"http.html#class-httpserverresponse\" class=\"type\">&lt;http.ServerResponse&gt;</a></li>\n<li><code>socket</code> <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a></li>\n<li><code>server</code> <a href=\"http.html#class-httpserver\" class=\"type\">&lt;http.Server&gt;</a></li>\n</ul>\n<p>当服务器收到请求时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.server.request.start'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http.server.response.created'`",
+                      "name": "事件:_`'http.server.response.created'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpincomingmessage\" class=\"type\">&lt;http.IncomingMessage&gt;</a></li>\n<li><code>response</code> <a href=\"http.html#class-httpserverresponse\" class=\"type\">&lt;http.ServerResponse&gt;</a></li>\n</ul>\n<p>当服务器创建响应时触发。\n此事件在响应发送之前触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.server.response.created'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http.server.response.finish'`",
+                      "name": "事件:_`'http.server.response.finish'`",
+                      "desc": "<ul>\n<li><code>request</code> <a href=\"http.html#class-httpincomingmessage\" class=\"type\">&lt;http.IncomingMessage&gt;</a></li>\n<li><code>response</code> <a href=\"http.html#class-httpserverresponse\" class=\"type\">&lt;http.ServerResponse&gt;</a></li>\n<li><code>socket</code> <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a></li>\n<li><code>server</code> <a href=\"http.html#class-httpserver\" class=\"type\">&lt;http.Server&gt;</a></li>\n</ul>\n<p>当服务器发送响应时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http.server.response.finish'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "HTTP"
+                },
+                {
+                  "textRaw": "HTTP/2",
+                  "name": "http/2",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'http2.client.stream.created'`",
+                      "name": "事件:_`'http2.client.stream.created'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-clienthttp2stream\" class=\"type\">&lt;ClientHttp2Stream&gt;</a></li>\n<li><code>headers</code> <a href=\"http2.html#headers-object\" class=\"type\">&lt;HTTP/2 Headers Object&gt;</a></li>\n</ul>\n<p>当在客户端创建流时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.client.stream.created'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.client.stream.start'`",
+                      "name": "事件:_`'http2.client.stream.start'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-clienthttp2stream\" class=\"type\">&lt;ClientHttp2Stream&gt;</a></li>\n<li><code>headers</code> <a href=\"http2.html#headers-object\" class=\"type\">&lt;HTTP/2 Headers Object&gt;</a></li>\n</ul>\n<p>当在客户端启动流时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.client.stream.start'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.client.stream.error'`",
+                      "name": "事件:_`'http2.client.stream.error'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-clienthttp2stream\" class=\"type\">&lt;ClientHttp2Stream&gt;</a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>当在客户端处理流期间发生错误时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.client.stream.error'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.client.stream.finish'`",
+                      "name": "事件:_`'http2.client.stream.finish'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-clienthttp2stream\" class=\"type\">&lt;ClientHttp2Stream&gt;</a></li>\n<li><code>headers</code> <a href=\"http2.html#headers-object\" class=\"type\">&lt;HTTP/2 Headers Object&gt;</a></li>\n<li><code>flags</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<p>当在客户端收到流时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.client.stream.finish'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.client.stream.close'`",
+                      "name": "事件:_`'http2.client.stream.close'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-clienthttp2stream\" class=\"type\">&lt;ClientHttp2Stream&gt;</a></li>\n</ul>\n<p>当在客户端关闭流时触发。关闭流时使用的 HTTP/2 错误代码可以使用 <code>stream.rstCode</code> 属性检索。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.client.stream.close'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.server.stream.created'`",
+                      "name": "事件:_`'http2.server.stream.created'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-serverhttp2stream\" class=\"type\">&lt;ServerHttp2Stream&gt;</a></li>\n<li><code>headers</code> <a href=\"http2.html#headers-object\" class=\"type\">&lt;HTTP/2 Headers Object&gt;</a></li>\n</ul>\n<p>当在服务器创建流时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.server.stream.created'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.server.stream.start'`",
+                      "name": "事件:_`'http2.server.stream.start'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-serverhttp2stream\" class=\"type\">&lt;ServerHttp2Stream&gt;</a></li>\n<li><code>headers</code> <a href=\"http2.html#headers-object\" class=\"type\">&lt;HTTP/2 Headers Object&gt;</a></li>\n</ul>\n<p>当在服务器启动流时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.server.stream.start'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.server.stream.error'`",
+                      "name": "事件:_`'http2.server.stream.error'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-serverhttp2stream\" class=\"type\">&lt;ServerHttp2Stream&gt;</a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>当在服务器处理流期间发生错误时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.server.stream.error'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.server.stream.finish'`",
+                      "name": "事件:_`'http2.server.stream.finish'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-serverhttp2stream\" class=\"type\">&lt;ServerHttp2Stream&gt;</a></li>\n<li><code>headers</code> <a href=\"http2.html#headers-object\" class=\"type\">&lt;HTTP/2 Headers Object&gt;</a></li>\n<li><code>flags</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<p>当在服务器发送流时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.server.stream.finish'`"
+                    },
+                    {
+                      "textRaw": "事件: `'http2.server.stream.close'`",
+                      "name": "事件:_`'http2.server.stream.close'`",
+                      "desc": "<ul>\n<li><code>stream</code> <a href=\"http2.html#class-serverhttp2stream\" class=\"type\">&lt;ServerHttp2Stream&gt;</a></li>\n</ul>\n<p>当在服务器关闭流时触发。关闭流时使用的 HTTP/2 错误代码可以使用 <code>stream.rstCode</code> 属性检索。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'http2.server.stream.close'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "HTTP/2"
+                },
+                {
+                  "textRaw": "Modules",
+                  "name": "modules",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'module.require.start'`",
+                      "name": "事件:_`'module.require.start'`",
+                      "desc": "<ul>\n<li><code>event</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 包含以下属性\n<ul>\n<li><code>id</code> 传递给 <code>require()</code> 的参数。模块名称。</li>\n<li><code>parentFilename</code> 尝试 require(id) 的模块名称。</li>\n</ul>\n</li>\n</ul>\n<p>当 <code>require()</code> 执行时触发。参见 <a href=\"#startevent\"><code>start</code> event</a>。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'module.require.start'`"
+                    },
+                    {
+                      "textRaw": "事件: `'module.require.end'`",
+                      "name": "事件:_`'module.require.end'`",
+                      "desc": "<ul>\n<li><code>event</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 包含以下属性\n<ul>\n<li><code>id</code> 传递给 <code>require()</code> 的参数。模块名称。</li>\n<li><code>parentFilename</code> 尝试 require(id) 的模块名称。</li>\n</ul>\n</li>\n</ul>\n<p>当 <code>require()</code> 调用返回时触发。参见 <a href=\"#endevent\"><code>end</code> event</a>。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'module.require.end'`"
+                    },
+                    {
+                      "textRaw": "事件: `'module.require.error'`",
+                      "name": "事件:_`'module.require.error'`",
+                      "desc": "<ul>\n<li><code>event</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 包含以下属性\n<ul>\n<li><code>id</code> 传递给 <code>require()</code> 的参数。模块名称。</li>\n<li><code>parentFilename</code> 尝试 require(id) 的模块名称。</li>\n</ul>\n</li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>当 <code>require()</code> 抛出错误时触发。参见 <a href=\"#errorevent\"><code>error</code> event</a>。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'module.require.error'`"
+                    },
+                    {
+                      "textRaw": "事件: `'module.import.asyncStart'`",
+                      "name": "事件:_`'module.import.asyncstart'`",
+                      "desc": "<ul>\n<li><code>event</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 包含以下属性\n<ul>\n<li><code>id</code> 传递给 <code>import()</code> 的参数。模块名称。</li>\n<li><code>parentURL</code> 尝试 import(id) 的模块的 URL 对象。</li>\n</ul>\n</li>\n</ul>\n<p>当 <code>import()</code> 被调用时触发。参见 <a href=\"#asyncstartevent\"><code>asyncStart</code> event</a>。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'module.import.asyncStart'`"
+                    },
+                    {
+                      "textRaw": "事件: `'module.import.asyncEnd'`",
+                      "name": "事件:_`'module.import.asyncend'`",
+                      "desc": "<ul>\n<li><code>event</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 包含以下属性\n<ul>\n<li><code>id</code> 传递给 <code>import()</code> 的参数。模块名称。</li>\n<li><code>parentURL</code> 尝试 import(id) 的模块的 URL 对象。</li>\n</ul>\n</li>\n</ul>\n<p>当 <code>import()</code> 完成时触发。参见 <a href=\"#asyncendevent\"><code>asyncEnd</code> event</a>。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'module.import.asyncEnd'`"
+                    },
+                    {
+                      "textRaw": "事件: `'module.import.error'`",
+                      "name": "事件:_`'module.import.error'`",
+                      "desc": "<ul>\n<li><code>event</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 包含以下属性\n<ul>\n<li><code>id</code> 传递给 <code>import()</code> 的参数。模块名称。</li>\n<li><code>parentURL</code> 尝试 import(id) 的模块的 URL 对象。</li>\n</ul>\n</li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>当 <code>import()</code> 抛出错误时触发。参见 <a href=\"#errorevent\"><code>error</code> event</a>。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'module.import.error'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "Modules"
+                },
+                {
+                  "textRaw": "NET",
+                  "name": "net",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'net.client.socket'`",
+                      "name": "事件:_`'net.client.socket'`",
+                      "desc": "<ul>\n<li><code>socket</code> <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> | <a href=\"tls.html#class-tlstlssocket\" class=\"type\">&lt;tls.TLSSocket&gt;</a></li>\n</ul>\n<p>当创建新的 TCP 或管道客户端套接字连接时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'net.client.socket'`"
+                    },
+                    {
+                      "textRaw": "事件: `'net.server.socket'`",
+                      "name": "事件:_`'net.server.socket'`",
+                      "desc": "<ul>\n<li><code>socket</code> <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a></li>\n</ul>\n<p>当收到新的 TCP 或管道连接时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'net.server.socket'`"
+                    },
+                    {
+                      "textRaw": "事件: `'tracing:net.server.listen:asyncStart'`",
+                      "name": "事件:_`'tracing:net.server.listen:asyncstart'`",
+                      "desc": "<ul>\n<li><code>server</code> <a href=\"net.html#class-netserver\" class=\"type\">&lt;net.Server&gt;</a></li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>当调用 <a href=\"net.html#serverlisten\"><code>net.Server.listen()</code></a> 时触发，在实际设置端口或管道之前。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'tracing:net.server.listen:asyncStart'`"
+                    },
+                    {
+                      "textRaw": "事件: `'tracing:net.server.listen:asyncEnd'`",
+                      "name": "事件:_`'tracing:net.server.listen:asyncend'`",
+                      "desc": "<ul>\n<li><code>server</code> <a href=\"net.html#class-netserver\" class=\"type\">&lt;net.Server&gt;</a></li>\n</ul>\n<p>当 <a href=\"net.html#serverlisten\"><code>net.Server.listen()</code></a> 完成并且服务器准备好接受连接时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'tracing:net.server.listen:asyncEnd'`"
+                    },
+                    {
+                      "textRaw": "事件: `'tracing:net.server.listen:error'`",
+                      "name": "事件:_`'tracing:net.server.listen:error'`",
+                      "desc": "<ul>\n<li><code>server</code> <a href=\"net.html#class-netserver\" class=\"type\">&lt;net.Server&gt;</a></li>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>当 <a href=\"net.html#serverlisten\"><code>net.Server.listen()</code></a> 返回错误时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'tracing:net.server.listen:error'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "NET"
+                },
+                {
+                  "textRaw": "UDP",
+                  "name": "udp",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'udp.socket'`",
+                      "name": "事件:_`'udp.socket'`",
+                      "desc": "<ul>\n<li><code>socket</code> <a href=\"dgram.html#class-dgramsocket\" class=\"type\">&lt;dgram.Socket&gt;</a></li>\n</ul>\n<p>当创建新的 UDP 套接字时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'udp.socket'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "UDP"
+                },
+                {
+                  "textRaw": "Process",
+                  "name": "process",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "meta": {
+                    "added": [
+                      "v16.18.0"
+                    ],
+                    "changes": []
+                  },
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'child_process'`",
+                      "name": "事件:_`'child_process'`",
+                      "desc": "<ul>\n<li><code>process</code> <a href=\"child_process.html#class-childprocess\" class=\"type\">&lt;ChildProcess&gt;</a></li>\n</ul>\n<p>当创建新进程时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'child_process'`"
+                    },
+                    {
+                      "textRaw": "事件: `'execve'`",
+                      "name": "事件:_`'execve'`",
+                      "desc": "<ul>\n<li><code>execPath</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a></li>\n<li><code>env</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a></li>\n</ul>\n<p>当调用 <a href=\"process.html#processexecvefile-args-env\"><code>process.execve()</code></a> 时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'execve'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "Process"
+                },
+                {
+                  "textRaw": "Worker Thread",
+                  "name": "worker_thread",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "meta": {
+                    "added": [
+                      "v16.18.0"
+                    ],
+                    "changes": []
+                  },
+                  "modules": [
+                    {
+                      "textRaw": "事件: `'worker_threads'`",
+                      "name": "事件:_`'worker_threads'`",
+                      "desc": "<ul>\n<li><code>worker</code> <a href=\"worker_threads.html#class-worker\" class=\"type\">&lt;Worker&gt;</a></li>\n</ul>\n<p>当创建新线程时触发。</p>",
+                      "type": "module",
+                      "displayName": "事件: `'worker_threads'`"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "Worker Thread"
+                }
+              ],
+              "type": "module",
+              "displayName": "内置通道"
+            }
+          ],
+          "type": "module",
+          "displayName": "公共 API"
+        }
+      ],
+      "type": "module",
+      "displayName": "Diagnostics Channel"
+    }
+  ]
+}

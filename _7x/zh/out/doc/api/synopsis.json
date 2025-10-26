@@ -1,0 +1,31 @@
+{
+  "type": "module",
+  "source": "doc/api/synopsis.md",
+  "modules": [
+    {
+      "textRaw": "使用方法及示例",
+      "name": "使用方法及示例",
+      "introduced_in": "v0.10.0",
+      "miscs": [
+        {
+          "textRaw": "使用方法",
+          "name": "使用方法",
+          "introduced_in": "v0.10.0",
+          "type": "misc",
+          "desc": "<p><code>node [options] [V8 options] [script.js | -e \"script\" | - ] [arguments]</code></p>\n<p>更多信息请参见<a href=\"cli.html#options\">命令行选项</a>文档。</p>"
+        }
+      ],
+      "modules": [
+        {
+          "textRaw": "示例",
+          "name": "示例",
+          "desc": "<p>一个用Node.js编写的<a href=\"http.html\">Web服务器</a>示例，它会响应<code>'Hello, World!'</code>：</p>\n<p>本文档中的命令以<code>$</code>或<code>></code>开头，以模拟它们在用户终端中的显示方式。不要包含<code>$</code>和<code>></code>字符。它们仅用于标识每个命令的开始。</p>\n<p>不以<code>$</code>或<code>></code>开头的行表示前一个命令的输出。</p>\n<p>首先，请确保已下载并安装Node.js。更多安装信息请参见<a href=\"https://nodejs.org/en/download/package-manager/\">通过包管理器安装Node.js</a>。</p>\n<p>现在，创建一个名为<code>projects</code>的空项目文件夹，然后进入该文件夹。</p>\n<p>Linux和Mac：</p>\n<pre><code class=\"language-bash\">mkdir ~/projects\ncd ~/projects\n</code></pre>\n<p>Windows命令提示符：</p>\n<pre><code class=\"language-powershell\">mkdir %USERPROFILE%\\projects\ncd %USERPROFILE%\\projects\n</code></pre>\n<p>Windows PowerShell：</p>\n<pre><code class=\"language-powershell\">mkdir $env:USERPROFILE\\projects\ncd $env:USERPROFILE\\projects\n</code></pre>\n<p>接下来，在<code>projects</code>文件夹中创建一个新的源文件，命名为<code>hello-world.js</code>。</p>\n<p>用你喜欢的文本编辑器打开<code>hello-world.js</code>，并粘贴以下内容：</p>\n<pre><code class=\"language-js\">const http = require('node:http');\n\nconst hostname = '127.0.0.1';\nconst port = 3000;\n\nconst server = http.createServer((req, res) => {\n  res.statusCode = 200;\n  res.setHeader('Content-Type', 'text/plain');\n  res.end('Hello, World!\\n');\n});\n\nserver.listen(port, hostname, () => {\n  console.log(`Server running at http://${hostname}:${port}/`);\n});\n</code></pre>\n<p>保存文件。然后，在终端窗口中，输入以下命令运行<code>hello-world.js</code>文件：</p>\n<pre><code class=\"language-bash\">node hello-world.js\n</code></pre>\n<p>终端中应该会显示如下输出：</p>\n<pre><code class=\"language-console\">Server running at http://127.0.0.1:3000/\n</code></pre>\n<p>现在，打开你喜欢的Web浏览器，访问<code>http://127.0.0.1:3000</code>。</p>\n<p>如果浏览器显示字符串<code>Hello, World!</code>，则表示服务器正常运行。</p>",
+          "type": "module",
+          "displayName": "示例"
+        }
+      ],
+      "type": "module",
+      "displayName": "使用方法及示例"
+    }
+  ]
+}

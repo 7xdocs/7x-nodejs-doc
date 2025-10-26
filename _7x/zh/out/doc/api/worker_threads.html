@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Worker threads | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/worker_threads.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:550px){.with-41-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:326px){.with-13-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:662px){.with-55-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:1096px){.with-75-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:1176px){.with-85-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:670px){.with-56-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:1064px){.with-71-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:502px){.with-35-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:574px){.with-44-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:342px){.with-15-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:646px){.with-53-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:486px){.with-33-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-worker_threads">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads active">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="worker_threads" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#worker-threads">Worker threads</a></span>
+<ul>
+<li><a href="#workergetenvironmentdatakey"><code>worker.getEnvironmentData(key)</code></a></li>
+<li><a href="#workerisinternalthread"><code>worker.isInternalThread</code></a></li>
+<li><a href="#workerismainthread"><code>worker.isMainThread</code></a></li>
+<li><a href="#workermarkasuntransferableobject"><code>worker.markAsUntransferable(object)</code></a></li>
+<li><a href="#workerismarkedasuntransferableobject"><code>worker.isMarkedAsUntransferable(object)</code></a></li>
+<li><a href="#workermarkasuncloneableobject"><code>worker.markAsUncloneable(object)</code></a></li>
+<li><a href="#workermovemessageporttocontextport-contextifiedsandbox"><code>worker.moveMessagePortToContext(port, contextifiedSandbox)</code></a></li>
+<li><a href="#workerparentport"><code>worker.parentPort</code></a></li>
+<li><span class="stability_1.1"><a href="#workerpostmessagetothreadthreadid-value-transferlist-timeout"><code>worker.postMessageToThread(threadId, value[, transferList][, timeout])</code></a></span></li>
+<li><a href="#workerreceivemessageonportport"><code>worker.receiveMessageOnPort(port)</code></a></li>
+<li><a href="#workerresourcelimits"><code>worker.resourceLimits</code></a></li>
+<li><a href="#workershare_env"><code>worker.SHARE_ENV</code></a></li>
+<li><a href="#workersetenvironmentdatakey-value"><code>worker.setEnvironmentData(key[, value])</code></a></li>
+<li><a href="#workerthreadid"><code>worker.threadId</code></a></li>
+<li><a href="#workerthreadname"><code>worker.threadName</code></a></li>
+<li><a href="#workerworkerdata"><code>worker.workerData</code></a></li>
+<li><span class="stability_1"><a href="#workerlocks"><code>worker.locks</code></a></span>
+<ul>
+<li><a href="#lock">类：<code>Lock</code></a>
+<ul>
+<li><a href="#lockname"><code>lock.name</code></a></li>
+<li><a href="#lockmode"><code>lock.mode</code></a></li>
+</ul>
+</li>
+<li><a href="#lockmanager">类：<code>LockManager</code></a>
+<ul>
+<li><a href="#locksrequestname-options-callback"><code>locks.request(name[, options], callback)</code></a></li>
+<li><a href="#locksquery"><code>locks.query()</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#broadcastchannel-extends-eventtarget">类：<code>BroadcastChannel extends EventTarget</code></a>
+<ul>
+<li><a href="#new-broadcastchannelname"><code>new BroadcastChannel(name)</code></a></li>
+<li><a href="#broadcastchannelclose"><code>broadcastChannel.close()</code></a></li>
+<li><a href="#broadcastchannelonmessage"><code>broadcastChannel.onmessage</code></a></li>
+<li><a href="#broadcastchannelonmessageerror"><code>broadcastChannel.onmessageerror</code></a></li>
+<li><a href="#broadcastchannelpostmessagemessage"><code>broadcastChannel.postMessage(message)</code></a></li>
+<li><a href="#broadcastchannelref"><code>broadcastChannel.ref()</code></a></li>
+<li><a href="#broadcastchannelunref"><code>broadcastChannel.unref()</code></a></li>
+</ul>
+</li>
+<li><a href="#messagechannel">类：<code>MessageChannel</code></a></li>
+<li><a href="#messageport">类：<code>MessagePort</code></a>
+<ul>
+<li><a href="#close">事件：<code>'close'</code></a></li>
+<li><a href="#message">事件：<code>'message'</code></a></li>
+<li><a href="#messageerror">事件：<code>'messageerror'</code></a></li>
+<li><a href="#portclose"><code>port.close()</code></a></li>
+<li><a href="#portpostmessagevalue-transferlist"><code>port.postMessage(value[, transferList])</code></a>
+<ul>
+<li><a href="#-typedarrays--buffers-">传输 TypedArrays 和 Buffers 时的注意事项</a></li>
+<li><a href="#">克隆具有原型、类和访问器的对象时的注意事项</a></li>
+</ul>
+</li>
+<li><a href="#porthasref"><code>port.hasRef()</code></a></li>
+<li><a href="#portref"><code>port.ref()</code></a></li>
+<li><a href="#portstart"><code>port.start()</code></a></li>
+<li><a href="#portunref"><code>port.unref()</code></a></li>
+</ul>
+</li>
+<li><a href="#worker">类：<code>Worker</code></a>
+<ul>
+<li><a href="#new-workerfilename-options"><code>new Worker(filename[, options])</code></a></li>
+<li><a href="#error">事件：<code>'error'</code></a></li>
+<li><a href="#exit">事件：<code>'exit'</code></a></li>
+<li><a href="#message_1">事件：<code>'message'</code></a></li>
+<li><a href="#messageerror_1">事件：<code>'messageerror'</code></a></li>
+<li><a href="#online">事件：<code>'online'</code></a></li>
+<li><a href="#workercpuusageprev"><code>worker.cpuUsage([prev])</code></a></li>
+<li><a href="#workergetheapsnapshotoptions"><code>worker.getHeapSnapshot([options])</code></a></li>
+<li><a href="#workergetheapstatistics"><code>worker.getHeapStatistics()</code></a></li>
+<li><a href="#workerperformance"><code>worker.performance</code></a>
+<ul>
+<li><a href="#performanceeventlooputilizationutilization1-utilization2"><code>performance.eventLoopUtilization([utilization1[, utilization2]])</code></a></li>
+</ul>
+</li>
+<li><a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage(value[, transferList])</code></a></li>
+<li><a href="#workerref"><code>worker.ref()</code></a></li>
+<li><a href="#workerresourcelimits_1"><code>worker.resourceLimits</code></a></li>
+<li><a href="#workerstartcpuprofile"><code>worker.startCpuProfile()</code></a></li>
+<li><a href="#workerstartheapprofile"><code>worker.startHeapProfile()</code></a></li>
+<li><a href="#workerstderr"><code>worker.stderr</code></a></li>
+<li><a href="#workerstdin"><code>worker.stdin</code></a></li>
+<li><a href="#workerstdout"><code>worker.stdout</code></a></li>
+<li><a href="#workerterminate"><code>worker.terminate()</code></a></li>
+<li><a href="#workerthreadid_1"><code>worker.threadId</code></a></li>
+<li><a href="#workerthreadname_1"><code>worker.threadName</code></a></li>
+<li><a href="#workerunref"><code>worker.unref()</code></a></li>
+<li><a href="#workersymbolasyncdispose"><code>worker[Symbol.asyncDispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#_1">注意事项</a>
+<ul>
+<li><a href="#stdio-">stdio 的同步阻塞</a></li>
+<li><a href="#_2">从预加载脚本启动工作线程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads active">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/worker_threads.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/worker_threads.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/worker_threads.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/worker_threads.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/worker_threads.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/worker_threads.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/worker_threads.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/worker_threads.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/worker_threads.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/worker_threads.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/worker_threads.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/worker_threads.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/worker_threads.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/worker_threads.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/worker_threads.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/worker_threads.html">10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="worker_threads.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/worker_threads.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#worker-threads">Worker threads</a></span>
+<ul>
+<li><a href="#workergetenvironmentdatakey"><code>worker.getEnvironmentData(key)</code></a></li>
+<li><a href="#workerisinternalthread"><code>worker.isInternalThread</code></a></li>
+<li><a href="#workerismainthread"><code>worker.isMainThread</code></a></li>
+<li><a href="#workermarkasuntransferableobject"><code>worker.markAsUntransferable(object)</code></a></li>
+<li><a href="#workerismarkedasuntransferableobject"><code>worker.isMarkedAsUntransferable(object)</code></a></li>
+<li><a href="#workermarkasuncloneableobject"><code>worker.markAsUncloneable(object)</code></a></li>
+<li><a href="#workermovemessageporttocontextport-contextifiedsandbox"><code>worker.moveMessagePortToContext(port, contextifiedSandbox)</code></a></li>
+<li><a href="#workerparentport"><code>worker.parentPort</code></a></li>
+<li><span class="stability_1.1"><a href="#workerpostmessagetothreadthreadid-value-transferlist-timeout"><code>worker.postMessageToThread(threadId, value[, transferList][, timeout])</code></a></span></li>
+<li><a href="#workerreceivemessageonportport"><code>worker.receiveMessageOnPort(port)</code></a></li>
+<li><a href="#workerresourcelimits"><code>worker.resourceLimits</code></a></li>
+<li><a href="#workershare_env"><code>worker.SHARE_ENV</code></a></li>
+<li><a href="#workersetenvironmentdatakey-value"><code>worker.setEnvironmentData(key[, value])</code></a></li>
+<li><a href="#workerthreadid"><code>worker.threadId</code></a></li>
+<li><a href="#workerthreadname"><code>worker.threadName</code></a></li>
+<li><a href="#workerworkerdata"><code>worker.workerData</code></a></li>
+<li><span class="stability_1"><a href="#workerlocks"><code>worker.locks</code></a></span>
+<ul>
+<li><a href="#lock">类：<code>Lock</code></a>
+<ul>
+<li><a href="#lockname"><code>lock.name</code></a></li>
+<li><a href="#lockmode"><code>lock.mode</code></a></li>
+</ul>
+</li>
+<li><a href="#lockmanager">类：<code>LockManager</code></a>
+<ul>
+<li><a href="#locksrequestname-options-callback"><code>locks.request(name[, options], callback)</code></a></li>
+<li><a href="#locksquery"><code>locks.query()</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#broadcastchannel-extends-eventtarget">类：<code>BroadcastChannel extends EventTarget</code></a>
+<ul>
+<li><a href="#new-broadcastchannelname"><code>new BroadcastChannel(name)</code></a></li>
+<li><a href="#broadcastchannelclose"><code>broadcastChannel.close()</code></a></li>
+<li><a href="#broadcastchannelonmessage"><code>broadcastChannel.onmessage</code></a></li>
+<li><a href="#broadcastchannelonmessageerror"><code>broadcastChannel.onmessageerror</code></a></li>
+<li><a href="#broadcastchannelpostmessagemessage"><code>broadcastChannel.postMessage(message)</code></a></li>
+<li><a href="#broadcastchannelref"><code>broadcastChannel.ref()</code></a></li>
+<li><a href="#broadcastchannelunref"><code>broadcastChannel.unref()</code></a></li>
+</ul>
+</li>
+<li><a href="#messagechannel">类：<code>MessageChannel</code></a></li>
+<li><a href="#messageport">类：<code>MessagePort</code></a>
+<ul>
+<li><a href="#close">事件：<code>'close'</code></a></li>
+<li><a href="#message">事件：<code>'message'</code></a></li>
+<li><a href="#messageerror">事件：<code>'messageerror'</code></a></li>
+<li><a href="#portclose"><code>port.close()</code></a></li>
+<li><a href="#portpostmessagevalue-transferlist"><code>port.postMessage(value[, transferList])</code></a>
+<ul>
+<li><a href="#-typedarrays--buffers-">传输 TypedArrays 和 Buffers 时的注意事项</a></li>
+<li><a href="#">克隆具有原型、类和访问器的对象时的注意事项</a></li>
+</ul>
+</li>
+<li><a href="#porthasref"><code>port.hasRef()</code></a></li>
+<li><a href="#portref"><code>port.ref()</code></a></li>
+<li><a href="#portstart"><code>port.start()</code></a></li>
+<li><a href="#portunref"><code>port.unref()</code></a></li>
+</ul>
+</li>
+<li><a href="#worker">类：<code>Worker</code></a>
+<ul>
+<li><a href="#new-workerfilename-options"><code>new Worker(filename[, options])</code></a></li>
+<li><a href="#error">事件：<code>'error'</code></a></li>
+<li><a href="#exit">事件：<code>'exit'</code></a></li>
+<li><a href="#message_1">事件：<code>'message'</code></a></li>
+<li><a href="#messageerror_1">事件：<code>'messageerror'</code></a></li>
+<li><a href="#online">事件：<code>'online'</code></a></li>
+<li><a href="#workercpuusageprev"><code>worker.cpuUsage([prev])</code></a></li>
+<li><a href="#workergetheapsnapshotoptions"><code>worker.getHeapSnapshot([options])</code></a></li>
+<li><a href="#workergetheapstatistics"><code>worker.getHeapStatistics()</code></a></li>
+<li><a href="#workerperformance"><code>worker.performance</code></a>
+<ul>
+<li><a href="#performanceeventlooputilizationutilization1-utilization2"><code>performance.eventLoopUtilization([utilization1[, utilization2]])</code></a></li>
+</ul>
+</li>
+<li><a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage(value[, transferList])</code></a></li>
+<li><a href="#workerref"><code>worker.ref()</code></a></li>
+<li><a href="#workerresourcelimits_1"><code>worker.resourceLimits</code></a></li>
+<li><a href="#workerstartcpuprofile"><code>worker.startCpuProfile()</code></a></li>
+<li><a href="#workerstartheapprofile"><code>worker.startHeapProfile()</code></a></li>
+<li><a href="#workerstderr"><code>worker.stderr</code></a></li>
+<li><a href="#workerstdin"><code>worker.stdin</code></a></li>
+<li><a href="#workerstdout"><code>worker.stdout</code></a></li>
+<li><a href="#workerterminate"><code>worker.terminate()</code></a></li>
+<li><a href="#workerthreadid_1"><code>worker.threadId</code></a></li>
+<li><a href="#workerthreadname_1"><code>worker.threadName</code></a></li>
+<li><a href="#workerunref"><code>worker.unref()</code></a></li>
+<li><a href="#workersymbolasyncdispose"><code>worker[Symbol.asyncDispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#_1">注意事项</a>
+<ul>
+<li><a href="#stdio-">stdio 的同步阻塞</a></li>
+<li><a href="#_2">从预加载脚本启动工作线程</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Worker threads<span><a class="mark" href="#worker-threads" id="worker-threads">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threads"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/worker_threads.js">lib/worker_threads.js</a></p>
+<p><code>node:worker_threads</code> 模块允许使用并行执行 JavaScript 的线程。要访问该模块：</p>
+
+<pre class="with-41-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> worker <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> worker = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);</code><button class="copy-button">copy</button></pre>
+<p>工作线程（线程）对于执行 CPU 密集型的 JavaScript 操作非常有用。它们对于 I/O 密集型工作的帮助不大。Node.js 内置的异步 I/O 操作比工作线程更高效。</p>
+<p>与 <code>child_process</code> 或 <code>cluster</code> 不同，<code>worker_threads</code> 可以共享内存。它们通过传输 <code>ArrayBuffer</code> 实例或共享 <code>SharedArrayBuffer</code> 实例来实现这一点。</p>
+
+<pre class="with-13-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">Worker</span>,
+  isMainThread,
+  parentPort,
+  workerData,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (!isMainThread) {
+  <span class="hljs-keyword">const</span> { parse } = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'some-js-parsing-library'</span>);
+  <span class="hljs-keyword">const</span> script = workerData;
+  parentPort.<span class="hljs-title function_">postMessage</span>(<span class="hljs-title function_">parse</span>(script));
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">parseJSAsync</span>(<span class="hljs-params">script</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =></span> {
+    <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>), {
+      <span class="hljs-attr">workerData</span>: script,
+    });
+    worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, resolve);
+    worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'error'</span>, reject);
+    worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
+      <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>)
+        <span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Worker stopped with exit code <span class="hljs-subst">${code}</span>`</span>));
+    });
+  });
+};</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> {
+  <span class="hljs-title class_">Worker</span>,
+  isMainThread,
+  parentPort,
+  workerData,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-keyword">function</span> <span class="hljs-title function_">parseJSAsync</span>(<span class="hljs-params">script</span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =></span> {
+      <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename, {
+        <span class="hljs-attr">workerData</span>: script,
+      });
+      worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, resolve);
+      worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'error'</span>, reject);
+      worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
+        <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>)
+          <span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Worker stopped with exit code <span class="hljs-subst">${code}</span>`</span>));
+      });
+    });
+  };
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-keyword">const</span> { parse } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'some-js-parsing-library'</span>);
+  <span class="hljs-keyword">const</span> script = workerData;
+  parentPort.<span class="hljs-title function_">postMessage</span>(<span class="hljs-title function_">parse</span>(script));
+}</code><button class="copy-button">copy</button></pre>
+<p>上面的例子为每个 <code>parseJSAsync()</code> 调用生成一个工作线程。在实践中，对于这类任务，应使用工作线程池。否则，创建 Worker 的开销可能会超过其好处。</p>
+<p>当实现工作线程池时，使用 <a href="async_hooks.html#class-asyncresource"><code>AsyncResource</code></a> API 来告知诊断工具（例如，为了提供异步堆栈跟踪）任务与其结果之间的关联关系。有关示例实现，请参阅 <code>async_hooks</code> 文档中的 <a href="async_context.html#using-asyncresource-for-a-worker-thread-pool">"对 <code>Worker</code> 线程池使用 <code>AsyncResource</code>"</a>。</p>
+<p>默认情况下，工作线程会继承非进程特定的选项。请参考 [<code>Worker 构造函数选项</code>][] 以了解如何自定义工作线程选项，特别是 <code>argv</code> 和 <code>execArgv</code> 选项。</p>
+<section><h3><code>worker.getEnvironmentData(key)</code><span><a class="mark" href="#workergetenvironmentdatakey" id="workergetenvironmentdatakey">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_getenvironmentdata_key"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v17.5.0, v16.15.0</td>
+<td><p>No longer experimental.</p></td></tr>
+<tr><td>v15.12.0, v14.18.0</td>
+<td><p><span>Added in: v15.12.0, v14.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>key</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何可以作为 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" class="type">&#x3C;Map></a> 键的任意、可克隆的 JavaScript 值。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+</ul>
+<p>在工作线程内部，<code>worker.getEnvironmentData()</code> 返回传递给生成线程的 <code>worker.setEnvironmentData()</code> 的数据的克隆。每个新的 <code>Worker</code> 会自动接收环境数据的自己的副本。</p>
+
+<pre class="with-13-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">Worker</span>,
+  isMainThread,
+  setEnvironmentData,
+  getEnvironmentData,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-title function_">setEnvironmentData</span>(<span class="hljs-string">'Hello'</span>, <span class="hljs-string">'World!'</span>);
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getEnvironmentData</span>(<span class="hljs-string">'Hello'</span>));  <span class="hljs-comment">// 打印 'World!'。</span>
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> {
+  <span class="hljs-title class_">Worker</span>,
+  isMainThread,
+  setEnvironmentData,
+  getEnvironmentData,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-title function_">setEnvironmentData</span>(<span class="hljs-string">'Hello'</span>, <span class="hljs-string">'World!'</span>);
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">getEnvironmentData</span>(<span class="hljs-string">'Hello'</span>));  <span class="hljs-comment">// 打印 'World!'。</span>
+}</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.isInternalThread</code><span><a class="mark" href="#workerisinternalthread" id="workerisinternalthread">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_isinternalthread"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.7.0, v22.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果此代码运行在内部的 <a href="#class-worker"><code>Worker</code></a> 线程内（例如加载器线程），则为 <code>true</code>。</p>
+<pre><code class="language-bash">node --experimental-loader ./loader.js main.js</code> <button class="copy-button">copy</button></pre>
+
+<pre class="with-55-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// loader.js</span>
+<span class="hljs-keyword">import</span> { isInternalThread } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(isInternalThread);  <span class="hljs-comment">// true</span></code><code class="language-js cjs"><span class="hljs-comment">// loader.js</span>
+<span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { isInternalThread } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(isInternalThread);  <span class="hljs-comment">// true</span></code><button class="copy-button">copy</button></pre>
+
+<pre class="with-55-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">import</span> { isInternalThread } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(isInternalThread);  <span class="hljs-comment">// false</span></code><code class="language-js cjs"><span class="hljs-comment">// main.js</span>
+<span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { isInternalThread } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(isInternalThread);  <span class="hljs-comment">// false</span></code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.isMainThread</code><span><a class="mark" href="#workerismainthread" id="workerismainthread">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_ismainthread"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果此代码不在 <a href="#class-worker"><code>Worker</code></a> 线程内运行，则为 <code>true</code>。</p>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Worker</span>, isMainThread } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-comment">// 这会在 Worker 实例内部重新加载当前文件。</span>
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Inside Worker!'</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(isMainThread);  <span class="hljs-comment">// 打印 'false'。</span>
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span>, isMainThread } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-comment">// 这会在 Worker 实例内部重新加载当前文件。</span>
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Inside Worker!'</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(isMainThread);  <span class="hljs-comment">// 打印 'false'。</span>
+}</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.markAsUntransferable(object)</code><span><a class="mark" href="#workermarkasuntransferableobject" id="workermarkasuntransferableobject">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_markasuntransferable_object"></a></h3>
+<div class="api_metadata">
+<span>Added in: v14.5.0, v12.19.0</span>
+</div>
+<ul>
+<li><code>object</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何 JavaScript 值。</li>
+</ul>
+<p>将对象标记为不可传输。如果 <code>object</code> 出现在 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a> 调用的传输列表中，则会抛出错误。如果 <code>object</code> 是原始值，则此操作无效。</p>
+<p>特别是，这对于可以被克隆而不是传输的对象是有意义的，并且这些对象被发送端的其他对象使用。例如，Node.js 使用此方法标记其用于 <a href="buffer.html#static-method-bufferallocunsafesize"><code>Buffer</code> 池</a> 的 <code>ArrayBuffer</code>。</p>
+<p>此操作不可撤销。</p>
+
+<pre class="with-75-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span>, markAsUntransferable } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> pooledBuffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">8</span>);
+<span class="hljs-keyword">const</span> typedArray1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>(pooledBuffer);
+<span class="hljs-keyword">const</span> typedArray2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Float64Array</span>(pooledBuffer);
+
+<span class="hljs-title function_">markAsUntransferable</span>(pooledBuffer);
+
+<span class="hljs-keyword">const</span> { port1 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-comment">// 这将抛出错误，因为 pooledBuffer 不可传输。</span>
+  port1.<span class="hljs-title function_">postMessage</span>(typedArray1, [ typedArray1.<span class="hljs-property">buffer</span> ]);
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-comment">// error.name === 'DataCloneError'</span>
+}
+
+<span class="hljs-comment">// 以下行打印 typedArray1 的内容——它仍然拥有其内存且未被传输。如果没有 `markAsUntransferable()`，这将打印一个空的 Uint8Array，并且 postMessage 调用会成功。</span>
+<span class="hljs-comment">// typedArray2 也完好无损。</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(typedArray1);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(typedArray2);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span>, markAsUntransferable } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> pooledBuffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">8</span>);
+<span class="hljs-keyword">const</span> typedArray1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>(pooledBuffer);
+<span class="hljs-keyword">const</span> typedArray2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Float64Array</span>(pooledBuffer);
+
+<span class="hljs-title function_">markAsUntransferable</span>(pooledBuffer);
+
+<span class="hljs-keyword">const</span> { port1 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-comment">// 这将抛出错误，因为 pooledBuffer 不可传输。</span>
+  port1.<span class="hljs-title function_">postMessage</span>(typedArray1, [ typedArray1.<span class="hljs-property">buffer</span> ]);
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-comment">// error.name === 'DataCloneError'</span>
+}
+
+<span class="hljs-comment">// 以下行打印 typedArray1 的内容——它仍然拥有其内存且未被传输。如果没有 `markAsUntransferable()`，这将打印一个空的 Uint8Array，并且 postMessage 调用会成功。</span>
+<span class="hljs-comment">// typedArray2 也完好无损。</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(typedArray1);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(typedArray2);</code><button class="copy-button">copy</button></pre>
+<p>浏览器中没有等效的 API。</p>
+</section><section><h3><code>worker.isMarkedAsUntransferable(object)</code><span><a class="mark" href="#workerismarkedasuntransferableobject" id="workerismarkedasuntransferableobject">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_ismarkedasuntransferable_object"></a></h3>
+<div class="api_metadata">
+<span>Added in: v21.0.0</span>
+</div>
+<ul>
+<li><code>object</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何 JavaScript 值。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>检查对象是否已使用 <a href="#workermarkasuntransferableobject"><code>markAsUntransferable()</code></a> 标记为不可传输。</p>
+
+<pre class="with-85-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { markAsUntransferable, isMarkedAsUntransferable } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> pooledBuffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">8</span>);
+<span class="hljs-title function_">markAsUntransferable</span>(pooledBuffer);
+
+<span class="hljs-title function_">isMarkedAsUntransferable</span>(pooledBuffer);  <span class="hljs-comment">// 返回 true。</span></code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { markAsUntransferable, isMarkedAsUntransferable } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> pooledBuffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">8</span>);
+<span class="hljs-title function_">markAsUntransferable</span>(pooledBuffer);
+
+<span class="hljs-title function_">isMarkedAsUntransferable</span>(pooledBuffer);  <span class="hljs-comment">// 返回 true。</span></code><button class="copy-button">copy</button></pre>
+<p>浏览器中没有等效的 API。</p>
+</section><section><h3><code>worker.markAsUncloneable(object)</code><span><a class="mark" href="#workermarkasuncloneableobject" id="workermarkasuncloneableobject">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_markasuncloneable_object"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.0.0, v22.10.0</span>
+</div>
+<ul>
+<li><code>object</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何 JavaScript 值。</li>
+</ul>
+<p>将对象标记为不可克隆。如果 <code>object</code> 在 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a> 调用中用作 <a href="#event-message"><code>message</code></a>，则会抛出错误。如果 <code>object</code> 是原始值，则此操作无效。</p>
+<p>这对 <code>ArrayBuffer</code> 或任何 <code>Buffer</code> 类对象没有影响。</p>
+<p>此操作不可撤销。</p>
+
+<pre class="with-56-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { markAsUncloneable } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> anyObject = { <span class="hljs-attr">foo</span>: <span class="hljs-string">'bar'</span> };
+<span class="hljs-title function_">markAsUncloneable</span>(anyObject);
+<span class="hljs-keyword">const</span> { port1 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-comment">// 这将抛出错误，因为 anyObject 不可克隆。</span>
+  port1.<span class="hljs-title function_">postMessage</span>(anyObject);
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-comment">// error.name === 'DataCloneError'</span>
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { markAsUncloneable } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> anyObject = { <span class="hljs-attr">foo</span>: <span class="hljs-string">'bar'</span> };
+<span class="hljs-title function_">markAsUncloneable</span>(anyObject);
+<span class="hljs-keyword">const</span> { port1 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-comment">// 这将抛出错误，因为 anyObject 不可克隆。</span>
+  port1.<span class="hljs-title function_">postMessage</span>(anyObject);
+} <span class="hljs-keyword">catch</span> (error) {
+  <span class="hljs-comment">// error.name === 'DataCloneError'</span>
+}</code><button class="copy-button">copy</button></pre>
+<p>浏览器中没有等效的 API。</p>
+</section><section><h3><code>worker.moveMessagePortToContext(port, contextifiedSandbox)</code><span><a class="mark" href="#workermovemessageporttocontextport-contextifiedsandbox" id="workermovemessageporttocontextport-contextifiedsandbox">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_movemessageporttocontext_port_contextifiedsandbox"></a></h3>
+<div class="api_metadata">
+<span>Added in: v11.13.0</span>
+</div>
+<ul>
+<li><code>port</code> <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a> 要传输的消息端口。</li>
+<li><code>contextifiedSandbox</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个由 <code>vm.createContext()</code> 方法返回的 <a href="vm.html#what-does-it-mean-to-contextify-an-object">contextified</a> 对象。</li>
+<li>返回: <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a></li>
+</ul>
+<p>将 <code>MessagePort</code> 传输到不同的 <a href="vm.html"><code>vm</code></a> 上下文。原始的 <code>port</code> 对象变得不可用，返回的 <code>MessagePort</code> 实例取代其位置。</p>
+<p>返回的 <code>MessagePort</code> 是目标上下文中的一个对象，并继承自其全局 <code>Object</code> 类。传递给 <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessagePort/onmessage"><code>port.onmessage()</code></a> 监听器的对象也在目标上下文中创建，并继承自其全局 <code>Object</code> 类。</p>
+<p>但是，创建的 <code>MessagePort</code> 不再继承自 <a href="events.html#class-eventtarget" class="type">&#x3C;EventTarget></a>，并且只能使用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessagePort/onmessage"><code>port.onmessage()</code></a> 来接收事件。</p>
+</section><section><h3><code>worker.parentPort</code><span><a class="mark" href="#workerparentport" id="workerparentport">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_parentport"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a></li>
+</ul>
+<p>如果此线程是一个 <a href="#class-worker"><code>Worker</code></a>，则这是一个允许与父线程通信的 <a href="#class-messageport"><code>MessagePort</code></a>。使用 <code>parentPort.postMessage()</code> 发送的消息在父线程中可以通过 <code>worker.on('message')</code> 获取，而使用 <code>worker.postMessage()</code> 从父线程发送的消息在此线程中可以通过 <code>parentPort.on('message')</code> 获取。</p>
+
+<pre class="with-71-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Worker</span>, isMainThread, parentPort } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+  worker.<span class="hljs-title function_">once</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message);  <span class="hljs-comment">// 打印 'Hello, world!'。</span>
+  });
+  worker.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'Hello, world!'</span>);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// 当收到来自父线程的消息时，将其发送回去：</span>
+  parentPort.<span class="hljs-title function_">once</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> {
+    parentPort.<span class="hljs-title function_">postMessage</span>(message);
+  });
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span>, isMainThread, parentPort } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+  worker.<span class="hljs-title function_">once</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message);  <span class="hljs-comment">// 打印 'Hello, world!'。</span>
+  });
+  worker.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'Hello, world!'</span>);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// 当收到来自父线程的消息时，将其发送回去：</span>
+  parentPort.<span class="hljs-title function_">once</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> {
+    parentPort.<span class="hljs-title function_">postMessage</span>(message);
+  });
+}</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.postMessageToThread(threadId, value[, transferList][, timeout])</code><span><a class="mark" href="#workerpostmessagetothreadthreadid-value-transferlist-timeout" id="workerpostmessagetothreadthreadid-value-transferlist-timeout">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_postmessagetothread_threadid_value_transferlist_timeout"></a></h3>
+<div class="api_metadata">
+<span>Added in: v22.5.0, v20.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development</div><p></p>
+<ul>
+<li><code>threadId</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 目标线程 ID。如果线程 ID 无效，将抛出 <a href="errors.html#err_worker_messaging_failed"><code>ERR_WORKER_MESSAGING_FAILED</code></a> 错误。如果目标线程 ID 是当前线程 ID，将抛出 <a href="errors.html#err_worker_messaging_same_thread"><code>ERR_WORKER_MESSAGING_SAME_THREAD</code></a> 错误。</li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 要发送的值。</li>
+<li><code>transferList</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> 如果 <code>value</code> 中传递了一个或多个 <code>MessagePort</code> 类对象，则这些项需要 <code>transferList</code>，否则会抛出 <a href="errors.html#err_missing_message_port_in_transfer_list"><code>ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST</code></a>。有关更多信息，请参阅 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a>。</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 等待消息传递的毫秒数。默认为 <code>undefined</code>，表示永远等待。如果操作超时，将抛出 <a href="errors.html#err_worker_messaging_timeout"><code>ERR_WORKER_MESSAGING_TIMEOUT</code></a> 错误。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 如果目标线程成功处理了消息，则 Promise 会完成。</li>
+</ul>
+<p>向另一个工作线程发送一个值，通过其线程 ID 标识。</p>
+<p>如果目标线程没有监听 <code>workerMessage</code> 事件，则操作将抛出 <a href="errors.html#err_worker_messaging_failed"><code>ERR_WORKER_MESSAGING_FAILED</code></a> 错误。</p>
+<p>如果目标线程在处理 <code>workerMessage</code> 事件时抛出错误，则操作将抛出 <a href="errors.html#err_worker_messaging_errored"><code>ERR_WORKER_MESSAGING_ERRORED</code></a> 错误。</p>
+<p>当目标线程不是当前线程的直接父线程或子线程时，应使用此方法。如果两个线程是父子关系，请使用 <a href="#workerpostmessagevalue-transferlist"><code>require('node:worker_threads').parentPort.postMessage()</code></a> 和 <a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage()</code></a> 来让线程通信。</p>
+<p>下面的例子展示了 <code>postMessageToThread</code> 的用法：它创建了 10 个嵌套线程，最后一个线程将尝试与主线程通信。</p>
+
+<pre class="with-35-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> process <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+<span class="hljs-keyword">import</span> {
+  postMessageToThread,
+  threadId,
+  workerData,
+  <span class="hljs-title class_">Worker</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> channel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BroadcastChannel</span>(<span class="hljs-string">'sync'</span>);
+<span class="hljs-keyword">const</span> level = workerData?.<span class="hljs-property">level</span> ?? <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">if</span> (level &#x3C; <span class="hljs-number">10</span>) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>), {
+    <span class="hljs-attr">workerData</span>: { <span class="hljs-attr">level</span>: level + <span class="hljs-number">1</span> },
+  });
+}
+
+<span class="hljs-keyword">if</span> (level === <span class="hljs-number">0</span>) {
+  process.<span class="hljs-title function_">on</span>(<span class="hljs-string">'workerMessage'</span>, <span class="hljs-function">(<span class="hljs-params">value, source</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${source}</span> -> <span class="hljs-subst">${threadId}</span>:`</span>, value);
+    <span class="hljs-title function_">postMessageToThread</span>(source, { <span class="hljs-attr">message</span>: <span class="hljs-string">'pong'</span> });
+  });
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (level === <span class="hljs-number">10</span>) {
+  process.<span class="hljs-title function_">on</span>(<span class="hljs-string">'workerMessage'</span>, <span class="hljs-function">(<span class="hljs-params">value, source</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${source}</span> -> <span class="hljs-subst">${threadId}</span>:`</span>, value);
+    channel.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'done'</span>);
+    channel.<span class="hljs-title function_">close</span>();
+  });
+
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">postMessageToThread</span>(<span class="hljs-number">0</span>, { <span class="hljs-attr">message</span>: <span class="hljs-string">'ping'</span> });
+}
+
+channel.<span class="hljs-property">onmessage</span> = channel.<span class="hljs-property">close</span>;</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> process = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:process'</span>);
+<span class="hljs-keyword">const</span> {
+  postMessageToThread,
+  threadId,
+  workerData,
+  <span class="hljs-title class_">Worker</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> channel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BroadcastChannel</span>(<span class="hljs-string">'sync'</span>);
+<span class="hljs-keyword">const</span> level = workerData?.<span class="hljs-property">level</span> ?? <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">if</span> (level &#x3C; <span class="hljs-number">10</span>) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename, {
+    <span class="hljs-attr">workerData</span>: { <span class="hljs-attr">level</span>: level + <span class="hljs-number">1</span> },
+  });
+}
+
+<span class="hljs-keyword">if</span> (level === <span class="hljs-number">0</span>) {
+  process.<span class="hljs-title function_">on</span>(<span class="hljs-string">'workerMessage'</span>, <span class="hljs-function">(<span class="hljs-params">value, source</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${source}</span> -> <span class="hljs-subst">${threadId}</span>:`</span>, value);
+    <span class="hljs-title function_">postMessageToThread</span>(source, { <span class="hljs-attr">message</span>: <span class="hljs-string">'pong'</span> });
+  });
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (level === <span class="hljs-number">10</span>) {
+  process.<span class="hljs-title function_">on</span>(<span class="hljs-string">'workerMessage'</span>, <span class="hljs-function">(<span class="hljs-params">value, source</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${source}</span> -> <span class="hljs-subst">${threadId}</span>:`</span>, value);
+    channel.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'done'</span>);
+    channel.<span class="hljs-title function_">close</span>();
+  });
+
+  <span class="hljs-title function_">postMessageToThread</span>(<span class="hljs-number">0</span>, { <span class="hljs-attr">message</span>: <span class="hljs-string">'ping'</span> });
+}
+
+channel.<span class="hljs-property">onmessage</span> = channel.<span class="hljs-property">close</span>;</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.receiveMessageOnPort(port)</code><span><a class="mark" href="#workerreceivemessageonportport" id="workerreceivemessageonportport">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_receivemessageonport_port"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.12.0</td>
+<td><p>The port argument can also refer to a <code>BroadcastChannel</code> now.</p></td></tr>
+<tr><td>v12.3.0</td>
+<td><p><span>Added in: v12.3.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>
+<p><code>port</code> <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a> | <a href="worker_threads.html#class-broadcastchannel-extends-eventtarget" class="type">&#x3C;BroadcastChannel></a></p>
+</li>
+<li>
+<p>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></p>
+</li>
+</ul>
+<p>从给定的 <code>MessagePort</code> 接收单条消息。如果没有可用消息，则返回 <code>undefined</code>，否则返回一个具有单个 <code>message</code> 属性的对象，该属性包含消息负载，对应于 <code>MessagePort</code> 队列中最旧的消息。</p>
+
+<pre class="with-75-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span>, receiveMessageOnPort } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+port1.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">hello</span>: <span class="hljs-string">'world'</span> });
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">receiveMessageOnPort</span>(port2));
+<span class="hljs-comment">// 打印: { message: { hello: 'world' } }</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">receiveMessageOnPort</span>(port2));
+<span class="hljs-comment">// 打印: undefined</span></code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span>, receiveMessageOnPort } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+port1.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">hello</span>: <span class="hljs-string">'world'</span> });
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">receiveMessageOnPort</span>(port2));
+<span class="hljs-comment">// 打印: { message: { hello: 'world' } }</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">receiveMessageOnPort</span>(port2));
+<span class="hljs-comment">// 打印: undefined</span></code><button class="copy-button">copy</button></pre>
+<p>使用此函数时，不会发出 <code>'message'</code> 事件，也不会调用 <code>onmessage</code> 监听器。</p>
+</section><section><h3><code>worker.resourceLimits</code><span><a class="mark" href="#workerresourcelimits" id="workerresourcelimits">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_resourcelimits"></a></h3>
+<div class="api_metadata">
+<span>Added in: v13.2.0, v12.16.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>maxYoungGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>maxOldGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>codeRangeSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>stackSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+</li>
+</ul>
+<p>提供此 Worker 线程内部的 JS 引擎资源约束集。如果 <code>resourceLimits</code> 选项传递给了 <a href="#class-worker"><code>Worker</code></a> 构造函数，则与此匹配其值。</p>
+<p>如果此代码在主线程中使用，则其值为空对象。</p>
+</section><section><h3><code>worker.SHARE_ENV</code><span><a class="mark" href="#workershare_env" id="workershare_env">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_share_env"></a></h3>
+<div class="api_metadata">
+<span>Added in: v11.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a></li>
+</ul>
+<p>一个特殊值，可以作为 <a href="#class-worker"><code>Worker</code></a> 构造函数的 <code>env</code> 选项传递，表示当前线程和 Worker 线程应共享对同一组环境变量的读写访问权限。</p>
+
+<pre class="with-56-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> process <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Worker</span>, <span class="hljs-variable constant_">SHARE_ENV</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">'process.env.SET_IN_WORKER = "foo"'</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">env</span>: <span class="hljs-variable constant_">SHARE_ENV</span> })
+  .<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">SET_IN_WORKER</span>);  <span class="hljs-comment">// 打印 'foo'。</span>
+  });</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span>, <span class="hljs-variable constant_">SHARE_ENV</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">'process.env.SET_IN_WORKER = "foo"'</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">env</span>: <span class="hljs-variable constant_">SHARE_ENV</span> })
+  .<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(process.<span class="hljs-property">env</span>.<span class="hljs-property">SET_IN_WORKER</span>);  <span class="hljs-comment">// 打印 'foo'。</span>
+  });</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.setEnvironmentData(key[, value])</code><span><a class="mark" href="#workersetenvironmentdatakey-value" id="workersetenvironmentdatakey-value">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_setenvironmentdata_key_value"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v17.5.0, v16.15.0</td>
+<td><p>No longer experimental.</p></td></tr>
+<tr><td>v15.12.0, v14.18.0</td>
+<td><p><span>Added in: v15.12.0, v14.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>key</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何可以作为 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" class="type">&#x3C;Map></a> 键的任意、可克隆的 JavaScript 值。</li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何将被克隆并自动传递给所有新 <code>Worker</code> 实例的任意、可克隆的 JavaScript 值。如果 <code>value</code> 作为 <code>undefined</code> 传递，则之前为 <code>key</code> 设置的任何值将被删除。</li>
+</ul>
+<p><code>worker.setEnvironmentData()</code> API 设置当前线程以及从当前上下文生成的所有新 <code>Worker</code> 实例中 <code>worker.getEnvironmentData()</code> 的内容。</p>
+</section><section><h3><code>worker.threadId</code><span><a class="mark" href="#workerthreadid" id="workerthreadid">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threadid"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>当前线程的整数标识符。在对应的 worker 对象上（如果有），它可作为 <a href="#workerthreadid_1"><code>worker.threadId</code></a> 使用。此值在单个进程内的每个 <a href="#class-worker"><code>Worker</code></a> 实例中是唯一的。</p>
+</section><section><h3><code>worker.threadName</code><span><a class="mark" href="#workerthreadname" id="workerthreadname">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threadname"></a></h3>
+<div class="api_metadata">
+<span>Added in: v24.6.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></li>
+</ul>
+<p>当前线程的字符串标识符，如果线程未运行则为 null。在对应的 worker 对象上（如果有），它可作为 <a href="#workerthreadname_1"><code>worker.threadName</code></a> 使用。</p>
+</section><section><h3><code>worker.workerData</code><span><a class="mark" href="#workerworkerdata" id="workerworkerdata">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_workerdata"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>一个任意的 JavaScript 值，包含传递给此线程的 <code>Worker</code> 构造函数的数据的克隆。</p>
+<p>数据是使用 <a href="#portpostmessagevalue-transferlist"><code>postMessage()</code></a> 进行克隆的，遵循 [HTML 结构化克隆算法][]。</p>
+
+<pre class="with-71-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Worker</span>, isMainThread, workerData } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>), { <span class="hljs-attr">workerData</span>: <span class="hljs-string">'Hello, world!'</span> });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(workerData);  <span class="hljs-comment">// 打印 'Hello, world!'。</span>
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span>, isMainThread, workerData } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename, { <span class="hljs-attr">workerData</span>: <span class="hljs-string">'Hello, world!'</span> });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(workerData);  <span class="hljs-comment">// 打印 'Hello, world!'。</span>
+}</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>worker.locks</code><span><a class="mark" href="#workerlocks" id="workerlocks">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_locks"></a></h3>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><a href="worker_threads.html#class-lockmanager" class="type">&#x3C;LockManager></a></li>
+</ul>
+<p><a href="#class-lockmanager"><code>LockManager</code></a> 的一个实例，可用于协调对同一进程内可能跨多个线程共享的资源的访问。该 API 镜像了 [浏览器 <code>LockManager</code>][] 的语义。</p>
+<div>
+<h4>类：<code>Lock</code><span><a class="mark" href="#lock" id="lock">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_lock"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<p><code>Lock</code> 接口提供有关通过 <a href="#locksrequestname-options-callback"><code>locks.request()</code></a> 授予的锁的信息。</p>
+<div>
+<h5><code>lock.name</code><span><a class="mark" href="#lockname" id="lockname">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_lock_name"></a></h5>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>锁的名称。</p>
+</div><div>
+<h5><code>lock.mode</code><span><a class="mark" href="#lockmode" id="lockmode">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_lock_mode"></a></h5>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>锁的模式。可以是 <code>shared</code> 或 <code>exclusive</code>。</p>
+</div></div><div>
+<h4>类：<code>LockManager</code><span><a class="mark" href="#lockmanager" id="lockmanager">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_lockmanager"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<p><code>LockManager</code> 接口提供了请求和检查锁的方法。要获取 <code>LockManager</code> 实例，请使用：</p>
+
+<pre class="with-44-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { locks } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { locks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);</code><button class="copy-button">copy</button></pre>
+<p>此实现与 [浏览器 <code>LockManager</code>][] API 匹配。</p>
+<div>
+<h5><code>locks.request(name[, options], callback)</code><span><a class="mark" href="#locksrequestname-options-callback" id="locksrequestname-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_locks_request_name_options_callback"></a></h5>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>mode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 可以是 <code>'exclusive'</code> 或 <code>'shared'</code>。<strong>默认值:</strong> <code>'exclusive'</code>。</li>
+<li><code>ifAvailable</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则仅当锁未被持有时才会授予请求。如果无法授予，<code>callback</code> 将使用 <code>null</code> 而不是 <code>Lock</code> 实例调用。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>steal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则任何具有相同名称的现有锁都会被释放，并且请求立即被授予，抢占任何排队的请求。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 可用于中止挂起（但尚未授予）的锁请求。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一旦锁被授予（或者如果 <code>ifAvailable</code> 为 <code>true</code> 且锁不可用，则立即使用 <code>null</code> 调用）。当函数返回时，锁会自动释放，或者——如果函数返回一个 Promise——当该 Promise 敲定时释放。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 在锁被释放后解决。</li>
+</ul>
+
+<pre class="with-44-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { locks } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">await</span> locks.<span class="hljs-title function_">request</span>(<span class="hljs-string">'my_resource'</span>, <span class="hljs-title function_">async</span> (lock) => {
+  <span class="hljs-comment">// 锁已被获取。</span>
+});
+<span class="hljs-comment">// 锁在此处已被释放。</span></code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { locks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+locks.<span class="hljs-title function_">request</span>(<span class="hljs-string">'my_resource'</span>, <span class="hljs-title function_">async</span> (lock) => {
+  <span class="hljs-comment">// 锁已被获取。</span>
+}).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// 锁在此处已被释放。</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>locks.query()</code><span><a class="mark" href="#locksquery" id="locksquery">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_locks_query"></a></h5>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>使用描述当前进程持有的和挂起的锁的 <code>LockManagerSnapshot</code> 进行解决。</p>
+
+<pre class="with-44-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { locks } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> snapshot = <span class="hljs-keyword">await</span> locks.<span class="hljs-title function_">query</span>();
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> lock <span class="hljs-keyword">of</span> snapshot.<span class="hljs-property">held</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`held lock: name <span class="hljs-subst">${lock.name}</span>, mode <span class="hljs-subst">${lock.mode}</span>`</span>);
+}
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> pending <span class="hljs-keyword">of</span> snapshot.<span class="hljs-property">pending</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`pending lock: name <span class="hljs-subst">${pending.name}</span>, mode <span class="hljs-subst">${pending.mode}</span>`</span>);
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { locks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+locks.<span class="hljs-title function_">query</span>().<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">snapshot</span>) =></span> {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> lock <span class="hljs-keyword">of</span> snapshot.<span class="hljs-property">held</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`held lock: name <span class="hljs-subst">${lock.name}</span>, mode <span class="hljs-subst">${lock.mode}</span>`</span>);
+  }
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> pending <span class="hljs-keyword">of</span> snapshot.<span class="hljs-property">pending</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`pending lock: name <span class="hljs-subst">${pending.name}</span>, mode <span class="hljs-subst">${pending.mode}</span>`</span>);
+  }
+});</code><button class="copy-button">copy</button></pre>
+</div></div>
+</section><section><h3>类：<code>BroadcastChannel extends EventTarget</code><span><a class="mark" href="#broadcastchannel-extends-eventtarget" id="broadcastchannel-extends-eventtarget">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_extends_eventtarget"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>No longer experimental.</p></td></tr>
+<tr><td>v15.4.0</td>
+<td><p><span>Added in: v15.4.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p><code>BroadcastChannel</code> 的实例允许与绑定到同一通道名称的所有其他 <code>BroadcastChannel</code> 实例进行异步的一对多通信。</p>
+
+<pre class="with-15-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  isMainThread,
+  <span class="hljs-title class_">BroadcastChannel</span>,
+  <span class="hljs-title class_">Worker</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> bc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BroadcastChannel</span>(<span class="hljs-string">'hello'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">let</span> c = <span class="hljs-number">0</span>;
+  bc.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">event</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(event.<span class="hljs-property">data</span>);
+    <span class="hljs-keyword">if</span> (++c === <span class="hljs-number">10</span>) bc.<span class="hljs-title function_">close</span>();
+  };
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>; n &#x3C; <span class="hljs-number">10</span>; n++)
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+} <span class="hljs-keyword">else</span> {
+  bc.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'hello from every worker'</span>);
+  bc.<span class="hljs-title function_">close</span>();
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> {
+  isMainThread,
+  <span class="hljs-title class_">BroadcastChannel</span>,
+  <span class="hljs-title class_">Worker</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> bc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BroadcastChannel</span>(<span class="hljs-string">'hello'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">let</span> c = <span class="hljs-number">0</span>;
+  bc.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">event</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(event.<span class="hljs-property">data</span>);
+    <span class="hljs-keyword">if</span> (++c === <span class="hljs-number">10</span>) bc.<span class="hljs-title function_">close</span>();
+  };
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>; n &#x3C; <span class="hljs-number">10</span>; n++)
+    <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+} <span class="hljs-keyword">else</span> {
+  bc.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'hello from every worker'</span>);
+  bc.<span class="hljs-title function_">close</span>();
+}</code><button class="copy-button">copy</button></pre>
+<div>
+<h4><code>new BroadcastChannel(name)</code><span><a class="mark" href="#new-broadcastchannelname" id="new-broadcastchannelname">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_new_broadcastchannel_name"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 要连接到的通道名称。允许任何可以使用 <code>`${name}`</code> 转换为字符串的 JavaScript 值。</li>
+</ul>
+</div><div>
+<h4><code>broadcastChannel.close()</code><span><a class="mark" href="#broadcastchannelclose" id="broadcastchannelclose">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<p>关闭 <code>BroadcastChannel</code> 连接。</p>
+</div><div>
+<h4><code>broadcastChannel.onmessage</code><span><a class="mark" href="#broadcastchannelonmessage" id="broadcastchannelonmessage">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_onmessage"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 当收到消息时使用单个 <code>MessageEvent</code> 参数调用。</li>
+</ul>
+</div><div>
+<h4><code>broadcastChannel.onmessageerror</code><span><a class="mark" href="#broadcastchannelonmessageerror" id="broadcastchannelonmessageerror">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_onmessageerror"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 当接收到的消息无法反序列化时调用。</li>
+</ul>
+</div><div>
+<h4><code>broadcastChannel.postMessage(message)</code><span><a class="mark" href="#broadcastchannelpostmessagemessage" id="broadcastchannelpostmessagemessage">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_postmessage_message"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<ul>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何可克隆的 JavaScript 值。</li>
+</ul>
+</div><div>
+<h4><code>broadcastChannel.ref()</code><span><a class="mark" href="#broadcastchannelref" id="broadcastchannelref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_ref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<p>与 <code>unref()</code> 相反。在先前 <code>unref()</code> 过的 BroadcastChannel 上调用 <code>ref()</code> <em>不会</em> 让程序退出（如果它是唯一活动的句柄，这是默认行为）。如果端口已被 <code>ref()</code>，再次调用 <code>ref()</code> 没有效果。</p>
+</div><div>
+<h4><code>broadcastChannel.unref()</code><span><a class="mark" href="#broadcastchannelunref" id="broadcastchannelunref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_broadcastchannel_unref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0</span>
+</div>
+<p>在 BroadcastChannel 上调用 <code>unref()</code> 允许线程退出，如果这是事件系统中唯一活动的句柄。如果 BroadcastChannel 已经是 <code>unref()</code> 状态，再次调用 <code>unref()</code> 没有效果。</p>
+</div>
+</section><section><h3>类：<code>MessageChannel</code><span><a class="mark" href="#messagechannel" id="messagechannel">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_messagechannel"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p><code>worker.MessageChannel</code> 类的实例表示一个异步的、双向的通信通道。<code>MessageChannel</code> 没有自己的方法。<code>new MessageChannel()</code> 产生一个具有 <code>port1</code> 和 <code>port2</code> 属性的对象，这些属性引用链接的 <a href="#class-messageport"><code>MessagePort</code></a> 实例。</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'received'</span>, message));
+port2.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">foo</span>: <span class="hljs-string">'bar'</span> });
+<span class="hljs-comment">// 从 `port1.on('message')` 监听器打印: received { foo: 'bar' }</span></code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'received'</span>, message));
+port2.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">foo</span>: <span class="hljs-string">'bar'</span> });
+<span class="hljs-comment">// 从 `port1.on('message')` 监听器打印: received { foo: 'bar' }</span></code><button class="copy-button">copy</button></pre>
+</section><section><h3>类：<code>MessagePort</code><span><a class="mark" href="#messageport" id="messageport">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_messageport"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v14.7.0</td>
+<td><p>This class now inherits from <code>EventTarget</code> rather than from <code>EventEmitter</code>.</p></td></tr>
+<tr><td>v10.5.0</td>
+<td><p><span>Added in: v10.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>扩展: <a href="events.html#class-eventtarget" class="type">&#x3C;EventTarget></a></li>
+</ul>
+<p><code>worker.MessagePort</code> 类的实例表示一个异步的、双向通信通道的一端。它可以用于在不同的 <a href="#class-worker"><code>Worker</code></a> 之间传输结构化数据、内存区域和其他 <code>MessagePort</code>。</p>
+<p>此实现与 [浏览器 <code>MessagePort</code>][] 匹配。</p>
+<div>
+<h4>事件：<code>'close'</code><span><a class="mark" href="#close" id="close">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>一旦通道的任一端断开连接，就会发出 <code>'close'</code> 事件。</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">//   foobar</span>
+<span class="hljs-comment">//   closed!</span>
+port2.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message));
+port2.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">() =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'closed!'</span>));
+
+port1.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'foobar'</span>);
+port1.<span class="hljs-title function_">close</span>();</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">//   foobar</span>
+<span class="hljs-comment">//   closed!</span>
+port2.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message));
+port2.<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">() =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'closed!'</span>));
+
+port1.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'foobar'</span>);
+port1.<span class="hljs-title function_">close</span>();</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'message'</code><span><a class="mark" href="#message" id="message">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_message"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传输的值</li>
+</ul>
+<p>对于任何传入的消息，都会发出 <code>'message'</code> 事件，其中包含 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a> 的克隆输入。</p>
+<p>此事件上的监听器接收传递给 <code>postMessage()</code> 的 <code>value</code> 参数的克隆，没有其他参数。</p>
+</div><div>
+<h4>事件：<code>'messageerror'</code><span><a class="mark" href="#messageerror" id="messageerror">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_messageerror"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.5.0, v12.19.0</span>
+</div>
+<ul>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> 一个 Error 对象</li>
+</ul>
+<p>当反序列化消息失败时，会发出 <code>'messageerror'</code> 事件。</p>
+<p>目前，当在接收端实例化发布的 JS 对象时发生错误，会发出此事件。这种情况很少见，但可能发生，例如，当某些 Node.js API 对象在 <code>vm.Context</code> 中接收时（其中 Node.js API 目前不可用）。</p>
+</div><div>
+<h4><code>port.close()</code><span><a class="mark" href="#portclose" id="portclose">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_port_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>禁用连接任一端进一步发送消息。当不再通过此 <code>MessagePort</code> 进行通信时，可以调用此方法。</p>
+<p>[<code>'close'</code> 事件][] 会在作为通道一部分的两个 <code>MessagePort</code> 实例上发出。</p>
+</div><div>
+<h4><code>port.postMessage(value[, transferList])</code><span><a class="mark" href="#portpostmessagevalue-transferlist" id="portpostmessagevalue-transferlist">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_port_postmessage_value_transferlist"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v21.0.0</td>
+<td><p>An error is thrown when an untransferable object is in the transfer list.</p></td></tr>
+<tr><td>v15.6.0</td>
+<td><p>Added <code>X509Certificate</code> to the list of cloneable types.</p></td></tr>
+<tr><td>v15.0.0</td>
+<td><p>Added <code>CryptoKey</code> to the list of cloneable types.</p></td></tr>
+<tr><td>v15.14.0, v14.18.0</td>
+<td><p>Add 'BlockList' to the list of cloneable types.</p></td></tr>
+<tr><td>v15.9.0, v14.18.0</td>
+<td><p>Add 'Histogram' types to the list of cloneable types.</p></td></tr>
+<tr><td>v14.5.0, v12.19.0</td>
+<td><p>Added <code>KeyObject</code> to the list of cloneable types.</p></td></tr>
+<tr><td>v14.5.0, v12.19.0</td>
+<td><p>Added <code>FileHandle</code> to the list of transferable types.</p></td></tr>
+<tr><td>v10.5.0</td>
+<td><p><span>Added in: v10.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+<li><code>transferList</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+<p>将 JavaScript 值发送到此通道的接收端。<code>value</code> 以与 [HTML 结构化克隆算法][] 兼容的方式进行传输。</p>
+<p>特别是，与 <code>JSON</code> 的显著区别是：</p>
+<ul>
+<li><code>value</code> 可以包含循环引用。</li>
+<li><code>value</code> 可以包含内置 JS 类型的实例，例如 <code>RegExp</code>、<code>BigInt</code>、<code>Map</code>、<code>Set</code> 等。</li>
+<li><code>value</code> 可以包含类型化数组，包括使用 <code>ArrayBuffer</code> 和 <code>SharedArrayBuffer</code> 的数组。</li>
+<li><code>value</code> 可以包含 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module"><code>WebAssembly.Module</code></a> 实例。</li>
+<li><code>value</code> 可能不包含本地（C++ 支持的）对象，除了：
+<ul>
+<li><a href="webcrypto.html#class-cryptokey" class="type">&#x3C;CryptoKey></a>、</li>
+<li><a href="fs.html#class-filehandle" class="type">&#x3C;FileHandle></a>、</li>
+<li><a href="perf_hooks.html#class-histogram" class="type">&#x3C;Histogram></a>、</li>
+<li><a href="crypto.html#class-keyobject" class="type">&#x3C;KeyObject></a>、</li>
+<li><a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a>、</li>
+<li><a href="net.html#class-netblocklist" class="type">&#x3C;net.BlockList></a>、</li>
+<li><a href="net.html#class-netsocketaddress" class="type">&#x3C;net.SocketAddress></a>、</li>
+<li><a href="crypto.html#class-x509certificate" class="type">&#x3C;X509Certificate></a>。</li>
+</ul>
+</li>
+</ul>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message));
+
+<span class="hljs-keyword">const</span> circularData = {};
+circularData.<span class="hljs-property">foo</span> = circularData;
+<span class="hljs-comment">// 打印: { foo: [Circular] }</span>
+port2.<span class="hljs-title function_">postMessage</span>(circularData);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message));
+
+<span class="hljs-keyword">const</span> circularData = {};
+circularData.<span class="hljs-property">foo</span> = circularData;
+<span class="hljs-comment">// 打印: { foo: [Circular] }</span>
+port2.<span class="hljs-title function_">postMessage</span>(circularData);</code><button class="copy-button">copy</button></pre>
+<p><code>transferList</code> 可以是 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a>、<a href="#class-messageport"><code>MessagePort</code></a> 和 <a href="fs.html#class-filehandle"><code>FileHandle</code></a> 对象的列表。传输后，它们在通道的发送端不再可用（即使它们不包含在 <code>value</code> 中）。与 [子进程][] 不同，目前不支持传输句柄，例如网络套接字。</p>
+<p>如果 <code>value</code> 包含 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer" class="type">&#x3C;SharedArrayBuffer></a> 实例，则可以从任一线程访问它们。它们不能列在 <code>transferList</code> 中。</p>
+<p><code>value</code> 可能仍然包含不在 <code>transferList</code> 中的 <code>ArrayBuffer</code> 实例；在这种情况下，底层内存被复制而不是移动。</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message));
+
+<span class="hljs-keyword">const</span> uint8Array = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>([ <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span> ]);
+<span class="hljs-comment">// 这会发布 `uint8Array` 的副本：</span>
+port2.<span class="hljs-title function_">postMessage</span>(uint8Array);
+<span class="hljs-comment">// 这不会复制数据，但会使 `uint8Array` 不可用：</span>
+port2.<span class="hljs-title function_">postMessage</span>(uint8Array, [ uint8Array.<span class="hljs-property">buffer</span> ]);
+
+<span class="hljs-comment">// `sharedUint8Array` 的内存可以从原始端和通过 `.on('message')` 接收的副本访问：</span>
+<span class="hljs-keyword">const</span> sharedUint8Array = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">SharedArrayBuffer</span>(<span class="hljs-number">4</span>));
+port2.<span class="hljs-title function_">postMessage</span>(sharedUint8Array);
+
+<span class="hljs-comment">// 这会将一个新创建的消息端口传输给接收者。</span>
+<span class="hljs-comment">// 例如，这可以用于在同一父线程的多个 `Worker` 子线程之间创建通信通道。</span>
+<span class="hljs-keyword">const</span> otherChannel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+port2.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">port</span>: otherChannel.<span class="hljs-property">port1</span> }, [ otherChannel.<span class="hljs-property">port1</span> ]);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message));
+
+<span class="hljs-keyword">const</span> uint8Array = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>([ <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span> ]);
+<span class="hljs-comment">// 这会发布 `uint8Array` 的副本：</span>
+port2.<span class="hljs-title function_">postMessage</span>(uint8Array);
+<span class="hljs-comment">// 这不会复制数据，但会使 `uint8Array` 不可用：</span>
+port2.<span class="hljs-title function_">postMessage</span>(uint8Array, [ uint8Array.<span class="hljs-property">buffer</span> ]);
+
+<span class="hljs-comment">// `sharedUint8Array` 的内存可以从原始端和通过 `.on('message')` 接收的副本访问：</span>
+<span class="hljs-keyword">const</span> sharedUint8Array = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">SharedArrayBuffer</span>(<span class="hljs-number">4</span>));
+port2.<span class="hljs-title function_">postMessage</span>(sharedUint8Array);
+
+<span class="hljs-comment">// 这会将一个新创建的消息端口传输给接收者。</span>
+<span class="hljs-comment">// 例如，这可以用于在同一父线程的多个 `Worker` 子线程之间创建通信通道。</span>
+<span class="hljs-keyword">const</span> otherChannel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+port2.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">port</span>: otherChannel.<span class="hljs-property">port1</span> }, [ otherChannel.<span class="hljs-property">port1</span> ]);</code><button class="copy-button">copy</button></pre>
+<p>消息对象会立即被克隆，发布后修改它不会产生副作用。</p>
+<p>有关此 API 背后的序列化和反序列化机制的更多信息，请参阅 <a href="v8.html#serialization-api"><code>node:v8</code> 模块的序列化 API</a>。</p>
+<div>
+<h5>传输 TypedArrays 和 Buffers 时的注意事项<span><a class="mark" href="#-typedarrays--buffers-" id="-typedarrays--buffers-">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_typedarrays_buffers"></a></h5>
+<p>所有 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 实例都是底层 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> 的视图。也就是说，实际上是 <code>ArrayBuffer</code> 存储原始数据，而 <code>TypedArray</code> 和 <code>Buffer</code> 对象提供了一种查看和操作数据的方式。有可能且常见的是在同一 <code>ArrayBuffer</code> 实例上创建多个视图。在使用传输列表传输 <code>ArrayBuffer</code> 时必须非常小心，因为这样做会导致共享同一 <code>ArrayBuffer</code> 的所有 <code>TypedArray</code> 和 <code>Buffer</code> 实例变得不可用。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ab = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayBuffer</span>(<span class="hljs-number">10</span>);
+
+<span class="hljs-keyword">const</span> u1 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint8Array</span>(ab);
+<span class="hljs-keyword">const</span> u2 = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Uint16Array</span>(ab);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(u2.<span class="hljs-property">length</span>);  <span class="hljs-comment">// 打印 5</span>
+
+port.<span class="hljs-title function_">postMessage</span>(u1, [u1.<span class="hljs-property">buffer</span>]);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(u2.<span class="hljs-property">length</span>);  <span class="hljs-comment">// 打印 0</span></code> <button class="copy-button">copy</button></pre>
+<p>对于 <code>Buffer</code> 实例，具体来说，底层 <code>ArrayBuffer</code> 是否可以传输或克隆完全取决于实例的创建方式，这通常无法可靠地确定。</p>
+<p>可以使用 <a href="#workermarkasuntransferableobject"><code>markAsUntransferable()</code></a> 标记 <code>ArrayBuffer</code>，以指示它应始终被克隆而从不传输。</p>
+<p>根据 <code>Buffer</code> 实例的创建方式，它可能拥有也可能不拥有其底层 <code>ArrayBuffer</code>。除非已知 <code>Buffer</code> 实例拥有它，否则不得传输 <code>ArrayBuffer</code>。特别是，对于从内部 <code>Buffer</code> 池创建的 <code>Buffer</code>（例如，使用 <code>Buffer.from()</code> 或 <code>Buffer.allocUnsafe()</code>），传输它们是不可能的，它们总是被克隆，这会发送整个 <code>Buffer</code> 池的副本。此行为可能会带来意外的更高内存使用量和可能的安全问题。</p>
+<p>有关 <code>Buffer</code> 池的更多详细信息，请参阅 <a href="buffer.html#static-method-bufferallocunsafesize"><code>Buffer.allocUnsafe()</code></a>。</p>
+<p>使用 <code>Buffer.alloc()</code> 或 <code>Buffer.allocUnsafeSlow()</code> 创建的 <code>Buffer</code> 实例的 <code>ArrayBuffer</code> 始终可以传输，但这样做会使这些 <code>ArrayBuffer</code> 的所有其他现有视图不可用。</p>
+</div><div>
+<h5>克隆具有原型、类和访问器的对象时的注意事项<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads"></a></h5>
+<p>由于对象克隆使用 [HTML 结构化克隆算法][]，因此不会保留不可枚举的属性、属性访问器和对象原型。特别是，<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 对象在接收端将被读取为普通的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a>，而 JavaScript 类的实例将被克隆为普通的 JavaScript 对象。</p>
+<!-- eslint-disable no-unused-private-class-members -->
+<pre><code class="language-js"><span class="hljs-keyword">const</span> b = <span class="hljs-title class_">Symbol</span>(<span class="hljs-string">'b'</span>);
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Foo</span> {
+  #a = <span class="hljs-number">1</span>;
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">this</span>[b] = <span class="hljs-number">2</span>;
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">c</span> = <span class="hljs-number">3</span>;
+  }
+
+  <span class="hljs-keyword">get</span> <span class="hljs-title function_">d</span>() { <span class="hljs-keyword">return</span> <span class="hljs-number">4</span>; }
+}
+
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">{ data }</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);
+
+port2.<span class="hljs-title function_">postMessage</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Foo</span>());
+
+<span class="hljs-comment">// 打印: { c: 3 }</span></code> <button class="copy-button">copy</button></pre>
+<p>此限制扩展到许多内置对象，例如全局 <code>URL</code> 对象：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-property">onmessage</span> = <span class="hljs-function">(<span class="hljs-params">{ data }</span>) =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);
+
+port2.<span class="hljs-title function_">postMessage</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org'</span>));
+
+<span class="hljs-comment">// 打印: { }</span></code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4><code>port.hasRef()</code><span><a class="mark" href="#porthasref" id="porthasref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_port_hasref"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>Marking the API stable.</p></td></tr>
+<tr><td>v18.1.0, v16.17.0</td>
+<td><p><span>Added in: v18.1.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果为 true，则 <code>MessagePort</code> 对象将保持 Node.js 事件循环活动。</p>
+</div><div>
+<h4><code>port.ref()</code><span><a class="mark" href="#portref" id="portref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_port_ref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>与 <code>unref()</code> 相反。在先前 <code>unref()</code> 过的端口上调用 <code>ref()</code> <em>不会</em> 让程序退出（如果它是唯一活动的句柄，这是默认行为）。如果端口已被 <code>ref()</code>，再次调用 <code>ref()</code> 没有效果。</p>
+<p>如果使用 <code>.on('message')</code> 附加或移除监听器，端口会根据事件是否存在监听器自动 <code>ref()</code> 和 <code>unref()</code>。</p>
+</div><div>
+<h4><code>port.start()</code><span><a class="mark" href="#portstart" id="portstart">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_port_start"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>开始在此 <code>MessagePort</code> 上接收消息。当将此端口用作事件发射器时，一旦附加了 <code>'message'</code> 监听器，就会自动调用此方法。</p>
+<p>此方法的存在是为了与 Web <code>MessagePort</code> API 保持对等。在 Node.js 中，它仅在无事件监听器存在时忽略消息时有用。Node.js 在处理 <code>.onmessage</code> 时也有所不同。设置它会自动调用 <code>.start()</code>，但取消设置它会让消息排队，直到设置新的处理程序或端口被丢弃。</p>
+</div><div>
+<h4><code>port.unref()</code><span><a class="mark" href="#portunref" id="portunref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_port_unref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>在端口上调用 <code>unref()</code> 允许线程退出，如果这是事件系统中唯一活动的句柄。如果端口已经是 <code>unref()</code> 状态，再次调用 <code>unref()</code> 没有效果。</p>
+<p>如果使用 <code>.on('message')</code> 附加或移除监听器，端口会根据事件是否存在监听器自动 <code>ref()</code> 和 <code>unref()</code>。</p>
+</div>
+</section><section><h3>类：<code>Worker</code><span><a class="mark" href="#worker" id="worker">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>扩展: <a href="events.html#class-eventemitter" class="type">&#x3C;EventEmitter></a></li>
+</ul>
+<p><code>Worker</code> 类代表一个独立的 JavaScript 执行线程。大多数 Node.js API 在其中可用。</p>
+<p>Worker 环境内的显著差异是：</p>
+<ul>
+<li><a href="process.html#processstdin"><code>process.stdin</code></a>、<a href="process.html#processstdout"><code>process.stdout</code></a> 和 <a href="process.html#processstderr"><code>process.stderr</code></a> 流可能被父线程重定向。</li>
+<li><a href="#workerismainthread"><code>require('node:worker_threads').isMainThread</code></a> 属性设置为 <code>false</code>。</li>
+<li><a href="#workerparentport"><code>require('node:worker_threads').parentPort</code></a> 消息端口可用。</li>
+<li><a href="process.html#processexitcode"><code>process.exit()</code></a> 不会停止整个程序，仅停止单个线程，并且 <a href="process.html#processabort"><code>process.abort()</code></a> 不可用。</li>
+<li><a href="process.html#processchdirdirectory"><code>process.chdir()</code></a> 和设置组或用户 ID 的 <code>process</code> 方法不可用。</li>
+<li><a href="process.html#processenv"><code>process.env</code></a> 是父线程环境变量的副本，除非另有指定。对一个副本的更改在其他线程中不可见，并且对本地插件不可见（除非将 <a href="#workershare_env"><code>worker.SHARE_ENV</code></a> 作为 <code>env</code> 选项传递给 <a href="#class-worker"><code>Worker</code></a> 构造函数）。在 Windows 上，与主线程不同，环境变量的副本以区分大小写的方式操作。</li>
+<li><a href="process.html#processtitle"><code>process.title</code></a> 无法修改。</li>
+<li>信号不会通过 <a href="process.html#signal-events"><code>process.on('...')</code></a> 传递。</li>
+<li>执行可能在任何时候由于调用 <a href="#workerterminate"><code>worker.terminate()</code></a> 而停止。</li>
+<li>来自父进程的 IPC 通道不可访问。</li>
+<li>不支持 <a href="tracing.html"><code>trace_events</code></a> 模块。</li>
+<li>本地插件只有在满足 <a href="addons.html#worker-support">某些条件</a> 时才能从多个线程加载。</li>
+</ul>
+<p>在其他 <code>Worker</code> 内部创建 <code>Worker</code> 实例是可能的。</p>
+<p>与 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API">Web Workers</a> 和 [<code>node:cluster</code> 模块][] 类似，可以通过线程间消息传递实现双向通信。在内部，<code>Worker</code> 具有一对内置的 <a href="#class-messageport"><code>MessagePort</code></a>，它们在 <code>Worker</code> 创建时已经相互关联。虽然父端的 <code>MessagePort</code> 对象没有直接暴露，但其功能通过父线程的 <code>Worker</code> 对象上的 <a href="#workerpostmessagevalue-transferlist"><code>worker.postMessage()</code></a> 和 <a href="#event-message_1"><code>worker.on('message')</code></a> 事件暴露。</p>
+<p>要创建自定义消息通道（鼓励使用自定义通道而不是使用默认的全局通道，因为它有助于分离关注点），用户可以在任一线程上创建 <code>MessageChannel</code> 对象，并通过预先存在的通道（例如全局通道）将该 <code>MessageChannel</code> 上的一个 <code>MessagePort</code> 传递给另一个线程。</p>
+<p>有关消息如何传递以及可以通过线程屏障成功传输哪种 JavaScript 值的更多信息，请参阅 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a>。</p>
+
+<pre class="with-33-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'node:assert'</span>;
+<span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">Worker</span>, <span class="hljs-title class_">MessageChannel</span>, <span class="hljs-title class_">MessagePort</span>, isMainThread, parentPort,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+  <span class="hljs-keyword">const</span> subChannel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+  worker.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">hereIsYourPort</span>: subChannel.<span class="hljs-property">port1</span> }, [subChannel.<span class="hljs-property">port1</span>]);
+  subChannel.<span class="hljs-property">port2</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">value</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'received:'</span>, value);
+  });
+} <span class="hljs-keyword">else</span> {
+  parentPort.<span class="hljs-title function_">once</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">value</span>) =></span> {
+    <span class="hljs-title function_">assert</span>(value.<span class="hljs-property">hereIsYourPort</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">MessagePort</span>);
+    value.<span class="hljs-property">hereIsYourPort</span>.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'the worker is sending this'</span>);
+    value.<span class="hljs-property">hereIsYourPort</span>.<span class="hljs-title function_">close</span>();
+  });
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:assert'</span>);
+<span class="hljs-keyword">const</span> {
+  <span class="hljs-title class_">Worker</span>, <span class="hljs-title class_">MessageChannel</span>, <span class="hljs-title class_">MessagePort</span>, isMainThread, parentPort,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+  <span class="hljs-keyword">const</span> subChannel = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+  worker.<span class="hljs-title function_">postMessage</span>({ <span class="hljs-attr">hereIsYourPort</span>: subChannel.<span class="hljs-property">port1</span> }, [subChannel.<span class="hljs-property">port1</span>]);
+  subChannel.<span class="hljs-property">port2</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">value</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'received:'</span>, value);
+  });
+} <span class="hljs-keyword">else</span> {
+  parentPort.<span class="hljs-title function_">once</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">value</span>) =></span> {
+    <span class="hljs-title function_">assert</span>(value.<span class="hljs-property">hereIsYourPort</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">MessagePort</span>);
+    value.<span class="hljs-property">hereIsYourPort</span>.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'the worker is sending this'</span>);
+    value.<span class="hljs-property">hereIsYourPort</span>.<span class="hljs-title function_">close</span>();
+  });
+}</code><button class="copy-button">copy</button></pre>
+<div>
+<h4><code>new Worker(filename[, options])</code><span><a class="mark" href="#new-workerfilename-options" id="new-workerfilename-options">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_new_worker_filename_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.8.0, v18.16.0</td>
+<td><p>Added support for a <code>name</code> option, which allows adding a name to worker title for debugging.</p></td></tr>
+<tr><td>v14.9.0</td>
+<td><p>The <code>filename</code> parameter can be a WHATWG <code>URL</code> object using <code>data:</code> protocol.</p></td></tr>
+<tr><td>v14.9.0</td>
+<td><p>The <code>trackUnmanagedFds</code> option was set to <code>true</code> by default.</p></td></tr>
+<tr><td>v14.6.0, v12.19.0</td>
+<td><p>The <code>trackUnmanagedFds</code> option was introduced.</p></td></tr>
+<tr><td>v13.13.0, v12.17.0</td>
+<td><p>The <code>transferList</code> option was introduced.</p></td></tr>
+<tr><td>v13.12.0, v12.17.0</td>
+<td><p>The <code>filename</code> parameter can be a WHATWG <code>URL</code> object using <code>file:</code> protocol.</p></td></tr>
+<tr><td>v13.4.0, v12.16.0</td>
+<td><p>The <code>argv</code> option was introduced.</p></td></tr>
+<tr><td>v13.2.0, v12.16.0</td>
+<td><p>The <code>resourceLimits</code> option was introduced.</p></td></tr>
+<tr><td>v10.5.0</td>
+<td><p><span>Added in: v10.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>filename</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> Worker 主脚本或模块的路径。必须是绝对路径或以 <code>./</code> 或 <code>../</code> 开头的相对路径（即相对于当前工作目录），或者是使用 <code>file:</code> 或 <code>data:</code> 协议的 WHATWG <code>URL</code> 对象。使用 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs"><code>data:</code> URL</a> 时，数据基于 MIME 类型使用 [ECMAScript 模块加载器][] 进行解释。如果 <code>options.eval</code> 为 <code>true</code>，则这是一个包含 JavaScript 代码的字符串，而不是路径。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>argv</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any[]></a> 参数列表，这些参数将被字符串化并附加到 Worker 内的 <code>process.argv</code>。这与 <code>workerData</code> 非常相似，但这些值在全局 <code>process.argv</code> 上可用，就像它们作为 CLI 选项传递给脚本一样。</li>
+<li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 如果设置，则指定 Worker 内部 <code>process.env</code> 的初始值。作为一个特殊值，可以使用 <a href="#workershare_env"><code>worker.SHARE_ENV</code></a> 来指定父线程和子线程应共享它们的环境变量；在这种情况下，一个线程的 <code>process.env</code> 对象的更改也会影响另一个线程。<strong>默认值:</strong> <code>process.env</code>。</li>
+<li><code>eval</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code> 且第一个参数是 <code>string</code>，则将构造函数的第一个参数解释为在线程上线后执行的脚本。</li>
+<li><code>execArgv</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 传递给 worker 的 node CLI 选项列表。不支持 V8 选项（例如 <code>--max-old-space-size</code>）和影响进程的选项（例如 <code>--title</code>）。如果设置，这将在 worker 内部作为 <a href="process.html#processexecargv"><code>process.execArgv</code></a> 提供。默认情况下，选项从父线程继承。</li>
+<li><code>stdin</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果设置为 <code>true</code>，则 <code>worker.stdin</code> 提供一个可写流，其内容在 Worker 内部显示为 <code>process.stdin</code>。默认情况下，不提供任何数据。</li>
+<li><code>stdout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果设置为 <code>true</code>，则 <code>worker.stdout</code> 不会自动通过管道传输到父进程中的 <code>process.stdout</code>。</li>
+<li><code>stderr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果设置为 <code>true</code>，则 <code>worker.stderr</code> 不会自动通过管道传输到父进程中的 <code>process.stderr</code>。</li>
+<li><code>workerData</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 任何被克隆并作为 <a href="#workerworkerdata"><code>require('node:worker_threads').workerData</code></a> 可用的 JavaScript 值。克隆过程如 [HTML 结构化克隆算法][] 所述，如果对象无法克隆（例如因为它包含 <code>function</code>），则会抛出错误。</li>
+<li><code>trackUnmanagedFds</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果设置为 <code>true</code>，则 Worker 会跟踪通过 <a href="fs.html#fsopenpath-flags-mode-callback"><code>fs.open()</code></a> 和 <a href="fs.html#fsclosefd-callback"><code>fs.close()</code></a> 管理的原始文件描述符，并在 Worker 退出时关闭它们，类似于其他资源，如网络套接字或通过 <a href="fs.html#class-filehandle"><code>FileHandle</code></a> API 管理的文件描述符。此选项由所有嵌套的 <code>Worker</code> 自动继承。<strong>默认值:</strong> <code>true</code>。</li>
+<li><code>transferList</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> 如果 <code>workerData</code> 中传递了一个或多个 <code>MessagePort</code> 类对象，则这些项需要 <code>transferList</code>，否则会抛出 <a href="errors.html#err_missing_message_port_in_transfer_list"><code>ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST</code></a>。有关更多信息，请参阅 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a>。</li>
+<li><code>resourceLimits</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 新的 JS 引擎实例的可选资源限制集。达到这些限制会导致 <code>Worker</code> 实例终止。这些限制仅影响 JS 引擎，不影响外部数据，包括 <code>ArrayBuffer</code>。即使设置了这些限制，如果进程遇到全局内存不足情况，它仍然可能中止。
+<ul>
+<li><code>maxOldGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 主堆的最大大小（MB）。如果设置了命令行参数 <a href="cli.html#--max-old-space-sizesize-in-mib"><code>--max-old-space-size</code></a>，它将覆盖此设置。</li>
+<li><code>maxYoungGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 用于最近创建的对象的堆空间的最大大小。如果设置了命令行参数 <a href="cli.html#--max-semi-space-sizesize-in-mib"><code>--max-semi-space-size</code></a>，它将覆盖此设置。</li>
+<li><code>codeRangeSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 用于生成代码的预分配内存范围的大小。</li>
+<li><code>stackSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 线程的默认最大堆栈大小。较小的值可能导致 Worker 实例不可用。<strong>默认值:</strong> <code>4</code>。</li>
+</ul>
+</li>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 一个可选的 <code>name</code>，用于替换线程名称和 worker 标题以进行调试/识别，使最终标题为 <code>[worker ${id}] ${name}</code>。此参数有允许的最大大小，具体取决于操作系统。如果提供的名称超过限制，它将被截断。
+<ul>
+<li>最大大小：
+<ul>
+<li>Windows：32,767 个字符</li>
+<li>macOS：64 个字符</li>
+<li>Linux：16 个字符</li>
+<li>NetBSD：限制为 <code>PTHREAD_MAX_NAMELEN_NP</code></li>
+<li>FreeBSD 和 OpenBSD：限制为 <code>MAXCOMLEN</code>
+<strong>默认值:</strong> <code>'WorkerThread'</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div><div>
+<h4>事件：<code>'error'</code><span><a class="mark" href="#error" id="error">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_error"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>如果工作线程抛出未捕获的异常，则会发出 <code>'error'</code> 事件。在这种情况下，worker 将被终止。</p>
+</div><div>
+<h4>事件：<code>'exit'</code><span><a class="mark" href="#exit" id="exit">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_exit"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li><code>exitCode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>一旦 worker 停止，就会发出 <code>'exit'</code> 事件。如果 worker 通过调用 <a href="process.html#processexitcode"><code>process.exit()</code></a> 退出，则 <code>exitCode</code> 参数是传递的退出码。如果 worker 被终止，则 <code>exitCode</code> 参数为 <code>1</code>。</p>
+<p>这是任何 <code>Worker</code> 实例发出的最终事件。</p>
+</div><div>
+<h4>事件：<code>'message'</code><span><a class="mark" href="#message_1" id="message_1">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_message_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传输的值</li>
+</ul>
+<p>当工作线程调用了 <a href="#workerpostmessagevalue-transferlist"><code>require('node:worker_threads').parentPort.postMessage()</code></a> 时，会发出 <code>'message'</code> 事件。有关更多详细信息，请参阅 <a href="#event-message"><code>port.on('message')</code></a> 事件。</p>
+<p>从工作线程发送的所有消息都在 <code>Worker</code> 对象上发出 [<code>'exit'</code> 事件][] 之前发出。</p>
+</div><div>
+<h4>事件：<code>'messageerror'</code><span><a class="mark" href="#messageerror_1" id="messageerror_1">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_messageerror_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.5.0, v12.19.0</span>
+</div>
+<ul>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> 一个 Error 对象</li>
+</ul>
+<p>当反序列化消息失败时，会发出 <code>'messageerror'</code> 事件。</p>
+</div><div>
+<h4>事件：<code>'online'</code><span><a class="mark" href="#online" id="online">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_online"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>当工作线程开始执行 JavaScript 代码时，会发出 <code>'online'</code> 事件。</p>
+</div><div>
+<h4><code>worker.cpuUsage([prev])</code><span><a class="mark" href="#workercpuusageprev" id="workercpuusageprev">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_cpuusage_prev"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.6.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>此方法返回一个 <code>Promise</code>，该 Promise 将解决为一个与 <a href="process.html#processthreadcpuusagepreviousvalue"><code>process.threadCpuUsage()</code></a> 相同的对象，或者如果 worker 不再运行，则拒绝并返回 <a href="errors.html#err_worker_not_running"><code>ERR_WORKER_NOT_RUNNING</code></a> 错误。此方法允许从实际线程外部观察统计信息。</p>
+</div><div>
+<h4><code>worker.getHeapSnapshot([options])</code><span><a class="mark" href="#workergetheapsnapshotoptions" id="workergetheapsnapshotoptions">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_getheapsnapshot_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.1.0</td>
+<td><p>Support options to configure the heap snapshot.</p></td></tr>
+<tr><td>v13.9.0, v12.17.0</td>
+<td><p><span>Added in: v13.9.0, v12.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>exposeInternals</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 true，则在堆快照中暴露内部结构。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>exposeNumericValues</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 true，则在人工字段中暴露数值。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 一个包含 V8 堆快照的可读流的 Promise</li>
+</ul>
+<p>返回一个可读流，用于获取 Worker 当前状态的 V8 快照。有关更多详细信息，请参阅 <a href="v8.html#v8getheapsnapshotoptions"><code>v8.getHeapSnapshot()</code></a>。</p>
+<p>如果工作线程不再运行（这可能在发出 [<code>'exit'</code> 事件][] 之前发生），返回的 <code>Promise</code> 会立即被拒绝，并返回 <a href="errors.html#err_worker_not_running"><code>ERR_WORKER_NOT_RUNNING</code></a> 错误。</p>
+</div><div>
+<h4><code>worker.getHeapStatistics()</code><span><a class="mark" href="#workergetheapstatistics" id="workergetheapstatistics">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_getheapstatistics"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.0.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>此方法返回一个 <code>Promise</code>，该 Promise 将解决为一个与 <a href="v8.html#v8getheapstatistics"><code>v8.getHeapStatistics()</code></a> 相同的对象，或者如果 worker 不再运行，则拒绝并返回 <a href="errors.html#err_worker_not_running"><code>ERR_WORKER_NOT_RUNNING</code></a> 错误。此方法允许从实际线程外部观察统计信息。</p>
+</div><div>
+<h4><code>worker.performance</code><span><a class="mark" href="#workerperformance" id="workerperformance">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_performance"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0, v12.22.0</span>
+</div>
+<p>一个可用于从 worker 实例查询性能信息的对象。类似于 <a href="perf_hooks.html#perf_hooksperformance"><code>perf_hooks.performance</code></a>。</p>
+<div>
+<h5><code>performance.eventLoopUtilization([utilization1[, utilization2]])</code><span><a class="mark" href="#performanceeventlooputilizationutilization1-utilization2" id="performanceeventlooputilizationutilization1-utilization2">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_performance_eventlooputilization_utilization1_utilization2"></a></h5>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0, v12.22.0</span>
+</div>
+<ul>
+<li><code>utilization1</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 之前调用 <code>eventLoopUtilization()</code> 的结果。</li>
+<li><code>utilization2</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 在 <code>utilization1</code> 之前调用 <code>eventLoopUtilization()</code> 的结果。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>idle</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>active</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>utilization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+</li>
+</ul>
+<p>与 [<code>perf_hooks</code> 的 <code>eventLoopUtilization()</code>][] 相同的调用，只是返回的是 worker 实例的值。</p>
+<p>一个区别是，与主线程不同，worker 内的引导是在事件循环内完成的。因此，一旦 worker 的脚本开始执行，事件循环利用率就立即可用。</p>
+<p><code>idle</code> 时间不增加并不表示 worker 卡在引导中。以下示例显示 worker 的整个生命周期从未累积任何 <code>idle</code> 时间，但仍然能够处理消息。</p>
+
+<pre class="with-71-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Worker</span>, isMainThread, parentPort } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+  <span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =></span> {
+    worker.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'hi'</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(worker.<span class="hljs-property">performance</span>.<span class="hljs-title function_">eventLoopUtilization</span>());
+  }, <span class="hljs-number">100</span>).<span class="hljs-title function_">unref</span>();
+} <span class="hljs-keyword">else</span> {
+  parentPort.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">() =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'msg'</span>)).<span class="hljs-title function_">unref</span>();
+  (<span class="hljs-keyword">function</span> <span class="hljs-title function_">r</span>(<span class="hljs-params">n</span>) {
+    <span class="hljs-keyword">if</span> (--n &#x3C; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">const</span> t = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+    <span class="hljs-keyword">while</span> (<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - t &#x3C; <span class="hljs-number">300</span>);
+    <span class="hljs-title function_">setImmediate</span>(r, n);
+  })(<span class="hljs-number">10</span>);
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span>, isMainThread, parentPort } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+  <span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =></span> {
+    worker.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">'hi'</span>);
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(worker.<span class="hljs-property">performance</span>.<span class="hljs-title function_">eventLoopUtilization</span>());
+  }, <span class="hljs-number">100</span>).<span class="hljs-title function_">unref</span>();
+} <span class="hljs-keyword">else</span> {
+  parentPort.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">() =></span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'msg'</span>)).<span class="hljs-title function_">unref</span>();
+  (<span class="hljs-keyword">function</span> <span class="hljs-title function_">r</span>(<span class="hljs-params">n</span>) {
+    <span class="hljs-keyword">if</span> (--n &#x3C; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span>;
+    <span class="hljs-keyword">const</span> t = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+    <span class="hljs-keyword">while</span> (<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - t &#x3C; <span class="hljs-number">300</span>);
+    <span class="hljs-title function_">setImmediate</span>(r, n);
+  })(<span class="hljs-number">10</span>);
+}</code><button class="copy-button">copy</button></pre>
+<p>worker 的事件循环利用率仅在 [<code>'online'</code> 事件][] 发出后可用，如果在此之前或 [<code>'exit'</code> 事件][] 之后调用，则所有属性的值都为 <code>0</code>。</p>
+</div></div><div>
+<h4><code>worker.postMessage(value[, transferList])</code><span><a class="mark" href="#workerpostmessagevalue-transferlist" id="workerpostmessagevalue-transferlist">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_postmessage_value_transferlist"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+<li><code>transferList</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+<p>向 worker 发送消息，该消息通过 <a href="#event-message"><code>require('node:worker_threads').parentPort.on('message')</code></a> 接收。有关更多详细信息，请参阅 <a href="#portpostmessagevalue-transferlist"><code>port.postMessage()</code></a>。</p>
+</div><div>
+<h4><code>worker.ref()</code><span><a class="mark" href="#workerref" id="workerref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_ref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>与 <code>unref()</code> 相反，在先前 <code>unref()</code> 过的 worker 上调用 <code>ref()</code> <em>不会</em> 让程序退出（如果它是唯一活动的句柄，这是默认行为）。如果 worker 已被 <code>ref()</code>，再次调用 <code>ref()</code> 没有效果。</p>
+</div><div>
+<h4><code>worker.resourceLimits</code><span><a class="mark" href="#workerresourcelimits_1" id="workerresourcelimits_1">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_resourcelimits_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v13.2.0, v12.16.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>maxYoungGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>maxOldGenerationSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>codeRangeSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>stackSizeMb</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+</li>
+</ul>
+<p>提供此 Worker 线程的 JS 引擎资源约束集。如果 <code>resourceLimits</code> 选项传递给了 <a href="#class-worker"><code>Worker</code></a> 构造函数，则与此匹配其值。</p>
+<p>如果 worker 已停止，则返回值是一个空对象。</p>
+</div><div>
+<h4><code>worker.startCpuProfile()</code><span><a class="mark" href="#workerstartcpuprofile" id="workerstartcpuprofile">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_startcpuprofile"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.8.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>启动 CPU 分析，然后返回一个 Promise，该 Promise 以错误或 <code>CPUProfileHandle</code> 对象完成。此 API 支持 <code>await using</code> 语法。</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-keyword">const</span> handle = <span class="hljs-keyword">await</span> worker.<span class="hljs-title function_">startCpuProfile</span>();
+  <span class="hljs-keyword">const</span> profile = <span class="hljs-keyword">await</span> handle.<span class="hljs-title function_">stop</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(profile);
+  worker.<span class="hljs-title function_">terminate</span>();
+});</code> <button class="copy-button">copy</button></pre>
+<p><code>await using</code> 示例。</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> w = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('node:worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+w.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-comment">// 返回时自动停止分析，并且分析数据将被丢弃</span>
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> handle = <span class="hljs-keyword">await</span> w.<span class="hljs-title function_">startCpuProfile</span>();
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>worker.startHeapProfile()</code><span><a class="mark" href="#workerstartheapprofile" id="workerstartheapprofile">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_startheapprofile"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>启动堆分析，然后返回一个 Promise，该 Promise 以错误或 <code>HeapProfileHandle</code> 对象完成。此 API 支持 <code>await using</code> 语法。</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-keyword">const</span> handle = <span class="hljs-keyword">await</span> worker.<span class="hljs-title function_">startHeapProfile</span>();
+  <span class="hljs-keyword">const</span> profile = <span class="hljs-keyword">await</span> handle.<span class="hljs-title function_">stop</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(profile);
+  worker.<span class="hljs-title function_">terminate</span>();
+});</code> <button class="copy-button">copy</button></pre>
+<p><code>await using</code> 示例。</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Worker</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">const</span> w = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">`
+  const { parentPort } = require('node:worker_threads');
+  parentPort.on('message', () => {});
+  `</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+
+w.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-title function_">async</span> () => {
+  <span class="hljs-comment">// 返回时自动停止分析，并且分析数据将被丢弃</span>
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> handle = <span class="hljs-keyword">await</span> w.<span class="hljs-title function_">startHeapProfile</span>();
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>worker.stderr</code><span><a class="mark" href="#workerstderr" id="workerstderr">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_stderr"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a></li>
+</ul>
+<p>这是一个可读流，其中包含在工作线程内部写入 <a href="process.html#processstderr"><code>process.stderr</code></a> 的数据。如果未将 <code>stderr: true</code> 传递给 <a href="#class-worker"><code>Worker</code></a> 构造函数，则数据将通过管道传输到父线程的 <a href="process.html#processstderr"><code>process.stderr</code></a> 流。</p>
+</div><div>
+<h4><code>worker.stdin</code><span><a class="mark" href="#workerstdin" id="workerstdin">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_stdin"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a></li>
+</ul>
+<p>如果 <code>stdin: true</code> 传递给了 <a href="#class-worker"><code>Worker</code></a> 构造函数，则这是一个可写流。写入此流的数据将在工作线程内作为 <a href="process.html#processstdin"><code>process.stdin</code></a> 可用。</p>
+</div><div>
+<h4><code>worker.stdout</code><span><a class="mark" href="#workerstdout" id="workerstdout">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_stdout"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a></li>
+</ul>
+<p>这是一个可读流，其中包含在工作线程内部写入 <a href="process.html#processstdout"><code>process.stdout</code></a> 的数据。如果未将 <code>stdout: true</code> 传递给 <a href="#class-worker"><code>Worker</code></a> 构造函数，则数据将通过管道传输到父线程的 <a href="process.html#processstdout"><code>process.stdout</code></a> 流。</p>
+</div><div>
+<h4><code>worker.terminate()</code><span><a class="mark" href="#workerterminate" id="workerterminate">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_terminate"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v12.5.0</td>
+<td><p>This function now returns a Promise. Passing a callback is deprecated, and was useless up to this version, as the Worker was actually terminated synchronously. Terminating is now a fully asynchronous operation.</p></td></tr>
+<tr><td>v10.5.0</td>
+<td><p><span>Added in: v10.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>尽快停止工作线程中的所有 JavaScript 执行。返回一个针对退出码的 Promise，该 Promise 在发出 [<code>'exit'</code> 事件][] 时完成。</p>
+</div><div>
+<h4><code>worker.threadId</code><span><a class="mark" href="#workerthreadid_1" id="workerthreadid_1">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threadid_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>被引用线程的整数标识符。在工作线程内部，它可作为 <a href="#workerthreadid"><code>require('node:worker_threads').threadId</code></a> 使用。此值在单个进程内的每个 <code>Worker</code> 实例中是唯一的。</p>
+</div><div>
+<h4><code>worker.threadName</code><span><a class="mark" href="#workerthreadname_1" id="workerthreadname_1">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_threadname_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.6.0</span>
+</div>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></li>
+</ul>
+<p>被引用线程的字符串标识符，如果线程未运行则为 null。在工作线程内部，它可作为 <a href="#workerthreadname"><code>require('node:worker_threads').threadName</code></a> 使用。</p>
+</div><div>
+<h4><code>worker.unref()</code><span><a class="mark" href="#workerunref" id="workerunref">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_unref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.5.0</span>
+</div>
+<p>在 worker 上调用 <code>unref()</code> 允许线程退出，如果这是事件系统中唯一活动的句柄。如果 worker 已经是 <code>unref()</code> 状态，再次调用 <code>unref()</code> 没有效果。</p>
+</div><div>
+<h4><code>worker[Symbol.asyncDispose]()</code><span><a class="mark" href="#workersymbolasyncdispose" id="workersymbolasyncdispose">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_worker_symbol_asyncdispose"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.2.0</span>
+</div>
+<p>当处置作用域退出时，调用 <a href="#workerterminate"><code>worker.terminate()</code></a>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">example</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> worker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-string">'for (;;) {}'</span>, { <span class="hljs-attr">eval</span>: <span class="hljs-literal">true</span> });
+  <span class="hljs-comment">// 当作用域退出时，Worker 会自动终止。</span>
+}</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>注意事项<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_1"></a></h3>
+<div>
+<h4>stdio 的同步阻塞<span><a class="mark" href="#stdio-" id="stdio-">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_stdio"></a></h4>
+<p><code>Worker</code> 利用通过 <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a> 的消息传递来实现与 <code>stdio</code> 的交互。这意味着源自 <code>Worker</code> 的 <code>stdio</code> 输出可能会被接收端阻塞 Node.js 事件循环的同步代码阻塞。</p>
+
+<pre class="with-13-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  <span class="hljs-title class_">Worker</span>,
+  isMainThread,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>; n &#x3C; <span class="hljs-number">1e10</span>; n++) {
+    <span class="hljs-comment">// 循环以模拟工作。</span>
+  }
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// 此输出将被主线程中的 for 循环阻塞。</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'foo'</span>);
+}</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+
+<span class="hljs-keyword">const</span> {
+  <span class="hljs-title class_">Worker</span>,
+  isMainThread,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-keyword">if</span> (isMainThread) {
+  <span class="hljs-keyword">new</span> <span class="hljs-title class_">Worker</span>(__filename);
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>; n &#x3C; <span class="hljs-number">1e10</span>; n++) {
+    <span class="hljs-comment">// 循环以模拟工作。</span>
+  }
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// 此输出将被主线程中的 for 循环阻塞。</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'foo'</span>);
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>从预加载脚本启动工作线程<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="worker_threads_2"></a></h4>
+<p>从预加载脚本（使用 <code>-r</code> 命令行标志加载和运行的脚本）启动工作线程时要小心。除非显式设置了 <code>execArgv</code> 选项，否则新的 Worker 线程会自动从正在运行的进程继承命令行标志，并会预加载与主线程相同的预加载脚本。如果预加载脚本无条件地启动工作线程，每个生成的线程都会启动另一个线程，直到应用程序崩溃。</p></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

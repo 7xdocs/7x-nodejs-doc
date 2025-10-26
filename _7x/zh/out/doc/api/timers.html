@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Timers | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/timers.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:1120px){.with-78-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:1088px){.with-74-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:326px){.with-13-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:342px){.with-15-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:334px){.with-14-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-timers">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers active">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="timers" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#timers">Timers</a></span>
+<ul>
+<li><a href="#-immediate">类: <code>Immediate</code></a>
+<ul>
+<li><a href="#immediatehasref"><code>immediate.hasRef()</code></a></li>
+<li><a href="#immediateref"><code>immediate.ref()</code></a></li>
+<li><a href="#immediateunref"><code>immediate.unref()</code></a></li>
+<li><a href="#immediatesymboldispose"><code>immediate[Symbol.dispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#-timeout">类: <code>Timeout</code></a>
+<ul>
+<li><span class="stability_3"><a href="#timeoutclose"><code>timeout.close()</code></a></span></li>
+<li><a href="#timeouthasref"><code>timeout.hasRef()</code></a></li>
+<li><a href="#timeoutref"><code>timeout.ref()</code></a></li>
+<li><a href="#timeoutrefresh"><code>timeout.refresh()</code></a></li>
+<li><a href="#timeoutunref"><code>timeout.unref()</code></a></li>
+<li><a href="#timeoutsymboltoprimitive"><code>timeout[Symbol.toPrimitive]()</code></a></li>
+<li><a href="#timeoutsymboldispose"><code>timeout[Symbol.dispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#">调度定时器</a>
+<ul>
+<li><a href="#setimmediatecallback-args"><code>setImmediate(callback[, ...args])</code></a></li>
+<li><a href="#setintervalcallback-delay-args"><code>setInterval(callback[, delay[, ...args]])</code></a></li>
+<li><a href="#settimeoutcallback-delay-args"><code>setTimeout(callback[, delay[, ...args]])</code></a></li>
+</ul>
+</li>
+<li><a href="#_1">取消定时器</a>
+<ul>
+<li><a href="#clearimmediateimmediate"><code>clearImmediate(immediate)</code></a></li>
+<li><a href="#clearintervaltimeout"><code>clearInterval(timeout)</code></a></li>
+<li><a href="#cleartimeouttimeout"><code>clearTimeout(timeout)</code></a></li>
+</ul>
+</li>
+<li><a href="#timers-promises-api">Timers Promises API</a>
+<ul>
+<li><a href="#timerspromisessettimeoutdelay-value-options"><code>timersPromises.setTimeout([delay[, value[, options]]])</code></a></li>
+<li><a href="#timerspromisessetimmediatevalue-options"><code>timersPromises.setImmediate([value[, options]])</code></a></li>
+<li><a href="#timerspromisessetintervaldelay-value-options"><code>timersPromises.setInterval([delay[, value[, options]]])</code></a></li>
+<li><span class="stability_1"><a href="#timerspromisesschedulerwaitdelay-options"><code>timersPromises.scheduler.wait(delay[, options])</code></a></span></li>
+<li><span class="stability_1"><a href="#timerspromisesscheduleryield"><code>timersPromises.scheduler.yield()</code></a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers active">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/timers.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/timers.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/timers.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/timers.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/timers.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/timers.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/timers.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/timers.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/timers.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/timers.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/timers.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/timers.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/timers.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/timers.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/timers.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/timers.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/timers.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/timers.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/timers.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/timers.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/timers.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/timers.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/timers.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/timers.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="timers.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/timers.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#timers">Timers</a></span>
+<ul>
+<li><a href="#-immediate">类: <code>Immediate</code></a>
+<ul>
+<li><a href="#immediatehasref"><code>immediate.hasRef()</code></a></li>
+<li><a href="#immediateref"><code>immediate.ref()</code></a></li>
+<li><a href="#immediateunref"><code>immediate.unref()</code></a></li>
+<li><a href="#immediatesymboldispose"><code>immediate[Symbol.dispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#-timeout">类: <code>Timeout</code></a>
+<ul>
+<li><span class="stability_3"><a href="#timeoutclose"><code>timeout.close()</code></a></span></li>
+<li><a href="#timeouthasref"><code>timeout.hasRef()</code></a></li>
+<li><a href="#timeoutref"><code>timeout.ref()</code></a></li>
+<li><a href="#timeoutrefresh"><code>timeout.refresh()</code></a></li>
+<li><a href="#timeoutunref"><code>timeout.unref()</code></a></li>
+<li><a href="#timeoutsymboltoprimitive"><code>timeout[Symbol.toPrimitive]()</code></a></li>
+<li><a href="#timeoutsymboldispose"><code>timeout[Symbol.dispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#">调度定时器</a>
+<ul>
+<li><a href="#setimmediatecallback-args"><code>setImmediate(callback[, ...args])</code></a></li>
+<li><a href="#setintervalcallback-delay-args"><code>setInterval(callback[, delay[, ...args]])</code></a></li>
+<li><a href="#settimeoutcallback-delay-args"><code>setTimeout(callback[, delay[, ...args]])</code></a></li>
+</ul>
+</li>
+<li><a href="#_1">取消定时器</a>
+<ul>
+<li><a href="#clearimmediateimmediate"><code>clearImmediate(immediate)</code></a></li>
+<li><a href="#clearintervaltimeout"><code>clearInterval(timeout)</code></a></li>
+<li><a href="#cleartimeouttimeout"><code>clearTimeout(timeout)</code></a></li>
+</ul>
+</li>
+<li><a href="#timers-promises-api">Timers Promises API</a>
+<ul>
+<li><a href="#timerspromisessettimeoutdelay-value-options"><code>timersPromises.setTimeout([delay[, value[, options]]])</code></a></li>
+<li><a href="#timerspromisessetimmediatevalue-options"><code>timersPromises.setImmediate([value[, options]])</code></a></li>
+<li><a href="#timerspromisessetintervaldelay-value-options"><code>timersPromises.setInterval([delay[, value[, options]]])</code></a></li>
+<li><span class="stability_1"><a href="#timerspromisesschedulerwaitdelay-options"><code>timersPromises.scheduler.wait(delay[, options])</code></a></span></li>
+<li><span class="stability_1"><a href="#timerspromisesscheduleryield"><code>timersPromises.scheduler.yield()</code></a></span></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Timers<span><a class="mark" href="#timers" id="timers">#</a></span><a aria-hidden="true" class="legacy" id="timers_timers"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/timers.js">lib/timers.js</a></p>
+<p><code>timer</code> 模块暴露了一个全局 API，用于调度在未来的某个时间点调用的函数。因为定时器函数是全局的，所以不需要调用 <code>require('node:timers')</code> 来使用该 API。</p>
+<p>Node.js 中的定时器函数实现了一个与 Web 浏览器提供的定时器 API 类似的 API，但使用了一个围绕 Node.js [事件循环][]构建的不同内部实现。</p>
+<section><h3>类: <code>Immediate</code><span><a class="mark" href="#-immediate" id="-immediate">#</a></span><a aria-hidden="true" class="legacy" id="timers_immediate"></a></h3>
+<p>此对象在内部创建，并从 <a href="#setimmediatecallback-args"><code>setImmediate()</code></a> 返回。它可以传递给 <a href="#clearimmediateimmediate"><code>clearImmediate()</code></a> 以取消已调度的操作。</p>
+<p>默认情况下，当调度了一个 Immediate 时，只要该 Immediate 是活跃的，Node.js 事件循环将继续运行。由 <a href="#setimmediatecallback-args"><code>setImmediate()</code></a> 返回的 <code>Immediate</code> 对象导出了 <code>immediate.ref()</code> 和 <code>immediate.unref()</code> 函数，可用于控制此默认行为。</p>
+<div>
+<h4><code>immediate.hasRef()</code><span><a class="mark" href="#immediatehasref" id="immediatehasref">#</a></span><a aria-hidden="true" class="legacy" id="timers_immediate_hasref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.0.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果为 true，则 <code>Immediate</code> 对象将保持 Node.js 事件循环活跃。</p>
+</div><div>
+<h4><code>immediate.ref()</code><span><a class="mark" href="#immediateref" id="immediateref">#</a></span><a aria-hidden="true" class="legacy" id="timers_immediate_ref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v9.7.0</span>
+</div>
+<ul>
+<li>返回: <a href="timers.html#class-immediate" class="type">&#x3C;Immediate></a> 对 <code>immediate</code> 的引用</li>
+</ul>
+<p>调用时，只要 <code>Immediate</code> 是活跃的，就请求 Node.js 事件循环<em>不要</em>退出。多次调用 <code>immediate.ref()</code> 将没有效果。</p>
+<p>默认情况下，所有 <code>Immediate</code> 对象都是 "ref'ed" 的，这使得通常不需要调用 <code>immediate.ref()</code>，除非之前调用过 <code>immediate.unref()</code>。</p>
+</div><div>
+<h4><code>immediate.unref()</code><span><a class="mark" href="#immediateunref" id="immediateunref">#</a></span><a aria-hidden="true" class="legacy" id="timers_immediate_unref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v9.7.0</span>
+</div>
+<ul>
+<li>返回: <a href="timers.html#class-immediate" class="type">&#x3C;Immediate></a> 对 <code>immediate</code> 的引用</li>
+</ul>
+<p>调用时，活跃的 <code>Immediate</code> 对象将不要求 Node.js 事件循环保持活跃。如果没有其他活动保持事件循环运行，进程可能会在 <code>Immediate</code> 对象的回调被调用之前退出。多次调用 <code>immediate.unref()</code> 将没有效果。</p>
+</div><div>
+<h4><code>immediate[Symbol.dispose]()</code><span><a class="mark" href="#immediatesymboldispose" id="immediatesymboldispose">#</a></span><a aria-hidden="true" class="legacy" id="timers_immediate_symbol_dispose"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.2.0</td>
+<td><p>No longer experimental.</p></td></tr>
+<tr><td>v20.5.0, v18.18.0</td>
+<td><p><span>Added in: v20.5.0, v18.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>取消 immediate。这类似于调用 <code>clearImmediate()</code>。</p>
+</div>
+</section><section><h3>类: <code>Timeout</code><span><a class="mark" href="#-timeout" id="-timeout">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout"></a></h3>
+<p>此对象在内部创建，并从 <a href="#settimeoutcallback-delay-args"><code>setTimeout()</code></a> 和 <a href="#setintervalcallback-delay-args"><code>setInterval()</code></a> 返回。它可以传递给 <a href="#cleartimeouttimeout"><code>clearTimeout()</code></a> 或 <a href="#clearintervaltimeout"><code>clearInterval()</code></a> 以取消已调度的操作。</p>
+<p>默认情况下，当使用 <a href="#settimeoutcallback-delay-args"><code>setTimeout()</code></a> 或 <a href="#setintervalcallback-delay-args"><code>setInterval()</code></a> 调度定时器时，只要定时器是活跃的，Node.js 事件循环将继续运行。这些函数返回的每个 <code>Timeout</code> 对象都导出了 <code>timeout.ref()</code> 和 <code>timeout.unref()</code> 函数，可用于控制此默认行为。</p>
+<div>
+<h4><code>timeout.close()</code><span><a class="mark" href="#timeoutclose" id="timeoutclose">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.9.1</span>
+</div>
+<p></p><div class="api_stability api_stability_3"><a href="documentation.html#stability-index">Stability: 3</a> - Legacy: 使用 <a href="#cleartimeouttimeout"><code>clearTimeout()</code></a> 代替。</div><p></p>
+<ul>
+<li>返回: <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> 对 <code>timeout</code> 的引用</li>
+</ul>
+<p>取消超时。</p>
+</div><div>
+<h4><code>timeout.hasRef()</code><span><a class="mark" href="#timeouthasref" id="timeouthasref">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_hasref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.0.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果为 true，则 <code>Timeout</code> 对象将保持 Node.js 事件循环活跃。</p>
+</div><div>
+<h4><code>timeout.ref()</code><span><a class="mark" href="#timeoutref" id="timeoutref">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_ref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.9.1</span>
+</div>
+<ul>
+<li>返回: <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> 对 <code>timeout</code> 的引用</li>
+</ul>
+<p>调用时，只要 <code>Timeout</code> 是活跃的，就请求 Node.js 事件循环<em>不要</em>退出。多次调用 <code>timeout.ref()</code> 将没有效果。</p>
+<p>默认情况下，所有 <code>Timeout</code> 对象都是 "ref'ed" 的，这使得通常不需要调用 <code>timeout.ref()</code>，除非之前调用过 <code>timeout.unref()</code>。</p>
+</div><div>
+<h4><code>timeout.refresh()</code><span><a class="mark" href="#timeoutrefresh" id="timeoutrefresh">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_refresh"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.2.0</span>
+</div>
+<ul>
+<li>返回: <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> 对 <code>timeout</code> 的引用</li>
+</ul>
+<p>将定时器的开始时间设置为当前时间，并重新调度定时器，以在当前时间调整后的先前指定持续时间调用其回调。这对于在不分配新的 JavaScript 对象的情况下刷新定时器非常有用。</p>
+<p>在已经调用过其回调的定时器上使用此方法将重新激活定时器。</p>
+</div><div>
+<h4><code>timeout.unref()</code><span><a class="mark" href="#timeoutunref" id="timeoutunref">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_unref"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.9.1</span>
+</div>
+<ul>
+<li>返回: <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> 对 <code>timeout</code> 的引用</li>
+</ul>
+<p>调用时，活跃的 <code>Timeout</code> 对象将不要求 Node.js 事件循环保持活跃。如果没有其他活动保持事件循环运行，进程可能会在 <code>Timeout</code> 对象的回调被调用之前退出。多次调用 <code>timeout.unref()</code> 将没有效果。</p>
+</div><div>
+<h4><code>timeout[Symbol.toPrimitive]()</code><span><a class="mark" href="#timeoutsymboltoprimitive" id="timeoutsymboltoprimitive">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_symbol_toprimitive"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.9.0, v12.19.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 一个可用于引用此 <code>timeout</code> 的数字</li>
+</ul>
+<p>将 <code>Timeout</code> 强制转换为原始值。该原始值可用于清除 <code>Timeout</code>。该原始值只能在创建超时的同一线程中使用。因此，要在 <a href="worker_threads.html"><code>worker_threads</code></a> 中使用它，必须首先将其传递到正确的线程。这增强了与浏览器 <code>setTimeout()</code> 和 <code>setInterval()</code> 实现的兼容性。</p>
+</div><div>
+<h4><code>timeout[Symbol.dispose]()</code><span><a class="mark" href="#timeoutsymboldispose" id="timeoutsymboldispose">#</a></span><a aria-hidden="true" class="legacy" id="timers_timeout_symbol_dispose"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.2.0</td>
+<td><p>No longer experimental.</p></td></tr>
+<tr><td>v20.5.0, v18.18.0</td>
+<td><p><span>Added in: v20.5.0, v18.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>取消超时。</p>
+</div>
+</section><section><h3>调度定时器<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="timers"></a></h3>
+<p>Node.js 中的定时器是一种内部构造，它在一定时间后调用给定的函数。定时器函数的调用时间取决于用于创建定时器的方法以及 Node.js 事件循环正在执行的其他工作。</p>
+<div>
+<h4><code>setImmediate(callback[, ...args])</code><span><a class="mark" href="#setimmediatecallback-args" id="setimmediatecallback-args">#</a></span><a aria-hidden="true" class="legacy" id="timers_setimmediate_callback_args"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.9.1</td>
+<td><p><span>Added in: v0.9.1</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 在 Node.js [事件循环][]的当前回合结束时调用的函数</li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 调用 <code>callback</code> 时传递的可选参数</li>
+<li>返回: <a href="timers.html#class-immediate" class="type">&#x3C;Immediate></a> 用于 <a href="#clearimmediateimmediate"><code>clearImmediate()</code></a></li>
+</ul>
+<p>调度 <code>callback</code> 在 I/O 事件回调之后"立即"执行。</p>
+<p>当多次调用 <code>setImmediate()</code> 时，<code>callback</code> 函数按照它们被创建的顺序排队执行。整个回调队列在每个事件循环迭代中处理。如果从正在执行的回调内部排队了一个 immediate 定时器，则该定时器直到下一个事件循环迭代才会触发。</p>
+<p>如果 <code>callback</code> 不是函数，将抛出 <a href="errors.html#class-typeerror"><code>TypeError</code></a>。</p>
+<p>此方法有一个用于 promise 的自定义变体，可通过 <a href="#timerspromisessetimmediatevalue-options"><code>timersPromises.setImmediate()</code></a> 使用。</p>
+</div><div>
+<h4><code>setInterval(callback[, delay[, ...args]])</code><span><a class="mark" href="#setintervalcallback-delay-args" id="setintervalcallback-delay-args">#</a></span><a aria-hidden="true" class="legacy" id="timers_setinterval_callback_delay_args"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.0.1</td>
+<td><p><span>Added in: v0.0.1</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 定时器到期时调用的函数</li>
+<li><code>delay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 在调用 <code>callback</code> 之前要等待的毫秒数。<strong>默认值:</strong> <code>1</code></li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 调用 <code>callback</code> 时传递的可选参数</li>
+<li>返回: <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> 用于 <a href="#clearintervaltimeout"><code>clearInterval()</code></a></li>
+</ul>
+<p>每隔 <code>delay</code> 毫秒调度重复执行 <code>callback</code>。</p>
+<p>当 <code>delay</code> 大于 <code>2147483647</code> 或小于 <code>1</code> 或 <code>NaN</code> 时，<code>delay</code> 将被设置为 <code>1</code>。非整数延迟会被截断为整数。</p>
+<p>如果 <code>callback</code> 不是函数，将抛出 <a href="errors.html#class-typeerror"><code>TypeError</code></a>。</p>
+<p>此方法有一个用于 promise 的自定义变体，可通过 <a href="#timerspromisessetintervaldelay-value-options"><code>timersPromises.setInterval()</code></a> 使用。</p>
+</div><div>
+<h4><code>setTimeout(callback[, delay[, ...args]])</code><span><a class="mark" href="#settimeoutcallback-delay-args" id="settimeoutcallback-delay-args">#</a></span><a aria-hidden="true" class="legacy" id="timers_settimeout_callback_delay_args"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.0.1</td>
+<td><p><span>Added in: v0.0.1</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 定时器到期时调用的函数</li>
+<li><code>delay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 在调用 <code>callback</code> 之前要等待的毫秒数。<strong>默认值:</strong> <code>1</code></li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 调用 <code>callback</code> 时传递的可选参数</li>
+<li>返回: <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> 用于 <a href="#cleartimeouttimeout"><code>clearTimeout()</code></a></li>
+</ul>
+<p>在 <code>delay</code> 毫秒后调度执行一次性的 <code>callback</code>。</p>
+<p><code>callback</code> 可能不会在精确的 <code>delay</code> 毫秒后被调用。Node.js 不保证回调触发的确切时间，也不保证它们的顺序。回调将尽可能接近指定的时间调用。</p>
+<p>当 <code>delay</code> 大于 <code>2147483647</code> 或小于 <code>1</code> 或 <code>NaN</code> 时，<code>delay</code> 将被设置为 <code>1</code>。非整数延迟会被截断为整数。</p>
+<p>如果 <code>callback</code> 不是函数，将抛出 <a href="errors.html#class-typeerror"><code>TypeError</code></a>。</p>
+<p>此方法有一个用于 promise 的自定义变体，可通过 <a href="#timerspromisessettimeoutdelay-value-options"><code>timersPromises.setTimeout()</code></a> 使用。</p>
+</div>
+</section><section><h3>取消定时器<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="timers_1"></a></h3>
+<p><a href="#setimmediatecallback-args"><code>setImmediate()</code></a>、<a href="#setintervalcallback-delay-args"><code>setInterval()</code></a> 和 <a href="#settimeoutcallback-delay-args"><code>setTimeout()</code></a> 方法各自返回代表已调度定时器的对象。这些对象可用于取消定时器并防止其触发。</p>
+<p>对于 <a href="#setimmediatecallback-args"><code>setImmediate()</code></a> 和 <a href="#settimeoutcallback-delay-args"><code>setTimeout()</code></a> 的 promise 化变体，可以使用 <a href="globals.html#class-abortcontroller"><code>AbortController</code></a> 来取消定时器。当取消时，返回的 Promise 将被拒绝，并带有一个 <code>'AbortError'</code>。</p>
+<p>对于 <code>setImmediate()</code>：</p>
+
+<pre class="with-78-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { setImmediate <span class="hljs-keyword">as</span> setImmediatePromise } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
+<span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
+
+<span class="hljs-comment">// We do not `await` the promise so `ac.abort()` is called concurrently.</span>
+<span class="hljs-title function_">setImmediatePromise</span>(<span class="hljs-string">'foobar'</span>, { signal })
+  .<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>)
+  .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =></span> {
+    <span class="hljs-keyword">if</span> (err.<span class="hljs-property">name</span> === <span class="hljs-string">'AbortError'</span>)
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'The immediate was aborted'</span>);
+  });
+
+ac.<span class="hljs-title function_">abort</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-attr">setImmediate</span>: setImmediatePromise } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
+
+<span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
+<span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
+
+<span class="hljs-title function_">setImmediatePromise</span>(<span class="hljs-string">'foobar'</span>, { signal })
+  .<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>)
+  .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =></span> {
+    <span class="hljs-keyword">if</span> (err.<span class="hljs-property">name</span> === <span class="hljs-string">'AbortError'</span>)
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'The immediate was aborted'</span>);
+  });
+
+ac.<span class="hljs-title function_">abort</span>();</code><button class="copy-button">copy</button></pre>
+<p>对于 <code>setTimeout()</code>：</p>
+
+<pre class="with-74-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-built_in">setTimeout</span> <span class="hljs-keyword">as</span> setTimeoutPromise } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
+<span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
+
+<span class="hljs-comment">// We do not `await` the promise so `ac.abort()` is called concurrently.</span>
+<span class="hljs-title function_">setTimeoutPromise</span>(<span class="hljs-number">1000</span>, <span class="hljs-string">'foobar'</span>, { signal })
+  .<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>)
+  .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =></span> {
+    <span class="hljs-keyword">if</span> (err.<span class="hljs-property">name</span> === <span class="hljs-string">'AbortError'</span>)
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'The timeout was aborted'</span>);
+  });
+
+ac.<span class="hljs-title function_">abort</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-attr">setTimeout</span>: setTimeoutPromise } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
+
+<span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
+<span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
+
+<span class="hljs-title function_">setTimeoutPromise</span>(<span class="hljs-number">1000</span>, <span class="hljs-string">'foobar'</span>, { signal })
+  .<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>)
+  .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =></span> {
+    <span class="hljs-keyword">if</span> (err.<span class="hljs-property">name</span> === <span class="hljs-string">'AbortError'</span>)
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'The timeout was aborted'</span>);
+  });
+
+ac.<span class="hljs-title function_">abort</span>();</code><button class="copy-button">copy</button></pre>
+<div>
+<h4><code>clearImmediate(immediate)</code><span><a class="mark" href="#clearimmediateimmediate" id="clearimmediateimmediate">#</a></span><a aria-hidden="true" class="legacy" id="timers_clearimmediate_immediate"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.9.1</span>
+</div>
+<ul>
+<li><code>immediate</code> <a href="timers.html#class-immediate" class="type">&#x3C;Immediate></a> 一个由 <a href="#setimmediatecallback-args"><code>setImmediate()</code></a> 返回的 <code>Immediate</code> 对象</li>
+</ul>
+<p>取消由 <a href="#setimmediatecallback-args"><code>setImmediate()</code></a> 创建的 <code>Immediate</code> 对象。</p>
+</div><div>
+<h4><code>clearInterval(timeout)</code><span><a class="mark" href="#clearintervaltimeout" id="clearintervaltimeout">#</a></span><a aria-hidden="true" class="legacy" id="timers_clearinterval_timeout"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.0.1</span>
+</div>
+<ul>
+<li><code>timeout</code> <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 一个由 <a href="#setintervalcallback-delay-args"><code>setInterval()</code></a> 返回的 <code>Timeout</code> 对象，或者是 <code>Timeout</code> 对象的[原始值][]（作为字符串或数字）</li>
+</ul>
+<p>取消由 <a href="#setintervalcallback-delay-args"><code>setInterval()</code></a> 创建的 <code>Timeout</code> 对象。</p>
+</div><div>
+<h4><code>clearTimeout(timeout)</code><span><a class="mark" href="#cleartimeouttimeout" id="cleartimeouttimeout">#</a></span><a aria-hidden="true" class="legacy" id="timers_cleartimeout_timeout"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.0.1</span>
+</div>
+<ul>
+<li><code>timeout</code> <a href="timers.html#class-timeout" class="type">&#x3C;Timeout></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 一个由 <a href="#settimeoutcallback-delay-args"><code>setTimeout()</code></a> 返回的 <code>Timeout</code> 对象，或者是 <code>Timeout</code> 对象的[原始值][]（作为字符串或数字）</li>
+</ul>
+<p>取消由 <a href="#settimeoutcallback-delay-args"><code>setTimeout()</code></a> 创建的 <code>Timeout</code> 对象。</p>
+</div>
+</section><section><h3>Timers Promises API<span><a class="mark" href="#timers-promises-api" id="timers-promises-api">#</a></span><a aria-hidden="true" class="legacy" id="timers_timers_promises_api"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0</td>
+<td><p>Graduated from experimental.</p></td></tr>
+<tr><td>v15.0.0</td>
+<td><p><span>Added in: v15.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p><code>timers/promises</code> API 提供了一组返回 <code>Promise</code> 对象的定时器函数。该 API 可通过 <code>require('node:timers/promises')</code> 访问。</p>
+
+<pre class="with-13-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  <span class="hljs-built_in">setTimeout</span>,
+  setImmediate,
+  <span class="hljs-built_in">setInterval</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  <span class="hljs-built_in">setTimeout</span>,
+  setImmediate,
+  <span class="hljs-built_in">setInterval</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);</code><button class="copy-button">copy</button></pre>
+<div>
+<h4><code>timersPromises.setTimeout([delay[, value[, options]]])</code><span><a class="mark" href="#timerspromisessettimeoutdelay-value-options" id="timerspromisessettimeoutdelay-value-options">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_settimeout_delay_value_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.0.0</span>
+</div>
+<ul>
+<li><code>delay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 在履行 promise 之前要等待的毫秒数。<strong>默认值:</strong> <code>1</code></li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 用于履行 promise 的值</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ref</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 设置为 <code>false</code> 表示已调度的 <code>Timeout</code> 不应要求 Node.js 事件循环保持活跃。<strong>默认值:</strong> <code>true</code></li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 一个可选的 <code>AbortSignal</code>，可用于取消已调度的 <code>Timeout</code></li>
+</ul>
+</li>
+</ul>
+
+<pre class="with-13-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  <span class="hljs-built_in">setTimeout</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-built_in">setTimeout</span>(<span class="hljs-number">100</span>, <span class="hljs-string">'result'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  <span class="hljs-built_in">setTimeout</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
+
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-number">100</span>, <span class="hljs-string">'result'</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>timersPromises.setImmediate([value[, options]])</code><span><a class="mark" href="#timerspromisessetimmediatevalue-options" id="timerspromisessetimmediatevalue-options">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_setimmediate_value_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.0.0</span>
+</div>
+<ul>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 用于履行 promise 的值</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ref</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 设置为 <code>false</code> 表示已调度的 <code>Immediate</code> 不应要求 Node.js 事件循环保持活跃。<strong>默认值:</strong> <code>true</code></li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 一个可选的 <code>AbortSignal</code>，可用于取消已调度的 <code>Immediate</code></li>
+</ul>
+</li>
+</ul>
+
+<pre class="with-15-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  setImmediate,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title function_">setImmediate</span>(<span class="hljs-string">'result'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  setImmediate,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
+
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-string">'result'</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res);  <span class="hljs-comment">// Prints 'result'</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>timersPromises.setInterval([delay[, value[, options]]])</code><span><a class="mark" href="#timerspromisessetintervaldelay-value-options" id="timerspromisessetintervaldelay-value-options">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_setinterval_delay_value_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.9.0</span>
+</div>
+<p>返回一个异步迭代器，该迭代器每隔 <code>delay</code> 毫秒生成值。如果 <code>ref</code> 为 <code>true</code>，则需要显式或隐式调用异步迭代器的 <code>next()</code> 来保持事件循环活跃。</p>
+<ul>
+<li><code>delay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 迭代之间等待的毫秒数。<strong>默认值:</strong> <code>1</code></li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 迭代器返回的值</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ref</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 设置为 <code>false</code> 表示迭代之间的已调度 <code>Timeout</code> 不应要求 Node.js 事件循环保持活跃。<strong>默认值:</strong> <code>true</code></li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 一个可选的 <code>AbortSignal</code>，可用于取消操作之间的已调度 <code>Timeout</code></li>
+</ul>
+</li>
+</ul>
+
+<pre class="with-14-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> {
+  <span class="hljs-built_in">setInterval</span>,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">const</span> interval = <span class="hljs-number">100</span>;
+<span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> startTime <span class="hljs-keyword">of</span> <span class="hljs-built_in">setInterval</span>(interval, <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>())) {
+  <span class="hljs-keyword">const</span> now = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(now);
+  <span class="hljs-keyword">if</span> ((now - startTime) > <span class="hljs-number">1000</span>)
+    <span class="hljs-keyword">break</span>;
+}
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>());</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  <span class="hljs-built_in">setInterval</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:timers/promises'</span>);
+<span class="hljs-keyword">const</span> interval = <span class="hljs-number">100</span>;
+
+(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> startTime <span class="hljs-keyword">of</span> <span class="hljs-built_in">setInterval</span>(interval, <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>())) {
+    <span class="hljs-keyword">const</span> now = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(now);
+    <span class="hljs-keyword">if</span> ((now - startTime) > <span class="hljs-number">1000</span>)
+      <span class="hljs-keyword">break</span>;
+  }
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>());
+})();</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>timersPromises.scheduler.wait(delay[, options])</code><span><a class="mark" href="#timerspromisesschedulerwaitdelay-options" id="timerspromisesschedulerwaitdelay-options">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_scheduler_wait_delay_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.3.0, v16.14.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>delay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 在解决 promise 之前要等待的毫秒数</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ref</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 设置为 <code>false</code> 表示已调度的 <code>Timeout</code> 不应要求 Node.js 事件循环保持活跃。<strong>默认值:</strong> <code>true</code></li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 一个可选的 <code>AbortSignal</code>，可用于取消等待</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>由[调度 APIs][]草案规范定义的一个实验性 API，该规范正在作为标准 Web 平台 API 开发。</p>
+<p>调用 <code>timersPromises.scheduler.wait(delay, options)</code> 等同于调用 <code>timersPromises.setTimeout(delay, undefined, options)</code>。</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { scheduler } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:timers/promises'</span>;
+
+<span class="hljs-keyword">await</span> scheduler.<span class="hljs-title function_">wait</span>(<span class="hljs-number">1000</span>); <span class="hljs-comment">// Wait one second before continuing</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>timersPromises.scheduler.yield()</code><span><a class="mark" href="#timerspromisesscheduleryield" id="timerspromisesscheduleryield">#</a></span><a aria-hidden="true" class="legacy" id="timers_timerspromises_scheduler_yield"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.3.0, v16.14.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p>由[调度 APIs][]草案规范定义的一个实验性 API，该规范正在作为标准 Web 平台 API 开发。</p>
+<p>调用 <code>timersPromises.scheduler.yield()</code> 等同于调用不带参数的 <code>timersPromises.setImmediate()</code>。</p></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

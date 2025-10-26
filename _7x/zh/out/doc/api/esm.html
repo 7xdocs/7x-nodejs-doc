@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Modules: ECMAScript modules | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/esm.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  
+</head>
+<body class="alt apidoc" id="api-section-esm">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm active">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="esm" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><a href="#modules-ecmascript-modules">Modules: ECMAScript modules</a>
+<ul>
+<li><a href="#">引言</a></li>
+<li><a href="#_1">启用</a></li>
+<li><a href="#_2">包</a></li>
+<li><a href="#import-"><code>import</code> 说明符</a>
+<ul>
+<li><a href="#_3">术语</a></li>
+<li><a href="#_4">强制文件扩展名</a></li>
+<li><a href="#urls">URLs</a>
+<ul>
+<li><a href="#file-urls"><code>file:</code> URLs</a></li>
+<li><a href="#data-"><code>data:</code> 导入</a></li>
+<li><a href="#node-"><code>node:</code> 导入</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_5">导入属性</a></li>
+<li><a href="#_6">内置模块</a></li>
+<li><a href="#import-_1"><code>import()</code> 表达式</a></li>
+<li><a href="#importmeta"><code>import.meta</code></a>
+<ul>
+<li><a href="#importmetadirname"><code>import.meta.dirname</code></a></li>
+<li><a href="#importmetafilename"><code>import.meta.filename</code></a></li>
+<li><a href="#importmetaurl"><code>import.meta.url</code></a></li>
+<li><span class="stability_1.0"><a href="#importmetamain"><code>import.meta.main</code></a></span></li>
+<li><span class="stability_1.2"><a href="#importmetaresolvespecifier"><code>import.meta.resolve(specifier)</code></a></span></li>
+</ul>
+</li>
+<li><a href="#-commonjs-">与 CommonJS 的互操作性</a>
+<ul>
+<li><a href="#import-_2"><code>import</code> 语句</a></li>
+<li><a href="#require"><code>require</code></a></li>
+<li><a href="#commonjs-">CommonJS 命名空间</a></li>
+<li><a href="#es--commonjs-">ES 模块和 CommonJS 之间的差异</a>
+<ul>
+<li><a href="#-requireexports--moduleexports">没有 <code>require</code>、<code>exports</code> 或 <code>module.exports</code></a></li>
+<li><a href="#-__filename--__dirname">没有 <code>__filename</code> 或 <code>__dirname</code></a></li>
+<li><a href="#_7">没有插件加载</a></li>
+<li><a href="#-requiremain">没有 <code>require.main</code></a></li>
+<li><a href="#-requireresolve">没有 <code>require.resolve</code></a></li>
+<li><a href="#-node_path">没有 <code>NODE_PATH</code></a></li>
+<li><a href="#-requireextensions">没有 <code>require.extensions</code></a></li>
+<li><a href="#-requirecache">没有 <code>require.cache</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#json-">JSON 模块</a></li>
+<li><a href="#wasm-">Wasm 模块</a>
+<ul>
+<li><span class="stability_1.2"><a href="#wasm-_1">Wasm 源阶段导入</a></span></li>
+<li><span class="stability_1.2"><a href="#javascript-">JavaScript 字符串内置函数</a></span></li>
+<li><span class="stability_1.1"><a href="#wasm-_2">Wasm 实例阶段导入</a></span></li>
+<li><a href="#-wasm-">保留的 Wasm 命名空间</a></li>
+</ul>
+</li>
+<li><a href="#-await">顶层 <code>await</code></a></li>
+<li><a href="#_8">加载器</a></li>
+<li><a href="#_9">解析和加载算法</a>
+<ul>
+<li><a href="#_10">特性</a></li>
+<li><a href="#_11">解析算法</a></li>
+<li><a href="#_12">解析算法规范</a></li>
+<li><a href="#-esm-">自定义 ESM 说明符解析算法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm active">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/esm.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/esm.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/esm.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/esm.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/esm.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/esm.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/esm.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/esm.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/esm.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/esm.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/esm.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/esm.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/esm.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/esm.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/esm.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/esm.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/esm.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/esm.html">8.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="esm.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/esm.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><a href="#modules-ecmascript-modules">Modules: ECMAScript modules</a>
+<ul>
+<li><a href="#">引言</a></li>
+<li><a href="#_1">启用</a></li>
+<li><a href="#_2">包</a></li>
+<li><a href="#import-"><code>import</code> 说明符</a>
+<ul>
+<li><a href="#_3">术语</a></li>
+<li><a href="#_4">强制文件扩展名</a></li>
+<li><a href="#urls">URLs</a>
+<ul>
+<li><a href="#file-urls"><code>file:</code> URLs</a></li>
+<li><a href="#data-"><code>data:</code> 导入</a></li>
+<li><a href="#node-"><code>node:</code> 导入</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_5">导入属性</a></li>
+<li><a href="#_6">内置模块</a></li>
+<li><a href="#import-_1"><code>import()</code> 表达式</a></li>
+<li><a href="#importmeta"><code>import.meta</code></a>
+<ul>
+<li><a href="#importmetadirname"><code>import.meta.dirname</code></a></li>
+<li><a href="#importmetafilename"><code>import.meta.filename</code></a></li>
+<li><a href="#importmetaurl"><code>import.meta.url</code></a></li>
+<li><span class="stability_1.0"><a href="#importmetamain"><code>import.meta.main</code></a></span></li>
+<li><span class="stability_1.2"><a href="#importmetaresolvespecifier"><code>import.meta.resolve(specifier)</code></a></span></li>
+</ul>
+</li>
+<li><a href="#-commonjs-">与 CommonJS 的互操作性</a>
+<ul>
+<li><a href="#import-_2"><code>import</code> 语句</a></li>
+<li><a href="#require"><code>require</code></a></li>
+<li><a href="#commonjs-">CommonJS 命名空间</a></li>
+<li><a href="#es--commonjs-">ES 模块和 CommonJS 之间的差异</a>
+<ul>
+<li><a href="#-requireexports--moduleexports">没有 <code>require</code>、<code>exports</code> 或 <code>module.exports</code></a></li>
+<li><a href="#-__filename--__dirname">没有 <code>__filename</code> 或 <code>__dirname</code></a></li>
+<li><a href="#_7">没有插件加载</a></li>
+<li><a href="#-requiremain">没有 <code>require.main</code></a></li>
+<li><a href="#-requireresolve">没有 <code>require.resolve</code></a></li>
+<li><a href="#-node_path">没有 <code>NODE_PATH</code></a></li>
+<li><a href="#-requireextensions">没有 <code>require.extensions</code></a></li>
+<li><a href="#-requirecache">没有 <code>require.cache</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#json-">JSON 模块</a></li>
+<li><a href="#wasm-">Wasm 模块</a>
+<ul>
+<li><span class="stability_1.2"><a href="#wasm-_1">Wasm 源阶段导入</a></span></li>
+<li><span class="stability_1.2"><a href="#javascript-">JavaScript 字符串内置函数</a></span></li>
+<li><span class="stability_1.1"><a href="#wasm-_2">Wasm 实例阶段导入</a></span></li>
+<li><a href="#-wasm-">保留的 Wasm 命名空间</a></li>
+</ul>
+</li>
+<li><a href="#-await">顶层 <code>await</code></a></li>
+<li><a href="#_8">加载器</a></li>
+<li><a href="#_9">解析和加载算法</a>
+<ul>
+<li><a href="#_10">特性</a></li>
+<li><a href="#_11">解析算法</a></li>
+<li><a href="#_12">解析算法规范</a></li>
+<li><a href="#-esm-">自定义 ESM 说明符解析算法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Modules: ECMAScript modules<span><a class="mark" href="#modules-ecmascript-modules" id="modules-ecmascript-modules">#</a></span><a aria-hidden="true" class="legacy" id="esm_modules_ecmascript_modules"></a></h2>
+
+
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.0.0</td>
+<td><p>Drop support for import assertions.</p></td></tr>
+<tr><td>v23.1.0, v22.12.0, v20.18.3, v18.20.5</td>
+<td><p>Import attributes are no longer experimental.</p></td></tr>
+<tr><td>v21.0.0, v20.10.0, v18.20.0</td>
+<td><p>Add experimental support for import attributes.</p></td></tr>
+<tr><td>v20.0.0, v18.19.0</td>
+<td><p>Module customization hooks are executed off the main thread.</p></td></tr>
+<tr><td>v18.6.0, v16.17.0</td>
+<td><p>Add support for chaining module customization hooks.</p></td></tr>
+<tr><td>v17.1.0, v16.14.0</td>
+<td><p>Add experimental support for import assertions.</p></td></tr>
+<tr><td>v17.0.0, v16.12.0</td>
+<td><p>Consolidate customization hooks, removed <code>getFormat</code>, <code>getSource</code>, <code>transformSource</code>, and <code>getGlobalPreloadCode</code> hooks added <code>load</code> and <code>globalPreload</code> hooks allowed returning <code>format</code> from either <code>resolve</code> or <code>load</code> hooks.</p></td></tr>
+<tr><td>v14.8.0</td>
+<td><p>Unflag Top-Level Await.</p></td></tr>
+<tr><td>v15.3.0, v14.17.0, v12.22.0</td>
+<td><p>Stabilize modules implementation.</p></td></tr>
+<tr><td>v14.13.0, v12.20.0</td>
+<td><p>Support for detection of CommonJS named exports.</p></td></tr>
+<tr><td>v14.0.0, v13.14.0, v12.20.0</td>
+<td><p>Remove experimental modules warning.</p></td></tr>
+<tr><td>v13.2.0, v12.17.0</td>
+<td><p>Loading ECMAScript modules no longer requires a command-line flag.</p></td></tr>
+<tr><td>v12.0.0</td>
+<td><p>Add support for ES modules using <code>.js</code> file extension via <code>package.json</code> <code>"type"</code> field.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<section><h3>引言<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="esm"></a></h3>
+
+<p>ECMAScript 模块是 <a href="https://tc39.github.io/ecma262/#sec-modules">官方标准格式</a>，用于打包 JavaScript 代码以供重用。模块使用各种 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import"><code>import</code></a> 和 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export"><code>export</code></a> 语句来定义。</p>
+<p>以下 ES 模块示例导出了一个函数：</p>
+<pre><code class="language-js"><span class="hljs-comment">// addTwo.mjs</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">addTwo</span>(<span class="hljs-params">num</span>) {
+  <span class="hljs-keyword">return</span> num + <span class="hljs-number">2</span>;
+}
+
+<span class="hljs-keyword">export</span> { addTwo };</code> <button class="copy-button">copy</button></pre>
+<p>以下 ES 模块示例从 <code>addTwo.mjs</code> 导入了该函数：</p>
+<pre><code class="language-js"><span class="hljs-comment">// app.mjs</span>
+<span class="hljs-keyword">import</span> { addTwo } <span class="hljs-keyword">from</span> <span class="hljs-string">'./addTwo.mjs'</span>;
+
+<span class="hljs-comment">// Prints: 6</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">addTwo</span>(<span class="hljs-number">4</span>));</code> <button class="copy-button">copy</button></pre>
+<p>Node.js 完全支持当前规范的 ECMAScript 模块，并提供了它们与其原始模块格式 <a href="modules.html">CommonJS</a> 之间的互操作性。</p>
+<!-- Anchors to make sure old links find a target -->
+<p><i id="esm_package_json_type_field"></i><i id="esm_package_scope_and_file_extensions"></i><i id="esm_input_type_flag"></i></p>
+</section><section><h3>启用<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="esm_1"></a></h3>
+
+<p>Node.js 有两个模块系统：<a href="modules.html">CommonJS</a> 模块和 ECMAScript 模块。</p>
+<p>作者可以通过 <code>.mjs</code> 文件扩展名、<code>package.json</code> 中值为 <code>"module"</code> 的 <a href="packages.html#type"><code>"type"</code></a> 字段，或值为 <code>"module"</code> 的 <a href="cli.html#--input-typetype"><code>--input-type</code></a> 标志，来告诉 Node.js 将 JavaScript 解释为 ES 模块。这些是代码旨在作为 ES 模块运行的显式标记。</p>
+<p>相反，作者可以通过 <code>.cjs</code> 文件扩展名、<code>package.json</code> 中值为 <code>"commonjs"</code> 的 <a href="packages.html#type"><code>"type"</code></a> 字段，或值为 <code>"commonjs"</code> 的 <a href="cli.html#--input-typetype"><code>--input-type</code></a> 标志，来明确告诉 Node.js 将 JavaScript 解释为 CommonJS。</p>
+<p>当代码缺乏两种模块系统的显式标记时，Node.js 会检查模块的源代码以查找 ES 模块语法。如果找到此类语法，Node.js 会将代码作为 ES 模块运行；否则，它将作为 CommonJS 运行模块。有关更多详细信息，请参阅 <a href="packages.html#determining-module-system">确定模块系统</a>。</p>
+<!-- Anchors to make sure old links find a target -->
+<p><i id="esm_package_entry_points"></i><i id="esm_main_entry_point_export"></i><i id="esm_subpath_exports"></i><i id="esm_package_exports_fallbacks"></i><i id="esm_exports_sugar"></i><i id="esm_conditional_exports"></i><i id="esm_nested_conditions"></i><i id="esm_self_referencing_a_package_using_its_name"></i><i id="esm_internal_package_imports"></i><i id="esm_dual_commonjs_es_module_packages"></i><i id="esm_dual_package_hazard"></i><i id="esm_writing_dual_packages_while_avoiding_or_minimizing_hazards"></i><i id="esm_approach_1_use_an_es_module_wrapper"></i><i id="esm_approach_2_isolate_state"></i></p>
+</section><section><h3>包<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="esm_2"></a></h3>
+<p>此部分已移至 <a href="packages.html">Modules: Packages</a>。</p>
+</section><section><h3><code>import</code> 说明符<span><a class="mark" href="#import-" id="import-">#</a></span><a aria-hidden="true" class="legacy" id="esm_import"></a></h3>
+<div>
+<h4>术语<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="esm_3"></a></h4>
+<p><code>import</code> 语句的 <em>说明符</em> 是 <code>from</code> 关键字之后的字符串，例如 <code>import { sep } from 'node:path'</code> 中的 <code>'node:path'</code>。说明符也用于 <code>export from</code> 语句，以及作为 <code>import()</code> 表达式的参数。</p>
+<p>说明符有三种类型：</p>
+<ul>
+<li>
+<p><em>相对说明符</em>，如 <code>'./startup.js'</code> 或 <code>'../config.mjs'</code>。它们引用相对于导入文件位置的路径。<em>对于这些，文件扩展名总是必需的。</em></p>
+</li>
+<li>
+<p><em>裸说明符</em>，如 <code>'some-package'</code> 或 <code>'some-package/shuffle'</code>。它们可以分别通过包名引用包的主入口点，或者通过包名前缀引用包内的特定功能模块。<em>仅对于没有 <a href="packages.html#exports"><code>"exports"</code></a> 字段的包，才需要包含文件扩展名。</em></p>
+</li>
+<li>
+<p><em>绝对说明符</em>，如 <code>'file:///opt/nodejs/config.js'</code>。它们直接且明确地引用完整路径。</p>
+</li>
+</ul>
+<p>裸说明符的解析由 <a href="#resolution-algorithm-specification">Node.js 模块解析和加载算法</a> 处理。
+所有其他说明符的解析始终仅使用标准的相对 <a href="https://url.spec.whatwg.org/">URL</a> 解析语义。</p>
+<p>与 CommonJS 中一样，除非包的 <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> 包含 <a href="packages.html#exports"><code>"exports"</code></a> 字段，否则可以通过将路径附加到包名来访问包内的模块文件。如果包含 <a href="packages.html#exports"><code>"exports"</code></a> 字段，则包内的文件只能通过 <a href="packages.html#exports"><code>"exports"</code></a> 中定义的路径访问。</p>
+<p>有关适用于 Node.js 模块解析中裸说明符的这些包解析规则的详细信息，请参阅 <a href="packages.html">包文档</a>。</p>
+</div><div>
+<h4>强制文件扩展名<span><a class="mark" href="#_4" id="_4">#</a></span><a aria-hidden="true" class="legacy" id="esm_4"></a></h4>
+<p>使用 <code>import</code> 关键字解析相对或绝对说明符时，必须提供文件扩展名。目录索引（例如 <code>'./startup/index.js'</code>）也必须完全指定。</p>
+<p>此行为与 <code>import</code> 在浏览器环境中的行为相匹配，假设服务器配置通常如此。</p>
+</div><div>
+<h4>URLs<span><a class="mark" href="#urls" id="urls">#</a></span><a aria-hidden="true" class="legacy" id="esm_urls"></a></h4>
+<p>ES 模块作为 URL 进行解析和缓存。这意味着特殊字符必须进行 <a href="url.html#percent-encoding-in-urls">百分比编码</a>，例如 <code>#</code> 编码为 <code>%23</code>，<code>?</code> 编码为 <code>%3F</code>。</p>
+<p>支持 <code>file:</code>、<code>node:</code> 和 <code>data:</code> URL 方案。像 <code>'https://example.com/app.js'</code> 这样的说明符在 Node.js 中本身不支持，除非使用 <a href="module.html#import-from-https">自定义 HTTPS 加载器</a>。</p>
+<div>
+<h5><code>file:</code> URLs<span><a class="mark" href="#file-urls" id="file-urls">#</a></span><a aria-hidden="true" class="legacy" id="esm_file_urls"></a></h5>
+<p>如果用于解析模块的 <code>import</code> 说明符具有不同的查询或片段，则模块会被多次加载。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">'./foo.mjs?query=1'</span>; <span class="hljs-comment">// 加载带有 "?query=1" 查询的 ./foo.mjs</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">'./foo.mjs?query=2'</span>; <span class="hljs-comment">// 加载带有 "?query=2" 查询的 ./foo.mjs</span></code> <button class="copy-button">copy</button></pre>
+<p>可以通过 <code>/</code>、<code>//</code> 或 <code>file:///</code> 引用卷根目录。鉴于 <a href="https://url.spec.whatwg.org/">URL</a> 和路径解析之间的差异（例如百分比编码细节），建议在导入路径时使用 <a href="url.html#urlpathtofileurlpath-options">url.pathToFileURL</a>。</p>
+</div><div>
+<h5><code>data:</code> 导入<span><a class="mark" href="#data-" id="data-">#</a></span><a aria-hidden="true" class="legacy" id="esm_data"></a></h5>
+<div class="api_metadata">
+<span>Added in: v12.10.0</span>
+</div>
+<p>支持使用以下 MIME 类型通过 <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs"><code>data:</code> URLs</a> 进行导入：</p>
+<ul>
+<li>用于 ES 模块的 <code>text/javascript</code></li>
+<li>用于 JSON 的 <code>application/json</code></li>
+<li>用于 Wasm 的 <code>application/wasm</code></li>
+</ul>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">'data:text/javascript,console.log("hello!");'</span>;
+<span class="hljs-keyword">import</span> _ <span class="hljs-keyword">from</span> <span class="hljs-string">'data:application/json,"world!"'</span> <span class="hljs-keyword">with</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> };</code> <button class="copy-button">copy</button></pre>
+<p><code>data:</code> URLs 仅解析内置模块的 <a href="#terminology">裸说明符</a> 和 <a href="#terminology">绝对说明符</a>。解析 <a href="#terminology">相对说明符</a> 不起作用，因为 <code>data:</code> 不是 <a href="https://url.spec.whatwg.org/#special-scheme">特殊方案</a>。例如，尝试从 <code>data:text/javascript,import "./foo";</code> 加载 <code>./foo</code> 会解析失败，因为 <code>data:</code> URLs 没有相对解析的概念。</p>
+</div><div>
+<h5><code>node:</code> 导入<span><a class="mark" href="#node-" id="node-">#</a></span><a aria-hidden="true" class="legacy" id="esm_node"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0, v14.18.0</td>
+<td><p>Added <code>node:</code> import support to <code>require(...)</code>.</p></td></tr>
+<tr><td>v14.13.1, v12.20.0</td>
+<td><p><span>Added in: v14.13.1, v12.20.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p><code>node:</code> URLs 作为加载 Node.js 内置模块的替代方式被支持。此 URL 方案允许通过有效的绝对 URL 字符串引用内置模块。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;</code> <button class="copy-button">copy</button></pre>
+<p><a id="import-assertions"></a></p>
+</div></div>
+</section><section><h3>导入属性<span><a class="mark" href="#_5" id="_5">#</a></span><a aria-hidden="true" class="legacy" id="esm_5"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v21.0.0, v20.10.0, v18.20.0</td>
+<td><p>Switch from Import Assertions to Import Attributes.</p></td></tr>
+<tr><td>v17.1.0, v16.14.0</td>
+<td><p><span>Added in: v17.1.0, v16.14.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import/with">导入属性</a> 是模块导入语句的内联语法，用于沿着模块说明符传递更多信息。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> fooData <span class="hljs-keyword">from</span> <span class="hljs-string">'./foo.json'</span> <span class="hljs-keyword">with</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> };
+
+<span class="hljs-keyword">const</span> { <span class="hljs-attr">default</span>: barData } =
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'./bar.json'</span>, { <span class="hljs-attr">with</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> } });</code> <button class="copy-button">copy</button></pre>
+<p>Node.js 仅支持 <code>type</code> 属性，它支持以下值：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>属性 <code>type</code></th><th>用于</th></tr></thead><tbody><tr><td><code>'json'</code></td><td>[JSON 模块][]</td></tr></tbody></table>
+<p>导入 JSON 模块时，<code>type: 'json'</code> 属性是强制性的。</p>
+</section><section><h3>内置模块<span><a class="mark" href="#_6" id="_6">#</a></span><a aria-hidden="true" class="legacy" id="esm_6"></a></h3>
+<p><a href="modules.html#built-in-modules">内置模块</a> 提供其公共 API 的命名导出。还提供了一个默认导出，它是 CommonJS 导出的值。默认导出可用于，除其他外，修改命名导出。内置模块的命名导出仅通过调用 <a href="module.html#modulesyncbuiltinesmexports"><code>module.syncBuiltinESMExports()</code></a> 来更新。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-title class_">EventEmitter</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
+<span class="hljs-keyword">const</span> e = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EventEmitter</span>();</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-title function_">readFile</span>(<span class="hljs-string">'./foo.txt'</span>, <span class="hljs-function">(<span class="hljs-params">err, source</span>) =></span> {
+  <span class="hljs-keyword">if</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(source);
+  }
+});</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> fs, { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { syncBuiltinESMExports } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">Buffer</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:buffer'</span>;
+
+fs.<span class="hljs-property">readFileSync</span> = <span class="hljs-function">() =></span> <span class="hljs-title class_">Buffer</span>.<span class="hljs-title function_">from</span>(<span class="hljs-string">'Hello, ESM'</span>);
+<span class="hljs-title function_">syncBuiltinESMExports</span>();
+
+fs.<span class="hljs-property">readFileSync</span> === readFileSync;</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>import()</code> 表达式<span><a class="mark" href="#import-_1" id="import-_1">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_1"></a></h3>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import">动态 <code>import()</code></a> 提供了一种异步导入模块的方式。它在 CommonJS 和 ES 模块中都受支持，并且可用于加载 CommonJS 和 ES 模块。</p>
+</section><section><h3><code>import.meta</code><span><a class="mark" href="#importmeta" id="importmeta">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta"></a></h3>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p><code>import.meta</code> 元属性是一个 <code>Object</code>，包含以下属性。它仅在 ES 模块中受支持。</p>
+<div>
+<h4><code>import.meta.dirname</code><span><a class="mark" href="#importmetadirname" id="importmetadirname">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta_dirname"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>This property is no longer experimental.</p></td></tr>
+<tr><td>v21.2.0, v20.11.0</td>
+<td><p><span>Added in: v21.2.0, v20.11.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 当前模块的目录名。</li>
+</ul>
+<p>这与 <a href="#importmetafilename"><code>import.meta.filename</code></a> 的 <a href="path.html#pathdirnamepath"><code>path.dirname()</code></a> 相同。</p>
+<blockquote>
+<p><strong>注意</strong>：仅存在于 <code>file:</code> 模块上。</p>
+</blockquote>
+</div><div>
+<h4><code>import.meta.filename</code><span><a class="mark" href="#importmetafilename" id="importmetafilename">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta_filename"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>This property is no longer experimental.</p></td></tr>
+<tr><td>v21.2.0, v20.11.0</td>
+<td><p><span>Added in: v21.2.0, v20.11.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 当前模块的完整绝对路径和文件名，已解析符号链接。</li>
+</ul>
+<p>这与 <a href="#importmetaurl"><code>import.meta.url</code></a> 的 <a href="url.html#urlfileurltopathurl-options"><code>url.fileURLToPath()</code></a> 相同。</p>
+<blockquote>
+<p><strong>注意</strong> 仅本地模块支持此属性。不使用 <code>file:</code> 协议的模块不提供此属性。</p>
+</blockquote>
+</div><div>
+<h4><code>import.meta.url</code><span><a class="mark" href="#importmetaurl" id="importmetaurl">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta_url"></a></h4>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 模块的绝对 <code>file:</code> URL。</li>
+</ul>
+<p>这与在浏览器中定义的方式完全相同，提供当前模块文件的 URL。</p>
+<p>这启用了有用的模式，例如相对文件加载：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">const</span> buffer = <span class="hljs-title function_">readFileSync</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'./data.proto'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>import.meta.main</code><span><a class="mark" href="#importmetamain" id="importmetamain">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta_main"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.2.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.0</a> - Early development</div><p></p>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 当当前模块是当前进程的入口点时，为 <code>true</code>；否则为 <code>false</code>。</li>
+</ul>
+<p>等效于 CommonJS 中的 <code>require.main === module</code>。</p>
+<p>类似于 Python 的 <code>__name__ == "__main__"</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">foo</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">'Hello, world'</span>;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">main</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> message = <span class="hljs-title function_">foo</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(message);
+}
+
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">main</span>) <span class="hljs-title function_">main</span>();
+<span class="hljs-comment">// `foo` 可以从另一个模块导入，而不会受到 `main` 可能的副作用影响</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>import.meta.resolve(specifier)</code><span><a class="mark" href="#importmetaresolvespecifier" id="importmetaresolvespecifier">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_meta_resolve_specifier"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.6.0, v18.19.0</td>
+<td><p>No longer behind <code>--experimental-import-meta-resolve</code> CLI flag, except for the non-standard <code>parentURL</code> parameter.</p></td></tr>
+<tr><td>v20.6.0, v18.19.0</td>
+<td><p>This API no longer throws when targeting <code>file:</code> URLs that do not map to an existing file on the local FS.</p></td></tr>
+<tr><td>v20.0.0, v18.19.0</td>
+<td><p>This API now returns a string synchronously instead of a Promise.</p></td></tr>
+<tr><td>v16.2.0, v14.18.0</td>
+<td><p>Add support for WHATWG <code>URL</code> object to <code>parentURL</code> parameter.</p></td></tr>
+<tr><td>v13.9.0, v12.16.2</td>
+<td><p><span>Added in: v13.9.0, v12.16.2</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<ul>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 相对于当前模块要解析的模块说明符。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 说明符将解析到的绝对 URL 字符串。</li>
+</ul>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta/resolve"><code>import.meta.resolve</code></a> 是一个相对于每个模块的作用域解析函数，返回 URL 字符串。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> dependencyAsset = <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'component-lib/asset.css'</span>);
+<span class="hljs-comment">// file:///app/node_modules/component-lib/asset.css</span>
+<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'./dep.js'</span>);
+<span class="hljs-comment">// file:///app/dep.js</span></code> <button class="copy-button">copy</button></pre>
+<p>支持 Node.js 模块解析的所有功能。依赖项解析受包内允许的导出解析的限制。</p>
+<p><strong>注意事项</strong>：</p>
+<ul>
+<li>这可能导致同步文件系统操作，这可能会类似地影响性能，如同 <code>require.resolve</code>。</li>
+<li>此功能在自定义加载器中不可用（它会导致死锁）。</li>
+</ul>
+<p><strong>非标准 API</strong>：</p>
+<p>当使用 <code>--experimental-import-meta-resolve</code> 标志时，该函数接受第二个参数：</p>
+<ul>
+<li><code>parent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 一个可选的绝对父模块 URL，用于从中解析。<strong>默认值:</strong> <code>import.meta.url</code></li>
+</ul>
+</div>
+</section><section><h3>与 CommonJS 的互操作性<span><a class="mark" href="#-commonjs-" id="-commonjs-">#</a></span><a aria-hidden="true" class="legacy" id="esm_commonjs"></a></h3>
+<div>
+<h4><code>import</code> 语句<span><a class="mark" href="#import-_2" id="import-_2">#</a></span><a aria-hidden="true" class="legacy" id="esm_import_2"></a></h4>
+<p><code>import</code> 语句可以引用 ES 模块或 CommonJS 模块。<code>import</code> 语句仅在 ES 模块中允许，但动态 <a href="#import-expressions"><code>import()</code></a> 表达式在 CommonJS 中受支持，用于加载 ES 模块。</p>
+<p>导入 <a href="#commonjs-namespaces">CommonJS 模块</a> 时，<code>module.exports</code> 对象作为默认导出提供。命名导出可能可用，通过静态分析提供，以便更好地实现生态系统兼容性。</p>
+</div><div>
+<h4><code>require</code><span><a class="mark" href="#require" id="require">#</a></span><a aria-hidden="true" class="legacy" id="esm_require"></a></h4>
+<p>CommonJS 模块 <code>require</code> 目前仅支持加载同步 ES 模块（即不使用顶层 <code>await</code> 的 ES 模块）。</p>
+<p>有关详细信息，请参阅 <a href="modules.html#loading-ecmascript-modules-using-require">使用 <code>require()</code> 加载 ECMAScript 模块</a>。</p>
+</div><div>
+<h4>CommonJS 命名空间<span><a class="mark" href="#commonjs-" id="commonjs-">#</a></span><a aria-hidden="true" class="legacy" id="esm_commonjs_1"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.0.0</td>
+<td><p>Added <code>'module.exports'</code> export marker to CJS namespaces.</p></td></tr>
+<tr><td>v14.13.0</td>
+<td><p><span>Added in: v14.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>CommonJS 模块由一个 <code>module.exports</code> 对象组成，该对象可以是任何类型。</p>
+<p>为了支持这一点，当从 ECMAScript 模块导入 CommonJS 时，会为 CommonJS 模块构造一个命名空间包装器，该包装器始终提供一个指向 CommonJS <code>module.exports</code> 值的 <code>default</code> 导出键。</p>
+<p>此外，对 CommonJS 模块的源文本执行启发式静态分析，以获取 <code>module.exports</code> 上值的尽力静态导出列表，以在命名空间上提供。这是必要的，因为这些命名空间必须在 CJS 模块评估之前构造。</p>
+<p>这些 CommonJS 命名空间对象还提供了一个 <code>default</code> 导出作为 <code>'module.exports'</code> 命名导出，以便明确指示它们在 CommonJS 中的表示使用此值，而不是命名空间值。这反映了 <a href="modules.html#loading-ecmascript-modules-using-require"><code>require(esm)</code></a> 互操作性支持中处理 <code>'module.exports'</code> 导出名称的语义。</p>
+<p>导入 CommonJS 模块时，可以使用 ES 模块默认导入或其相应的语法糖可靠地导入：</p>
+<!-- eslint-disable no-duplicate-imports -->
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { <span class="hljs-keyword">default</span> <span class="hljs-keyword">as</span> cjs } <span class="hljs-keyword">from</span> <span class="hljs-string">'cjs'</span>;
+<span class="hljs-comment">// 与上述相同</span>
+<span class="hljs-keyword">import</span> cjsSugar <span class="hljs-keyword">from</span> <span class="hljs-string">'cjs'</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(cjs);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(cjs === cjsSugar);
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">//   &#x3C;module.exports></span>
+<span class="hljs-comment">//   true</span></code> <button class="copy-button">copy</button></pre>
+<p>当使用 <code>import * as m from 'cjs'</code> 或动态导入时，可以直接观察到这个模块命名空间异质对象：</p>
+<!-- eslint-skip -->
+<pre><code class="language-js"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> m <span class="hljs-keyword">from</span> <span class="hljs-string">'cjs'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m === <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'cjs'</span>));
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">//   [Module] { default: &#x3C;module.exports>, 'module.exports': &#x3C;module.exports> }</span>
+<span class="hljs-comment">//   true</span></code> <button class="copy-button">copy</button></pre>
+<p>为了更好地与 JS 生态系统中的现有用法兼容，Node.js 还尝试确定每个导入的 CommonJS 模块的 CommonJS 命名导出，以通过静态分析过程将它们作为单独的 ES 模块导出提供。</p>
+<p>例如，考虑一个用以下方式编写的 CommonJS 模块：</p>
+<pre><code class="language-js cjs"><span class="hljs-comment">// cjs.cjs</span>
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">name</span> = <span class="hljs-string">'exported'</span>;</code> <button class="copy-button">copy</button></pre>
+<p>前面的模块在 ES 模块中支持命名导入：</p>
+<!-- eslint-disable no-duplicate-imports -->
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { name } <span class="hljs-keyword">from</span> <span class="hljs-string">'./cjs.cjs'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(name);
+<span class="hljs-comment">// 打印: 'exported'</span>
+
+<span class="hljs-keyword">import</span> cjs <span class="hljs-keyword">from</span> <span class="hljs-string">'./cjs.cjs'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(cjs);
+<span class="hljs-comment">// 打印: { name: 'exported' }</span>
+
+<span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> m <span class="hljs-keyword">from</span> <span class="hljs-string">'./cjs.cjs'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(m);
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">//   [Module] {</span>
+<span class="hljs-comment">//     default: { name: 'exported' },</span>
+<span class="hljs-comment">//     'module.exports': { name: 'exported' },</span>
+<span class="hljs-comment">//     name: 'exported'</span>
+<span class="hljs-comment">//   }</span></code> <button class="copy-button">copy</button></pre>
+<p>从记录的模块命名空间异质对象的最后一个示例中可以看出，<code>name</code> 导出从 <code>module.exports</code> 对象复制并在导入模块时直接设置在 ES 模块命名空间上。</p>
+<p>对这些命名导出不会检测到对 <code>module.exports</code> 的实时绑定更新或新增的导出。</p>
+<p>命名导出的检测基于常见的语法模式，但并非总能正确检测到命名导出。在这些情况下，使用上述默认导入形式可能是更好的选择。</p>
+<p>命名导出检测涵盖了许多常见的导出模式、重新导出模式以及构建工具和转译器的输出。有关实现的精确语义，请参阅 <a href="https://github.com/nodejs/cjs-module-lexer/tree/2.0.0">cjs-module-lexer</a>。</p>
+</div><div>
+<h4>ES 模块和 CommonJS 之间的差异<span><a class="mark" href="#es--commonjs-" id="es--commonjs-">#</a></span><a aria-hidden="true" class="legacy" id="esm_es_commonjs"></a></h4>
+<div>
+<h5>没有 <code>require</code>、<code>exports</code> 或 <code>module.exports</code><span><a class="mark" href="#-requireexports--moduleexports" id="-requireexports--moduleexports">#</a></span><a aria-hidden="true" class="legacy" id="esm_require_exports_module_exports"></a></h5>
+<p>在大多数情况下，可以使用 ES 模块 <code>import</code> 来加载 CommonJS 模块。</p>
+<p>如果需要，可以使用 <a href="module.html#modulecreaterequirefilename"><code>module.createRequire()</code></a> 在 ES 模块内构造 <code>require</code> 函数。</p>
+</div><div>
+<h5>没有 <code>__filename</code> 或 <code>__dirname</code><span><a class="mark" href="#-__filename--__dirname" id="-__filename--__dirname">#</a></span><a aria-hidden="true" class="legacy" id="esm_filename_dirname"></a></h5>
+<p>这些 CommonJS 变量在 ES 模块中不可用。</p>
+<p><code>__filename</code> 和 <code>__dirname</code> 的用例可以通过 <a href="#importmetafilename"><code>import.meta.filename</code></a> 和 <a href="#importmetadirname"><code>import.meta.dirname</code></a> 来复制。</p>
+</div><div>
+<h5>没有插件加载<span><a class="mark" href="#_7" id="_7">#</a></span><a aria-hidden="true" class="legacy" id="esm_7"></a></h5>
+<p><a href="addons.html">插件</a> 目前不支持通过 ES 模块导入。</p>
+<p>它们可以使用 <a href="module.html#modulecreaterequirefilename"><code>module.createRequire()</code></a> 或 <a href="process.html#processdlopenmodule-filename-flags"><code>process.dlopen</code></a> 加载。</p>
+</div><div>
+<h5>没有 <code>require.main</code><span><a class="mark" href="#-requiremain" id="-requiremain">#</a></span><a aria-hidden="true" class="legacy" id="esm_require_main"></a></h5>
+<p>要替换 <code>require.main === module</code>，有 <a href="#importmetamain"><code>import.meta.main</code></a> API。</p>
+</div><div>
+<h5>没有 <code>require.resolve</code><span><a class="mark" href="#-requireresolve" id="-requireresolve">#</a></span><a aria-hidden="true" class="legacy" id="esm_require_resolve"></a></h5>
+<p>相对解析可以通过 <code>new URL('./local', import.meta.url)</code> 处理。</p>
+<p>对于完整的 <code>require.resolve</code> 替换，有 <a href="#importmetaresolvespecifier">import.meta.resolve</a> API。</p>
+<p>或者可以使用 <code>module.createRequire()</code>。</p>
+</div><div>
+<h5>没有 <code>NODE_PATH</code><span><a class="mark" href="#-node_path" id="-node_path">#</a></span><a aria-hidden="true" class="legacy" id="esm_node_path"></a></h5>
+<p><code>NODE_PATH</code> 不是解析 <code>import</code> 说明符的一部分。如果需要此行为，请使用符号链接。</p>
+</div><div>
+<h5>没有 <code>require.extensions</code><span><a class="mark" href="#-requireextensions" id="-requireextensions">#</a></span><a aria-hidden="true" class="legacy" id="esm_require_extensions"></a></h5>
+<p><code>import</code> 不使用 <code>require.extensions</code>。模块自定义钩子可以提供替代方案。</p>
+</div><div>
+<h5>没有 <code>require.cache</code><span><a class="mark" href="#-requirecache" id="-requirecache">#</a></span><a aria-hidden="true" class="legacy" id="esm_require_cache"></a></h5>
+<p><code>import</code> 不使用 <code>require.cache</code>，因为 ES 模块加载器有自己的独立缓存。</p>
+<p><i id="esm_experimental_json_modules"></i></p>
+</div></div>
+</section><section><h3>JSON 模块<span><a class="mark" href="#json-" id="json-">#</a></span><a aria-hidden="true" class="legacy" id="esm_json"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.1.0, v22.12.0, v20.18.3, v18.20.5</td>
+<td><p>JSON modules are no longer experimental.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>JSON 文件可以通过 <code>import</code> 引用：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> packageConfig <span class="hljs-keyword">from</span> <span class="hljs-string">'./package.json'</span> <span class="hljs-keyword">with</span> { <span class="hljs-attr">type</span>: <span class="hljs-string">'json'</span> };</code> <button class="copy-button">copy</button></pre>
+<p><code>with { type: 'json' }</code> 语法是强制性的；请参阅 <a href="#import-attributes">导入属性</a>。</p>
+<p>导入的 JSON 仅公开一个 <code>default</code> 导出。不支持命名导出。会在 CommonJS 缓存中创建一个缓存条目以避免重复。如果已经从同一路径导入了 JSON 模块，则在 CommonJS 中返回相同的对象。</p>
+<p><i id="esm_experimental_wasm_modules"></i></p>
+</section><section><h3>Wasm 模块<span><a class="mark" href="#wasm-" id="wasm-">#</a></span><a aria-hidden="true" class="legacy" id="esm_wasm"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.5.0</td>
+<td><p>Wasm modules no longer require the <code>--experimental-wasm-modules</code> flag.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>支持导入 WebAssembly 模块实例和 WebAssembly 源阶段导入。</p>
+<p>这两种集成都符合 <a href="https://github.com/webassembly/esm-integration">WebAssembly 的 ES 模块集成提案</a>。</p>
+<div>
+<h4>Wasm 源阶段导入<span><a class="mark" href="#wasm-_1" id="wasm-_1">#</a></span><a aria-hidden="true" class="legacy" id="esm_wasm_1"></a></h4>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<div class="api_metadata">
+<span>Added in: v24.0.0</span>
+</div>
+<p><a href="https://github.com/tc39/proposal-source-phase-imports">源阶段导入</a> 提案允许使用 <code>import source</code> 关键字组合直接导入 <code>WebAssembly.Module</code> 对象，而不是获取已经使用其依赖项实例化的模块实例。</p>
+<p>当需要为 Wasm 进行自定义实例化，同时仍然通过 ES 模块集成解析和加载它时，这很有用。</p>
+<p>例如，要创建模块的多个实例，或将自定义导入传递到 <code>library.wasm</code> 的新实例中：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> source libraryModule <span class="hljs-keyword">from</span> <span class="hljs-string">'./library.wasm'</span>;
+
+<span class="hljs-keyword">const</span> instance1 = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(libraryModule, importObject1);
+
+<span class="hljs-keyword">const</span> instance2 = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(libraryModule, importObject2);</code> <button class="copy-button">copy</button></pre>
+<p>除了静态源阶段之外，还有通过 <code>import.source</code> 动态阶段导入语法的动态变体：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> dynamicLibrary = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>.<span class="hljs-title function_">source</span>(<span class="hljs-string">'./library.wasm'</span>);
+
+<span class="hljs-keyword">const</span> instance = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(dynamicLibrary, importObject);</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>JavaScript 字符串内置函数<span><a class="mark" href="#javascript-" id="javascript-">#</a></span><a aria-hidden="true" class="legacy" id="esm_javascript"></a></h4>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<p>导入 WebAssembly 模块时，<a href="https://github.com/WebAssembly/js-string-builtins">WebAssembly JS 字符串内置函数提案</a> 通过 ESM 集成自动启用。这允许 WebAssembly 模块直接使用来自 <code>wasm:js-string</code> 命名空间的高效编译时字符串内置函数。</p>
+<p>例如，以下 Wasm 模块使用 <code>wasm:js-string</code> 的 <code>length</code> 内置函数导出一个字符串 <code>getLength</code> 函数：</p>
+<pre><code class="language-text">(module
+  ;; 编译时导入字符串长度内置函数。
+  (import "wasm:js-string" "length" (func $string_length (param externref) (result i32)))
+
+  ;; 定义 getLength，接受一个假定为字符串的 JS 值参数，
+  ;; 对其调用字符串长度并返回结果。
+  (func $getLength (param $str externref) (result i32)
+    local.get $str
+    call $string_length
+  )
+
+  ;; 导出 getLength 函数。
+  (export "getLength" (func $get_length))
+)</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { getLength } <span class="hljs-keyword">from</span> <span class="hljs-string">'./string-len.wasm'</span>;
+<span class="hljs-title function_">getLength</span>(<span class="hljs-string">'foo'</span>); <span class="hljs-comment">// 返回 3。</span></code> <button class="copy-button">copy</button></pre>
+<p>Wasm 内置函数是编译时导入，在模块编译期间链接，而不是在实例化期间。它们的行为不像普通的模块图导入，并且无法通过 <code>WebAssembly.Module.imports(mod)</code> 进行检查或虚拟化，除非使用直接的 <code>WebAssembly.compile</code> API 并禁用字符串内置函数重新编译模块。</p>
+<p>在模块实例化之前以源阶段导入模块也会自动使用编译时内置函数：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> source mod <span class="hljs-keyword">from</span> <span class="hljs-string">'./string-len.wasm'</span>;
+<span class="hljs-keyword">const</span> { <span class="hljs-attr">exports</span>: { getLength } } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">WebAssembly</span>.<span class="hljs-title function_">instantiate</span>(mod, {});
+<span class="hljs-title function_">getLength</span>(<span class="hljs-string">'foo'</span>); <span class="hljs-comment">// 也返回 3。</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>Wasm 实例阶段导入<span><a class="mark" href="#wasm-_2" id="wasm-_2">#</a></span><a aria-hidden="true" class="legacy" id="esm_wasm_2"></a></h4>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development</div><p></p>
+<p>实例导入允许任何 <code>.wasm</code> 文件作为普通模块导入，进而支持它们的模块导入。</p>
+<p>例如，一个包含以下内容的 <code>index.js</code>：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> M <span class="hljs-keyword">from</span> <span class="hljs-string">'./library.wasm'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(M);</code> <button class="copy-button">copy</button></pre>
+<p>在以下情况下执行：</p>
+<pre><code class="language-bash">node index.mjs</code> <button class="copy-button">copy</button></pre>
+<p>将提供 <code>library.wasm</code> 实例化的导出接口。</p>
+</div><div>
+<h4>保留的 Wasm 命名空间<span><a class="mark" href="#-wasm-" id="-wasm-">#</a></span><a aria-hidden="true" class="legacy" id="esm_wasm_3"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<p>导入 WebAssembly 模块实例时，它们不能使用以保留前缀开头的导入模块名称或导入/导出名称：</p>
+<ul>
+<li><code>wasm-js:</code> - 在所有模块导入名称、模块名称和导出名称中保留。</li>
+<li><code>wasm:</code> - 在模块导入名称和导出名称中保留（允许导入的模块名称以支持未来的内置函数填充）。</li>
+</ul>
+<p>使用上述保留名称导入模块将抛出 <code>WebAssembly.LinkError</code>。</p>
+<p><i id="esm_experimental_top_level_await"></i></p>
+</div>
+</section><section><h3>顶层 <code>await</code><span><a class="mark" href="#-await" id="-await">#</a></span><a aria-hidden="true" class="legacy" id="esm_await"></a></h3>
+<div class="api_metadata">
+<span>Added in: v14.8.0</span>
+</div>
+<p><code>await</code> 关键字可以在 ECMAScript 模块的顶层主体中使用。</p>
+<p>假设有一个 <code>a.mjs</code>，内容为：</p>
+<pre><code class="language-js"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> five = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-number">5</span>);</code> <button class="copy-button">copy</button></pre>
+<p>以及一个 <code>b.mjs</code>，内容为：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { five } <span class="hljs-keyword">from</span> <span class="hljs-string">'./a.mjs'</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(five); <span class="hljs-comment">// 打印 `5`</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-bash">node b.mjs <span class="hljs-comment"># 正常工作</span></code> <button class="copy-button">copy</button></pre>
+<p>如果顶层 <code>await</code> 表达式从未解析，<code>node</code> 进程将以 <code>13</code> <a href="process.html#exit-codes">状态码</a> 退出。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> { spawn } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:child_process'</span>;
+<span class="hljs-keyword">import</span> { execPath } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-title function_">spawn</span>(execPath, [
+  <span class="hljs-string">'--input-type=module'</span>,
+  <span class="hljs-string">'--eval'</span>,
+  <span class="hljs-comment">// 永不解析的 Promise：</span>
+  <span class="hljs-string">'await new Promise(() => {})'</span>,
+]).<span class="hljs-title function_">once</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(code); <span class="hljs-comment">// 打印 `13`</span>
+});</code> <button class="copy-button">copy</button></pre>
+<p><i id="esm_experimental_loaders"></i></p>
+</section><section><h3>加载器<span><a class="mark" href="#_8" id="_8">#</a></span><a aria-hidden="true" class="legacy" id="esm_8"></a></h3>
+<p>以前的加载器文档现在位于 <a href="module.html#customization-hooks">Modules: Customization hooks</a>。</p>
+</section><section><h3>解析和加载算法<span><a class="mark" href="#_9" id="_9">#</a></span><a aria-hidden="true" class="legacy" id="esm_9"></a></h3>
+<div>
+<h4>特性<span><a class="mark" href="#_10" id="_10">#</a></span><a aria-hidden="true" class="legacy" id="esm_10"></a></h4>
+<p>默认解析器具有以下属性：</p>
+<ul>
+<li>基于 FileURL 的解析，如同 ES 模块所使用的</li>
+<li>相对和绝对 URL 解析</li>
+<li>无默认扩展名</li>
+<li>无文件夹主文件</li>
+<li>通过 node_modules 进行裸说明符包解析查找</li>
+<li>不会因未知扩展名或协议而失败</li>
+<li>可以选择向加载阶段提供格式提示</li>
+</ul>
+<p>默认加载器具有以下属性：</p>
+<ul>
+<li>通过 <code>node:</code> URLs 支持内置模块加载</li>
+<li>通过 <code>data:</code> URLs 支持“内联”模块加载</li>
+<li>支持 <code>file:</code> 模块加载</li>
+<li>对任何其他 URL 协议失败</li>
+<li>对 <code>file:</code> 加载的未知扩展名失败（仅支持 <code>.cjs</code>、<code>.js</code> 和 <code>.mjs</code>）</li>
+</ul>
+</div><div>
+<h4>解析算法<span><a class="mark" href="#_11" id="_11">#</a></span><a aria-hidden="true" class="legacy" id="esm_11"></a></h4>
+<p>加载 ES 模块说明符的算法通过下面的 <strong>ESM_RESOLVE</strong> 方法给出。它返回相对于 parentURL 的模块说明符的解析后 URL。</p>
+<p>解析算法确定模块加载的完整解析 URL，以及其建议的模块格式。解析算法不确定解析后的 URL 协议是否可以加载，或者文件扩展名是否被允许，相反，这些验证由 Node.js 在加载阶段应用（例如，如果要求加载一个具有非 <code>file:</code>、<code>data:</code> 或 <code>node:</code> 协议的 URL）。</p>
+<p>该算法还尝试根据扩展名确定文件的格式（参见下面的 <code>ESM_FILE_FORMAT</code> 算法）。如果它不认识文件扩展名（例如，如果不是 <code>.mjs</code>、<code>.cjs</code> 或 <code>.json</code>），则返回 <code>undefined</code> 格式，这将在加载阶段抛出。</p>
+<p>确定解析 URL 的模块格式的算法由 <strong>ESM_FILE_FORMAT</strong> 提供，它返回任何文件的唯一模块格式。对于 ECMAScript 模块返回 <em>"module"</em> 格式，而 <em>"commonjs"</em> 格式用于指示通过传统 CommonJS 加载器加载。未来更新可以扩展其他格式，例如 <em>"addon"</em>。</p>
+<p>在以下算法中，除非另有说明，所有子程序错误都会作为这些顶级例程的错误传播。</p>
+<p><em>defaultConditions</em> 是条件环境名称数组，<code>["node", "import"]</code>。</p>
+<p>解析器可以抛出以下错误：</p>
+<ul>
+<li><em>无效模块说明符</em>：模块说明符是无效的 URL、包名或包子路径说明符。</li>
+<li><em>无效包配置</em>：package.json 配置无效或包含无效配置。</li>
+<li><em>无效包目标</em>：包导出或导入为包定义了一个无效类型或字符串目标模块。</li>
+<li><em>包路径未导出</em>：包导出未定义或不允许包中给定模块的目标子路径。</li>
+<li><em>包导入未定义</em>：包导入未定义说明符。</li>
+<li><em>模块未找到</em>：请求的包或模块不存在。</li>
+<li><em>不支持的目录导入</em>：解析后的路径对应于一个目录，这不是模块导入支持的目标。</li>
+</ul>
+</div><div>
+<h4>解析算法规范<span><a class="mark" href="#_12" id="_12">#</a></span><a aria-hidden="true" class="legacy" id="esm_12"></a></h4>
+<p><strong>ESM_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>)</p>
+<blockquote>
+<ol>
+<li>令 <em>resolved</em> 为 <strong>undefined</strong>。</li>
+<li>如果 <em>specifier</em> 是有效的 URL，则
+<ol>
+<li>将 <em>resolved</em> 设置为将 <em>specifier</em> 解析并重新序列化为 URL 的结果。</li>
+</ol>
+</li>
+<li>否则，如果 <em>specifier</em> 以 <em>"/"</em>、<em>"./"</em> 或 <em>"../"</em> 开头，则
+<ol>
+<li>将 <em>resolved</em> 设置为 <em>specifier</em> 相对于 <em>parentURL</em> 的 URL 解析结果。</li>
+</ol>
+</li>
+<li>否则，如果 <em>specifier</em> 以 <em>"#"</em> 开头，则
+<ol>
+<li>将 <em>resolved</em> 设置为 <strong>PACKAGE_IMPORTS_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>, <em>defaultConditions</em>) 的结果。</li>
+</ol>
+</li>
+<li>否则，
+<ol>
+<li>注意：<em>specifier</em> 现在是裸说明符。</li>
+<li>将 <em>resolved</em> 设置为 <strong>PACKAGE_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>) 的结果。</li>
+</ol>
+</li>
+<li>令 <em>format</em> 为 <strong>undefined</strong>。</li>
+<li>如果 <em>resolved</em> 是 <em>"file:"</em> URL，则
+<ol>
+<li>如果 <em>resolved</em> 包含 <em>"/"</em> 或 <em>"\"</em> 的任何百分比编码（分别为 <em>"%2F"</em> 和 <em>"%5C"</em>），则
+<ol>
+<li>抛出 <em>无效模块说明符</em> 错误。</li>
+</ol>
+</li>
+<li>如果 <em>resolved</em> 处的文件是目录，则
+<ol>
+<li>抛出 <em>不支持的目录导入</em> 错误。</li>
+</ol>
+</li>
+<li>如果 <em>resolved</em> 处的文件不存在，则
+<ol>
+<li>抛出 <em>模块未找到</em> 错误。</li>
+</ol>
+</li>
+<li>将 <em>resolved</em> 设置为 <em>resolved</em> 的真实路径，保持相同的 URL 查询字符串和片段组件。</li>
+<li>将 <em>format</em> 设置为 <strong>ESM_FILE_FORMAT</strong>(<em>resolved</em>) 的结果。</li>
+</ol>
+</li>
+<li>否则，
+<ol>
+<li>将 <em>format</em> 设置为与 URL <em>resolved</em> 关联的内容类型的模块格式。</li>
+</ol>
+</li>
+<li>将 <em>format</em> 和 <em>resolved</em> 返回给加载阶段。</li>
+</ol>
+</blockquote>
+<p><strong>PACKAGE_RESOLVE</strong>(<em>packageSpecifier</em>, <em>parentURL</em>)</p>
+<blockquote>
+<ol>
+<li>令 <em>packageName</em> 为 <strong>undefined</strong>。</li>
+<li>如果 <em>packageSpecifier</em> 是空字符串，则
+<ol>
+<li>抛出 <em>无效模块说明符</em> 错误。</li>
+</ol>
+</li>
+<li>如果 <em>packageSpecifier</em> 是 Node.js 内置模块名称，则
+<ol>
+<li>返回字符串 <em>"node:"</em> 连接 <em>packageSpecifier</em>。</li>
+</ol>
+</li>
+<li>如果 <em>packageSpecifier</em> 不以 <em>"@"</em> 开头，则
+<ol>
+<li>将 <em>packageName</em> 设置为 <em>packageSpecifier</em> 的子字符串，直到第一个 <em>"/"</em> 分隔符或字符串结尾。</li>
+</ol>
+</li>
+<li>否则，
+<ol>
+<li>如果 <em>packageSpecifier</em> 不包含 <em>"/"</em> 分隔符，则
+<ol>
+<li>抛出 <em>无效模块说明符</em> 错误。</li>
+</ol>
+</li>
+<li>将 <em>packageName</em> 设置为 <em>packageSpecifier</em> 的子字符串，直到第二个 <em>"/"</em> 分隔符或字符串结尾。</li>
+</ol>
+</li>
+<li>如果 <em>packageName</em> 以 <em>"."</em> 开头或包含 <em>"\"</em> 或 <em>"%"</em>，则
+<ol>
+<li>抛出 <em>无效模块说明符</em> 错误。</li>
+</ol>
+</li>
+<li>令 <em>packageSubpath</em> 为 <em>"."</em> 连接 <em>packageSpecifier</em> 从 <em>packageName</em> 长度位置开始的子字符串。</li>
+<li>令 <em>selfUrl</em> 为 <strong>PACKAGE_SELF_RESOLVE</strong>(<em>packageName</em>, <em>packageSubpath</em>, <em>parentURL</em>) 的结果。</li>
+<li>如果 <em>selfUrl</em> 不是 <strong>undefined</strong>，返回 <em>selfUrl</em>。</li>
+<li>当 <em>parentURL</em> 不是文件系统根目录时，
+<ol>
+<li>令 <em>packageURL</em> 为 <em>"node_modules/"</em> 连接 <em>packageName</em> 相对于 <em>parentURL</em> 的 URL 解析结果。</li>
+<li>将 <em>parentURL</em> 设置为 <em>parentURL</em> 的父文件夹 URL。</li>
+<li>如果 <em>packageURL</em> 处的文件夹不存在，则
+<ol>
+<li>继续下一个循环迭代。</li>
+</ol>
+</li>
+<li>令 <em>pjson</em> 为 <strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>) 的结果。</li>
+<li>如果 <em>pjson</em> 不是 <strong>null</strong> 且 <em>pjson</em>.<em>exports</em> 不是 <strong>null</strong> 或 <strong>undefined</strong>，则
+<ol>
+<li>返回 <strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>, <em>packageSubpath</em>, <em>pjson.exports</em>, <em>defaultConditions</em>) 的结果。</li>
+</ol>
+</li>
+<li>否则，如果 <em>packageSubpath</em> 等于 <em>"."</em>，则
+<ol>
+<li>如果 <em>pjson.main</em> 是字符串，则
+<ol>
+<li>返回 <em>packageURL</em> 中 <em>main</em> 的 URL 解析结果。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>否则，
+<ol>
+<li>返回 <em>packageURL</em> 中 <em>packageSubpath</em> 的 URL 解析结果。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>抛出 <em>模块未找到</em> 错误。</li>
+</ol>
+</blockquote>
+<p><strong>PACKAGE_SELF_RESOLVE</strong>(<em>packageName</em>, <em>packageSubpath</em>, <em>parentURL</em>)</p>
+<blockquote>
+<ol>
+<li>令 <em>packageURL</em> 为 <strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>parentURL</em>) 的结果。</li>
+<li>如果 <em>packageURL</em> 是 <strong>null</strong>，则
+<ol>
+<li>返回 <strong>undefined</strong>。</li>
+</ol>
+</li>
+<li>令 <em>pjson</em> 为 <strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>) 的结果。</li>
+<li>如果 <em>pjson</em> 是 <strong>null</strong> 或如果 <em>pjson</em>.<em>exports</em> 是 <strong>null</strong> 或 <strong>undefined</strong>，则
+<ol>
+<li>返回 <strong>undefined</strong>。</li>
+</ol>
+</li>
+<li>如果 <em>pjson.name</em> 等于 <em>packageName</em>，则
+<ol>
+<li>返回 <strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>, <em>packageSubpath</em>, <em>pjson.exports</em>, <em>defaultConditions</em>) 的结果。</li>
+</ol>
+</li>
+<li>否则，返回 <strong>undefined</strong>。</li>
+</ol>
+</blockquote>
+<p><strong>PACKAGE_EXPORTS_RESOLVE</strong>(<em>packageURL</em>, <em>subpath</em>, <em>exports</em>, <em>conditions</em>)</p>
+<p>注意：此函数由 CommonJS 解析算法直接调用。</p>
+<blockquote>
+<ol>
+<li>如果 <em>exports</em> 是一个对象，同时具有以 <em>"."</em> 开头的键和不以 <em>"."</em> 开头的键，则抛出 <em>无效包配置</em> 错误。</li>
+<li>如果 <em>subpath</em> 等于 <em>"."</em>，则
+<ol>
+<li>令 <em>mainExport</em> 为 <strong>undefined</strong>。</li>
+<li>如果 <em>exports</em> 是字符串或数组，或者是不包含以 <em>"."</em> 开头的键的对象，则
+<ol>
+<li>将 <em>mainExport</em> 设置为 <em>exports</em>。</li>
+</ol>
+</li>
+<li>否则，如果 <em>exports</em> 是包含 <em>"."</em> 属性的对象，则
+<ol>
+<li>将 <em>mainExport</em> 设置为 <em>exports</em>[<em>"."</em>]。</li>
+</ol>
+</li>
+<li>如果 <em>mainExport</em> 不是 <strong>undefined</strong>，则
+<ol>
+<li>令 <em>resolved</em> 为 <strong>PACKAGE_TARGET_RESOLVE</strong>( <em>packageURL</em>, <em>mainExport</em>, <strong>null</strong>, <strong>false</strong>, <em>conditions</em>) 的结果。</li>
+<li>如果 <em>resolved</em> 不是 <strong>null</strong> 或 <strong>undefined</strong>，返回 <em>resolved</em>。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>否则，如果 <em>exports</em> 是一个对象且 <em>exports</em> 的所有键都以 <em>"."</em> 开头，则
+<ol>
+<li>断言：<em>subpath</em> 以 <em>"./"</em> 开头。</li>
+<li>令 <em>resolved</em> 为 <strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>( <em>subpath</em>, <em>exports</em>, <em>packageURL</em>, <strong>false</strong>, <em>conditions</em>) 的结果。</li>
+<li>如果 <em>resolved</em> 不是 <strong>null</strong> 或 <strong>undefined</strong>，返回 <em>resolved</em>。</li>
+</ol>
+</li>
+<li>抛出 <em>包路径未导出</em> 错误。</li>
+</ol>
+</blockquote>
+<p><strong>PACKAGE_IMPORTS_RESOLVE</strong>(<em>specifier</em>, <em>parentURL</em>, <em>conditions</em>)</p>
+<p>注意：此函数由 CommonJS 解析算法直接调用。</p>
+<blockquote>
+<ol>
+<li>断言：<em>specifier</em> 以 <em>"#"</em> 开头。</li>
+<li>如果 <em>specifier</em> 完全等于 <em>"#"</em> 或以 <em>"#/"</em> 开头，则
+<ol>
+<li>抛出 <em>无效模块说明符</em> 错误。</li>
+</ol>
+</li>
+<li>令 <em>packageURL</em> 为 <strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>parentURL</em>) 的结果。</li>
+<li>如果 <em>packageURL</em> 不是 <strong>null</strong>，则
+<ol>
+<li>令 <em>pjson</em> 为 <strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>) 的结果。</li>
+<li>如果 <em>pjson.imports</em> 是非空对象，则
+<ol>
+<li>令 <em>resolved</em> 为 <strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>( <em>specifier</em>, <em>pjson.imports</em>, <em>packageURL</em>, <strong>true</strong>, <em>conditions</em>) 的结果。</li>
+<li>如果 <em>resolved</em> 不是 <strong>null</strong> 或 <strong>undefined</strong>，返回 <em>resolved</em>。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>抛出 <em>包导入未定义</em> 错误。</li>
+</ol>
+</blockquote>
+<p><strong>PACKAGE_IMPORTS_EXPORTS_RESOLVE</strong>(<em>matchKey</em>, <em>matchObj</em>, <em>packageURL</em>, <em>isImports</em>, <em>conditions</em>)</p>
+<blockquote>
+<ol>
+<li>如果 <em>matchKey</em> 以 <em>"/"</em> 结尾，则
+<ol>
+<li>抛出 <em>无效模块说明符</em> 错误。</li>
+</ol>
+</li>
+<li>如果 <em>matchKey</em> 是 <em>matchObj</em> 的键且不包含 <em>"*"</em>，则
+<ol>
+<li>令 <em>target</em> 为 <em>matchObj</em>[<em>matchKey</em>] 的值。</li>
+<li>返回 <strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>, <em>target</em>, <strong>null</strong>, <em>isImports</em>, <em>conditions</em>) 的结果。</li>
+</ol>
+</li>
+<li>令 <em>expansionKeys</em> 为 <em>matchObj</em> 的键列表，这些键仅包含单个 <em>"*"</em>，通过排序函数 <strong>PATTERN_KEY_COMPARE</strong> 排序，该函数按特异性降序排序。</li>
+<li>对于 <em>expansionKeys</em> 中的每个键 <em>expansionKey</em>，执行
+<ol>
+<li>令 <em>patternBase</em> 为 <em>expansionKey</em> 的子字符串，直到但不包括第一个 <em>"*"</em> 字符。</li>
+<li>如果 <em>matchKey</em> 以 <em>patternBase</em> 开头但不等于 <em>patternBase</em>，则
+<ol>
+<li>令 <em>patternTrailer</em> 为 <em>expansionKey</em> 从第一个 <em>"*"</em> 字符之后的索引开始的子字符串。</li>
+<li>如果 <em>patternTrailer</em> 长度为零，或者如果 <em>matchKey</em> 以 <em>patternTrailer</em> 结尾且 <em>matchKey</em> 的长度大于或等于 <em>expansionKey</em> 的长度，则
+<ol>
+<li>令 <em>target</em> 为 <em>matchObj</em>[<em>expansionKey</em>] 的值。</li>
+<li>令 <em>patternMatch</em> 为 <em>matchKey</em> 从 <em>patternBase</em> 长度索引开始到 <em>matchKey</em> 长度减去 <em>patternTrailer</em> 长度的子字符串。</li>
+<li>返回 <strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>, <em>target</em>, <em>patternMatch</em>, <em>isImports</em>, <em>conditions</em>) 的结果。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>返回 <strong>null</strong>。</li>
+</ol>
+</blockquote>
+<p><strong>PATTERN_KEY_COMPARE</strong>(<em>keyA</em>, <em>keyB</em>)</p>
+<blockquote>
+<ol>
+<li>断言：<em>keyA</em> 仅包含单个 <em>"*"</em>。</li>
+<li>断言：<em>keyB</em> 仅包含单个 <em>"*"</em>。</li>
+<li>令 <em>baseLengthA</em> 为 <em>keyA</em> 中 <em>"*"</em> 的索引。</li>
+<li>令 <em>baseLengthB</em> 为 <em>keyB</em> 中 <em>"*"</em> 的索引。</li>
+<li>如果 <em>baseLengthA</em> 大于 <em>baseLengthB</em>，返回 -1。</li>
+<li>如果 <em>baseLengthB</em> 大于 <em>baseLengthA</em>，返回 1。</li>
+<li>如果 <em>keyA</em> 的长度大于 <em>keyB</em> 的长度，返回 -1。</li>
+<li>如果 <em>keyB</em> 的长度大于 <em>keyA</em> 的长度，返回 1。</li>
+<li>返回 0。</li>
+</ol>
+</blockquote>
+<p><strong>PACKAGE_TARGET_RESOLVE</strong>(<em>packageURL</em>, <em>target</em>, <em>patternMatch</em>, <em>isImports</em>, <em>conditions</em>)</p>
+<blockquote>
+<ol>
+<li>如果 <em>target</em> 是字符串，则
+<ol>
+<li>如果 <em>target</em> 不以 <em>"./"</em> 开头，则
+<ol>
+<li>如果 <em>isImports</em> 为 <strong>false</strong>，或者如果 <em>target</em> 以 <em>"../"</em> 或 <em>"/"</em> 开头，或者如果 <em>target</em> 是有效的 URL，则
+<ol>
+<li>抛出 <em>无效包目标</em> 错误。</li>
+</ol>
+</li>
+<li>如果 <em>patternMatch</em> 是字符串，则
+<ol>
+<li>返回 <strong>PACKAGE_RESOLVE</strong>(<em>target</em> 中每个 <em>"*"</em> 实例替换为 <em>patternMatch</em> 的结果, <em>packageURL</em> + <em>"/"</em>)。</li>
+</ol>
+</li>
+<li>返回 <strong>PACKAGE_RESOLVE</strong>(<em>target</em>, <em>packageURL</em> + <em>"/"</em>)。</li>
+</ol>
+</li>
+<li>如果 <em>target</em> 在 <em>"/"</em> 或 <em>"\"</em> 上拆分后，在第一个 <em>"."</em> 段之后包含任何 <em>""</em>、<em>"."</em>、<em>".."</em> 或 <em>"node_modules"</em> 段，不区分大小写且包括百分比编码变体，则抛出 <em>无效包目标</em> 错误。</li>
+<li>令 <em>resolvedTarget</em> 为 <em>packageURL</em> 和 <em>target</em> 连接后的 URL 解析结果。</li>
+<li>断言：<em>packageURL</em> 包含在 <em>resolvedTarget</em> 中。</li>
+<li>如果 <em>patternMatch</em> 为 <strong>null</strong>，则
+<ol>
+<li>返回 <em>resolvedTarget</em>。</li>
+</ol>
+</li>
+<li>如果 <em>patternMatch</em> 在 <em>"/"</em> 或 <em>"\"</em> 上拆分后包含任何 <em>""</em>、<em>"."</em>、<em>".."</em> 或 <em>"node_modules"</em> 段，不区分大小写且包括百分比编码变体，则抛出 <em>无效模块说明符</em> 错误。</li>
+<li>返回 <em>resolvedTarget</em> 中每个 <em>"*"</em> 实例替换为 <em>patternMatch</em> 后的 URL 解析结果。</li>
+</ol>
+</li>
+<li>否则，如果 <em>target</em> 是非空对象，则
+<ol>
+<li>如果 <em>target</em> 包含任何索引属性键，如 ECMA-262 <a href="https://tc39.es/ecma262/#integer-index">6.1.7 Array Index</a> 中所定义，则抛出 <em>无效包配置</em> 错误。</li>
+<li>对于 <em>target</em> 的每个属性 <em>p</em>，按对象插入顺序，
+<ol>
+<li>如果 <em>p</em> 等于 <em>"default"</em> 或 <em>conditions</em> 包含 <em>p</em> 的条目，则
+<ol>
+<li>令 <em>targetValue</em> 为 <em>target</em> 中 <em>p</em> 属性的值。</li>
+<li>令 <em>resolved</em> 为 <strong>PACKAGE_TARGET_RESOLVE</strong>( <em>packageURL</em>, <em>targetValue</em>, <em>patternMatch</em>, <em>isImports</em>, <em>conditions</em>) 的结果。</li>
+<li>如果 <em>resolved</em> 等于 <strong>undefined</strong>，继续循环。</li>
+<li>返回 <em>resolved</em>。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>返回 <strong>undefined</strong>。</li>
+</ol>
+</li>
+<li>否则，如果 <em>target</em> 是数组，则
+<ol>
+<li>如果 _target.length 为零，返回 <strong>null</strong>。</li>
+<li>对于 <em>target</em> 中的每个项目 <em>targetValue</em>，执行
+<ol>
+<li>令 <em>resolved</em> 为 <strong>PACKAGE_TARGET_RESOLVE</strong>( <em>packageURL</em>, <em>targetValue</em>, <em>patternMatch</em>, <em>isImports</em>, <em>conditions</em>) 的结果，在任何 <em>无效包目标</em> 错误时继续循环。</li>
+<li>如果 <em>resolved</em> 是 <strong>undefined</strong>，继续循环。</li>
+<li>返回 <em>resolved</em>。</li>
+</ol>
+</li>
+<li>返回或抛出最后一个回退解析 <strong>null</strong> 返回或错误。</li>
+</ol>
+</li>
+<li>否则，如果 <em>target</em> 是 <em>null</em>，返回 <strong>null</strong>。</li>
+<li>否则抛出 <em>无效包目标</em> 错误。</li>
+</ol>
+</blockquote>
+<p><strong>ESM_FILE_FORMAT</strong>(<em>url</em>)</p>
+<blockquote>
+<ol>
+<li>断言：<em>url</em> 对应于现有文件。</li>
+<li>如果 <em>url</em> 以 <em>".mjs"</em> 结尾，则
+<ol>
+<li>返回 <em>"module"</em>。</li>
+</ol>
+</li>
+<li>如果 <em>url</em> 以 <em>".cjs"</em> 结尾，则
+<ol>
+<li>返回 <em>"commonjs"</em>。</li>
+</ol>
+</li>
+<li>如果 <em>url</em> 以 <em>".json"</em> 结尾，则
+<ol>
+<li>返回 <em>"json"</em>。</li>
+</ol>
+</li>
+<li>如果 <em>url</em> 以 <em>".wasm"</em> 结尾，则
+<ol>
+<li>返回 <em>"wasm"</em>。</li>
+</ol>
+</li>
+<li>如果启用了 <code>--experimental-addon-modules</code> 且 <em>url</em> 以 <em>".node"</em> 结尾，则
+<ol>
+<li>返回 <em>"addon"</em>。</li>
+</ol>
+</li>
+<li>令 <em>packageURL</em> 为 <strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>url</em>) 的结果。</li>
+<li>令 <em>pjson</em> 为 <strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>) 的结果。</li>
+<li>令 <em>packageType</em> 为 <strong>null</strong>。</li>
+<li>如果 <em>pjson?.type</em> 是 <em>"module"</em> 或 <em>"commonjs"</em>，则
+<ol>
+<li>将 <em>packageType</em> 设置为 <em>pjson.type</em>。</li>
+</ol>
+</li>
+<li>如果 <em>url</em> 以 <em>".js"</em> 结尾，则
+<ol>
+<li>如果 <em>packageType</em> 不是 <strong>null</strong>，则
+<ol>
+<li>返回 <em>packageType</em>。</li>
+</ol>
+</li>
+<li>如果 <strong>DETECT_MODULE_SYNTAX</strong>(<em>source</em>) 的结果为 true，则
+<ol>
+<li>返回 <em>"module"</em>。</li>
+</ol>
+</li>
+<li>返回 <em>"commonjs"</em>。</li>
+</ol>
+</li>
+<li>如果 <em>url</em> 没有任何扩展名，则
+<ol>
+<li>如果 <em>packageType</em> 是 <em>"module"</em> 且 <em>url</em> 处的文件包含 WebAssembly 模块的 "application/wasm" 内容类型头，则
+<ol>
+<li>返回 <em>"wasm"</em>。</li>
+</ol>
+</li>
+<li>如果 <em>packageType</em> 不是 <strong>null</strong>，则
+<ol>
+<li>返回 <em>packageType</em>。</li>
+</ol>
+</li>
+<li>如果 <strong>DETECT_MODULE_SYNTAX</strong>(<em>source</em>) 的结果为 true，则
+<ol>
+<li>返回 <em>"module"</em>。</li>
+</ol>
+</li>
+<li>返回 <em>"commonjs"</em>。</li>
+</ol>
+</li>
+<li>返回 <strong>undefined</strong>（将在加载阶段抛出）。</li>
+</ol>
+</blockquote>
+<p><strong>LOOKUP_PACKAGE_SCOPE</strong>(<em>url</em>)</p>
+<blockquote>
+<ol>
+<li>令 <em>scopeURL</em> 为 <em>url</em>。</li>
+<li>当 <em>scopeURL</em> 不是文件系统根目录时，
+<ol>
+<li>将 <em>scopeURL</em> 设置为 <em>scopeURL</em> 的父 URL。</li>
+<li>如果 <em>scopeURL</em> 以 <em>"node_modules"</em> 路径段结尾，返回 <strong>null</strong>。</li>
+<li>令 <em>pjsonURL</em> 为 <em>scopeURL</em> 内 <em>"package.json"</em> 的解析结果。</li>
+<li>如果 <em>pjsonURL</em> 处的文件存在，则
+<ol>
+<li>返回 <em>scopeURL</em>。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>返回 <strong>null</strong>。</li>
+</ol>
+</blockquote>
+<p><strong>READ_PACKAGE_JSON</strong>(<em>packageURL</em>)</p>
+<blockquote>
+<ol>
+<li>令 <em>pjsonURL</em> 为 <em>packageURL</em> 内 <em>"package.json"</em> 的解析结果。</li>
+<li>如果 <em>pjsonURL</em> 处的文件不存在，则
+<ol>
+<li>返回 <strong>null</strong>。</li>
+</ol>
+</li>
+<li>如果 <em>packageURL</em> 处的文件无法解析为有效的 JSON，则
+<ol>
+<li>抛出 <em>无效包配置</em> 错误。</li>
+</ol>
+</li>
+<li>返回 <em>pjsonURL</em> 处文件的已解析 JSON 源。</li>
+</ol>
+</blockquote>
+<p><strong>DETECT_MODULE_SYNTAX</strong>(<em>source</em>)</p>
+<blockquote>
+<ol>
+<li>将 <em>source</em> 解析为 ECMAScript 模块。</li>
+<li>如果解析成功，则
+<ol>
+<li>如果 <em>source</em> 包含顶层 <code>await</code>、静态 <code>import</code> 或 <code>export</code> 语句，或 <code>import.meta</code>，返回 <strong>true</strong>。</li>
+<li>如果 <em>source</em> 包含任何 CommonJS 包装器变量（<code>require</code>、<code>exports</code>、<code>module</code>、<code>__filename</code> 或 <code>__dirname</code>）的顶层词法声明（<code>const</code>、<code>let</code> 或 <code>class</code>），则返回 <strong>true</strong>。</li>
+</ol>
+</li>
+<li>否则返回 <strong>false</strong>。</li>
+</ol>
+</blockquote>
+</div><div>
+<h4>自定义 ESM 说明符解析算法<span><a class="mark" href="#-esm-" id="-esm-">#</a></span><a aria-hidden="true" class="legacy" id="esm_esm"></a></h4>
+<p><a href="module.html#customization-hooks">模块自定义钩子</a> 提供了一种自定义 ESM 说明符解析算法的机制。一个为 ESM 说明符提供 CommonJS 样式解析的示例是 <a href="https://github.com/nodejs/loaders-test/tree/main/commonjs-extension-resolution-loader">commonjs-extension-resolution-loader</a>。</p>
+<!-- Note: The cjs-module-lexer link should be kept in-sync with the deps version --></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

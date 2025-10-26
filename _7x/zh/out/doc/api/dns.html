@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>域名系统 DNS | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/dns.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:478px){.with-32-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:550px){.with-41-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:734px){.with-64-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:622px){.with-50-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:486px){.with-33-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-dns">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns active">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="dns" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#-dns">域名系统 DNS</a></span>
+<ul>
+<li><a href="#dnsresolver">类：<code>dns.Resolver</code></a>
+<ul>
+<li><a href="#resolveroptions"><code>Resolver([options])</code></a></li>
+<li><a href="#resolvercancel"><code>resolver.cancel()</code></a></li>
+<li><a href="#resolversetlocaladdressipv4-ipv6"><code>resolver.setLocalAddress([ipv4][, ipv6])</code></a></li>
+</ul>
+</li>
+<li><a href="#dnsgetservers"><code>dns.getServers()</code></a></li>
+<li><a href="#dnslookuphostname-options-callback"><code>dns.lookup(hostname[, options], callback)</code></a>
+<ul>
+<li><a href="#-getaddrinfo-">支持的 getaddrinfo 标志</a></li>
+</ul>
+</li>
+<li><a href="#dnslookupserviceaddress-port-callback"><code>dns.lookupService(address, port, callback)</code></a></li>
+<li><a href="#dnsresolvehostname-rrtype-callback"><code>dns.resolve(hostname[, rrtype], callback)</code></a></li>
+<li><a href="#dnsresolve4hostname-options-callback"><code>dns.resolve4(hostname[, options], callback)</code></a></li>
+<li><a href="#dnsresolve6hostname-options-callback"><code>dns.resolve6(hostname[, options], callback)</code></a></li>
+<li><a href="#dnsresolveanyhostname-callback"><code>dns.resolveAny(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvecnamehostname-callback"><code>dns.resolveCname(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvecaahostname-callback"><code>dns.resolveCaa(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvemxhostname-callback"><code>dns.resolveMx(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvenaptrhostname-callback"><code>dns.resolveNaptr(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvenshostname-callback"><code>dns.resolveNs(hostname, callback)</code></a></li>
+<li><a href="#dnsresolveptrhostname-callback"><code>dns.resolvePtr(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvesoahostname-callback"><code>dns.resolveSoa(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvesrvhostname-callback"><code>dns.resolveSrv(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvetlsahostname-callback"><code>dns.resolveTlsa(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvetxthostname-callback"><code>dns.resolveTxt(hostname, callback)</code></a></li>
+<li><a href="#dnsreverseip-callback"><code>dns.reverse(ip, callback)</code></a></li>
+<li><a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder(order)</code></a></li>
+<li><a href="#dnsgetdefaultresultorder"><code>dns.getDefaultResultOrder()</code></a></li>
+<li><a href="#dnssetserversservers"><code>dns.setServers(servers)</code></a></li>
+<li><a href="#dns-promises-api">DNS promises API</a>
+<ul>
+<li><a href="#dnspromisesresolver">类：<code>dnsPromises.Resolver</code></a></li>
+<li><a href="#resolvercancel_1"><code>resolver.cancel()</code></a></li>
+<li><a href="#dnspromisesgetservers"><code>dnsPromises.getServers()</code></a></li>
+<li><a href="#dnspromiseslookuphostname-options"><code>dnsPromises.lookup(hostname[, options])</code></a></li>
+<li><a href="#dnspromiseslookupserviceaddress-port"><code>dnsPromises.lookupService(address, port)</code></a></li>
+<li><a href="#dnspromisesresolvehostname-rrtype"><code>dnsPromises.resolve(hostname[, rrtype])</code></a></li>
+<li><a href="#dnspromisesresolve4hostname-options"><code>dnsPromises.resolve4(hostname[, options])</code></a></li>
+<li><a href="#dnspromisesresolve6hostname-options"><code>dnsPromises.resolve6(hostname[, options])</code></a></li>
+<li><a href="#dnspromisesresolveanyhostname"><code>dnsPromises.resolveAny(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvecaahostname"><code>dnsPromises.resolveCaa(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvecnamehostname"><code>dnsPromises.resolveCname(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvemxhostname"><code>dnsPromises.resolveMx(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvenaptrhostname"><code>dnsPromises.resolveNaptr(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvenshostname"><code>dnsPromises.resolveNs(hostname)</code></a></li>
+<li><a href="#dnspromisesresolveptrhostname"><code>dnsPromises.resolvePtr(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvesoahostname"><code>dnsPromises.resolveSoa(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvesrvhostname"><code>dnsPromises.resolveSrv(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvetlsahostname"><code>dnsPromises.resolveTlsa(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvetxthostname"><code>dnsPromises.resolveTxt(hostname)</code></a></li>
+<li><a href="#dnspromisesreverseip"><code>dnsPromises.reverse(ip)</code></a></li>
+<li><a href="#dnspromisessetdefaultresultorderorder"><code>dnsPromises.setDefaultResultOrder(order)</code></a></li>
+<li><a href="#dnspromisesgetdefaultresultorder"><code>dnsPromises.getDefaultResultOrder()</code></a></li>
+<li><a href="#dnspromisessetserversservers"><code>dnsPromises.setServers(servers)</code></a></li>
+</ul>
+</li>
+<li><a href="#">错误代码</a></li>
+<li><a href="#_1">实现考虑</a>
+<ul>
+<li><a href="#dnslookup"><code>dns.lookup()</code></a></li>
+<li><a href="#dnsresolvednsresolve--dnsreverse"><code>dns.resolve()</code>、<code>dns.resolve*()</code> 和 <code>dns.reverse()</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns active">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/dns.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/dns.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/dns.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/dns.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/dns.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/dns.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/dns.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/dns.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/dns.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/dns.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/dns.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/dns.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/dns.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/dns.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/dns.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/dns.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/dns.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/dns.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/dns.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/dns.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/dns.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/dns.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/dns.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/dns.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="dns.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/dns.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#-dns">域名系统 DNS</a></span>
+<ul>
+<li><a href="#dnsresolver">类：<code>dns.Resolver</code></a>
+<ul>
+<li><a href="#resolveroptions"><code>Resolver([options])</code></a></li>
+<li><a href="#resolvercancel"><code>resolver.cancel()</code></a></li>
+<li><a href="#resolversetlocaladdressipv4-ipv6"><code>resolver.setLocalAddress([ipv4][, ipv6])</code></a></li>
+</ul>
+</li>
+<li><a href="#dnsgetservers"><code>dns.getServers()</code></a></li>
+<li><a href="#dnslookuphostname-options-callback"><code>dns.lookup(hostname[, options], callback)</code></a>
+<ul>
+<li><a href="#-getaddrinfo-">支持的 getaddrinfo 标志</a></li>
+</ul>
+</li>
+<li><a href="#dnslookupserviceaddress-port-callback"><code>dns.lookupService(address, port, callback)</code></a></li>
+<li><a href="#dnsresolvehostname-rrtype-callback"><code>dns.resolve(hostname[, rrtype], callback)</code></a></li>
+<li><a href="#dnsresolve4hostname-options-callback"><code>dns.resolve4(hostname[, options], callback)</code></a></li>
+<li><a href="#dnsresolve6hostname-options-callback"><code>dns.resolve6(hostname[, options], callback)</code></a></li>
+<li><a href="#dnsresolveanyhostname-callback"><code>dns.resolveAny(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvecnamehostname-callback"><code>dns.resolveCname(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvecaahostname-callback"><code>dns.resolveCaa(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvemxhostname-callback"><code>dns.resolveMx(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvenaptrhostname-callback"><code>dns.resolveNaptr(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvenshostname-callback"><code>dns.resolveNs(hostname, callback)</code></a></li>
+<li><a href="#dnsresolveptrhostname-callback"><code>dns.resolvePtr(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvesoahostname-callback"><code>dns.resolveSoa(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvesrvhostname-callback"><code>dns.resolveSrv(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvetlsahostname-callback"><code>dns.resolveTlsa(hostname, callback)</code></a></li>
+<li><a href="#dnsresolvetxthostname-callback"><code>dns.resolveTxt(hostname, callback)</code></a></li>
+<li><a href="#dnsreverseip-callback"><code>dns.reverse(ip, callback)</code></a></li>
+<li><a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder(order)</code></a></li>
+<li><a href="#dnsgetdefaultresultorder"><code>dns.getDefaultResultOrder()</code></a></li>
+<li><a href="#dnssetserversservers"><code>dns.setServers(servers)</code></a></li>
+<li><a href="#dns-promises-api">DNS promises API</a>
+<ul>
+<li><a href="#dnspromisesresolver">类：<code>dnsPromises.Resolver</code></a></li>
+<li><a href="#resolvercancel_1"><code>resolver.cancel()</code></a></li>
+<li><a href="#dnspromisesgetservers"><code>dnsPromises.getServers()</code></a></li>
+<li><a href="#dnspromiseslookuphostname-options"><code>dnsPromises.lookup(hostname[, options])</code></a></li>
+<li><a href="#dnspromiseslookupserviceaddress-port"><code>dnsPromises.lookupService(address, port)</code></a></li>
+<li><a href="#dnspromisesresolvehostname-rrtype"><code>dnsPromises.resolve(hostname[, rrtype])</code></a></li>
+<li><a href="#dnspromisesresolve4hostname-options"><code>dnsPromises.resolve4(hostname[, options])</code></a></li>
+<li><a href="#dnspromisesresolve6hostname-options"><code>dnsPromises.resolve6(hostname[, options])</code></a></li>
+<li><a href="#dnspromisesresolveanyhostname"><code>dnsPromises.resolveAny(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvecaahostname"><code>dnsPromises.resolveCaa(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvecnamehostname"><code>dnsPromises.resolveCname(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvemxhostname"><code>dnsPromises.resolveMx(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvenaptrhostname"><code>dnsPromises.resolveNaptr(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvenshostname"><code>dnsPromises.resolveNs(hostname)</code></a></li>
+<li><a href="#dnspromisesresolveptrhostname"><code>dnsPromises.resolvePtr(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvesoahostname"><code>dnsPromises.resolveSoa(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvesrvhostname"><code>dnsPromises.resolveSrv(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvetlsahostname"><code>dnsPromises.resolveTlsa(hostname)</code></a></li>
+<li><a href="#dnspromisesresolvetxthostname"><code>dnsPromises.resolveTxt(hostname)</code></a></li>
+<li><a href="#dnspromisesreverseip"><code>dnsPromises.reverse(ip)</code></a></li>
+<li><a href="#dnspromisessetdefaultresultorderorder"><code>dnsPromises.setDefaultResultOrder(order)</code></a></li>
+<li><a href="#dnspromisesgetdefaultresultorder"><code>dnsPromises.getDefaultResultOrder()</code></a></li>
+<li><a href="#dnspromisessetserversservers"><code>dnsPromises.setServers(servers)</code></a></li>
+</ul>
+</li>
+<li><a href="#">错误代码</a></li>
+<li><a href="#_1">实现考虑</a>
+<ul>
+<li><a href="#dnslookup"><code>dns.lookup()</code></a></li>
+<li><a href="#dnsresolvednsresolve--dnsreverse"><code>dns.resolve()</code>、<code>dns.resolve*()</code> 和 <code>dns.reverse()</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>域名系统 DNS<span><a class="mark" href="#-dns" id="-dns">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/dns.js">lib/dns.js</a></p>
+<p><code>node:dns</code> 模块实现了域名解析功能。例如，可以使用它来查询主机名的 IP 地址。</p>
+<p>虽然该模块以<a href="https://en.wikipedia.org/wiki/Domain_Name_System">域名系统 (DNS)</a>命名，但它并不总是使用 DNS 协议进行查找。<a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 使用操作系统提供的设施来进行名称解析。它可能不需要执行任何网络通信。要以与系统上其他应用程序相同的方式执行名称解析，请使用 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a>。</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> dns <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, <span class="hljs-function">(<span class="hljs-params">err, address, family</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'address: %j family: IPv%s'</span>, address, family);
+});
+<span class="hljs-comment">// address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> dns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, <span class="hljs-function">(<span class="hljs-params">err, address, family</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'address: %j family: IPv%s'</span>, address, family);
+});
+<span class="hljs-comment">// address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6</span></code><button class="copy-button">copy</button></pre>
+<p><code>node:dns</code> 模块中的所有其他函数都连接到实际的 DNS 服务器以执行名称解析。它们将始终使用网络来执行 DNS 查询。这些函数不使用 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 所使用的同一组配置文件（例如 <code>/etc/hosts</code>）。使用这些函数可以始终执行 DNS 查询，绕过其他名称解析设施。</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> dns <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+
+dns.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'archive.org'</span>, <span class="hljs-function">(<span class="hljs-params">err, addresses</span>) =></span> {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`addresses: <span class="hljs-subst">${<span class="hljs-built_in">JSON</span>.stringify(addresses)}</span>`</span>);
+
+  addresses.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">a</span>) =></span> {
+    dns.<span class="hljs-title function_">reverse</span>(a, <span class="hljs-function">(<span class="hljs-params">err, hostnames</span>) =></span> {
+      <span class="hljs-keyword">if</span> (err) {
+        <span class="hljs-keyword">throw</span> err;
+      }
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`reverse for <span class="hljs-subst">${a}</span>: <span class="hljs-subst">${<span class="hljs-built_in">JSON</span>.stringify(hostnames)}</span>`</span>);
+    });
+  });
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> dns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+
+dns.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'archive.org'</span>, <span class="hljs-function">(<span class="hljs-params">err, addresses</span>) =></span> {
+  <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`addresses: <span class="hljs-subst">${<span class="hljs-built_in">JSON</span>.stringify(addresses)}</span>`</span>);
+
+  addresses.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">a</span>) =></span> {
+    dns.<span class="hljs-title function_">reverse</span>(a, <span class="hljs-function">(<span class="hljs-params">err, hostnames</span>) =></span> {
+      <span class="hljs-keyword">if</span> (err) {
+        <span class="hljs-keyword">throw</span> err;
+      }
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`reverse for <span class="hljs-subst">${a}</span>: <span class="hljs-subst">${<span class="hljs-built_in">JSON</span>.stringify(hostnames)}</span>`</span>);
+    });
+  });
+});</code><button class="copy-button">copy</button></pre>
+<p>更多信息请参阅<a href="#implementation-considerations">实现考虑部分</a>。</p>
+<section><h3>类：<code>dns.Resolver</code><span><a class="mark" href="#dnsresolver" id="dnsresolver">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolver"></a></h3>
+<div class="api_metadata">
+<span>Added in: v8.3.0</span>
+</div>
+<p>一个独立的 DNS 请求解析器。</p>
+<p>创建新的解析器会使用默认的服务器设置。使用 <a href="#dnssetserversservers"><code>resolver.setServers()</code></a> 设置解析器使用的服务器不会影响其他解析器：</p>
+
+<pre class="with-41-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Resolver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+<span class="hljs-keyword">const</span> resolver = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Resolver</span>();
+resolver.<span class="hljs-title function_">setServers</span>([<span class="hljs-string">'4.4.4.4'</span>]);
+
+<span class="hljs-comment">// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。</span>
+resolver.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'example.org'</span>, <span class="hljs-function">(<span class="hljs-params">err, addresses</span>) =></span> {
+  <span class="hljs-comment">// ...</span>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Resolver</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+<span class="hljs-keyword">const</span> resolver = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Resolver</span>();
+resolver.<span class="hljs-title function_">setServers</span>([<span class="hljs-string">'4.4.4.4'</span>]);
+
+<span class="hljs-comment">// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。</span>
+resolver.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'example.org'</span>, <span class="hljs-function">(<span class="hljs-params">err, addresses</span>) =></span> {
+  <span class="hljs-comment">// ...</span>
+});</code><button class="copy-button">copy</button></pre>
+<p><code>node:dns</code> 模块中的以下方法可用：</p>
+<ul>
+<li><a href="#dnsgetservers"><code>resolver.getServers()</code></a></li>
+<li><a href="#dnsresolvehostname-rrtype-callback"><code>resolver.resolve()</code></a></li>
+<li><a href="#dnsresolve4hostname-options-callback"><code>resolver.resolve4()</code></a></li>
+<li><a href="#dnsresolve6hostname-options-callback"><code>resolver.resolve6()</code></a></li>
+<li><a href="#dnsresolveanyhostname-callback"><code>resolver.resolveAny()</code></a></li>
+<li><a href="#dnsresolvecaahostname-callback"><code>resolver.resolveCaa()</code></a></li>
+<li><a href="#dnsresolvecnamehostname-callback"><code>resolver.resolveCname()</code></a></li>
+<li><a href="#dnsresolvemxhostname-callback"><code>resolver.resolveMx()</code></a></li>
+<li><a href="#dnsresolvenaptrhostname-callback"><code>resolver.resolveNaptr()</code></a></li>
+<li><a href="#dnsresolvenshostname-callback"><code>resolver.resolveNs()</code></a></li>
+<li><a href="#dnsresolveptrhostname-callback"><code>resolver.resolvePtr()</code></a></li>
+<li><a href="#dnsresolvesoahostname-callback"><code>resolver.resolveSoa()</code></a></li>
+<li><a href="#dnsresolvesrvhostname-callback"><code>resolver.resolveSrv()</code></a></li>
+<li><a href="#dnsresolvetlsahostname-callback"><code>resolver.resolveTlsa()</code></a></li>
+<li><a href="#dnsresolvetxthostname-callback"><code>resolver.resolveTxt()</code></a></li>
+<li><a href="#dnsreverseip-callback"><code>resolver.reverse()</code></a></li>
+<li><a href="#dnssetserversservers"><code>resolver.setServers()</code></a></li>
+</ul>
+<div>
+<h4><code>Resolver([options])</code><span><a class="mark" href="#resolveroptions" id="resolveroptions">#</a></span><a aria-hidden="true" class="legacy" id="dns_resolver_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.7.0, v14.18.0</td>
+<td><p>The <code>options</code> object now accepts a <code>tries</code> option.</p></td></tr>
+<tr><td>v12.18.3</td>
+<td><p>The constructor now accepts an <code>options</code> object. The single supported option is <code>timeout</code>.</p></td></tr>
+<tr><td>v8.3.0</td>
+<td><p><span>Added in: v8.3.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>创建一个新的解析器。</p>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 查询超时时间，单位为毫秒，或 <code>-1</code> 使用默认超时时间。</li>
+<li><code>tries</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 解析器在放弃之前尝试联系每个名称服务器的次数。<strong>默认值：</strong> <code>4</code></li>
+<li><code>maxTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 最大重试超时时间，单位为毫秒。<strong>默认值：</strong> <code>0</code>，禁用。</li>
+</ul>
+</li>
+</ul>
+</div><div>
+<h4><code>resolver.cancel()</code><span><a class="mark" href="#resolvercancel" id="resolvercancel">#</a></span><a aria-hidden="true" class="legacy" id="dns_resolver_cancel"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.3.0</span>
+</div>
+<p>取消此解析器进行的所有未完成的 DNS 查询。相应的回调将以错误码 <code>ECANCELLED</code> 调用。</p>
+</div><div>
+<h4><code>resolver.setLocalAddress([ipv4][, ipv6])</code><span><a class="mark" href="#resolversetlocaladdressipv4-ipv6" id="resolversetlocaladdressipv4-ipv6">#</a></span><a aria-hidden="true" class="legacy" id="dns_resolver_setlocaladdress_ipv4_ipv6"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0</span>
+</div>
+<ul>
+<li><code>ipv4</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> IPv4 地址的字符串表示。<strong>默认值：</strong> <code>'0.0.0.0'</code></li>
+<li><code>ipv6</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> IPv6 地址的字符串表示。<strong>默认值：</strong> <code>'::0'</code></li>
+</ul>
+<p>解析器实例将从指定的 IP 地址发送其请求。这允许程序在多宿主系统上使用时指定出站接口。</p>
+<p>如果未指定 v4 或 v6 地址，则设置为默认值，操作系统将自动选择本地地址。</p>
+<p>解析器在向 IPv4 DNS 服务器发出请求时将使用 v4 本地地址，在向 IPv6 DNS 服务器发出请求时将使用 v6 本地地址。解析请求的 <code>rrtype</code> 对使用的本地地址没有影响。</p>
+</div>
+</section><section><h3><code>dns.getServers()</code><span><a class="mark" href="#dnsgetservers" id="dnsgetservers">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_getservers"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.3</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>返回一个 IP 地址字符串数组，根据 <a href="https://tools.ietf.org/html/rfc5952#section-6">RFC 5952</a> 格式化，这些地址当前配置用于 DNS 解析。如果使用了自定义端口，字符串将包含端口部分。</p>
+<!-- eslint-disable @stylistic/js/semi-->
+<pre><code class="language-js">[
+  <span class="hljs-string">'8.8.8.8'</span>,
+  <span class="hljs-string">'2001:4860:4860::8888'</span>,
+  <span class="hljs-string">'8.8.8.8:1053'</span>,
+  <span class="hljs-string">'[2001:4860:4860::8888]:1053'</span>,
+]</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>dns.lookup(hostname[, options], callback)</code><span><a class="mark" href="#dnslookuphostname-options-callback" id="dnslookuphostname-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_lookup_hostname_options_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>verbatim</code> option is now deprecated in favor of the new <code>order</code> option.</p></td></tr>
+<tr><td>v18.4.0</td>
+<td><p>For compatibility with <code>node:net</code>, when passing an option object the <code>family</code> option can be the string <code>'IPv4'</code> or the string <code>'IPv6'</code>.</p></td></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v17.0.0</td>
+<td><p>The <code>verbatim</code> options defaults to <code>true</code> now.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p>The <code>verbatim</code> option is supported now.</p></td></tr>
+<tr><td>v1.2.0</td>
+<td><p>The <code>all</code> option is supported now.</p></td></tr>
+<tr><td>v0.1.90</td>
+<td><p><span>Added in: v0.1.90</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>family</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 记录族。必须为 <code>4</code>、<code>6</code> 或 <code>0</code>。出于向后兼容的原因，<code>'IPv4'</code> 和 <code>'IPv6'</code> 分别被解释为 <code>4</code> 和 <code>6</code>。值 <code>0</code> 表示返回 IPv4 或 IPv6 地址。如果值 <code>0</code> 与 <code>{ all: true }</code> 一起使用（见下文），则返回 IPv4 和 IPv6 地址中的一个或两个，具体取决于系统的 DNS 解析器。<strong>默认值：</strong> <code>0</code>。</li>
+<li><code>hints</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 一个或多个<a href="#supported-getaddrinfo-flags">支持的 <code>getaddrinfo</code> 标志</a>。可以通过按位 <code>OR</code> 运算它们的值来传递多个标志。</li>
+<li><code>all</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 当为 <code>true</code> 时，回调返回所有已解析地址的数组。否则，返回单个地址。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>order</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 当为 <code>verbatim</code> 时，返回的地址未排序。当为 <code>ipv4first</code> 时，返回的地址通过将 IPv4 地址放在 IPv6 地址之前来排序。当为 <code>ipv6first</code> 时，返回的地址通过将 IPv6 地址放在 IPv4 地址之前来排序。<strong>默认值：</strong> <code>verbatim</code>（地址不重新排序）。默认值可使用 <a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder()</code></a> 或 <a href="cli.html#--dns-result-orderorder"><code>--dns-result-order</code></a> 配置。</li>
+<li><code>verbatim</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 当为 <code>true</code> 时，回调按 DNS 解析器返回的顺序接收 IPv4 和 IPv6 地址。当为 <code>false</code> 时，IPv4 地址放在 IPv6 地址之前。此选项将被弃用，转而使用 <code>order</code>。当两者都指定时，<code>order</code> 具有更高的优先级。新代码应仅使用 <code>order</code>。<strong>默认值：</strong> <code>true</code>（地址不重新排序）。默认值可使用 <a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder()</code></a> 或 <a href="cli.html#--dns-result-orderorder"><code>--dns-result-order</code></a> 配置。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> IPv4 或 IPv6 地址的字符串表示。</li>
+<li><code>family</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> <code>4</code> 或 <code>6</code>，表示 <code>address</code> 的族，如果地址不是 IPv4 或 IPv6 地址，则为 <code>0</code>。<code>0</code> 可能是操作系统使用的名称解析服务存在错误的指示。</li>
+</ul>
+</li>
+</ul>
+<p>将主机名（例如 <code>'nodejs.org'</code>）解析为找到的第一个 A (IPv4) 或 AAAA (IPv6) 记录。所有 <code>option</code> 属性都是可选的。如果 <code>options</code> 是整数，则必须是 <code>4</code> 或 <code>6</code> – 如果未提供 <code>options</code>，则如果找到，将返回 IPv4 或 IPv6 地址，或两者都返回。</p>
+<p>当 <code>all</code> 选项设置为 <code>true</code> 时，<code>callback</code> 的参数变为 <code>(err, addresses)</code>，其中 <code>addresses</code> 是一个具有 <code>address</code> 和 <code>family</code> 属性的对象数组。</p>
+<p>出错时，<code>err</code> 是一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是错误代码。请记住，不仅当主机名不存在时 <code>err.code</code> 会被设置为 <code>'ENOTFOUND'</code>，而且当查找以其他方式失败时（例如没有可用的文件描述符）也会如此。</p>
+<p><code>dns.lookup()</code> 不一定与 DNS 协议有关。该实现使用操作系统提供的设施，可以将名称与地址关联，反之亦然。这种实现可能对任何 Node.js 程序的行为产生微妙但重要的影响。在使用 <code>dns.lookup()</code> 之前，请花些时间查阅<a href="#implementation-considerations">实现考虑部分</a>。</p>
+<p>用法示例：</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> dns <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-attr">family</span>: <span class="hljs-number">6</span>,
+  <span class="hljs-attr">hints</span>: dns.<span class="hljs-property">ADDRCONFIG</span> | dns.<span class="hljs-property">V4MAPPED</span>,
+};
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options, <span class="hljs-function">(<span class="hljs-params">err, address, family</span>) =></span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'address: %j family: IPv%s'</span>, address, family));
+<span class="hljs-comment">// address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6</span>
+
+<span class="hljs-comment">// 当 options.all 为 true 时，结果将是一个数组。</span>
+options.<span class="hljs-property">all</span> = <span class="hljs-literal">true</span>;
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options, <span class="hljs-function">(<span class="hljs-params">err, addresses</span>) =></span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'addresses: %j'</span>, addresses));
+<span class="hljs-comment">// addresses: [{"address":"2606:2800:21f:cb07:6820:80da:af6b:8b2c","family":6}]</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> dns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-attr">family</span>: <span class="hljs-number">6</span>,
+  <span class="hljs-attr">hints</span>: dns.<span class="hljs-property">ADDRCONFIG</span> | dns.<span class="hljs-property">V4MAPPED</span>,
+};
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options, <span class="hljs-function">(<span class="hljs-params">err, address, family</span>) =></span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'address: %j family: IPv%s'</span>, address, family));
+<span class="hljs-comment">// address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6</span>
+
+<span class="hljs-comment">// 当 options.all 为 true 时，结果将是一个数组。</span>
+options.<span class="hljs-property">all</span> = <span class="hljs-literal">true</span>;
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options, <span class="hljs-function">(<span class="hljs-params">err, addresses</span>) =></span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'addresses: %j'</span>, addresses));
+<span class="hljs-comment">// addresses: [{"address":"2606:2800:21f:cb07:6820:80da:af6b:8b2c","family":6}]</span></code><button class="copy-button">copy</button></pre>
+<p>如果此方法以其 <a href="util.html#utilpromisifyoriginal"><code>util.promisify()</code></a> 版本调用，且 <code>all</code> 未设置为 <code>true</code>，则返回一个包含 <code>address</code> 和 <code>family</code> 属性的 <code>Object</code> 的 <code>Promise</code>。</p>
+<div>
+<h4>支持的 getaddrinfo 标志<span><a class="mark" href="#-getaddrinfo-" id="-getaddrinfo-">#</a></span><a aria-hidden="true" class="legacy" id="dns_getaddrinfo"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.13.0, v12.17.0</td>
+<td><p>Added support for the <code>dns.ALL</code> flag.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>以下标志可以作为提示传递给 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a>。</p>
+<ul>
+<li><code>dns.ADDRCONFIG</code>：将返回的地址类型限制为系统上配置的非回环地址类型。例如，仅当当前系统至少配置了一个 IPv4 地址时才返回 IPv4 地址。</li>
+<li><code>dns.V4MAPPED</code>：如果指定了 IPv6 族，但未找到 IPv6 地址，则返回 IPv4 映射的 IPv6 地址。在某些操作系统（例如 FreeBSD 10.1）上不支持。</li>
+<li><code>dns.ALL</code>：如果指定了 <code>dns.V4MAPPED</code>，则返回已解析的 IPv6 地址以及 IPv4 映射的 IPv6 地址。</li>
+</ul>
+</div>
+</section><section><h3><code>dns.lookupService(address, port, callback)</code><span><a class="mark" href="#dnslookupserviceaddress-port-callback" id="dnslookupserviceaddress-port-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_lookupservice_address_port_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.11.14</td>
+<td><p><span>Added in: v0.11.14</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 例如 <code>example.com</code></li>
+<li><code>service</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 例如 <code>http</code></li>
+</ul>
+</li>
+</ul>
+<p>使用操作系统底层的 <code>getnameinfo</code> 实现将给定的 <code>address</code> 和 <code>port</code> 解析为主机名和服务。</p>
+<p>如果 <code>address</code> 不是有效的 IP 地址，将抛出 <code>TypeError</code>。<code>port</code> 将被强制转换为数字。如果它不是合法端口，将抛出 <code>TypeError</code>。</p>
+<p>出错时，<code>err</code> 是一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是错误代码。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> dns <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+dns.<span class="hljs-title function_">lookupService</span>(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">22</span>, <span class="hljs-function">(<span class="hljs-params">err, hostname, service</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(hostname, service);
+  <span class="hljs-comment">// 打印: localhost ssh</span>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> dns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+dns.<span class="hljs-title function_">lookupService</span>(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">22</span>, <span class="hljs-function">(<span class="hljs-params">err, hostname, service</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(hostname, service);
+  <span class="hljs-comment">// 打印: localhost ssh</span>
+});</code><button class="copy-button">copy</button></pre>
+<p>如果此方法以其 <a href="util.html#utilpromisifyoriginal"><code>util.promisify()</code></a> 版本调用，则返回一个包含 <code>hostname</code> 和 <code>service</code> 属性的 <code>Object</code> 的 <code>Promise</code>。</p>
+</section><section><h3><code>dns.resolve(hostname[, rrtype], callback)</code><span><a class="mark" href="#dnsresolvehostname-rrtype-callback" id="dnsresolvehostname-rrtype-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolve_hostname_rrtype_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.1.27</td>
+<td><p><span>Added in: v0.1.27</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的主机名。</li>
+<li><code>rrtype</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 资源记录类型。<strong>默认值：</strong> <code>'A'</code>。</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>records</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议将主机名（例如 <code>'nodejs.org'</code>）解析为资源记录数组。<code>callback</code> 函数具有参数 <code>(err, records)</code>。成功时，<code>records</code> 将是资源记录数组。单个结果的类型和结构因 <code>rrtype</code> 而异：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><code>rrtype</code></th><th><code>records</code> 包含</th><th>结果类型</th><th>简写方法</th></tr></thead><tbody><tr><td><code>'A'</code></td><td>IPv4 地址（默认）</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnsresolve4hostname-options-callback"><code>dns.resolve4()</code></a></td></tr><tr><td><code>'AAAA'</code></td><td>IPv6 地址</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnsresolve6hostname-options-callback"><code>dns.resolve6()</code></a></td></tr><tr><td><code>'ANY'</code></td><td>任何记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolveanyhostname-callback"><code>dns.resolveAny()</code></a></td></tr><tr><td><code>'CAA'</code></td><td>CA 授权记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolvecaahostname-callback"><code>dns.resolveCaa()</code></a></td></tr><tr><td><code>'CNAME'</code></td><td>规范名称记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnsresolvecnamehostname-callback"><code>dns.resolveCname()</code></a></td></tr><tr><td><code>'MX'</code></td><td>邮件交换记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolvemxhostname-callback"><code>dns.resolveMx()</code></a></td></tr><tr><td><code>'NAPTR'</code></td><td>名称权威指针记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolvenaptrhostname-callback"><code>dns.resolveNaptr()</code></a></td></tr><tr><td><code>'NS'</code></td><td>名称服务器记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnsresolvenshostname-callback"><code>dns.resolveNs()</code></a></td></tr><tr><td><code>'PTR'</code></td><td>指针记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnsresolveptrhostname-callback"><code>dns.resolvePtr()</code></a></td></tr><tr><td><code>'SOA'</code></td><td>权威起始记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolvesoahostname-callback"><code>dns.resolveSoa()</code></a></td></tr><tr><td><code>'SRV'</code></td><td>服务记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolvesrvhostname-callback"><code>dns.resolveSrv()</code></a></td></tr><tr><td><code>'TLSA'</code></td><td>证书关联记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnsresolvetlsahostname-callback"><code>dns.resolveTlsa()</code></a></td></tr><tr><td><code>'TXT'</code></td><td>文本记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></td><td><a href="#dnsresolvetxthostname-callback"><code>dns.resolveTxt()</code></a></td></tr></tbody></table>
+<p>出错时，<code>err</code> 是一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是<a href="#error-codes">DNS 错误代码</a>之一。</p>
+</section><section><h3><code>dns.resolve4(hostname[, options], callback)</code><span><a class="mark" href="#dnsresolve4hostname-options-callback" id="dnsresolve4hostname-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolve4_hostname_options_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v7.2.0</td>
+<td><p>This method now supports passing <code>options</code>, specifically <code>options.ttl</code>.</p></td></tr>
+<tr><td>v0.1.16</td>
+<td><p><span>Added in: v0.1.16</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的主机名。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ttl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 检索每条记录的生存时间值 (TTL)。当为 <code>true</code> 时，回调接收一个 <code>{ address: '1.2.3.4', ttl: 60 }</code> 对象数组，而不是字符串数组，TTL 以秒表示。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 IPv4 地址（<code>A</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含一个 IPv4 地址数组（例如 <code>['74.125.79.104', '74.125.79.105', '74.125.79.106']</code>）。</p>
+</section><section><h3><code>dns.resolve6(hostname[, options], callback)</code><span><a class="mark" href="#dnsresolve6hostname-options-callback" id="dnsresolve6hostname-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolve6_hostname_options_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v7.2.0</td>
+<td><p>This method now supports passing <code>options</code>, specifically <code>options.ttl</code>.</p></td></tr>
+<tr><td>v0.1.16</td>
+<td><p><span>Added in: v0.1.16</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的主机名。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ttl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 检索每条记录的生存时间值 (TTL)。当为 <code>true</code> 时，回调接收一个 <code>{ address: '0:1:2:3:4:5:6:7', ttl: 60 }</code> 对象数组，而不是字符串数组，TTL 以秒表示。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 IPv6 地址（<code>AAAA</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含一个 IPv6 地址数组。</p>
+</section><section><h3><code>dns.resolveAny(hostname, callback)</code><span><a class="mark" href="#dnsresolveanyhostname-callback" id="dnsresolveanyhostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolveany_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>ret</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析所有记录（也称为 <code>ANY</code> 或 <code>*</code> 查询）。传递给 <code>callback</code> 函数的 <code>ret</code> 参数将是一个包含各种类型记录的数组。每个对象都有一个属性 <code>type</code>，指示当前记录的类型。根据 <code>type</code>，对象上将存在其他属性：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>属性</th></tr></thead><tbody><tr><td><code>'A'</code></td><td><code>address</code>/<code>ttl</code></td></tr><tr><td><code>'AAAA'</code></td><td><code>address</code>/<code>ttl</code></td></tr><tr><td><code>'CNAME'</code></td><td><code>value</code></td></tr><tr><td><code>'MX'</code></td><td>参考 <a href="#dnsresolvemxhostname-callback"><code>dns.resolveMx()</code></a></td></tr><tr><td><code>'NAPTR'</code></td><td>参考 <a href="#dnsresolvenaptrhostname-callback"><code>dns.resolveNaptr()</code></a></td></tr><tr><td><code>'NS'</code></td><td><code>value</code></td></tr><tr><td><code>'PTR'</code></td><td><code>value</code></td></tr><tr><td><code>'SOA'</code></td><td>参考 <a href="#dnsresolvesoahostname-callback"><code>dns.resolveSoa()</code></a></td></tr><tr><td><code>'SRV'</code></td><td>参考 <a href="#dnsresolvesrvhostname-callback"><code>dns.resolveSrv()</code></a></td></tr><tr><td><code>'TLSA'</code></td><td>参考 <a href="#dnsresolvetlsahostname-callback"><code>dns.resolveTlsa()</code></a></td></tr><tr><td><code>'TXT'</code></td><td>此类型的记录包含一个名为 <code>entries</code> 的数组属性，参考 <a href="#dnsresolvetxthostname-callback"><code>dns.resolveTxt()</code></a>，例如 <code>{ entries: ['...'], type: 'TXT' }</code></td></tr></tbody></table>
+<p>以下是传递给回调的 <code>ret</code> 对象示例：</p>
+<!-- eslint-disable @stylistic/js/semi -->
+<pre><code class="language-js">[ { <span class="hljs-attr">type</span>: <span class="hljs-string">'A'</span>, <span class="hljs-attr">address</span>: <span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-attr">ttl</span>: <span class="hljs-number">299</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'CNAME'</span>, <span class="hljs-attr">value</span>: <span class="hljs-string">'example.com'</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'MX'</span>, <span class="hljs-attr">exchange</span>: <span class="hljs-string">'alt4.aspmx.l.example.com'</span>, <span class="hljs-attr">priority</span>: <span class="hljs-number">50</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'NS'</span>, <span class="hljs-attr">value</span>: <span class="hljs-string">'ns1.example.com'</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'TXT'</span>, <span class="hljs-attr">entries</span>: [ <span class="hljs-string">'v=spf1 include:_spf.example.com ~all'</span> ] },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'SOA'</span>,
+    <span class="hljs-attr">nsname</span>: <span class="hljs-string">'ns1.example.com'</span>,
+    <span class="hljs-attr">hostmaster</span>: <span class="hljs-string">'admin.example.com'</span>,
+    <span class="hljs-attr">serial</span>: <span class="hljs-number">156696742</span>,
+    <span class="hljs-attr">refresh</span>: <span class="hljs-number">900</span>,
+    <span class="hljs-attr">retry</span>: <span class="hljs-number">900</span>,
+    <span class="hljs-attr">expire</span>: <span class="hljs-number">1800</span>,
+    <span class="hljs-attr">minttl</span>: <span class="hljs-number">60</span> } ]</code> <button class="copy-button">copy</button></pre>
+<p>DNS 服务器运营商可能选择不响应 <code>ANY</code> 查询。最好调用单独的方法，如 <a href="#dnsresolve4hostname-options-callback"><code>dns.resolve4()</code></a>、<a href="#dnsresolvemxhostname-callback"><code>dns.resolveMx()</code></a> 等。更多细节，请参阅 <a href="https://tools.ietf.org/html/rfc8482">RFC 8482</a>。</p>
+</section><section><h3><code>dns.resolveCname(hostname, callback)</code><span><a class="mark" href="#dnsresolvecnamehostname-callback" id="dnsresolvecnamehostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvecname_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.3.2</td>
+<td><p><span>Added in: v0.3.2</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 <code>CNAME</code> 记录。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含 <code>hostname</code> 可用的规范名称记录数组（例如 <code>['bar.example.com']</code>）。</p>
+</section><section><h3><code>dns.resolveCaa(hostname, callback)</code><span><a class="mark" href="#dnsresolvecaahostname-callback" id="dnsresolvecaahostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvecaa_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v15.0.0, v14.17.0</td>
+<td><p><span>Added in: v15.0.0, v14.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>records</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 <code>CAA</code> 记录。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含 <code>hostname</code> 可用的证书颁发机构授权记录数组（例如 <code>[{critical: 0, iodef: 'mailto:pki@example.com'}, {critical: 128, issue: 'pki.example.com'}]</code>）。</p>
+</section><section><h3><code>dns.resolveMx(hostname, callback)</code><span><a class="mark" href="#dnsresolvemxhostname-callback" id="dnsresolvemxhostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvemx_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.1.27</td>
+<td><p><span>Added in: v0.1.27</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的邮件交换记录（<code>MX</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含一个包含 <code>priority</code> 和 <code>exchange</code> 属性的对象数组（例如 <code>[{priority: 10, exchange: 'mx.example.com'}, ...]</code>）。</p>
+</section><section><h3><code>dns.resolveNaptr(hostname, callback)</code><span><a class="mark" href="#dnsresolvenaptrhostname-callback" id="dnsresolvenaptrhostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvenaptr_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.9.12</td>
+<td><p><span>Added in: v0.9.12</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的基于正则表达式的记录（<code>NAPTR</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含一个具有以下属性的对象数组：</p>
+<ul>
+<li><code>flags</code></li>
+<li><code>service</code></li>
+<li><code>regexp</code></li>
+<li><code>replacement</code></li>
+<li><code>order</code></li>
+<li><code>preference</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">flags</span>: <span class="hljs-string">'s'</span>,
+  <span class="hljs-attr">service</span>: <span class="hljs-string">'SIP+D2U'</span>,
+  <span class="hljs-attr">regexp</span>: <span class="hljs-string">''</span>,
+  <span class="hljs-attr">replacement</span>: <span class="hljs-string">'_sip._udp.example.com'</span>,
+  <span class="hljs-attr">order</span>: <span class="hljs-number">30</span>,
+  <span class="hljs-attr">preference</span>: <span class="hljs-number">100</span>
+}</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>dns.resolveNs(hostname, callback)</code><span><a class="mark" href="#dnsresolvenshostname-callback" id="dnsresolvenshostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvens_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.1.90</td>
+<td><p><span>Added in: v0.1.90</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的名称服务器记录（<code>NS</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将包含 <code>hostname</code> 可用的名称服务器记录数组（例如 <code>['ns1.example.com', 'ns2.example.com']</code>）。</p>
+</section><section><h3><code>dns.resolvePtr(hostname, callback)</code><span><a class="mark" href="#dnsresolveptrhostname-callback" id="dnsresolveptrhostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolveptr_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v6.0.0</td>
+<td><p><span>Added in: v6.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的指针记录（<code>PTR</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将是一个包含回复记录的字符串数组。</p>
+</section><section><h3><code>dns.resolveSoa(hostname, callback)</code><span><a class="mark" href="#dnsresolvesoahostname-callback" id="dnsresolvesoahostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvesoa_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.11.10</td>
+<td><p><span>Added in: v0.11.10</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的权威起始记录（<code>SOA</code> 记录）。传递给 <code>callback</code> 函数的 <code>address</code> 参数将是一个具有以下属性的对象：</p>
+<ul>
+<li><code>nsname</code></li>
+<li><code>hostmaster</code></li>
+<li><code>serial</code></li>
+<li><code>refresh</code></li>
+<li><code>retry</code></li>
+<li><code>expire</code></li>
+<li><code>minttl</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">nsname</span>: <span class="hljs-string">'ns.example.com'</span>,
+  <span class="hljs-attr">hostmaster</span>: <span class="hljs-string">'root.example.com'</span>,
+  <span class="hljs-attr">serial</span>: <span class="hljs-number">2013101809</span>,
+  <span class="hljs-attr">refresh</span>: <span class="hljs-number">10000</span>,
+  <span class="hljs-attr">retry</span>: <span class="hljs-number">2400</span>,
+  <span class="hljs-attr">expire</span>: <span class="hljs-number">604800</span>,
+  <span class="hljs-attr">minttl</span>: <span class="hljs-number">3600</span>
+}</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>dns.resolveSrv(hostname, callback)</code><span><a class="mark" href="#dnsresolvesrvhostname-callback" id="dnsresolvesrvhostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvesrv_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.1.27</td>
+<td><p><span>Added in: v0.1.27</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>addresses</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的服务记录（<code>SRV</code> 记录）。传递给 <code>callback</code> 函数的 <code>addresses</code> 参数将是一个具有以下属性的对象数组：</p>
+<ul>
+<li><code>priority</code></li>
+<li><code>weight</code></li>
+<li><code>port</code></li>
+<li><code>name</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">priority</span>: <span class="hljs-number">10</span>,
+  <span class="hljs-attr">weight</span>: <span class="hljs-number">5</span>,
+  <span class="hljs-attr">port</span>: <span class="hljs-number">21223</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-string">'service.example.com'</span>
+}</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>dns.resolveTlsa(hostname, callback)</code><span><a class="mark" href="#dnsresolvetlsahostname-callback" id="dnsresolvetlsahostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvetlsa_hostname_callback"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.9.0, v22.15.0</span>
+</div>
+<!--lint disable no-undefined-references list-item-bullet-indent-->
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>records</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+</li>
+</ul>
+<!--lint enable no-undefined-references list-item-bullet-indent-->
+<p>使用 DNS 协议解析 <code>hostname</code> 的证书关联记录（<code>TLSA</code> 记录）。传递给 <code>callback</code> 函数的 <code>records</code> 参数是一个具有以下属性的对象数组：</p>
+<ul>
+<li><code>certUsage</code></li>
+<li><code>selector</code></li>
+<li><code>match</code></li>
+<li><code>data</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">certUsage</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-attr">selector</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">match</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">data</span>: [<span class="hljs-title class_">ArrayBuffer</span>]
+}</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>dns.resolveTxt(hostname, callback)</code><span><a class="mark" href="#dnsresolvetxthostname-callback" id="dnsresolvetxthostname-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolvetxt_hostname_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.1.27</td>
+<td><p><span>Added in: v0.1.27</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>records</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的文本查询（<code>TXT</code> 记录）。传递给 <code>callback</code> 函数的 <code>records</code> 参数是一个二维数组，包含 <code>hostname</code> 可用的文本记录（例如 <code>[ ['v=spf1 ip4:0.0.0.0 ', '~all' ] ]</code>）。每个子数组包含一条记录的 TXT 块。根据使用情况，这些可以连接在一起或单独处理。</p>
+</section><section><h3><code>dns.reverse(ip, callback)</code><span><a class="mark" href="#dnsreverseip-callback" id="dnsreverseip-callback">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_reverse_ip_callback"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li><code>ip</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>hostnames</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+</li>
+</ul>
+<p>执行反向 DNS 查询，将 IPv4 或 IPv6 地址解析为主机名数组。</p>
+<p>出错时，<code>err</code> 是一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是<a href="#error-codes">DNS 错误代码</a>之一。</p>
+</section><section><h3><code>dns.setDefaultResultOrder(order)</code><span><a class="mark" href="#dnssetdefaultresultorderorder" id="dnssetdefaultresultorderorder">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_setdefaultresultorder_order"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>ipv6first</code> value is supported now.</p></td></tr>
+<tr><td>v17.0.0</td>
+<td><p>Changed default value to <code>verbatim</code>.</p></td></tr>
+<tr><td>v16.4.0, v14.18.0</td>
+<td><p><span>Added in: v16.4.0, v14.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>order</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 必须是 <code>'ipv4first'</code>、<code>'ipv6first'</code> 或 <code>'verbatim'</code>。</li>
+</ul>
+<p>设置 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 和 <a href="#dnspromiseslookuphostname-options"><code>dnsPromises.lookup()</code></a> 中 <code>order</code> 的默认值。值可以是：</p>
+<ul>
+<li><code>ipv4first</code>：将默认 <code>order</code> 设置为 <code>ipv4first</code>。</li>
+<li><code>ipv6first</code>：将默认 <code>order</code> 设置为 <code>ipv6first</code>。</li>
+<li><code>verbatim</code>：将默认 <code>order</code> 设置为 <code>verbatim</code>。</li>
+</ul>
+<p>默认值为 <code>verbatim</code>，且 <a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder()</code></a> 的优先级高于 <a href="cli.html#--dns-result-orderorder"><code>--dns-result-order</code></a>。当使用<a href="worker_threads.html">工作线程</a>时，主线程中的 <a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder()</code></a> 不会影响工作线程中的默认 DNS 顺序。</p>
+</section><section><h3><code>dns.getDefaultResultOrder()</code><span><a class="mark" href="#dnsgetdefaultresultorder" id="dnsgetdefaultresultorder">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_getdefaultresultorder"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>ipv6first</code> value is supported now.</p></td></tr>
+<tr><td>v20.1.0, v18.17.0</td>
+<td><p><span>Added in: v20.1.0, v18.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>获取 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 和 <a href="#dnspromiseslookuphostname-options"><code>dnsPromises.lookup()</code></a> 中 <code>order</code> 的默认值。值可以是：</p>
+<ul>
+<li><code>ipv4first</code>：表示 <code>order</code> 默认为 <code>ipv4first</code>。</li>
+<li><code>ipv6first</code>：表示 <code>order</code> 默认为 <code>ipv6first</code>。</li>
+<li><code>verbatim</code>：表示 <code>order</code> 默认为 <code>verbatim</code>。</li>
+</ul>
+</section><section><h3><code>dns.setServers(servers)</code><span><a class="mark" href="#dnssetserversservers" id="dnssetserversservers">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_setservers_servers"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.3</span>
+</div>
+<ul>
+<li><code>servers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> <a href="https://tools.ietf.org/html/rfc5952#section-6">RFC 5952</a> 格式化地址的数组</li>
+</ul>
+<p>设置执行 DNS 解析时要使用的服务器的 IP 地址和端口。<code>servers</code> 参数是 <a href="https://tools.ietf.org/html/rfc5952#section-6">RFC 5952</a> 格式化地址的数组。如果端口是 IANA 默认 DNS 端口 (53)，则可以省略。</p>
+<pre><code class="language-js">dns.<span class="hljs-title function_">setServers</span>([
+  <span class="hljs-string">'8.8.8.8'</span>,
+  <span class="hljs-string">'[2001:4860:4860::8888]'</span>,
+  <span class="hljs-string">'8.8.8.8:1053'</span>,
+  <span class="hljs-string">'[2001:4860:4860::8888]:1053'</span>,
+]);</code> <button class="copy-button">copy</button></pre>
+<p>如果提供了无效地址，将抛出错误。</p>
+<p><code>dns.setServers()</code> 方法不得在 DNS 查询进行时调用。</p>
+<p><a href="#dnssetserversservers"><code>dns.setServers()</code></a> 方法仅影响 <a href="#dnsresolvehostname-rrtype-callback"><code>dns.resolve()</code></a>、<code>dns.resolve*()</code> 和 <a href="#dnsreverseip-callback"><code>dns.reverse()</code></a>（特别是不影响 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a>）。</p>
+<p>此方法的工作方式非常类似于 <a href="https://man7.org/linux/man-pages/man5/resolv.conf.5.html">resolve.conf</a>。也就是说，如果尝试使用提供的第一个服务器解析导致 <code>NOTFOUND</code> 错误，则 <code>resolve()</code> 方法将不会尝试使用后续提供的服务器进行解析。仅当较早的服务器超时或导致其他错误时，才会使用备用 DNS 服务器。</p>
+</section><section><h3>DNS promises API<span><a class="mark" href="#dns-promises-api" id="dns-promises-api">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_promises_api"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.0.0</td>
+<td><p>Exposed as <code>require('dns/promises')</code>.</p></td></tr>
+<tr><td>v11.14.0, v10.17.0</td>
+<td><p>This API is no longer experimental.</p></td></tr>
+<tr><td>v10.6.0</td>
+<td><p><span>Added in: v10.6.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p><code>dns.promises</code> API 提供了一组替代的异步 DNS 方法，这些方法返回 <code>Promise</code> 对象而不是使用回调。该 API 可通过 <code>require('node:dns').promises</code> 或 <code>require('node:dns/promises')</code> 访问。</p>
+<div>
+<h4>类：<code>dnsPromises.Resolver</code><span><a class="mark" href="#dnspromisesresolver" id="dnspromisesresolver">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolver"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<p>一个独立的 DNS 请求解析器。</p>
+<p>创建新的解析器会使用默认的服务器设置。使用 <a href="#dnspromisessetserversservers"><code>resolver.setServers()</code></a> 设置解析器使用的服务器不会影响其他解析器：</p>
+
+<pre class="with-50-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Resolver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns/promises'</span>;
+<span class="hljs-keyword">const</span> resolver = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Resolver</span>();
+resolver.<span class="hljs-title function_">setServers</span>([<span class="hljs-string">'4.4.4.4'</span>]);
+
+<span class="hljs-comment">// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。</span>
+<span class="hljs-keyword">const</span> addresses = <span class="hljs-keyword">await</span> resolver.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'example.org'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Resolver</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>).<span class="hljs-property">promises</span>;
+<span class="hljs-keyword">const</span> resolver = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Resolver</span>();
+resolver.<span class="hljs-title function_">setServers</span>([<span class="hljs-string">'4.4.4.4'</span>]);
+
+<span class="hljs-comment">// 此请求将使用 4.4.4.4 的服务器，独立于全局设置。</span>
+resolver.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'example.org'</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">addresses</span>) =></span> {
+  <span class="hljs-comment">// ...</span>
+});
+
+<span class="hljs-comment">// 或者，可以使用 async-await 风格编写相同的代码。</span>
+(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> addresses = <span class="hljs-keyword">await</span> resolver.<span class="hljs-title function_">resolve4</span>(<span class="hljs-string">'example.org'</span>);
+})();</code><button class="copy-button">copy</button></pre>
+<p><code>dnsPromises</code> API 中的以下方法可用：</p>
+<ul>
+<li><a href="#dnspromisesgetservers"><code>resolver.getServers()</code></a></li>
+<li><a href="#dnspromisesresolvehostname-rrtype"><code>resolver.resolve()</code></a></li>
+<li><a href="#dnspromisesresolve4hostname-options"><code>resolver.resolve4()</code></a></li>
+<li><a href="#dnspromisesresolve6hostname-options"><code>resolver.resolve6()</code></a></li>
+<li><a href="#dnspromisesresolveanyhostname"><code>resolver.resolveAny()</code></a></li>
+<li><a href="#dnspromisesresolvecaahostname"><code>resolver.resolveCaa()</code></a></li>
+<li><a href="#dnspromisesresolvecnamehostname"><code>resolver.resolveCname()</code></a></li>
+<li><a href="#dnspromisesresolvemxhostname"><code>resolver.resolveMx()</code></a></li>
+<li><a href="#dnspromisesresolvenaptrhostname"><code>resolver.resolveNaptr()</code></a></li>
+<li><a href="#dnspromisesresolvenshostname"><code>resolver.resolveNs()</code></a></li>
+<li><a href="#dnspromisesresolveptrhostname"><code>resolver.resolvePtr()</code></a></li>
+<li><a href="#dnspromisesresolvesoahostname"><code>resolver.resolveSoa()</code></a></li>
+<li><a href="#dnspromisesresolvesrvhostname"><code>resolver.resolveSrv()</code></a></li>
+<li><a href="#dnspromisesresolvetlsahostname"><code>resolver.resolveTlsa()</code></a></li>
+<li><a href="#dnspromisesresolvetxthostname"><code>resolver.resolveTxt()</code></a></li>
+<li><a href="#dnspromisesreverseip"><code>resolver.reverse()</code></a></li>
+<li><a href="#dnspromisessetserversservers"><code>resolver.setServers()</code></a></li>
+</ul>
+</div><div>
+<h4><code>resolver.cancel()</code><span><a class="mark" href="#resolvercancel_1" id="resolvercancel_1">#</a></span><a aria-hidden="true" class="legacy" id="dns_resolver_cancel_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.3.0, v14.17.0</span>
+</div>
+<p>取消此解析器进行的所有未完成的 DNS 查询。相应的 promise 将被拒绝，错误码为 <code>ECANCELLED</code>。</p>
+</div><div>
+<h4><code>dnsPromises.getServers()</code><span><a class="mark" href="#dnspromisesgetservers" id="dnspromisesgetservers">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_getservers"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>返回一个 IP 地址字符串数组，根据 <a href="https://tools.ietf.org/html/rfc5952#section-6">RFC 5952</a> 格式化，这些地址当前配置用于 DNS 解析。如果使用了自定义端口，字符串将包含端口部分。</p>
+<!-- eslint-disable @stylistic/js/semi-->
+<pre><code class="language-js">[
+  <span class="hljs-string">'8.8.8.8'</span>,
+  <span class="hljs-string">'2001:4860:4860::8888'</span>,
+  <span class="hljs-string">'8.8.8.8:1053'</span>,
+  <span class="hljs-string">'[2001:4860:4860::8888]:1053'</span>,
+]</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.lookup(hostname[, options])</code><span><a class="mark" href="#dnspromiseslookuphostname-options" id="dnspromiseslookuphostname-options">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_lookup_hostname_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>verbatim</code> option is now deprecated in favor of the new <code>order</code> option.</p></td></tr>
+<tr><td>v10.6.0</td>
+<td><p><span>Added in: v10.6.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>family</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 记录族。必须为 <code>4</code>、<code>6</code> 或 <code>0</code>。值 <code>0</code> 表示返回 IPv4 或 IPv6 地址。如果值 <code>0</code> 与 <code>{ all: true }</code> 一起使用（见下文），则返回 IPv4 和 IPv6 地址中的一个或两个，具体取决于系统的 DNS 解析器。<strong>默认值：</strong> <code>0</code>。</li>
+<li><code>hints</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 一个或多个<a href="#supported-getaddrinfo-flags">支持的 <code>getaddrinfo</code> 标志</a>。可以通过按位 <code>OR</code> 运算它们的值来传递多个标志。</li>
+<li><code>all</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 当为 <code>true</code> 时，<code>Promise</code> 以所有地址的数组解析。否则，返回单个地址。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>order</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 当为 <code>verbatim</code> 时，<code>Promise</code> 以 DNS 解析器返回的 IPv4 和 IPv6 地址顺序解析。当为 <code>ipv4first</code> 时，IPv4 地址放在 IPv6 地址之前。当为 <code>ipv6first</code> 时，IPv6 地址放在 IPv4 地址之前。<strong>默认值：</strong> <code>verbatim</code>（地址不重新排序）。默认值可使用 <a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder()</code></a> 或 <a href="cli.html#--dns-result-orderorder"><code>--dns-result-order</code></a> 配置。新代码应使用 <code>{ order: 'verbatim' }</code>。</li>
+<li><code>verbatim</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 当为 <code>true</code> 时，<code>Promise</code> 以 DNS 解析器返回的 IPv4 和 IPv6 地址顺序解析。当为 <code>false</code> 时，IPv4 地址放在 IPv6 地址之前。此选项将被弃用，转而使用 <code>order</code>。当两者都指定时，<code>order</code> 具有更高的优先级。新代码应仅使用 <code>order</code>。<strong>默认值：</strong> 当前为 <code>false</code>（地址重新排序），但预计在不久的将来会更改。默认值可使用 <a href="#dnssetdefaultresultorderorder"><code>dns.setDefaultResultOrder()</code></a> 或 <a href="cli.html#--dns-result-orderorder"><code>--dns-result-order</code></a> 配置。</li>
+</ul>
+</li>
+</ul>
+<p>将主机名（例如 <code>'nodejs.org'</code>）解析为找到的第一个 A (IPv4) 或 AAAA (IPv6) 记录。所有 <code>option</code> 属性都是可选的。如果 <code>options</code> 是整数，则必须是 <code>4</code> 或 <code>6</code> – 如果未提供 <code>options</code>，则如果找到，将返回 IPv4 或 IPv6 地址，或两者都返回。</p>
+<p>当 <code>all</code> 选项设置为 <code>true</code> 时，<code>Promise</code> 以 <code>addresses</code> 解析，<code>addresses</code> 是一个具有 <code>address</code> 和 <code>family</code> 属性的对象数组。</p>
+<p>出错时，<code>Promise</code> 被拒绝，并带有一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是错误代码。请记住，不仅当主机名不存在时 <code>err.code</code> 会被设置为 <code>'ENOTFOUND'</code>，而且当查找以其他方式失败时（例如没有可用的文件描述符）也会如此。</p>
+<p><a href="#dnspromiseslookuphostname-options"><code>dnsPromises.lookup()</code></a> 不一定与 DNS 协议有关。该实现使用操作系统提供的设施，可以将名称与地址关联，反之亦然。这种实现可能对任何 Node.js 程序的行为产生微妙但重要的影响。在使用 <code>dnsPromises.lookup()</code> 之前，请花些时间查阅<a href="#implementation-considerations">实现考虑部分</a>。</p>
+<p>用法示例：</p>
+
+<pre class="with-33-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> dns <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+<span class="hljs-keyword">const</span> dnsPromises = dns.<span class="hljs-property">promises</span>;
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-attr">family</span>: <span class="hljs-number">6</span>,
+  <span class="hljs-attr">hints</span>: dns.<span class="hljs-property">ADDRCONFIG</span> | dns.<span class="hljs-property">V4MAPPED</span>,
+};
+
+<span class="hljs-keyword">await</span> dnsPromises.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'address: %j family: IPv%s'</span>, result.<span class="hljs-property">address</span>, result.<span class="hljs-property">family</span>);
+  <span class="hljs-comment">// address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6</span>
+});
+
+<span class="hljs-comment">// 当 options.all 为 true 时，结果将是一个数组。</span>
+options.<span class="hljs-property">all</span> = <span class="hljs-literal">true</span>;
+<span class="hljs-keyword">await</span> dnsPromises.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'addresses: %j'</span>, result);
+  <span class="hljs-comment">// addresses: [{"address":"2606:2800:21f:cb07:6820:80da:af6b:8b2c","family":6}]</span>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> dns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+<span class="hljs-keyword">const</span> dnsPromises = dns.<span class="hljs-property">promises</span>;
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-attr">family</span>: <span class="hljs-number">6</span>,
+  <span class="hljs-attr">hints</span>: dns.<span class="hljs-property">ADDRCONFIG</span> | dns.<span class="hljs-property">V4MAPPED</span>,
+};
+
+dnsPromises.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'address: %j family: IPv%s'</span>, result.<span class="hljs-property">address</span>, result.<span class="hljs-property">family</span>);
+  <span class="hljs-comment">// address: "2606:2800:21f:cb07:6820:80da:af6b:8b2c" family: IPv6</span>
+});
+
+<span class="hljs-comment">// 当 options.all 为 true 时，结果将是一个数组。</span>
+options.<span class="hljs-property">all</span> = <span class="hljs-literal">true</span>;
+dnsPromises.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'example.org'</span>, options).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'addresses: %j'</span>, result);
+  <span class="hljs-comment">// addresses: [{"address":"2606:2800:21f:cb07:6820:80da:af6b:8b2c","family":6}]</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.lookupService(address, port)</code><span><a class="mark" href="#dnspromiseslookupserviceaddress-port" id="dnspromiseslookupserviceaddress-port">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_lookupservice_address_port"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>使用操作系统底层的 <code>getnameinfo</code> 实现将给定的 <code>address</code> 和 <code>port</code> 解析为主机名和服务。</p>
+<p>如果 <code>address</code> 不是有效的 IP 地址，将抛出 <code>TypeError</code>。<code>port</code> 将被强制转换为数字。如果它不是合法端口，将抛出 <code>TypeError</code>。</p>
+<p>出错时，<code>Promise</code> 被拒绝，并带有一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是错误代码。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> dnsPromises <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns/promises'</span>;
+<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> dnsPromises.<span class="hljs-title function_">lookupService</span>(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">22</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(result.<span class="hljs-property">hostname</span>, result.<span class="hljs-property">service</span>); <span class="hljs-comment">// 打印: localhost ssh</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> dnsPromises = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>).<span class="hljs-property">promises</span>;
+dnsPromises.<span class="hljs-title function_">lookupService</span>(<span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-number">22</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">result</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(result.<span class="hljs-property">hostname</span>, result.<span class="hljs-property">service</span>);
+  <span class="hljs-comment">// 打印: localhost ssh</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.resolve(hostname[, rrtype])</code><span><a class="mark" href="#dnspromisesresolvehostname-rrtype" id="dnspromisesresolvehostname-rrtype">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolve_hostname_rrtype"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的主机名。</li>
+<li><code>rrtype</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 资源记录类型。<strong>默认值：</strong> <code>'A'</code>。</li>
+</ul>
+<p>使用 DNS 协议将主机名（例如 <code>'nodejs.org'</code>）解析为资源记录数组。成功时，<code>Promise</code> 以资源记录数组解析。单个结果的类型和结构因 <code>rrtype</code> 而异：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><code>rrtype</code></th><th><code>records</code> 包含</th><th>结果类型</th><th>简写方法</th></tr></thead><tbody><tr><td><code>'A'</code></td><td>IPv4 地址（默认）</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnspromisesresolve4hostname-options"><code>dnsPromises.resolve4()</code></a></td></tr><tr><td><code>'AAAA'</code></td><td>IPv6 地址</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnspromisesresolve6hostname-options"><code>dnsPromises.resolve6()</code></a></td></tr><tr><td><code>'ANY'</code></td><td>任何记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolveanyhostname"><code>dnsPromises.resolveAny()</code></a></td></tr><tr><td><code>'CAA'</code></td><td>CA 授权记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolvecaahostname"><code>dnsPromises.resolveCaa()</code></a></td></tr><tr><td><code>'CNAME'</code></td><td>规范名称记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnspromisesresolvecnamehostname"><code>dnsPromises.resolveCname()</code></a></td></tr><tr><td><code>'MX'</code></td><td>邮件交换记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolvemxhostname"><code>dnsPromises.resolveMx()</code></a></td></tr><tr><td><code>'NAPTR'</code></td><td>名称权威指针记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolvenaptrhostname"><code>dnsPromises.resolveNaptr()</code></a></td></tr><tr><td><code>'NS'</code></td><td>名称服务器记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnspromisesresolvenshostname"><code>dnsPromises.resolveNs()</code></a></td></tr><tr><td><code>'PTR'</code></td><td>指针记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td><td><a href="#dnspromisesresolveptrhostname"><code>dnsPromises.resolvePtr()</code></a></td></tr><tr><td><code>'SOA'</code></td><td>权威起始记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolvesoahostname"><code>dnsPromises.resolveSoa()</code></a></td></tr><tr><td><code>'SRV'</code></td><td>服务记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolvesrvhostname"><code>dnsPromises.resolveSrv()</code></a></td></tr><tr><td><code>'TLSA'</code></td><td>证书关联记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></td><td><a href="#dnspromisesresolvetlsahostname"><code>dnsPromises.resolveTlsa()</code></a></td></tr><tr><td><code>'TXT'</code></td><td>文本记录</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></td><td><a href="#dnspromisesresolvetxthostname"><code>dnsPromises.resolveTxt()</code></a></td></tr></tbody></table>
+<p>出错时，<code>Promise</code> 被拒绝，并带有一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是<a href="#error-codes">DNS 错误代码</a>之一。</p>
+</div><div>
+<h4><code>dnsPromises.resolve4(hostname[, options])</code><span><a class="mark" href="#dnspromisesresolve4hostname-options" id="dnspromisesresolve4hostname-options">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolve4_hostname_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的主机名。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ttl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 检索每条记录的生存时间值 (TTL)。当为 <code>true</code> 时，<code>Promise</code> 以 <code>{ address: '1.2.3.4', ttl: 60 }</code> 对象数组解析，而不是字符串数组，TTL 以秒表示。</li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 IPv4 地址（<code>A</code> 记录）。成功时，<code>Promise</code> 以 IPv4 地址数组解析（例如 <code>['74.125.79.104', '74.125.79.105', '74.125.79.106']</code>）。</p>
+</div><div>
+<h4><code>dnsPromises.resolve6(hostname[, options])</code><span><a class="mark" href="#dnspromisesresolve6hostname-options" id="dnspromisesresolve6hostname-options">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolve6_hostname_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的主机名。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ttl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 检索每条记录的生存时间值 (TTL)。当为 <code>true</code> 时，<code>Promise</code> 以 <code>{ address: '0:1:2:3:4:5:6:7', ttl: 60 }</code> 对象数组解析，而不是字符串数组，TTL 以秒表示。</li>
+</ul>
+</li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 IPv6 地址（<code>AAAA</code> 记录）。成功时，<code>Promise</code> 以 IPv6 地址数组解析。</p>
+</div><div>
+<h4><code>dnsPromises.resolveAny(hostname)</code><span><a class="mark" href="#dnspromisesresolveanyhostname" id="dnspromisesresolveanyhostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolveany_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析所有记录（也称为 <code>ANY</code> 或 <code>*</code> 查询）。成功时，<code>Promise</code> 以包含各种类型记录的数组解析。每个对象有一个属性 <code>type</code>，指示当前记录的类型。根据 <code>type</code>，对象上将存在其他属性：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>类型</th><th>属性</th></tr></thead><tbody><tr><td><code>'A'</code></td><td><code>address</code>/<code>ttl</code></td></tr><tr><td><code>'AAAA'</code></td><td><code>address</code>/<code>ttl</code></td></tr><tr><td><code>'CNAME'</code></td><td><code>value</code></td></tr><tr><td><code>'MX'</code></td><td>参考 <a href="#dnspromisesresolvemxhostname"><code>dnsPromises.resolveMx()</code></a></td></tr><tr><td><code>'NAPTR'</code></td><td>参考 <a href="#dnspromisesresolvenaptrhostname"><code>dnsPromises.resolveNaptr()</code></a></td></tr><tr><td><code>'NS'</code></td><td><code>value</code></td></tr><tr><td><code>'PTR'</code></td><td><code>value</code></td></tr><tr><td><code>'SOA'</code></td><td>参考 <a href="#dnspromisesresolvesoahostname"><code>dnsPromises.resolveSoa()</code></a></td></tr><tr><td><code>'SRV'</code></td><td>参考 <a href="#dnspromisesresolvesrvhostname"><code>dnsPromises.resolveSrv()</code></a></td></tr><tr><td><code>'TLSA'</code></td><td>参考 <a href="#dnspromisesresolvetlsahostname"><code>dnsPromises.resolveTlsa()</code></a></td></tr><tr><td><code>'TXT'</code></td><td>此类型的记录包含一个名为 <code>entries</code> 的数组属性，参考 <a href="#dnspromisesresolvetxthostname"><code>dnsPromises.resolveTxt()</code></a>，例如 <code>{ entries: ['...'], type: 'TXT' }</code></td></tr></tbody></table>
+<p>以下是结果对象的示例：</p>
+<!-- eslint-disable @stylistic/js/semi -->
+<pre><code class="language-js">[ { <span class="hljs-attr">type</span>: <span class="hljs-string">'A'</span>, <span class="hljs-attr">address</span>: <span class="hljs-string">'127.0.0.1'</span>, <span class="hljs-attr">ttl</span>: <span class="hljs-number">299</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'CNAME'</span>, <span class="hljs-attr">value</span>: <span class="hljs-string">'example.com'</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'MX'</span>, <span class="hljs-attr">exchange</span>: <span class="hljs-string">'alt4.aspmx.l.example.com'</span>, <span class="hljs-attr">priority</span>: <span class="hljs-number">50</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'NS'</span>, <span class="hljs-attr">value</span>: <span class="hljs-string">'ns1.example.com'</span> },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'TXT'</span>, <span class="hljs-attr">entries</span>: [ <span class="hljs-string">'v=spf1 include:_spf.example.com ~all'</span> ] },
+  { <span class="hljs-attr">type</span>: <span class="hljs-string">'SOA'</span>,
+    <span class="hljs-attr">nsname</span>: <span class="hljs-string">'ns1.example.com'</span>,
+    <span class="hljs-attr">hostmaster</span>: <span class="hljs-string">'admin.example.com'</span>,
+    <span class="hljs-attr">serial</span>: <span class="hljs-number">156696742</span>,
+    <span class="hljs-attr">refresh</span>: <span class="hljs-number">900</span>,
+    <span class="hljs-attr">retry</span>: <span class="hljs-number">900</span>,
+    <span class="hljs-attr">expire</span>: <span class="hljs-number">1800</span>,
+    <span class="hljs-attr">minttl</span>: <span class="hljs-number">60</span> } ]</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.resolveCaa(hostname)</code><span><a class="mark" href="#dnspromisesresolvecaahostname" id="dnspromisesresolvecaahostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvecaa_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.0.0, v14.17.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 <code>CAA</code> 记录。成功时，<code>Promise</code> 以包含 <code>hostname</code> 可用的证书颁发机构授权记录的对象数组解析（例如 <code>[{critical: 0, iodef: 'mailto:pki@example.com'},{critical: 128, issue: 'pki.example.com'}]</code>）。</p>
+</div><div>
+<h4><code>dnsPromises.resolveCname(hostname)</code><span><a class="mark" href="#dnspromisesresolvecnamehostname" id="dnspromisesresolvecnamehostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvecname_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的 <code>CNAME</code> 记录。成功时，<code>Promise</code> 以 <code>hostname</code> 可用的规范名称记录数组解析（例如 <code>['bar.example.com']</code>）。</p>
+</div><div>
+<h4><code>dnsPromises.resolveMx(hostname)</code><span><a class="mark" href="#dnspromisesresolvemxhostname" id="dnspromisesresolvemxhostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvemx_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的邮件交换记录（<code>MX</code> 记录）。成功时，<code>Promise</code> 以包含 <code>priority</code> 和 <code>exchange</code> 属性的对象数组解析（例如 <code>[{priority: 10, exchange: 'mx.example.com'}, ...]</code>）。</p>
+</div><div>
+<h4><code>dnsPromises.resolveNaptr(hostname)</code><span><a class="mark" href="#dnspromisesresolvenaptrhostname" id="dnspromisesresolvenaptrhostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvenaptr_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的基于正则表达式的记录（<code>NAPTR</code> 记录）。成功时，<code>Promise</code> 以具有以下属性的对象数组解析：</p>
+<ul>
+<li><code>flags</code></li>
+<li><code>service</code></li>
+<li><code>regexp</code></li>
+<li><code>replacement</code></li>
+<li><code>order</code></li>
+<li><code>preference</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">flags</span>: <span class="hljs-string">'s'</span>,
+  <span class="hljs-attr">service</span>: <span class="hljs-string">'SIP+D2U'</span>,
+  <span class="hljs-attr">regexp</span>: <span class="hljs-string">''</span>,
+  <span class="hljs-attr">replacement</span>: <span class="hljs-string">'_sip._udp.example.com'</span>,
+  <span class="hljs-attr">order</span>: <span class="hljs-number">30</span>,
+  <span class="hljs-attr">preference</span>: <span class="hljs-number">100</span>
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.resolveNs(hostname)</code><span><a class="mark" href="#dnspromisesresolvenshostname" id="dnspromisesresolvenshostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvens_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的名称服务器记录（<code>NS</code> 记录）。成功时，<code>Promise</code> 以 <code>hostname</code> 可用的名称服务器记录数组解析（例如 <code>['ns1.example.com', 'ns2.example.com']</code>）。</p>
+</div><div>
+<h4><code>dnsPromises.resolvePtr(hostname)</code><span><a class="mark" href="#dnspromisesresolveptrhostname" id="dnspromisesresolveptrhostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolveptr_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的指针记录（<code>PTR</code> 记录）。成功时，<code>Promise</code> 以包含回复记录的字符串数组解析。</p>
+</div><div>
+<h4><code>dnsPromises.resolveSoa(hostname)</code><span><a class="mark" href="#dnspromisesresolvesoahostname" id="dnspromisesresolvesoahostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvesoa_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的权威起始记录（<code>SOA</code> 记录）。成功时，<code>Promise</code> 以具有以下属性的对象解析：</p>
+<ul>
+<li><code>nsname</code></li>
+<li><code>hostmaster</code></li>
+<li><code>serial</code></li>
+<li><code>refresh</code></li>
+<li><code>retry</code></li>
+<li><code>expire</code></li>
+<li><code>minttl</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">nsname</span>: <span class="hljs-string">'ns.example.com'</span>,
+  <span class="hljs-attr">hostmaster</span>: <span class="hljs-string">'root.example.com'</span>,
+  <span class="hljs-attr">serial</span>: <span class="hljs-number">2013101809</span>,
+  <span class="hljs-attr">refresh</span>: <span class="hljs-number">10000</span>,
+  <span class="hljs-attr">retry</span>: <span class="hljs-number">2400</span>,
+  <span class="hljs-attr">expire</span>: <span class="hljs-number">604800</span>,
+  <span class="hljs-attr">minttl</span>: <span class="hljs-number">3600</span>
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.resolveSrv(hostname)</code><span><a class="mark" href="#dnspromisesresolvesrvhostname" id="dnspromisesresolvesrvhostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvesrv_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的服务记录（<code>SRV</code> 记录）。成功时，<code>Promise</code> 以具有以下属性的对象数组解析：</p>
+<ul>
+<li><code>priority</code></li>
+<li><code>weight</code></li>
+<li><code>port</code></li>
+<li><code>name</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">priority</span>: <span class="hljs-number">10</span>,
+  <span class="hljs-attr">weight</span>: <span class="hljs-number">5</span>,
+  <span class="hljs-attr">port</span>: <span class="hljs-number">21223</span>,
+  <span class="hljs-attr">name</span>: <span class="hljs-string">'service.example.com'</span>
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.resolveTlsa(hostname)</code><span><a class="mark" href="#dnspromisesresolvetlsahostname" id="dnspromisesresolvetlsahostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvetlsa_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.9.0, v22.15.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的证书关联记录（<code>TLSA</code> 记录）。成功时，<code>Promise</code> 以具有以下属性的对象数组解析：</p>
+<ul>
+<li><code>certUsage</code></li>
+<li><code>selector</code></li>
+<li><code>match</code></li>
+<li><code>data</code></li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">certUsage</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-attr">selector</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">match</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">data</span>: [<span class="hljs-title class_">ArrayBuffer</span>]
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>dnsPromises.resolveTxt(hostname)</code><span><a class="mark" href="#dnspromisesresolvetxthostname" id="dnspromisesresolvetxthostname">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_resolvetxt_hostname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用 DNS 协议解析 <code>hostname</code> 的文本查询（<code>TXT</code> 记录）。成功时，<code>Promise</code> 以 <code>hostname</code> 可用的文本记录的二维数组解析（例如 <code>[ ['v=spf1 ip4:0.0.0.0 ', '~all' ] ]</code>）。每个子数组包含一条记录的 TXT 块。根据使用情况，这些可以连接在一起或单独处理。</p>
+</div><div>
+<h4><code>dnsPromises.reverse(ip)</code><span><a class="mark" href="#dnspromisesreverseip" id="dnspromisesreverseip">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_reverse_ip"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>ip</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>执行反向 DNS 查询，将 IPv4 或 IPv6 地址解析为主机名数组。</p>
+<p>出错时，<code>Promise</code> 被拒绝，并带有一个 <a href="errors.html#class-error"><code>Error</code></a> 对象，其中 <code>err.code</code> 是<a href="#error-codes">DNS 错误代码</a>之一。</p>
+</div><div>
+<h4><code>dnsPromises.setDefaultResultOrder(order)</code><span><a class="mark" href="#dnspromisessetdefaultresultorderorder" id="dnspromisessetdefaultresultorderorder">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_setdefaultresultorder_order"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>ipv6first</code> value is supported now.</p></td></tr>
+<tr><td>v17.0.0</td>
+<td><p>Changed default value to <code>verbatim</code>.</p></td></tr>
+<tr><td>v16.4.0, v14.18.0</td>
+<td><p><span>Added in: v16.4.0, v14.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>order</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 必须是 <code>'ipv4first'</code>、<code>'ipv6first'</code> 或 <code>'verbatim'</code>。</li>
+</ul>
+<p>设置 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 和 <a href="#dnspromiseslookuphostname-options"><code>dnsPromises.lookup()</code></a> 中 <code>order</code> 的默认值。值可以是：</p>
+<ul>
+<li><code>ipv4first</code>：将默认 <code>order</code> 设置为 <code>ipv4first</code>。</li>
+<li><code>ipv6first</code>：将默认 <code>order</code> 设置为 <code>ipv6first</code>。</li>
+<li><code>verbatim</code>：将默认 <code>order</code> 设置为 <code>verbatim</code>。</li>
+</ul>
+<p>默认值为 <code>verbatim</code>，且 <a href="#dnspromisessetdefaultresultorderorder"><code>dnsPromises.setDefaultResultOrder()</code></a> 的优先级高于 <a href="cli.html#--dns-result-orderorder"><code>--dns-result-order</code></a>。当使用<a href="worker_threads.html">工作线程</a>时，主线程中的 <a href="#dnspromisessetdefaultresultorderorder"><code>dnsPromises.setDefaultResultOrder()</code></a> 不会影响工作线程中的默认 DNS 顺序。</p>
+</div><div>
+<h4><code>dnsPromises.getDefaultResultOrder()</code><span><a class="mark" href="#dnspromisesgetdefaultresultorder" id="dnspromisesgetdefaultresultorder">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_getdefaultresultorder"></a></h4>
+<div class="api_metadata">
+<span>Added in: v20.1.0, v18.17.0</span>
+</div>
+<p>获取 <code>dnsOrder</code> 的值。</p>
+</div><div>
+<h4><code>dnsPromises.setServers(servers)</code><span><a class="mark" href="#dnspromisessetserversservers" id="dnspromisessetserversservers">#</a></span><a aria-hidden="true" class="legacy" id="dns_dnspromises_setservers_servers"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.6.0</span>
+</div>
+<ul>
+<li><code>servers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> <a href="https://tools.ietf.org/html/rfc5952#section-6">RFC 5952</a> 格式化地址的数组</li>
+</ul>
+<p>设置执行 DNS 解析时要使用的服务器的 IP 地址和端口。<code>servers</code> 参数是 <a href="https://tools.ietf.org/html/rfc5952#section-6">RFC 5952</a> 格式化地址的数组。如果端口是 IANA 默认 DNS 端口 (53)，则可以省略。</p>
+<pre><code class="language-js">dnsPromises.<span class="hljs-title function_">setServers</span>([
+  <span class="hljs-string">'8.8.8.8'</span>,
+  <span class="hljs-string">'[2001:4860:4860::8888]'</span>,
+  <span class="hljs-string">'8.8.8.8:1053'</span>,
+  <span class="hljs-string">'[2001:4860:4860::8888]:1053'</span>,
+]);</code> <button class="copy-button">copy</button></pre>
+<p>如果提供了无效地址，将抛出错误。</p>
+<p><code>dnsPromises.setServers()</code> 方法不得在 DNS 查询进行时调用。</p>
+<p>此方法的工作方式非常类似于 <a href="https://man7.org/linux/man-pages/man5/resolv.conf.5.html">resolve.conf</a>。也就是说，如果尝试使用提供的第一个服务器解析导致 <code>NOTFOUND</code> 错误，则 <code>resolve()</code> 方法将不会尝试使用后续提供的服务器进行解析。仅当较早的服务器超时或导致其他错误时，才会使用备用 DNS 服务器。</p>
+</div>
+</section><section><h3>错误代码<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="dns"></a></h3>
+<p>每个 DNS 查询可以返回以下错误代码之一：</p>
+<ul>
+<li><code>dns.NODATA</code>: DNS 服务器返回无数据的答案。</li>
+<li><code>dns.FORMERR</code>: DNS 服务器声称查询格式错误。</li>
+<li><code>dns.SERVFAIL</code>: DNS 服务器返回一般故障。</li>
+<li><code>dns.NOTFOUND</code>: 未找到域名。</li>
+<li><code>dns.NOTIMP</code>: DNS 服务器未实现请求的操作。</li>
+<li><code>dns.REFUSED</code>: DNS 服务器拒绝查询。</li>
+<li><code>dns.BADQUERY</code>: 格式错误的 DNS 查询。</li>
+<li><code>dns.BADNAME</code>: 格式错误的主机名。</li>
+<li><code>dns.BADFAMILY</code>: 不支持的地址族。</li>
+<li><code>dns.BADRESP</code>: 格式错误的 DNS 回复。</li>
+<li><code>dns.CONNREFUSED</code>: 无法联系 DNS 服务器。</li>
+<li><code>dns.TIMEOUT</code>: 联系 DNS 服务器时超时。</li>
+<li><code>dns.EOF</code>: 文件结束。</li>
+<li><code>dns.FILE</code>: 读取文件时出错。</li>
+<li><code>dns.NOMEM</code>: 内存不足。</li>
+<li><code>dns.DESTRUCTION</code>: 通道正在被销毁。</li>
+<li><code>dns.BADSTR</code>: 格式错误的字符串。</li>
+<li><code>dns.BADFLAGS</code>: 指定了非法标志。</li>
+<li><code>dns.NONAME</code>: 给定的主机名不是数字。</li>
+<li><code>dns.BADHINTS</code>: 指定了非法提示标志。</li>
+<li><code>dns.NOTINITIALIZED</code>: c-ares 库尚未初始化。</li>
+<li><code>dns.LOADIPHLPAPI</code>: 加载 <code>iphlpapi.dll</code> 时出错。</li>
+<li><code>dns.ADDRGETNETWORKPARAMS</code>: 找不到 <code>GetNetworkParams</code> 函数。</li>
+<li><code>dns.CANCELLED</code>: DNS 查询已取消。</li>
+</ul>
+<p><code>dnsPromises</code> API 也导出上述错误代码，例如 <code>dnsPromises.NODATA</code>。</p>
+</section><section><h3>实现考虑<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="dns_1"></a></h3>
+<p>尽管 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 和各种 <code>dns.resolve*()/dns.reverse()</code> 函数具有将网络名称与网络地址（或反之）关联的相同目标，但它们的行为截然不同。这些差异可能对 Node.js 程序的行为产生微妙但重要的影响。</p>
+<div>
+<h4><code>dns.lookup()</code><span><a class="mark" href="#dnslookup" id="dnslookup">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_lookup"></a></h4>
+<p>在底层，<a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 使用与大多数其他程序相同的操作系统设施。例如，<a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 几乎总是以与 <code>ping</code> 命令相同的方式解析给定名称。在大多数类 POSIX 操作系统上，<a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 函数的行为可以通过更改 <a href="http://man7.org/linux/man-pages/man5/nsswitch.conf.5.html"><code>nsswitch.conf(5)</code></a> 和/或 <a href="http://man7.org/linux/man-pages/man5/resolv.conf.5.html"><code>resolv.conf(5)</code></a> 中的设置来修改，但更改这些文件将更改在同一操作系统上运行的所有其他程序的行为。</p>
+<p>尽管从 JavaScript 的角度来看，对 <code>dns.lookup()</code> 的调用是异步的，但它是作为对 <a href="http://man7.org/linux/man-pages/man3/getaddrinfo.3.html"><code>getaddrinfo(3)</code></a> 的同步调用在 libuv 的线程池中实现的。这可能对某些应用程序产生令人惊讶的负面性能影响，更多信息请参阅 <a href="cli.html#uv_threadpool_sizesize"><code>UV_THREADPOOL_SIZE</code></a> 文档。</p>
+<p>各种网络 API 将在内部调用 <code>dns.lookup()</code> 来解析主机名。如果这是一个问题，考虑使用 <code>dns.resolve()</code> 将主机名解析为地址，并使用地址而不是主机名。此外，一些网络 API（如 <a href="net.html#socketconnectoptions-connectlistener"><code>socket.connect()</code></a> 和 <a href="dgram.html#dgramcreatesocketoptions-callback"><code>dgram.createSocket()</code></a>）允许替换默认解析器 <code>dns.lookup()</code>。</p>
+</div><div>
+<h4><code>dns.resolve()</code>、<code>dns.resolve*()</code> 和 <code>dns.reverse()</code><span><a class="mark" href="#dnsresolvednsresolve--dnsreverse" id="dnsresolvednsresolve--dnsreverse">#</a></span><a aria-hidden="true" class="legacy" id="dns_dns_resolve_dns_resolve_dns_reverse"></a></h4>
+<p>这些函数的实现与 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 完全不同。它们不使用 <a href="http://man7.org/linux/man-pages/man3/getaddrinfo.3.html"><code>getaddrinfo(3)</code></a>，并且它们总是在网络上执行 DNS 查询。此网络通信始终是异步完成的，并且不使用 libuv 的线程池。</p>
+<p>因此，这些函数不会对 libuv 线程池上发生的其他处理产生与 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 相同的负面影响。</p>
+<p>它们不使用 <a href="#dnslookuphostname-options-callback"><code>dns.lookup()</code></a> 使用的同一组配置文件。例如，它们不使用 <code>/etc/hosts</code> 中的配置。</p></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

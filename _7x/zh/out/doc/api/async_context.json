@@ -1,0 +1,564 @@
+{
+  "type": "module",
+  "source": "doc/api/async_context.md",
+  "modules": [
+    {
+      "textRaw": "异步上下文追踪",
+      "name": "异步上下文追踪",
+      "introduced_in": "v16.4.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/async_hooks.js\">lib/async_hooks.js</a></p>",
+      "modules": [
+        {
+          "textRaw": "简介",
+          "name": "简介",
+          "desc": "<p>这些类用于关联状态并在回调和 Promise 链中传播它。\n它们允许在整个 Web 请求或任何其他异步持续时间的内存周期内存储数据。\n这类似于其他语言中的线程本地存储。</p>\n<p><code>AsyncLocalStorage</code> 和 <code>AsyncResource</code> 类是 <code>node:async_hooks</code> 模块的一部分：</p>\n<pre><code class=\"language-mjs\">import { AsyncLocalStorage, AsyncResource } from 'node:async_hooks';\n</code></pre>\n<pre><code class=\"language-cjs\">const { AsyncLocalStorage, AsyncResource } = require('node:async_hooks');\n</code></pre>",
+          "type": "module",
+          "displayName": "简介"
+        },
+        {
+          "textRaw": "类：`AsyncLocalStorage`",
+          "name": "类：`asynclocalstorage`",
+          "meta": {
+            "added": [
+              "v13.10.0",
+              "v12.17.0"
+            ],
+            "changes": [
+              {
+                "version": "v16.4.0",
+                "pr-url": "https://github.com/nodejs/node/pull/37675",
+                "description": "AsyncLocalStorage 现已稳定。之前它是实验性的。"
+              }
+            ]
+          },
+          "desc": "<p>该类创建的存储空间在异步操作期间保持一致性。</p>\n<p>虽然你可以在 <code>node:async_hooks</code> 模块之上创建自己的实现，但应优先使用 <code>AsyncLocalStorage</code>，因为它是一个高性能且内存安全的实现，包含了许多非显而易见的重大优化。</p>\n<p>以下示例使用 <code>AsyncLocalStorage</code> 构建一个简单的日志记录器，该记录器为传入的 HTTP 请求分配 ID，并在每个请求内记录的消息中包含这些 ID。</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport { AsyncLocalStorage } from 'node:async_hooks';\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // 想象这里有任何异步操作链\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// 打印：\n//   0: start\n//   0: finish\n//   1: start\n//   1: finish\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst { AsyncLocalStorage } = require('node:async_hooks');\n\nconst asyncLocalStorage = new AsyncLocalStorage();\n\nfunction logWithId(msg) {\n  const id = asyncLocalStorage.getStore();\n  console.log(`${id !== undefined ? id : '-'}:`, msg);\n}\n\nlet idSeq = 0;\nhttp.createServer((req, res) => {\n  asyncLocalStorage.run(idSeq++, () => {\n    logWithId('start');\n    // 想象这里有任何异步操作链\n    setImmediate(() => {\n      logWithId('finish');\n      res.end();\n    });\n  });\n}).listen(8080);\n\nhttp.get('http://localhost:8080');\nhttp.get('http://localhost:8080');\n// 打印：\n//   0: start\n//   0: finish\n//   1: start\n//   1: finish\n</code></pre>\n<p>每个 <code>AsyncLocalStorage</code> 实例维护一个独立的存储上下文。\n多个实例可以安全地同时存在，而不会相互干扰数据的风险。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new AsyncLocalStorage([options])`",
+              "type": "ctor",
+              "name": "AsyncLocalStorage",
+              "meta": {
+                "added": [
+                  "v13.10.0",
+                  "v12.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/57766",
+                    "description": "添加了 `defaultValue` 和 `name` 选项。"
+                  },
+                  {
+                    "version": [
+                      "v19.7.0",
+                      "v18.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/46386",
+                    "description": "移除了实验性的 onPropagate 选项。"
+                  },
+                  {
+                    "version": [
+                      "v19.2.0",
+                      "v18.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/45386",
+                    "description": "添加了 onPropagate 选项。"
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`defaultValue` {any} 当没有提供存储时使用的默认值。",
+                          "name": "defaultValue",
+                          "type": "any",
+                          "desc": "当没有提供存储时使用的默认值。"
+                        },
+                        {
+                          "textRaw": "`name` {string} `AsyncLocalStorage` 值的名称。",
+                          "name": "name",
+                          "type": "string",
+                          "desc": "`AsyncLocalStorage` 值的名称。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个新的 <code>AsyncLocalStorage</code> 实例。存储仅在 <code>run()</code> 调用内或 <code>enterWith()</code> 调用之后提供。</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "静态方法：`AsyncLocalStorage.bind(fn)`",
+              "name": "静态方法：`asynclocalstorage.bind(fn)`",
+              "meta": {
+                "added": [
+                  "v19.8.0",
+                  "v18.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.11.0",
+                      "v22.15.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/57510",
+                    "description": "标记该 API 为稳定。"
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li><code>fn</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 要绑定到当前执行上下文的函数。</li>\n<li>返回: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 一个在捕获的执行上下文中调用 <code>fn</code> 的新函数。</li>\n</ul>\n<p>将给定函数绑定到当前执行上下文。</p>",
+              "type": "module",
+              "displayName": "静态方法：`AsyncLocalStorage.bind(fn)`"
+            },
+            {
+              "textRaw": "静态方法：`AsyncLocalStorage.snapshot()`",
+              "name": "静态方法：`asynclocalstorage.snapshot()`",
+              "meta": {
+                "added": [
+                  "v19.8.0",
+                  "v18.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.11.0",
+                      "v22.15.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/57510",
+                    "description": "标记该 API 为稳定。"
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li>返回: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 一个具有签名 <code>(fn: (...args) : R, ...args) : R</code> 的新函数。</li>\n</ul>\n<p>捕获当前执行上下文并返回一个接受函数作为参数的函数。每当调用返回的函数时，它会在捕获的上下文中调用传递给它的函数。</p>\n<pre><code class=\"language-js\">const asyncLocalStorage = new AsyncLocalStorage();\nconst runInAsyncScope = asyncLocalStorage.run(123, () => AsyncLocalStorage.snapshot());\nconst result = asyncLocalStorage.run(321, () => runInAsyncScope(() => asyncLocalStorage.getStore()));\nconsole.log(result);  // 返回 123\n</code></pre>\n<p>对于简单的异步上下文追踪目的，<code>AsyncLocalStorage.snapshot()</code> 可以替代 <code>AsyncResource</code> 的使用，例如：</p>\n<pre><code class=\"language-js\">class Foo {\n  #runInAsyncScope = AsyncLocalStorage.snapshot();\n\n  get() { return this.#runInAsyncScope(() => asyncLocalStorage.getStore()); }\n}\n\nconst foo = asyncLocalStorage.run(123, () => new Foo());\nconsole.log(asyncLocalStorage.run(321, () => foo.get())); // 返回 123\n</code></pre>",
+              "type": "module",
+              "displayName": "静态方法：`AsyncLocalStorage.snapshot()`"
+            },
+            {
+              "textRaw": "与 `async/await` 一起使用",
+              "name": "与_`async/await`_一起使用",
+              "desc": "<p>如果在异步函数中，只有一个 <code>await</code> 调用需要在上下文中运行，则应使用以下模式：</p>\n<pre><code class=\"language-js\">async function fn() {\n  await asyncLocalStorage.run(new Map(), () => {\n    asyncLocalStorage.getStore().set('key', value);\n    return foo(); // foo 的返回值将被 await\n  });\n}\n</code></pre>\n<p>在此示例中，存储仅在回调函数和 <code>foo</code> 调用的函数中可用。在 <code>run</code> 外部，调用 <code>getStore</code> 将返回 <code>undefined</code>。</p>",
+              "type": "module",
+              "displayName": "与 `async/await` 一起使用"
+            },
+            {
+              "textRaw": "故障排除：上下文丢失",
+              "name": "故障排除：上下文丢失",
+              "desc": "<p>在大多数情况下，<code>AsyncLocalStorage</code> 工作无误。在极少数情况下，当前存储在某个异步操作中丢失。</p>\n<p>如果你的代码是基于回调的，使用 <a href=\"util.html#utilpromisifyoriginal\"><code>util.promisify()</code></a> 将其 Promise 化就足以使其开始与原生 Promise 一起工作。</p>\n<p>如果你需要使用基于回调的 API 或者你的代码假设自定义的 thenable 实现，请使用 <a href=\"#class-asyncresource\"><code>AsyncResource</code></a> 类将异步操作与正确的执行上下文关联起来。通过在你怀疑导致丢失的调用之后记录 <code>asyncLocalStorage.getStore()</code> 的内容来找到导致上下文丢失的函数调用。当代码记录 <code>undefined</code> 时，最后调用的回调可能是导致上下文丢失的原因。</p>",
+              "type": "module",
+              "displayName": "故障排除：上下文丢失"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`asyncLocalStorage.disable()`",
+              "type": "method",
+              "name": "disable",
+              "meta": {
+                "added": [
+                  "v13.10.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>禁用 <code>AsyncLocalStorage</code> 实例。所有后续对 <code>asyncLocalStorage.getStore()</code> 的调用将返回 <code>undefined</code>，直到再次调用 <code>asyncLocalStorage.run()</code> 或 <code>asyncLocalStorage.enterWith()</code>。</p>\n<p>当调用 <code>asyncLocalStorage.disable()</code> 时，所有链接到该实例的当前上下文都将被退出。</p>\n<p>在 <code>asyncLocalStorage</code> 可以被垃圾回收之前，需要调用 <code>asyncLocalStorage.disable()</code>。这不适用于由 <code>asyncLocalStorage</code> 提供的存储，因为这些对象会随着相应的异步资源一起被垃圾回收。</p>\n<p>当 <code>asyncLocalStorage</code> 在当前进程中不再使用时，请使用此方法。</p>"
+            },
+            {
+              "textRaw": "`asyncLocalStorage.getStore()`",
+              "type": "method",
+              "name": "getStore",
+              "meta": {
+                "added": [
+                  "v13.10.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {any}",
+                      "name": "返回",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回当前存储。\n如果在通过调用 <code>asyncLocalStorage.run()</code> 或 <code>asyncLocalStorage.enterWith()</code> 初始化的异步上下文之外调用，则返回 <code>undefined</code>。</p>"
+            },
+            {
+              "textRaw": "`asyncLocalStorage.enterWith(store)`",
+              "type": "method",
+              "name": "enterWith",
+              "meta": {
+                "added": [
+                  "v13.11.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`store` {any}",
+                      "name": "store",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在剩余的当前同步执行期间进入上下文，然后通过任何后续的异步调用持久化存储。</p>\n<p>示例：</p>\n<pre><code class=\"language-js\">const store = { id: 1 };\n// 用给定的存储对象替换之前的存储\nasyncLocalStorage.enterWith(store);\nasyncLocalStorage.getStore(); // 返回存储对象\nsomeAsyncOperation(() => {\n  asyncLocalStorage.getStore(); // 返回相同的对象\n});\n</code></pre>\n<p>此转换将持续整个_同步_执行。\n这意味着，例如，如果在事件处理程序中进入上下文，则后续的事件处理程序也将在该上下文中运行，除非使用 <code>AsyncResource</code> 显式绑定到另一个上下文。这就是为什么除非有强烈理由使用后者方法，否则应优先使用 <code>run()</code> 而不是 <code>enterWith()</code>。</p>\n<pre><code class=\"language-js\">const store = { id: 1 };\n\nemitter.on('my-event', () => {\n  asyncLocalStorage.enterWith(store);\n});\nemitter.on('my-event', () => {\n  asyncLocalStorage.getStore(); // 返回相同的对象\n});\n\nasyncLocalStorage.getStore(); // 返回 undefined\nemitter.emit('my-event');\nasyncLocalStorage.getStore(); // 返回相同的对象\n</code></pre>"
+            },
+            {
+              "textRaw": "`asyncLocalStorage.run(store, callback[, ...args])`",
+              "type": "method",
+              "name": "run",
+              "meta": {
+                "added": [
+                  "v13.10.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`store` {any}",
+                      "name": "store",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在上下文中同步运行一个函数并返回其返回值。存储在该回调函数外部不可访问。存储对该回调函数内创建的任何异步操作都是可访问的。</p>\n<p>可选的 <code>args</code> 会传递给回调函数。</p>\n<p>如果回调函数抛出错误，该错误也会被 <code>run()</code> 抛出。堆栈跟踪不受此调用的影响，并且上下文会退出。</p>\n<p>示例：</p>\n<pre><code class=\"language-js\">const store = { id: 2 };\ntry {\n  asyncLocalStorage.run(store, () => {\n    asyncLocalStorage.getStore(); // 返回存储对象\n    setTimeout(() => {\n      asyncLocalStorage.getStore(); // 返回存储对象\n    }, 200);\n    throw new Error();\n  });\n} catch (e) {\n  asyncLocalStorage.getStore(); // 返回 undefined\n  // 错误将在这里被捕获\n}\n</code></pre>"
+            },
+            {
+              "textRaw": "`asyncLocalStorage.exit(callback[, ...args])`",
+              "type": "method",
+              "name": "exit",
+              "meta": {
+                "added": [
+                  "v13.10.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在上下文外部同步运行一个函数并返回其返回值。存储在该回调函数内部或该回调函数内创建的异步操作中不可访问。在回调函数内进行的任何 <code>getStore()</code> 调用都将始终返回 <code>undefined</code>。</p>\n<p>可选的 <code>args</code> 会传递给回调函数。</p>\n<p>如果回调函数抛出错误，该错误也会被 <code>exit()</code> 抛出。堆栈跟踪不受此调用的影响，并且上下文会重新进入。</p>\n<p>示例：</p>\n<pre><code class=\"language-js\">// 在 run 调用内部\ntry {\n  asyncLocalStorage.getStore(); // 返回存储对象或值\n  asyncLocalStorage.exit(() => {\n    asyncLocalStorage.getStore(); // 返回 undefined\n    throw new Error();\n  });\n} catch (e) {\n  asyncLocalStorage.getStore(); // 返回相同的对象或值\n  // 错误将在这里被捕获\n}\n</code></pre>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`name` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果提供了，则为 <code>AsyncLocalStorage</code> 实例的名称。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`AsyncLocalStorage`"
+        },
+        {
+          "textRaw": "类：`AsyncResource`",
+          "name": "类：`asyncresource`",
+          "meta": {
+            "changes": [
+              {
+                "version": "v16.4.0",
+                "pr-url": "https://github.com/nodejs/node/pull/37675",
+                "description": "AsyncResource 现已稳定。之前它是实验性的。"
+              }
+            ]
+          },
+          "desc": "<p><code>AsyncResource</code> 类旨在由嵌入器的异步资源扩展。使用它，用户可以轻松触发自己资源的生命周期事件。</p>\n<p>当实例化 <code>AsyncResource</code> 时，将触发 <code>init</code> 钩子。</p>\n<p>以下是 <code>AsyncResource</code> API 的概述。</p>\n<pre><code class=\"language-mjs\">import { AsyncResource, executionAsyncId } from 'node:async_hooks';\n\n// AsyncResource() 旨在被扩展。实例化一个新的 AsyncResource() 也会触发 init。如果省略 triggerAsyncId，则使用 async_hook.executionAsyncId()。\nconst asyncResource = new AsyncResource(\n  type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false },\n);\n\n// 在资源的执行上下文中运行一个函数。这将：\n// * 建立资源的上下文\n// * 触发 AsyncHooks before 回调\n// * 使用提供的参数调用提供的函数 `fn`\n// * 触发 AsyncHooks after 回调\n// * 恢复原始的执行上下文\nasyncResource.runInAsyncScope(fn, thisArg, ...args);\n\n// 调用 AsyncHooks destroy 回调。\nasyncResource.emitDestroy();\n\n// 返回分配给 AsyncResource 实例的唯一 ID。\nasyncResource.asyncId();\n\n// 返回 AsyncResource 实例的触发器 ID。\nasyncResource.triggerAsyncId();\n</code></pre>\n<pre><code class=\"language-cjs\">const { AsyncResource, executionAsyncId } = require('node:async_hooks');\n\n// AsyncResource() 旨在被扩展。实例化一个新的 AsyncResource() 也会触发 init。如果省略 triggerAsyncId，则使用 async_hook.executionAsyncId()。\nconst asyncResource = new AsyncResource(\n  type, { triggerAsyncId: executionAsyncId(), requireManualDestroy: false },\n);\n\n// 在资源的执行上下文中运行一个函数。这将：\n// * 建立资源的上下文\n// * 触发 AsyncHooks before 回调\n// * 使用提供的参数调用提供的函数 `fn`\n// * 触发 AsyncHooks after 回调\n// * 恢复原始的执行上下文\nasyncResource.runInAsyncScope(fn, thisArg, ...args);\n\n// 调用 AsyncHooks destroy 回调。\nasyncResource.emitDestroy();\n\n// 返回分配给 AsyncResource 实例的唯一 ID。\nasyncResource.asyncId();\n\n// 返回 AsyncResource 实例的触发器 ID。\nasyncResource.triggerAsyncId();\n</code></pre>",
+          "ctors": [
+            {
+              "textRaw": "`new AsyncResource(type[, options])`",
+              "type": "ctor",
+              "name": "AsyncResource",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`type` {string} 异步事件的类型。",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "异步事件的类型。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`triggerAsyncId` {number} 创建此异步事件的执行上下文的 ID。**默认值:** `executionAsyncId()`。",
+                          "name": "triggerAsyncId",
+                          "type": "number",
+                          "desc": "创建此异步事件的执行上下文的 ID。**默认值:** `executionAsyncId()`。"
+                        },
+                        {
+                          "textRaw": "`requireManualDestroy` {boolean} 如果设置为 `true`，则在对象被垃圾回收时禁用 `emitDestroy`。这通常不需要设置（即使手动调用 `emitDestroy`），除非获取了资源的 `asyncId` 并使用敏感的 API 的 `emitDestroy` 调用它。当设置为 `false` 时，垃圾回收时的 `emitDestroy` 调用仅在有至少一个活跃的 `destroy` 钩子时发生。**默认值:** `false`。",
+                          "name": "requireManualDestroy",
+                          "type": "boolean",
+                          "desc": "如果设置为 `true`，则在对象被垃圾回收时禁用 `emitDestroy`。这通常不需要设置（即使手动调用 `emitDestroy`），除非获取了资源的 `asyncId` 并使用敏感的 API 的 `emitDestroy` 调用它。当设置为 `false` 时，垃圾回收时的 `emitDestroy` 调用仅在有至少一个活跃的 `destroy` 钩子时发生。**默认值:** `false`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>用法示例：</p>\n<pre><code class=\"language-js\">class DBQuery extends AsyncResource {\n  constructor(db) {\n    super('DBQuery');\n    this.db = db;\n  }\n\n  getInfo(query, callback) {\n    this.db.get(query, (err, data) => {\n      this.runInAsyncScope(callback, null, err, data);\n    });\n  }\n\n  close() {\n    this.db = null;\n    this.emitDestroy();\n  }\n}\n</code></pre>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "静态方法：`AsyncResource.bind(fn[, type[, thisArg]])`",
+              "name": "静态方法：`asyncresource.bind(fn[,_type[,_thisarg]])`",
+              "meta": {
+                "added": [
+                  "v14.8.0",
+                  "v12.19.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46432",
+                    "description": "添加到绑定函数的 `asyncResource` 属性已被弃用，并将在未来版本中移除。"
+                  },
+                  {
+                    "version": [
+                      "v17.8.0",
+                      "v16.15.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/42177",
+                    "description": "当 `thisArg` 未定义时，默认改为使用调用者的 `this`。"
+                  },
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/36782",
+                    "description": "添加了可选的 thisArg。"
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li><code>fn</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 要绑定到当前执行上下文的函数。</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 与底层 <code>AsyncResource</code> 关联的可选名称。</li>\n<li><code>thisArg</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n</ul>\n<p>将给定函数绑定到当前执行上下文。</p>",
+              "type": "module",
+              "displayName": "静态方法：`AsyncResource.bind(fn[, type[, thisArg]])`"
+            },
+            {
+              "textRaw": "使用 `AsyncResource` 实现 `Worker` 线程池",
+              "name": "使用_`asyncresource`_实现_`worker`_线程池",
+              "desc": "<p>以下示例展示了如何使用 <code>AsyncResource</code> 类为 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 池正确提供异步追踪。其他资源池，例如数据库连接池，可以遵循类似的模型。</p>\n<p>假设任务是两个数字相加，使用名为 <code>task_processor.js</code> 的文件，内容如下：</p>\n<pre><code class=\"language-mjs\">import { parentPort } from 'node:worker_threads';\nparentPort.on('message', (task) => {\n  parentPort.postMessage(task.a + task.b);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { parentPort } = require('node:worker_threads');\nparentPort.on('message', (task) => {\n  parentPort.postMessage(task.a + task.b);\n});\n</code></pre>\n<p>围绕它的 Worker 池可以使用以下结构：</p>\n<pre><code class=\"language-mjs\">import { AsyncResource } from 'node:async_hooks';\nimport { EventEmitter } from 'node:events';\nimport { Worker } from 'node:worker_threads';\n\nconst kTaskInfo = Symbol('kTaskInfo');\nconst kWorkerFreedEvent = Symbol('kWorkerFreedEvent');\n\nclass WorkerPoolTaskInfo extends AsyncResource {\n  constructor(callback) {\n    super('WorkerPoolTaskInfo');\n    this.callback = callback;\n  }\n\n  done(err, result) {\n    this.runInAsyncScope(this.callback, null, err, result);\n    this.emitDestroy();  // `TaskInfo` 仅使用一次。\n  }\n}\n\nexport default class WorkerPool extends EventEmitter {\n  constructor(numThreads) {\n    super();\n    this.numThreads = numThreads;\n    this.workers = [];\n    this.freeWorkers = [];\n    this.tasks = [];\n\n    for (let i = 0; i &#x3C; numThreads; i++)\n      this.addNewWorker();\n\n    // 每当发出 kWorkerFreedEvent 时，调度队列中挂起的下一个任务（如果有）。\n    this.on(kWorkerFreedEvent, () => {\n      if (this.tasks.length > 0) {\n        const { task, callback } = this.tasks.shift();\n        this.runTask(task, callback);\n      }\n    });\n  }\n\n  addNewWorker() {\n    const worker = new Worker(new URL('task_processor.js', import.meta.url));\n    worker.on('message', (result) => {\n      // 成功情况下：调用传递给 `runTask` 的回调，移除与 Worker 关联的 `TaskInfo`，并将其标记为空闲。\n      worker[kTaskInfo].done(null, result);\n      worker[kTaskInfo] = null;\n      this.freeWorkers.push(worker);\n      this.emit(kWorkerFreedEvent);\n    });\n    worker.on('error', (err) => {\n      // 在未捕获异常的情况下：使用错误调用传递给 `runTask` 的回调。\n      if (worker[kTaskInfo])\n        worker[kTaskInfo].done(err, null);\n      else\n        this.emit('error', err);\n      // 从列表中移除该 worker 并启动一个新的 Worker 来替换当前 worker。\n      this.workers.splice(this.workers.indexOf(worker), 1);\n      this.addNewWorker();\n    });\n    this.workers.push(worker);\n    this.freeWorkers.push(worker);\n    this.emit(kWorkerFreedEvent);\n  }\n\n  runTask(task, callback) {\n    if (this.freeWorkers.length === 0) {\n      // 没有空闲线程，等待一个工作线程空闲。\n      this.tasks.push({ task, callback });\n      return;\n    }\n\n    const worker = this.freeWorkers.pop();\n    worker[kTaskInfo] = new WorkerPoolTaskInfo(callback);\n    worker.postMessage(task);\n  }\n\n  close() {\n    for (const worker of this.workers) worker.terminate();\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { AsyncResource } = require('node:async_hooks');\nconst { EventEmitter } = require('node:events');\nconst path = require('node:path');\nconst { Worker } = require('node:worker_threads');\n\nconst kTaskInfo = Symbol('kTaskInfo');\nconst kWorkerFreedEvent = Symbol('kWorkerFreedEvent');\n\nclass WorkerPoolTaskInfo extends AsyncResource {\n  constructor(callback) {\n    super('WorkerPoolTaskInfo');\n    this.callback = callback;\n  }\n\n  done(err, result) {\n    this.runInAsyncScope(this.callback, null, err, result);\n    this.emitDestroy();  // `TaskInfo` 仅使用一次。\n  }\n}\n\nclass WorkerPool extends EventEmitter {\n  constructor(numThreads) {\n    super();\n    this.numThreads = numThreads;\n    this.workers = [];\n    this.freeWorkers = [];\n    this.tasks = [];\n\n    for (let i = 0; i &#x3C; numThreads; i++)\n      this.addNewWorker();\n\n    // 每当发出 kWorkerFreedEvent 时，调度队列中挂起的下一个任务（如果有）。\n    this.on(kWorkerFreedEvent, () => {\n      if (this.tasks.length > 0) {\n        const { task, callback } = this.tasks.shift();\n        this.runTask(task, callback);\n      }\n    });\n  }\n\n  addNewWorker() {\n    const worker = new Worker(path.resolve(__dirname, 'task_processor.js'));\n    worker.on('message', (result) => {\n      // 成功情况下：调用传递给 `runTask` 的回调，移除与 Worker 关联的 `TaskInfo`，并将其标记为空闲。\n      worker[kTaskInfo].done(null, result);\n      worker[kTaskInfo] = null;\n      this.freeWorkers.push(worker);\n      this.emit(kWorkerFreedEvent);\n    });\n    worker.on('error', (err) => {\n      // 在未捕获异常的情况下：使用错误调用传递给 `runTask` 的回调。\n      if (worker[kTaskInfo])\n        worker[kTaskInfo].done(err, null);\n      else\n        this.emit('error', err);\n      // 从列表中移除该 worker 并启动一个新的 Worker 来替换当前 worker。\n      this.workers.splice(this.workers.indexOf(worker), 1);\n      this.addNewWorker();\n    });\n    this.workers.push(worker);\n    this.freeWorkers.push(worker);\n    this.emit(kWorkerFreedEvent);\n  }\n\n  runTask(task, callback) {\n    if (this.freeWorkers.length === 0) {\n      // 没有空闲线程，等待一个工作线程空闲。\n      this.tasks.push({ task, callback });\n      return;\n    }\n\n    const worker = this.freeWorkers.pop();\n    worker[kTaskInfo] = new WorkerPoolTaskInfo(callback);\n    worker.postMessage(task);\n  }\n\n  close() {\n    for (const worker of this.workers) worker.terminate();\n  }\n}\n\nmodule.exports = WorkerPool;\n</code></pre>\n<p>如果没有由 <code>WorkerPoolTaskInfo</code> 对象添加的显式追踪，回调看起来似乎与单个 <code>Worker</code> 对象关联。然而，<code>Worker</code> 的创建与任务的创建无关，并且不提供有关任务何时调度的信息。</p>\n<p>该池的使用方式如下：</p>\n<pre><code class=\"language-mjs\">import WorkerPool from './worker_pool.js';\nimport os from 'node:os';\n\nconst pool = new WorkerPool(os.availableParallelism());\n\nlet finished = 0;\nfor (let i = 0; i &#x3C; 10; i++) {\n  pool.runTask({ a: 42, b: 100 }, (err, result) => {\n    console.log(i, err, result);\n    if (++finished === 10)\n      pool.close();\n  });\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const WorkerPool = require('./worker_pool.js');\nconst os = require('node:os');\n\nconst pool = new WorkerPool(os.availableParallelism());\n\nlet finished = 0;\nfor (let i = 0; i &#x3C; 10; i++) {\n  pool.runTask({ a: 42, b: 100 }, (err, result) => {\n    console.log(i, err, result);\n    if (++finished === 10)\n      pool.close();\n  });\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "使用 `AsyncResource` 实现 `Worker` 线程池"
+            },
+            {
+              "textRaw": "将 `AsyncResource` 与 `EventEmitter` 集成",
+              "name": "将_`asyncresource`_与_`eventemitter`_集成",
+              "desc": "<p>由 <a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a> 触发的事件监听器可能在不同于调用 <code>eventEmitter.on()</code> 时的执行上下文中运行。</p>\n<p>以下示例展示了如何使用 <code>AsyncResource</code> 类正确地将事件监听器与正确的执行上下文关联。相同的方法可以应用于 <a href=\"stream.html#stream\"><code>Stream</code></a> 或类似的事件驱动类。</p>\n<pre><code class=\"language-mjs\">import { createServer } from 'node:http';\nimport { AsyncResource, executionAsyncId } from 'node:async_hooks';\n\nconst server = createServer((req, res) => {\n  req.on('close', AsyncResource.bind(() => {\n    // 执行上下文绑定到当前外部作用域。\n  }));\n  req.on('close', () => {\n    // 执行上下文绑定到触发 'close' 发射的作用域。\n  });\n  res.end();\n}).listen(3000);\n</code></pre>\n<pre><code class=\"language-cjs\">const { createServer } = require('node:http');\nconst { AsyncResource, executionAsyncId } = require('node:async_hooks');\n\nconst server = createServer((req, res) => {\n  req.on('close', AsyncResource.bind(() => {\n    // 执行上下文绑定到当前外部作用域。\n  }));\n  req.on('close', () => {\n    // 执行上下文绑定到触发 'close' 发射的作用域。\n  });\n  res.end();\n}).listen(3000);\n</code></pre>",
+              "type": "module",
+              "displayName": "将 `AsyncResource` 与 `EventEmitter` 集成"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`asyncResource.bind(fn[, thisArg])`",
+              "type": "method",
+              "name": "bind",
+              "meta": {
+                "added": [
+                  "v14.8.0",
+                  "v12.19.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46432",
+                    "description": "添加到绑定函数的 `asyncResource` 属性已被弃用，并将在未来版本中移除。"
+                  },
+                  {
+                    "version": [
+                      "v17.8.0",
+                      "v16.15.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/42177",
+                    "description": "当 `thisArg` 未定义时，默认改为使用调用者的 `this`。"
+                  },
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/36782",
+                    "description": "添加了可选的 thisArg。"
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function} 要绑定到当前 `AsyncResource` 的函数。",
+                      "name": "fn",
+                      "type": "Function",
+                      "desc": "要绑定到当前 `AsyncResource` 的函数。"
+                    },
+                    {
+                      "textRaw": "`thisArg` {any}",
+                      "name": "thisArg",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将给定函数绑定到此 <code>AsyncResource</code> 的作用域中执行。</p>"
+            },
+            {
+              "textRaw": "`asyncResource.runInAsyncScope(fn[, thisArg, ...args])`",
+              "type": "method",
+              "name": "runInAsyncScope",
+              "meta": {
+                "added": [
+                  "v9.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function} 要在此异步资源的执行上下文中调用的函数。",
+                      "name": "fn",
+                      "type": "Function",
+                      "desc": "要在此异步资源的执行上下文中调用的函数。"
+                    },
+                    {
+                      "textRaw": "`thisArg` {any} 用于函数调用的接收器。",
+                      "name": "thisArg",
+                      "type": "any",
+                      "desc": "用于函数调用的接收器。"
+                    },
+                    {
+                      "textRaw": "`...args` {any} 传递给函数的可选参数。",
+                      "name": "...args",
+                      "type": "any",
+                      "desc": "传递给函数的可选参数。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在异步资源的执行上下文中使用提供的参数调用提供的函数。这将建立上下文，触发 AsyncHooks before 回调，调用函数，触发 AsyncHooks after 回调，然后恢复原始的执行上下文。</p>"
+            },
+            {
+              "textRaw": "`asyncResource.emitDestroy()`",
+              "type": "method",
+              "name": "emitDestroy",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {AsyncResource} 对 `asyncResource` 的引用。",
+                      "name": "返回",
+                      "type": "AsyncResource",
+                      "desc": "对 `asyncResource` 的引用。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>调用所有 <code>destroy</code> 钩子。这应该只调用一次。如果调用超过一次，将抛出错误。这<strong>必须</strong>手动调用。如果资源留给 GC 回收，则 <code>destroy</code> 钩子将永远不会被调用。</p>"
+            },
+            {
+              "textRaw": "`asyncResource.asyncId()`",
+              "type": "method",
+              "name": "asyncId",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {number} 分配给资源的唯一 `asyncId`。",
+                      "name": "返回",
+                      "type": "number",
+                      "desc": "分配给资源的唯一 `asyncId`。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`asyncResource.triggerAsyncId()`",
+              "type": "method",
+              "name": "triggerAsyncId",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {number} 传递给 `AsyncResource` 构造函数的相同 `triggerAsyncId`。",
+                      "name": "返回",
+                      "type": "number",
+                      "desc": "传递给 `AsyncResource` 构造函数的相同 `triggerAsyncId`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><a id=\"async-resource-worker-pool\"></a></p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`AsyncResource`"
+        }
+      ],
+      "type": "module",
+      "displayName": "异步上下文追踪"
+    }
+  ]
+}

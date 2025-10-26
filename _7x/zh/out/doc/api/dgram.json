@@ -1,0 +1,1068 @@
+{
+  "type": "module",
+  "source": "doc/api/dgram.md",
+  "modules": [
+    {
+      "textRaw": "UDP/datagram sockets",
+      "name": "dgram",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/dgram.js\">lib/dgram.js</a></p>\n<p><code>node:dgram</code> 模块提供了 UDP 数据报套接字的实现。</p>\n<pre><code class=\"language-mjs\">import dgram from 'node:dgram';\n\nconst server = dgram.createSocket('udp4');\n\nserver.on('error', (err) => {\n  console.error(`server error:\\n${err.stack}`);\n  server.close();\n});\n\nserver.on('message', (msg, rinfo) => {\n  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);\n});\n\nserver.on('listening', () => {\n  const address = server.address();\n  console.log(`server listening ${address.address}:${address.port}`);\n});\n\nserver.bind(41234);\n// Prints: server listening 0.0.0.0:41234\n</code></pre>\n<pre><code class=\"language-cjs\">const dgram = require('node:dgram');\nconst server = dgram.createSocket('udp4');\n\nserver.on('error', (err) => {\n  console.error(`server error:\\n${err.stack}`);\n  server.close();\n});\n\nserver.on('message', (msg, rinfo) => {\n  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);\n});\n\nserver.on('listening', () => {\n  const address = server.address();\n  console.log(`server listening ${address.address}:${address.port}`);\n});\n\nserver.bind(41234);\n// Prints: server listening 0.0.0.0:41234\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "类：`dgram.Socket`",
+          "name": "类：`dgram.socket`",
+          "meta": {
+            "added": [
+              "v0.1.99"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>继承：<a href=\"events.html#class-eventemitter\" class=\"type\">&lt;EventEmitter&gt;</a></li>\n</ul>\n<p>封装了数据报功能。</p>\n<p>使用 <a href=\"#dgramcreatesocketoptions-callback\"><code>dgram.createSocket()</code></a> 创建 <code>dgram.Socket</code> 的新实例。不应使用 <code>new</code> 关键字来创建 <code>dgram.Socket</code> 实例。</p>",
+          "modules": [
+            {
+              "textRaw": "事件：`'close'`",
+              "name": "事件：`'close'`",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在使用 <a href=\"#socketclosecallback\"><code>close()</code></a> 关闭套接字后，会发出 <code>'close'</code> 事件。一旦触发，此套接字上不会再发出新的 <code>'message'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'close'`"
+            },
+            {
+              "textRaw": "事件：`'connect'`",
+              "name": "事件：`'connect'`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当套接字因成功调用 <a href=\"#socketconnectport-address-callback\"><code>connect()</code></a> 而与远程地址关联后，会发出 <code>'connect'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'connect'`"
+            },
+            {
+              "textRaw": "事件：`'error'`",
+              "name": "事件：`'error'`",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>exception</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>每当发生任何错误时，都会发出 <code>'error'</code> 事件。事件处理函数会传入一个 <code>Error</code> 对象。</p>",
+              "type": "module",
+              "displayName": "事件：`'error'`"
+            },
+            {
+              "textRaw": "事件：`'listening'`",
+              "name": "事件：`'listening'`",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一旦 <code>dgram.Socket</code> 可寻址并能接收数据，就会发出 <code>'listening'</code> 事件。这可以通过显式调用 <code>socket.bind()</code> 或隐式地在首次使用 <code>socket.send()</code> 发送数据时发生。在 <code>dgram.Socket</code> 开始监听之前，底层系统资源不存在，并且调用诸如 <code>socket.address()</code> 和 <code>socket.setTTL()</code> 等方法将会失败。</p>",
+              "type": "module",
+              "displayName": "事件：`'listening'`"
+            },
+            {
+              "textRaw": "事件：`'message'`",
+              "name": "事件：`'message'`",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/43054",
+                    "description": "The `family` property now returns a string instead of a number."
+                  },
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41431",
+                    "description": "The `family` property now returns a number instead of a string."
+                  }
+                ]
+              },
+              "desc": "<p>当套接字上有新的数据报可用时，会发出 <code>'message'</code> 事件。事件处理函数会传入两个参数：<code>msg</code> 和 <code>rinfo</code>。</p>\n<ul>\n<li><code>msg</code> <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> 消息。</li>\n<li><code>rinfo</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 远程地址信息。\n<ul>\n<li><code>address</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 发送方地址。</li>\n<li><code>family</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 地址族（<code>'IPv4'</code> 或 <code>'IPv6'</code>）。</li>\n<li><code>port</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 发送方端口。</li>\n<li><code>size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 消息大小。</li>\n</ul>\n</li>\n</ul>\n<p>如果传入数据包的源地址是 IPv6 链路本地地址，则接口名称会添加到 <code>address</code> 中。例如，在 <code>en0</code> 接口上接收的数据包可能将地址字段设置为 <code>'fe80::2618:1234:ab11:3b9c%en0'</code>，其中 <code>'%en0'</code> 是作为区域 ID 后缀的接口名称。</p>",
+              "type": "module",
+              "displayName": "事件：`'message'`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`socket.addMembership(multicastAddress[, multicastInterface])`",
+              "type": "method",
+              "name": "addMembership",
+              "meta": {
+                "added": [
+                  "v0.6.9"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`multicastAddress` {string}",
+                      "name": "multicastAddress",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`multicastInterface` {string}",
+                      "name": "multicastInterface",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>告诉内核使用 <code>IP_ADD_MEMBERSHIP</code> 套接字选项在给定的 <code>multicastAddress</code> 和 <code>multicastInterface</code> 上加入多播组。如果未指定 <code>multicastInterface</code> 参数，操作系统将选择一个接口并加入其成员资格。要加入每个可用接口的成员资格，请多次调用 <code>addMembership</code>，每个接口一次。</p>\n<p>在未绑定的套接字上调用此方法时，该方法将隐式绑定到随机端口，监听所有接口。</p>\n<p>在多个 <code>cluster</code> 工作进程之间共享 UDP 套接字时，必须仅调用一次 <code>socket.addMembership()</code> 函数，否则将发生 <code>EADDRINUSE</code> 错误：</p>\n<pre><code class=\"language-mjs\">import cluster from 'node:cluster';\nimport dgram from 'node:dgram';\n\nif (cluster.isPrimary) {\n  cluster.fork(); // 工作正常。\n  cluster.fork(); // 因 EADDRINUSE 失败。\n} else {\n  const s = dgram.createSocket('udp4');\n  s.bind(1234, () => {\n    s.addMembership('224.0.0.114');\n  });\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const cluster = require('node:cluster');\nconst dgram = require('node:dgram');\n\nif (cluster.isPrimary) {\n  cluster.fork(); // 工作正常。\n  cluster.fork(); // 因 EADDRINUSE 失败。\n} else {\n  const s = dgram.createSocket('udp4');\n  s.bind(1234, () => {\n    s.addMembership('224.0.0.114');\n  });\n}\n</code></pre>"
+            },
+            {
+              "textRaw": "`socket.addSourceSpecificMembership(sourceAddress, groupAddress[, multicastInterface])`",
+              "type": "method",
+              "name": "addSourceSpecificMembership",
+              "meta": {
+                "added": [
+                  "v13.1.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sourceAddress` {string}",
+                      "name": "sourceAddress",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`groupAddress` {string}",
+                      "name": "groupAddress",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`multicastInterface` {string}",
+                      "name": "multicastInterface",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>告诉内核使用 <code>IP_ADD_SOURCE_MEMBERSHIP</code> 套接字选项，在给定的 <code>sourceAddress</code> 和 <code>groupAddress</code> 上加入特定源多播通道，并使用 <code>multicastInterface</code>。如果未指定 <code>multicastInterface</code> 参数，操作系统将选择一个接口并加入其成员资格。要加入每个可用接口的成员资格，请多次调用 <code>socket.addSourceSpecificMembership()</code>，每个接口一次。</p>\n<p>在未绑定的套接字上调用此方法时，该方法将隐式绑定到随机端口，监听所有接口。</p>"
+            },
+            {
+              "textRaw": "`socket.address()`",
+              "type": "method",
+              "name": "address",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Object}",
+                      "name": "返回：",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个包含套接字地址信息的对象。对于 UDP 套接字，此对象将包含 <code>address</code>、<code>family</code> 和 <code>port</code> 属性。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <code>EBADF</code>。</p>"
+            },
+            {
+              "textRaw": "`socket.bind([port][, address][, callback])`",
+              "type": "method",
+              "name": "bind",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": [
+                  {
+                    "version": "v0.9.1",
+                    "commit": "332fea5ac1816e498030109c4211bca24a7fa667",
+                    "description": "The method was changed to an asynchronous execution model. Legacy code would need to be changed to pass a callback function to the method call."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`port` {integer}",
+                      "name": "port",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`address` {string}",
+                      "name": "address",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 无参数。绑定完成时调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "无参数。绑定完成时调用。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>对于 UDP 套接字，使 <code>dgram.Socket</code> 在指定的 <code>port</code> 和可选的 <code>address</code> 上监听数据报消息。如果未指定 <code>port</code> 或为 <code>0</code>，操作系统将尝试绑定到随机端口。如果未指定 <code>address</code>，操作系统将尝试在所有地址上监听。一旦绑定完成，将发出 <code>'listening'</code> 事件，并调用可选的 <code>callback</code> 函数。</p>\n<p>同时指定 <code>'listening'</code> 事件监听器并将 <code>callback</code> 传递给 <code>socket.bind()</code> 方法并无害处，但不是很实用。</p>\n<p>绑定的数据报套接字会保持 Node.js 进程运行以接收数据报消息。</p>\n<p>如果绑定失败，会生成 <code>'error'</code> 事件。在极少数情况下（例如尝试使用已关闭的套接字进行绑定），可能会抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</p>\n<p>监听端口 41234 的 UDP 服务器示例：</p>\n<pre><code class=\"language-mjs\">import dgram from 'node:dgram';\n\nconst server = dgram.createSocket('udp4');\n\nserver.on('error', (err) => {\n  console.error(`server error:\\n${err.stack}`);\n  server.close();\n});\n\nserver.on('message', (msg, rinfo) => {\n  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);\n});\n\nserver.on('listening', () => {\n  const address = server.address();\n  console.log(`server listening ${address.address}:${address.port}`);\n});\n\nserver.bind(41234);\n// Prints: server listening 0.0.0.0:41234\n</code></pre>\n<pre><code class=\"language-cjs\">const dgram = require('node:dgram');\nconst server = dgram.createSocket('udp4');\n\nserver.on('error', (err) => {\n  console.error(`server error:\\n${err.stack}`);\n  server.close();\n});\n\nserver.on('message', (msg, rinfo) => {\n  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);\n});\n\nserver.on('listening', () => {\n  const address = server.address();\n  console.log(`server listening ${address.address}:${address.port}`);\n});\n\nserver.bind(41234);\n// Prints: server listening 0.0.0.0:41234\n</code></pre>"
+            },
+            {
+              "textRaw": "`socket.bind(options[, callback])`",
+              "type": "method",
+              "name": "bind",
+              "meta": {
+                "added": [
+                  "v0.11.14"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object} 必需。支持以下属性：",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "必需。支持以下属性：",
+                      "options": [
+                        {
+                          "textRaw": "`port` {integer}",
+                          "name": "port",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "`address` {string}",
+                          "name": "address",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`exclusive` {boolean}",
+                          "name": "exclusive",
+                          "type": "boolean"
+                        },
+                        {
+                          "textRaw": "`fd` {integer}",
+                          "name": "fd",
+                          "type": "integer"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>对于 UDP 套接字，使 <code>dgram.Socket</code> 在作为第一个参数传递的 <code>options</code> 对象的属性中指定的命名 <code>port</code> 和可选 <code>address</code> 上监听数据报消息。如果未指定 <code>port</code> 或为 <code>0</code>，操作系统将尝试绑定到随机端口。如果未指定 <code>address</code>，操作系统将尝试在所有地址上监听。一旦绑定完成，将发出 <code>'listening'</code> 事件，并调用可选的 <code>callback</code> 函数。</p>\n<p><code>options</code> 对象可能包含 <code>fd</code> 属性。当设置了大于 <code>0</code> 的 <code>fd</code> 时，它将包装具有给定文件描述符的现有套接字。在这种情况下，将忽略 <code>port</code> 和 <code>address</code> 的属性。</p>\n<p>同时指定 <code>'listening'</code> 事件监听器并将 <code>callback</code> 传递给 <code>socket.bind()</code> 方法并无害处，但不是很实用。</p>\n<p><code>options</code> 对象可能包含一个额外的 <code>exclusive</code> 属性，该属性在与 <a href=\"cluster.html\"><code>cluster</code></a> 模块一起使用 <code>dgram.Socket</code> 对象时使用。当 <code>exclusive</code> 设置为 <code>false</code>（默认值）时，集群工作进程将使用相同的底层套接字句柄，允许共享连接处理职责。然而，当 <code>exclusive</code> 为 <code>true</code> 时，句柄不共享，尝试共享端口会导致错误。创建 <code>dgram.Socket</code> 时将 <code>reusePort</code> 选项设置为 <code>true</code> 会导致在调用 <code>socket.bind()</code> 时 <code>exclusive</code> 始终为 <code>true</code>。</p>\n<p>绑定的数据报套接字会保持 Node.js 进程运行以接收数据报消息。</p>\n<p>如果绑定失败，会生成 <code>'error'</code> 事件。在极少数情况下（例如尝试使用已关闭的套接字进行绑定），可能会抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</p>\n<p>下面显示了一个监听独占端口的套接字示例。</p>\n<pre><code class=\"language-js\">socket.bind({\n  address: 'localhost',\n  port: 8000,\n  exclusive: true,\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`socket.close([callback])`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 当套接字关闭时调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "当套接字关闭时调用。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>关闭底层套接字并停止在其上监听数据。如果提供了回调函数，它会被添加为 <a href=\"#event-close\"><code>'close'</code></a> 事件的监听器。</p>"
+            },
+            {
+              "textRaw": "`socket[Symbol.asyncDispose]()`",
+              "type": "method",
+              "name": "[Symbol.asyncDispose]",
+              "meta": {
+                "added": [
+                  "v20.5.0",
+                  "v18.18.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58467",
+                    "description": "No longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>调用 <a href=\"#socketclosecallback\"><code>socket.close()</code></a> 并返回一个在套接字关闭时完成的 promise。</p>"
+            },
+            {
+              "textRaw": "`socket.connect(port[, address][, callback])`",
+              "type": "method",
+              "name": "connect",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`port` {integer}",
+                      "name": "port",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`address` {string}",
+                      "name": "address",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 当连接完成或出错时调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "当连接完成或出错时调用。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 <code>dgram.Socket</code> 与远程地址和端口关联。此句柄发送的每条消息都会自动发送到该目的地。此外，套接字将仅接收来自该远程对等方的消息。尝试在已连接的套接字上调用 <code>connect()</code> 将导致 <a href=\"errors.html#err_socket_dgram_is_connected\"><code>ERR_SOCKET_DGRAM_IS_CONNECTED</code></a> 异常。如果未提供 <code>address</code>，将默认使用 <code>'127.0.0.1'</code>（对于 <code>udp4</code> 套接字）或 <code>'::1'</code>（对于 <code>udp6</code> 套接字）。连接完成后，会发出 <code>'connect'</code> 事件，并调用可选的 <code>callback</code> 函数。如果失败，将调用 <code>callback</code>，或者，如果失败，将发出 <code>'error'</code> 事件。</p>"
+            },
+            {
+              "textRaw": "`socket.disconnect()`",
+              "type": "method",
+              "name": "disconnect",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>一个同步函数，用于将已连接的 <code>dgram.Socket</code> 与其远程地址解除关联。尝试在未绑定或已断开连接的套接字上调用 <code>disconnect()</code> 将导致 <a href=\"errors.html#err_socket_dgram_not_connected\"><code>ERR_SOCKET_DGRAM_NOT_CONNECTED</code></a> 异常。</p>"
+            },
+            {
+              "textRaw": "`socket.dropMembership(multicastAddress[, multicastInterface])`",
+              "type": "method",
+              "name": "dropMembership",
+              "meta": {
+                "added": [
+                  "v0.6.9"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`multicastAddress` {string}",
+                      "name": "multicastAddress",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`multicastInterface` {string}",
+                      "name": "multicastInterface",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>指示内核使用 <code>IP_DROP_MEMBERSHIP</code> 套接字选项在 <code>multicastAddress</code> 上离开多播组。当套接字关闭或进程终止时，内核会自动调用此方法，因此大多数应用程序永远没有理由调用此方法。</p>\n<p>如果未指定 <code>multicastInterface</code>，操作系统将尝试在所有有效接口上删除成员资格。</p>"
+            },
+            {
+              "textRaw": "`socket.dropSourceSpecificMembership(sourceAddress, groupAddress[, multicastInterface])`",
+              "type": "method",
+              "name": "dropSourceSpecificMembership",
+              "meta": {
+                "added": [
+                  "v13.1.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sourceAddress` {string}",
+                      "name": "sourceAddress",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`groupAddress` {string}",
+                      "name": "groupAddress",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`multicastInterface` {string}",
+                      "name": "multicastInterface",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>指示内核使用 <code>IP_DROP_SOURCE_MEMBERSHIP</code> 套接字选项在给定的 <code>sourceAddress</code> 和 <code>groupAddress</code> 上离开特定源多播通道。当套接字关闭或进程终止时，内核会自动调用此方法，因此大多数应用程序永远没有理由调用此方法。</p>\n<p>如果未指定 <code>multicastInterface</code>，操作系统将尝试在所有有效接口上删除成员资格。</p>"
+            },
+            {
+              "textRaw": "`socket.getRecvBufferSize()`",
+              "type": "method",
+              "name": "getRecvBufferSize",
+              "meta": {
+                "added": [
+                  "v8.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{number} `SO_RCVBUF` 套接字接收缓冲区大小（以字节为单位）。",
+                      "name": "返回：",
+                      "type": "number",
+                      "desc": "`SO_RCVBUF` 套接字接收缓冲区大小（以字节为单位）。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果在未绑定的套接字上调用此方法，则会抛出 <a href=\"errors.html#err_socket_buffer_size\"><code>ERR_SOCKET_BUFFER_SIZE</code></a>。</p>"
+            },
+            {
+              "textRaw": "`socket.getSendBufferSize()`",
+              "type": "method",
+              "name": "getSendBufferSize",
+              "meta": {
+                "added": [
+                  "v8.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{number} `SO_SNDBUF` 套接字发送缓冲区大小（以字节为单位）。",
+                      "name": "返回：",
+                      "type": "number",
+                      "desc": "`SO_SNDBUF` 套接字发送缓冲区大小（以字节为单位）。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果在未绑定的套接字上调用此方法，则会抛出 <a href=\"errors.html#err_socket_buffer_size\"><code>ERR_SOCKET_BUFFER_SIZE</code></a>。</p>"
+            },
+            {
+              "textRaw": "`socket.getSendQueueSize()`",
+              "type": "method",
+              "name": "getSendQueueSize",
+              "meta": {
+                "added": [
+                  "v18.8.0",
+                  "v16.19.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{number} 排队等待发送的字节数。",
+                      "name": "返回：",
+                      "type": "number",
+                      "desc": "排队等待发送的字节数。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`socket.getSendQueueCount()`",
+              "type": "method",
+              "name": "getSendQueueCount",
+              "meta": {
+                "added": [
+                  "v18.8.0",
+                  "v16.19.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{number} 当前队列中等待处理的发送请求数。",
+                      "name": "返回：",
+                      "type": "number",
+                      "desc": "当前队列中等待处理的发送请求数。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`socket.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{dgram.Socket}",
+                      "name": "返回：",
+                      "type": "dgram.Socket"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>默认情况下，绑定套接字将导致 Node.js 进程在套接字打开时保持运行。<code>socket.unref()</code> 方法可用于将套接字从保持 Node.js 进程活动的引用计数中排除。<code>socket.ref()</code> 方法将套接字添加回引用计数并恢复默认行为。</p>\n<p>多次调用 <code>socket.ref()</code> 不会有额外效果。</p>\n<p><code>socket.ref()</code> 方法返回对套接字的引用，因此可以链式调用。</p>"
+            },
+            {
+              "textRaw": "`socket.remoteAddress()`",
+              "type": "method",
+              "name": "remoteAddress",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Object}",
+                      "name": "返回：",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个包含远程端点的 <code>address</code>、<code>family</code> 和 <code>port</code> 的对象。如果套接字未连接，此方法将抛出 <a href=\"errors.html#err_socket_dgram_not_connected\"><code>ERR_SOCKET_DGRAM_NOT_CONNECTED</code></a> 异常。</p>"
+            },
+            {
+              "textRaw": "`socket.send(msg[, offset, length][, port][, address][, callback])`",
+              "type": "method",
+              "name": "send",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": [
+                  {
+                    "version": "v17.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/39190",
+                    "description": "The `address` parameter now only accepts a `string`, `null` or `undefined`."
+                  },
+                  {
+                    "version": [
+                      "v14.5.0",
+                      "v12.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/22413",
+                    "description": "The `msg` parameter can now be any `TypedArray` or `DataView`."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/26871",
+                    "description": "Added support for sending data on connected sockets."
+                  },
+                  {
+                    "version": "v8.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/11985",
+                    "description": "The `msg` parameter can be an `Uint8Array` now."
+                  },
+                  {
+                    "version": "v8.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/10473",
+                    "description": "The `address` parameter is always optional now."
+                  },
+                  {
+                    "version": "v6.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/5929",
+                    "description": "On success, `callback` will now be called with an `error` argument of `null` rather than `0`."
+                  },
+                  {
+                    "version": "v5.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/4374",
+                    "description": "The `msg` parameter can be an array now. Also, the `offset` and `length` parameters are optional now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`msg` {Buffer|TypedArray|DataView|string|Array} 要发送的消息。",
+                      "name": "msg",
+                      "type": "Buffer|TypedArray|DataView|string|Array",
+                      "desc": "要发送的消息。"
+                    },
+                    {
+                      "textRaw": "`offset` {integer} 缓冲区中消息开始的位置。",
+                      "name": "offset",
+                      "type": "integer",
+                      "desc": "缓冲区中消息开始的位置。"
+                    },
+                    {
+                      "textRaw": "`length` {integer} 消息中的字节数。",
+                      "name": "length",
+                      "type": "integer",
+                      "desc": "消息中的字节数。"
+                    },
+                    {
+                      "textRaw": "`port` {integer} 目标端口。",
+                      "name": "port",
+                      "type": "integer",
+                      "desc": "目标端口。"
+                    },
+                    {
+                      "textRaw": "`address` {string} 目标主机名或 IP 地址。",
+                      "name": "address",
+                      "type": "string",
+                      "desc": "目标主机名或 IP 地址。"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 当消息已发送时调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "当消息已发送时调用。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在套接字上广播数据报。对于无连接套接字，必须指定目标 <code>port</code> 和 <code>address</code>。相反，已连接的套接字将使用其关联的远程端点，因此不得设置 <code>port</code> 和 <code>address</code> 参数。</p>\n<p><code>msg</code> 参数包含要发送的消息。根据其类型，可能适用不同的行为。如果 <code>msg</code> 是 <code>Buffer</code>、任何 <code>TypedArray</code> 或 <code>DataView</code>，则 <code>offset</code> 和 <code>length</code> 分别指定 <code>Buffer</code> 中消息开始的偏移量和消息中的字节数。如果 <code>msg</code> 是 <code>String</code>，则它会自动转换为使用 <code>'utf8'</code> 编码的 <code>Buffer</code>。对于包含多字节字符的消息，<code>offset</code> 和 <code>length</code> 将根据[字节长度][byte length]计算，而不是字符位置。如果 <code>msg</code> 是数组，则不得指定 <code>offset</code> 和 <code>length</code>。</p>\n<p><code>address</code> 参数是一个字符串。如果 <code>address</code> 的值是主机名，则将使用 DNS 来解析主机的地址。如果未提供 <code>address</code> 或为 nullish，将默认使用 <code>'127.0.0.1'</code>（对于 <code>udp4</code> 套接字）或 <code>'::1'</code>（对于 <code>udp6</code> 套接字）。</p>\n<p>如果套接字之前未通过调用 <code>bind</code> 进行绑定，则将为套接字分配一个随机端口号，并绑定到“所有接口”地址（对于 <code>udp4</code> 套接字为 <code>'0.0.0.0'</code>，对于 <code>udp6</code> 套接字为 <code>'::0'</code>）。</p>\n<p>可以指定可选的 <code>callback</code> 函数作为报告 DNS 错误或确定何时可以安全重用 <code>buf</code> 对象的一种方式。DNS 查找会延迟发送时间至少一个 Node.js 事件循环滴答。</p>\n<p>确定数据报已发送的唯一方法是使用 <code>callback</code>。如果发生错误并且提供了 <code>callback</code>，则错误将作为第一个参数传递给 <code>callback</code>。如果未提供 <code>callback</code>，则错误将作为 <code>'error'</code> 事件在 <code>socket</code> 对象上发出。</p>\n<p>偏移量和长度是可选的，但如果使用了其中一个，则两者_必须_都设置。仅当第一个参数是 <code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code> 时才支持它们。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <a href=\"errors.html#err_socket_bad_port\"><code>ERR_SOCKET_BAD_PORT</code></a>。</p>\n<p>向 <code>localhost</code> 上的端口发送 UDP 数据包的示例；</p>\n<pre><code class=\"language-mjs\">import dgram from 'node:dgram';\nimport { Buffer } from 'node:buffer';\n\nconst message = Buffer.from('Some bytes');\nconst client = dgram.createSocket('udp4');\nclient.send(message, 41234, 'localhost', (err) => {\n  client.close();\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const dgram = require('node:dgram');\nconst { Buffer } = require('node:buffer');\n\nconst message = Buffer.from('Some bytes');\nconst client = dgram.createSocket('udp4');\nclient.send(message, 41234, 'localhost', (err) => {\n  client.close();\n});\n</code></pre>\n<p>向 <code>127.0.0.1</code> 上的端口发送由多个缓冲区组成的 UDP 数据包的示例；</p>\n<pre><code class=\"language-mjs\">import dgram from 'node:dgram';\nimport { Buffer } from 'node:buffer';\n\nconst buf1 = Buffer.from('Some ');\nconst buf2 = Buffer.from('bytes');\nconst client = dgram.createSocket('udp4');\nclient.send([buf1, buf2], 41234, (err) => {\n  client.close();\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const dgram = require('node:dgram');\nconst { Buffer } = require('node:buffer');\n\nconst buf1 = Buffer.from('Some ');\nconst buf2 = Buffer.from('bytes');\nconst client = dgram.createSocket('udp4');\nclient.send([buf1, buf2], 41234, (err) => {\n  client.close();\n});\n</code></pre>\n<p>发送多个缓冲区可能会更快或更慢，具体取决于应用程序和操作系统。运行基准测试以根据具体情况确定最佳策略。然而，一般来说，发送多个缓冲区更快。</p>\n<p>使用连接到 <code>localhost</code> 上端口的套接字发送 UDP 数据包的示例：</p>\n<pre><code class=\"language-mjs\">import dgram from 'node:dgram';\nimport { Buffer } from 'node:buffer';\n\nconst message = Buffer.from('Some bytes');\nconst client = dgram.createSocket('udp4');\nclient.connect(41234, 'localhost', (err) => {\n  client.send(message, (err) => {\n    client.close();\n  });\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const dgram = require('node:dgram');\nconst { Buffer } = require('node:buffer');\n\nconst message = Buffer.from('Some bytes');\nconst client = dgram.createSocket('udp4');\nclient.connect(41234, 'localhost', (err) => {\n  client.send(message, (err) => {\n    client.close();\n  });\n});\n</code></pre>",
+              "modules": [
+                {
+                  "textRaw": "关于 UDP 数据报大小的说明",
+                  "name": "关于_udp_数据报大小的说明",
+                  "desc": "<p>IPv4/v6 数据报的最大大小取决于 <code>MTU</code>（最大传输单元）和 <code>Payload Length</code> 字段大小。</p>\n<ul>\n<li>\n<p><code>Payload Length</code> 字段为 16 位宽，这意味着正常有效载荷不能超过 64K 八位字节，包括互联网头和数据（65,507 字节 = 65,535 − 8 字节 UDP 头 − 20 字节 IP 头）；这对于环回接口通常成立，但如此长的数据报消息对于大多数主机和网络来说不切实际。</p>\n</li>\n<li>\n<p><code>MTU</code> 是给定链路层技术可以支持的数据报消息的最大大小。对于任何链路，IPv4 强制要求最小 <code>MTU</code> 为 68 个八位字节，而 IPv4 的推荐 <code>MTU</code> 为 576（通常推荐作为拨号类型应用程序的 <code>MTU</code>），无论它们是完整到达还是分段到达。</p>\n<p>对于 IPv6，最小 <code>MTU</code> 为 1280 个八位字节。但是，强制的最小分段重组缓冲区大小为 1500 个八位字节。68 个八位字节的值非常小，因为大多数当前的链路层技术（如以太网）的最小 <code>MTU</code> 为 1500。</p>\n</li>\n</ul>\n<p>无法预先知道数据包可能经过的每个链路的 MTU。发送大于接收方 <code>MTU</code> 的数据报将不起作用，因为数据包将被静默丢弃，而不会通知源数据未到达其预期的接收者。</p>",
+                  "type": "module",
+                  "displayName": "关于 UDP 数据报大小的说明"
+                }
+              ]
+            },
+            {
+              "textRaw": "`socket.setBroadcast(flag)`",
+              "type": "method",
+              "name": "setBroadcast",
+              "meta": {
+                "added": [
+                  "v0.6.9"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`flag` {boolean}",
+                      "name": "flag",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置或清除 <code>SO_BROADCAST</code> 套接字选项。当设置为 <code>true</code> 时，UDP 数据包可以发送到本地接口的广播地址。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <code>EBADF</code>。</p>"
+            },
+            {
+              "textRaw": "`socket.setMulticastInterface(multicastInterface)`",
+              "type": "method",
+              "name": "setMulticastInterface",
+              "meta": {
+                "added": [
+                  "v8.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`multicastInterface` {string}",
+                      "name": "multicastInterface",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><em>本节中所有对范围的引用都是指 <a href=\"https://en.wikipedia.org/wiki/IPv6_address#Scoped_literal_IPv6_addresses\">IPv6 区域索引</a>，这些索引由 <a href=\"https://tools.ietf.org/html/rfc4007\">RFC 4007</a> 定义。在字符串形式中，带有范围索引的 IP 写为 <code>'IP%scope'</code>，其中 scope 是接口名称或接口编号。</em></p>\n<p>将套接字的默认传出多播接口设置为选择的接口或恢复为系统接口选择。<code>multicastInterface</code> 必须是套接字族 IP 的有效字符串表示形式。</p>\n<p>对于 IPv4 套接字，这应该是为所需物理接口配置的 IP。发送到套接字上多播的所有数据包将在最近一次成功使用此调用确定的接口上发送。</p>\n<p>对于 IPv6 套接字，<code>multicastInterface</code> 应包含一个范围以指示接口，如下例所示。在 IPv6 中，各个 <code>send</code> 调用也可以在地址中使用显式范围，因此只有发送到未指定显式范围的多播地址的数据包才会受到最近一次成功使用此调用的影响。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <code>EBADF</code>。</p>",
+              "modules": [
+                {
+                  "textRaw": "示例：IPv6 传出多播接口",
+                  "name": "示例：ipv6_传出多播接口",
+                  "desc": "<p>在大多数系统上，范围格式使用接口名称：</p>\n<pre><code class=\"language-js\">const socket = dgram.createSocket('udp6');\n\nsocket.bind(1234, () => {\n  socket.setMulticastInterface('::%eth1');\n});\n</code></pre>\n<p>在 Windows 上，范围格式使用接口编号：</p>\n<pre><code class=\"language-js\">const socket = dgram.createSocket('udp6');\n\nsocket.bind(1234, () => {\n  socket.setMulticastInterface('::%2');\n});\n</code></pre>",
+                  "type": "module",
+                  "displayName": "示例：IPv6 传出多播接口"
+                },
+                {
+                  "textRaw": "示例：IPv4 传出多播接口",
+                  "name": "示例：ipv4_传出多播接口",
+                  "desc": "<p>所有系统都使用所需物理接口上的主机 IP：</p>\n<pre><code class=\"language-js\">const socket = dgram.createSocket('udp4');\n\nsocket.bind(1234, () => {\n  socket.setMulticastInterface('10.0.0.2');\n});\n</code></pre>",
+                  "type": "module",
+                  "displayName": "示例：IPv4 传出多播接口"
+                },
+                {
+                  "textRaw": "调用结果",
+                  "name": "调用结果",
+                  "desc": "<p>在未准备好发送或不再打开的套接字上调用可能会抛出 <em>Not running</em> <a href=\"errors.html#class-error\"><code>Error</code></a>。</p>\n<p>如果 <code>multicastInterface</code> 无法解析为 IP，则会抛出 <em>EINVAL</em> <a href=\"errors.html#class-systemerror\"><code>System Error</code></a>。</p>\n<p>在 IPv4 上，如果 <code>multicastInterface</code> 是有效地址但与任何接口不匹配，或者地址与族不匹配，则会抛出 <a href=\"errors.html#class-systemerror\"><code>System Error</code></a>，例如 <code>EADDRNOTAVAIL</code> 或 <code>EPROTONOSUP</code>。</p>\n<p>在 IPv6 上，指定或省略范围的大多数错误将导致套接字继续使用（或恢复为）系统的默认接口选择。</p>\n<p>套接字地址族的 ANY 地址（IPv4 <code>'0.0.0.0'</code> 或 IPv6 <code>'::'</code>）可用于将套接字的默认传出接口的控制权返回给系统，以供将来的多播数据包使用。</p>",
+                  "type": "module",
+                  "displayName": "调用结果"
+                }
+              ]
+            },
+            {
+              "textRaw": "`socket.setMulticastLoopback(flag)`",
+              "type": "method",
+              "name": "setMulticastLoopback",
+              "meta": {
+                "added": [
+                  "v0.3.8"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`flag` {boolean}",
+                      "name": "flag",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置或清除 <code>IP_MULTICAST_LOOP</code> 套接字选项。当设置为 <code>true</code> 时，多播数据包也将在本地接口上接收。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <code>EBADF</code>。</p>"
+            },
+            {
+              "textRaw": "`socket.setMulticastTTL(ttl)`",
+              "type": "method",
+              "name": "setMulticastTTL",
+              "meta": {
+                "added": [
+                  "v0.3.8"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`ttl` {integer}",
+                      "name": "ttl",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置 <code>IP_MULTICAST_TTL</code> 套接字选项。虽然 TTL 通常代表“生存时间”，但在此上下文中，它指定数据包允许经过的 IP 跳数，特别是多播流量。转发数据包的每个路由器或网关都会递减 TTL。如果路由器将 TTL 递减到 0，则不会转发。</p>\n<p><code>ttl</code> 参数可能在 0 到 255 之间。大多数系统上的默认值为 <code>1</code>。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <code>EBADF</code>。</p>"
+            },
+            {
+              "textRaw": "`socket.setRecvBufferSize(size)`",
+              "type": "method",
+              "name": "setRecvBufferSize",
+              "meta": {
+                "added": [
+                  "v8.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`size` {integer}",
+                      "name": "size",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置 <code>SO_RCVBUF</code> 套接字选项。设置最大套接字接收缓冲区（以字节为单位）。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <a href=\"errors.html#err_socket_buffer_size\"><code>ERR_SOCKET_BUFFER_SIZE</code></a>。</p>"
+            },
+            {
+              "textRaw": "`socket.setSendBufferSize(size)`",
+              "type": "method",
+              "name": "setSendBufferSize",
+              "meta": {
+                "added": [
+                  "v8.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`size` {integer}",
+                      "name": "size",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置 <code>SO_SNDBUF</code> 套接字选项。设置最大套接字发送缓冲区（以字节为单位）。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <a href=\"errors.html#err_socket_buffer_size\"><code>ERR_SOCKET_BUFFER_SIZE</code></a>。</p>"
+            },
+            {
+              "textRaw": "`socket.setTTL(ttl)`",
+              "type": "method",
+              "name": "setTTL",
+              "meta": {
+                "added": [
+                  "v0.1.101"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`ttl` {integer}",
+                      "name": "ttl",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置 <code>IP_TTL</code> 套接字选项。虽然 TTL 通常代表“生存时间”，但在此上下文中，它指定数据包允许经过的 IP 跳数。转发数据包的每个路由器或网关都会递减 TTL。如果路由器将 TTL 递减到 0，则不会转发。更改 TTL 值通常用于网络探测或多播。</p>\n<p><code>ttl</code> 参数可能在 1 到 255 之间。大多数系统上的默认值为 64。</p>\n<p>如果在未绑定的套接字上调用此方法，则会抛出 <code>EBADF</code>。</p>"
+            },
+            {
+              "textRaw": "`socket.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{dgram.Socket}",
+                      "name": "返回：",
+                      "type": "dgram.Socket"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>默认情况下，绑定套接字将导致 Node.js 进程在套接字打开时保持运行。<code>socket.unref()</code> 方法可用于将套接字从保持 Node.js 进程活动的引用计数中排除，允许进程退出，即使套接字仍在监听。</p>\n<p>多次调用 <code>socket.unref()</code> 不会有额外效果。</p>\n<p><code>socket.unref()</code> 方法返回对套接字的引用，因此可以链式调用。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`dgram.Socket`"
+        },
+        {
+          "textRaw": "`node:dgram` 模块函数",
+          "name": "`node:dgram`_模块函数",
+          "methods": [
+            {
+              "textRaw": "`dgram.createSocket(options[, callback])`",
+              "type": "method",
+              "name": "createSocket",
+              "meta": {
+                "added": [
+                  "v0.11.13"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.1.0",
+                      "v22.12.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/55403",
+                    "description": "The `reusePort` option is supported."
+                  },
+                  {
+                    "version": "v15.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37026",
+                    "description": "AbortSignal support was added."
+                  },
+                  {
+                    "version": "v11.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/23798",
+                    "description": "The `ipv6Only` option is supported."
+                  },
+                  {
+                    "version": "v8.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/13623",
+                    "description": "The `recvBufferSize` and `sendBufferSize` options are supported now."
+                  },
+                  {
+                    "version": "v8.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/14560",
+                    "description": "The `lookup` option is supported."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object} 可用选项有：",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "可用选项有：",
+                      "options": [
+                        {
+                          "textRaw": "`type` {string} 套接字的族。必须是 `'udp4'` 或 `'udp6'`。必需。",
+                          "name": "type",
+                          "type": "string",
+                          "desc": "套接字的族。必须是 `'udp4'` 或 `'udp6'`。必需。"
+                        },
+                        {
+                          "textRaw": "`reuseAddr` {boolean} 当为 `true` 时，[`socket.bind()`][] 将重用地址，即使另一个进程已经在其上绑定了套接字，但只有一个套接字可以接收数据。**默认值：** `false`。",
+                          "name": "reuseAddr",
+                          "type": "boolean",
+                          "desc": "当为 `true` 时，[`socket.bind()`][] 将重用地址，即使另一个进程已经在其上绑定了套接字，但只有一个套接字可以接收数据。**默认值：** `false`。"
+                        },
+                        {
+                          "textRaw": "`reusePort` {boolean} 当为 `true` 时，[`socket.bind()`][] 将重用端口，即使另一个进程已经在其上绑定了套接字。传入的数据报会分发给监听的套接字。此选项仅在部分平台上可用，例如 Linux 3.9+、DragonFlyBSD 3.6+、FreeBSD 12.0+、Solaris 11.4 和 AIX 7.2.5+。在不支持的平台上，此选项在绑定套接字时会引发错误。**默认值：** `false`。",
+                          "name": "reusePort",
+                          "type": "boolean",
+                          "desc": "当为 `true` 时，[`socket.bind()`][] 将重用端口，即使另一个进程已经在其上绑定了套接字。传入的数据报会分发给监听的套接字。此选项仅在部分平台上可用，例如 Linux 3.9+、DragonFlyBSD 3.6+、FreeBSD 12.0+、Solaris 11.4 和 AIX 7.2.5+。在不支持的平台上，此选项在绑定套接字时会引发错误。**默认值：** `false`。"
+                        },
+                        {
+                          "textRaw": "`ipv6Only` {boolean} 将 `ipv6Only` 设置为 `true` 将禁用双栈支持，即绑定到地址 `::` 不会绑定 `0.0.0.0`。**默认值：** `false`。",
+                          "name": "ipv6Only",
+                          "type": "boolean",
+                          "desc": "将 `ipv6Only` 设置为 `true` 将禁用双栈支持，即绑定到地址 `::` 不会绑定 `0.0.0.0`。**默认值：** `false`。"
+                        },
+                        {
+                          "textRaw": "`recvBufferSize` {number} 设置 `SO_RCVBUF` 套接字值。",
+                          "name": "recvBufferSize",
+                          "type": "number",
+                          "desc": "设置 `SO_RCVBUF` 套接字值。"
+                        },
+                        {
+                          "textRaw": "`sendBufferSize` {number} 设置 `SO_SNDBUF` 套接字值。",
+                          "name": "sendBufferSize",
+                          "type": "number",
+                          "desc": "设置 `SO_SNDBUF` 套接字值。"
+                        },
+                        {
+                          "textRaw": "`lookup` {Function} 自定义查找函数。**默认值：** [`dns.lookup()`][]。",
+                          "name": "lookup",
+                          "type": "Function",
+                          "desc": "自定义查找函数。**默认值：** [`dns.lookup()`][]。"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} 可用于关闭套接字的 AbortSignal。",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "可用于关闭套接字的 AbortSignal。"
+                        },
+                        {
+                          "textRaw": "`receiveBlockList` {net.BlockList} `receiveBlockList` 可用于丢弃到特定 IP 地址、IP 范围或 IP 子网的入站数据报。如果服务器在反向代理、NAT 等后面，则此方法不起作用，因为检查阻止列表的地址是代理的地址或 NAT 指定的地址。",
+                          "name": "receiveBlockList",
+                          "type": "net.BlockList",
+                          "desc": "`receiveBlockList` 可用于丢弃到特定 IP 地址、IP 范围或 IP 子网的入站数据报。如果服务器在反向代理、NAT 等后面，则此方法不起作用，因为检查阻止列表的地址是代理的地址或 NAT 指定的地址。"
+                        },
+                        {
+                          "textRaw": "`sendBlockList` {net.BlockList} `sendBlockList` 可用于禁用对特定 IP 地址、IP 范围或 IP 子网的出站访问。",
+                          "name": "sendBlockList",
+                          "type": "net.BlockList",
+                          "desc": "`sendBlockList` 可用于禁用对特定 IP 地址、IP 范围或 IP 子网的出站访问。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 作为 `'message'` 事件的监听器附加。可选。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "作为 `'message'` 事件的监听器附加。可选。"
+                    },
+                    {
+                      "textRaw": "返回：{dgram.Socket}",
+                      "name": "返回：",
+                      "type": "dgram.Socket"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个 <code>dgram.Socket</code> 对象。一旦创建了套接字，调用 <a href=\"#socketbindport-address-callback\"><code>socket.bind()</code></a> 将指示套接字开始监听数据报消息。当 <code>address</code> 和 <code>port</code> 未传递给 <a href=\"#socketbindport-address-callback\"><code>socket.bind()</code></a> 时，该方法会将套接字绑定到随机端口上的“所有接口”地址（它对 <code>udp4</code> 和 <code>udp6</code> 套接字都执行正确的操作）。绑定的地址和端口可以使用 <a href=\"#socketaddress\"><code>socket.address().address</code></a> 和 <a href=\"#socketaddress\"><code>socket.address().port</code></a> 检索。</p>\n<p>如果启用了 <code>signal</code> 选项，在相应的 <code>AbortController</code> 上调用 <code>.abort()</code> 类似于在套接字上调用 <code>.close()</code>：</p>\n<pre><code class=\"language-js\">const controller = new AbortController();\nconst { signal } = controller;\nconst server = dgram.createSocket({ type: 'udp4', signal });\nserver.on('message', (msg, rinfo) => {\n  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);\n});\n// 稍后，当您想关闭服务器时。\ncontroller.abort();\n</code></pre>"
+            },
+            {
+              "textRaw": "`dgram.createSocket(type[, callback])`",
+              "type": "method",
+              "name": "createSocket",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`type` {string} `'udp4'` 或 `'udp6'`。",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "`'udp4'` 或 `'udp6'`。"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 作为 `'message'` 事件的监听器附加。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "作为 `'message'` 事件的监听器附加。"
+                    },
+                    {
+                      "textRaw": "返回：{dgram.Socket}",
+                      "name": "返回：",
+                      "type": "dgram.Socket"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建指定 <code>type</code> 的 <code>dgram.Socket</code> 对象。</p>\n<p>一旦创建了套接字，调用 <a href=\"#socketbindport-address-callback\"><code>socket.bind()</code></a> 将指示套接字开始监听数据报消息。当 <code>address</code> 和 <code>port</code> 未传递给 <a href=\"#socketbindport-address-callback\"><code>socket.bind()</code></a> 时，该方法会将套接字绑定到随机端口上的“所有接口”地址（它对 <code>udp4</code> 和 <code>udp6</code> 套接字都执行正确的操作）。绑定的地址和端口可以使用 <a href=\"#socketaddress\"><code>socket.address().address</code></a> 和 <a href=\"#socketaddress\"><code>socket.address().port</code></a> 检索。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "`node:dgram` 模块函数"
+        }
+      ],
+      "type": "module",
+      "displayName": "dgram"
+    }
+  ]
+}

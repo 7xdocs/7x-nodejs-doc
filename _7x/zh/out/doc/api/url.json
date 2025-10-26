@@ -1,0 +1,1608 @@
+{
+  "type": "module",
+  "source": "doc/api/url.md",
+  "modules": [
+    {
+      "textRaw": "URL",
+      "name": "url",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/url.js\">lib/url.js</a></p>\n<p><code>node:url</code> 模块提供了用于 URL 解析和处理的实用工具。可以通过以下方式访问：</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "URL 字符串与 URL 对象",
+          "name": "url_字符串与_url_对象",
+          "desc": "<p>URL 字符串是包含多个有意义组件的结构化字符串。解析后，会返回一个 URL 对象，其中包含每个组件的属性。</p>\n<p><code>node:url</code> 模块提供了两种用于处理 URL 的 API：一种是 Node.js 特定的旧版 API，另一种是实现了与 Web 浏览器相同的 [WHATWG URL 标准][] 的新版 API。</p>\n<p>下面提供了 WHATWG 与旧版 API 的比较。在 URL <code>'https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</code> 上方，显示的是旧版 <code>url.parse()</code> 返回的对象的属性。其下方是 WHATWG <code>URL</code> 对象的属性。</p>\n<p>WHATWG URL 的 <code>origin</code> 属性包括 <code>protocol</code> 和 <code>host</code>，但不包括 <code>username</code> 或 <code>password</code>。</p>\n<pre><code class=\"language-text\">┌────────────────────────────────────────────────────────────────────────────────────────────────┐\n│                                              href                                              │\n├──────────┬──┬─────────────────────┬────────────────────────┬───────────────────────────┬───────┤\n│ protocol │  │        auth         │          host          │           path            │ hash  │\n│          │  │                     ├─────────────────┬──────┼──────────┬────────────────┤       │\n│          │  │                     │    hostname     │ port │ pathname │     search     │       │\n│          │  │                     │                 │      │          ├─┬──────────────┤       │\n│          │  │                     │                 │      │          │ │    query     │       │\n\"  https:   //    user   :   pass   @ sub.example.com : 8080   /p/a/t/h  ?  query=string   #hash \"\n│          │  │          │          │    hostname     │ port │          │                │       │\n│          │  │          │          ├─────────────────┴──────┤          │                │       │\n│ protocol │  │ username │ password │          host          │          │                │       │\n├──────────┴──┼──────────┴──────────┼────────────────────────┤          │                │       │\n│   origin    │                     │         origin         │ pathname │     search     │ hash  │\n├─────────────┴─────────────────────┴────────────────────────┴──────────┴────────────────┴───────┤\n│                                              href                                              │\n└────────────────────────────────────────────────────────────────────────────────────────────────┘\n(\"\" 行中的所有空格都应被忽略。它们纯粹用于格式化。)\n</code></pre>\n<p>使用 WHATWG API 解析 URL 字符串：</p>\n<pre><code class=\"language-js\">const myURL =\n  new URL('https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash');\n</code></pre>\n<p>使用旧版 API 解析 URL 字符串：</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\nconst myURL =\n  url.parse('https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash');\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\nconst myURL =\n  url.parse('https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash');\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "从组件部分构建 URL 并获取构建后的字符串",
+              "name": "从组件部分构建_url_并获取构建后的字符串",
+              "desc": "<p>可以使用属性设置器或模板字面量字符串从组件部分构建 WHATWG URL：</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org');\nmyURL.pathname = '/a/b/c';\nmyURL.search = '?d=e';\nmyURL.hash = '#fgh';\n</code></pre>\n<pre><code class=\"language-js\">const pathname = '/a/b/c';\nconst search = '?d=e';\nconst hash = '#fgh';\nconst myURL = new URL(`https://example.org${pathname}${search}${hash}`);\n</code></pre>\n<p>要获取构建后的 URL 字符串，请使用 <code>href</code> 属性访问器：</p>\n<pre><code class=\"language-js\">console.log(myURL.href);\n</code></pre>",
+              "type": "module",
+              "displayName": "从组件部分构建 URL 并获取构建后的字符串"
+            }
+          ],
+          "type": "module",
+          "displayName": "URL 字符串与 URL 对象"
+        },
+        {
+          "textRaw": "WHATWG URL API",
+          "name": "whatwg_url_api",
+          "modules": [
+            {
+              "textRaw": "类：`URL`",
+              "name": "类：`url`",
+              "meta": {
+                "added": [
+                  "v7.0.0",
+                  "v6.13.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v10.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/18281",
+                    "description": "The class is now available on the global object."
+                  }
+                ]
+              },
+              "desc": "<p>兼容浏览器的 <code>URL</code> 类，通过遵循 WHATWG URL 标准实现。[已解析 URL 的示例][]可以在标准自身中找到。<code>URL</code> 类在全局对象上也可用。</p>\n<p>根据浏览器约定，<code>URL</code> 对象的所有属性都作为类原型上的 getter 和 setter 实现，而不是作为对象自身的数据属性。因此，与[旧版 <code>urlObject</code>][] 不同，在 <code>URL</code> 对象的任何属性上使用 <code>delete</code> 关键字（例如 <code>delete myURL.protocol</code>、<code>delete myURL.pathname</code> 等）没有效果，但仍然会返回 <code>true</code>。</p>",
+              "ctors": [
+                {
+                  "textRaw": "`new URL(input[, base])`",
+                  "type": "ctor",
+                  "name": "URL",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": [
+                          "v20.0.0",
+                          "v18.17.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/47339",
+                        "description": "ICU requirement is removed."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string} 要解析的绝对或相对输入 URL。如果 `input` 是相对的，则必须提供 `base`。如果 `input` 是绝对的，则忽略 `base`。如果 `input` 不是字符串，会先[转换为字符串][]。",
+                          "name": "input",
+                          "type": "string",
+                          "desc": "要解析的绝对或相对输入 URL。如果 `input` 是相对的，则必须提供 `base`。如果 `input` 是绝对的，则忽略 `base`。如果 `input` 不是字符串，会先[转换为字符串][]。"
+                        },
+                        {
+                          "textRaw": "`base` {string} 如果 `input` 不是绝对 URL，则用于解析的基础 URL。如果 `base` 不是字符串，会先[转换为字符串][]。",
+                          "name": "base",
+                          "type": "string",
+                          "desc": "如果 `input` 不是绝对 URL，则用于解析的基础 URL。如果 `base` 不是字符串，会先[转换为字符串][]。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>通过解析相对于 <code>base</code> 的 <code>input</code> 来创建一个新的 <code>URL</code> 对象。如果 <code>base</code> 作为字符串传递，它将被解析为等同于 <code>new URL(base)</code>。</p>\n<pre><code class=\"language-js\">const myURL = new URL('/foo', 'https://example.org/');\n// https://example.org/foo\n</code></pre>\n<p>URL 构造函数可以作为全局对象上的属性访问。它也可以从内置的 url 模块导入：</p>\n<pre><code class=\"language-mjs\">import { URL } from 'node:url';\nconsole.log(URL === globalThis.URL); // 打印 'true'。\n</code></pre>\n<pre><code class=\"language-cjs\">console.log(URL === require('node:url').URL); // 打印 'true'。\n</code></pre>\n<p>如果 <code>input</code> 或 <code>base</code> 不是有效的 URL，将抛出 <code>TypeError</code>。请注意，会尽力将给定的值强制转换为字符串。例如：</p>\n<pre><code class=\"language-js\">const myURL = new URL({ toString: () => 'https://example.org/' });\n// https://example.org/\n</code></pre>\n<p>出现在 <code>input</code> 主机名中的 Unicode 字符将使用 <a href=\"https://tools.ietf.org/html/rfc5891#section-4.4\">Punycode</a> 算法自动转换为 ASCII。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://測試');\n// https://xn--g6w251d/\n</code></pre>\n<p>在事先不知道 <code>input</code> 是否是绝对 URL 并且提供了 <code>base</code> 的情况下，建议验证 <code>URL</code> 对象的 <code>origin</code> 是否符合预期。</p>\n<pre><code class=\"language-js\">let myURL = new URL('http://Example.com/', 'https://example.org/');\n// http://example.com/\n\nmyURL = new URL('https://Example.com/', 'https://example.org/');\n// https://example.com/\n\nmyURL = new URL('foo://Example.com/', 'https://example.org/');\n// foo://Example.com/\n\nmyURL = new URL('http:Example.com/', 'https://example.org/');\n// http://example.com/\n\nmyURL = new URL('https:Example.com/', 'https://example.org/');\n// https://example.org/Example.com/\n\nmyURL = new URL('foo:Example.com/', 'https://example.org/');\n// foo:Example.com/\n</code></pre>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`hash` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的片段部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/foo#bar');\nconsole.log(myURL.hash);\n// 打印 #bar\n\nmyURL.hash = 'baz';\nconsole.log(myURL.href);\n// 打印 https://example.org/foo#baz\n</code></pre>\n<p>分配给 <code>hash</code> 属性的值中包含的无效 URL 字符将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href=\"#urlparseurlstring-parsequerystring-slashesdenotehost\"><code>url.parse()</code></a> 和 <a href=\"#urlformaturlobject\"><code>url.format()</code></a> 方法产生的结果略有不同。</p>"
+                },
+                {
+                  "textRaw": "`host` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的主机部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org:81/foo');\nconsole.log(myURL.host);\n// 打印 example.org:81\n\nmyURL.host = 'example.com:82';\nconsole.log(myURL.href);\n// 打印 https://example.com:82/foo\n</code></pre>\n<p>分配给 <code>host</code> 属性的无效主机值将被忽略。</p>"
+                },
+                {
+                  "textRaw": "`hostname` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的主机名部分。<code>url.host</code> 和 <code>url.hostname</code> 的关键区别在于 <code>url.hostname</code> <strong>不</strong> 包括端口。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org:81/foo');\nconsole.log(myURL.hostname);\n// 打印 example.org\n\n// 设置 hostname 不会改变端口\nmyURL.hostname = 'example.com';\nconsole.log(myURL.href);\n// 打印 https://example.com:81/foo\n\n// 使用 myURL.host 来更改主机名和端口\nmyURL.host = 'example.org:82';\nconsole.log(myURL.href);\n// 打印 https://example.org:82/foo\n</code></pre>\n<p>分配给 <code>hostname</code> 属性的无效主机名值将被忽略。</p>"
+                },
+                {
+                  "textRaw": "`href` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置序列化的 URL。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/foo');\nconsole.log(myURL.href);\n// 打印 https://example.org/foo\n\nmyURL.href = 'https://example.com/bar';\nconsole.log(myURL.href);\n// 打印 https://example.com/bar\n</code></pre>\n<p>获取 <code>href</code> 属性的值等同于调用 <a href=\"#urltostring\"><code>url.toString()</code></a>。</p>\n<p>将此属性的值设置为新值等同于使用 <a href=\"#new-urlinput-base\"><code>new URL(value)</code></a> 创建一个新的 <code>URL</code> 对象。<code>URL</code> 对象的每个属性都将被修改。</p>\n<p>如果分配给 <code>href</code> 属性的值不是有效的 URL，将抛出 <code>TypeError</code>。</p>"
+                },
+                {
+                  "textRaw": "`origin` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": "v15.0.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/33325",
+                        "description": "The scheme \"gopher\" is no longer special and `url.origin` now returns `'null'` for it."
+                      }
+                    ]
+                  },
+                  "desc": "<p>获取 URL 来源的只读序列化形式。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/foo/bar?baz');\nconsole.log(myURL.origin);\n// 打印 https://example.org\n</code></pre>\n<pre><code class=\"language-js\">const idnURL = new URL('https://測試');\nconsole.log(idnURL.origin);\n// 打印 https://xn--g6w251d\n\nconsole.log(idnURL.hostname);\n// 打印 xn--g6w251d\n</code></pre>"
+                },
+                {
+                  "textRaw": "`password` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的密码部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://abc:xyz@example.com');\nconsole.log(myURL.password);\n// 打印 xyz\n\nmyURL.password = '123';\nconsole.log(myURL.href);\n// 打印 https://abc:123@example.com/\n</code></pre>\n<p>分配给 <code>password</code> 属性的值中包含的无效 URL 字符将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href=\"#urlparseurlstring-parsequerystring-slashesdenotehost\"><code>url.parse()</code></a> 和 <a href=\"#urlformaturlobject\"><code>url.format()</code></a> 方法产生的结果略有不同。</p>"
+                },
+                {
+                  "textRaw": "`pathname` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的路径部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/abc/xyz?123');\nconsole.log(myURL.pathname);\n// 打印 /abc/xyz\n\nmyURL.pathname = '/abcdef';\nconsole.log(myURL.href);\n// 打印 https://example.org/abcdef?123\n</code></pre>\n<p>分配给 <code>pathname</code> 属性的值中包含的无效 URL 字符将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href=\"#urlparseurlstring-parsequerystring-slashesdenotehost\"><code>url.parse()</code></a> 和 <a href=\"#urlformaturlobject\"><code>url.format()</code></a> 方法产生的结果略有不同。</p>"
+                },
+                {
+                  "textRaw": "`port` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": "v15.0.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/33325",
+                        "description": "The scheme \"gopher\" is no longer special."
+                      }
+                    ]
+                  },
+                  "desc": "<p>获取和设置 URL 的端口部分。</p>\n<p>端口值可以是一个数字或包含一个在 <code>0</code> 到 <code>65535</code>（含）范围内数字的字符串。将值设置为 <code>URL</code> 对象给定 <code>protocol</code> 的默认端口将导致 <code>port</code> 值变为空字符串 (<code>''</code>)。</p>\n<p>端口值可以是空字符串，这种情况下端口取决于协议/方案：</p>\n<table>\n<thead>\n<tr>\n<th>协议</th>\n<th>端口</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>\"ftp\"</td>\n<td>21</td>\n</tr>\n<tr>\n<td>\"file\"</td>\n<td></td>\n</tr>\n<tr>\n<td>\"http\"</td>\n<td>80</td>\n</tr>\n<tr>\n<td>\"https\"</td>\n<td>443</td>\n</tr>\n<tr>\n<td>\"ws\"</td>\n<td>80</td>\n</tr>\n<tr>\n<td>\"wss\"</td>\n<td>443</td>\n</tr>\n</tbody>\n</table>\n<p>在给端口赋值时，该值将首先使用 <code>.toString()</code> 转换为字符串。</p>\n<p>如果该字符串无效但以数字开头，则前导数字将被分配给 <code>port</code>。\n如果该数字超出上述范围，它将被忽略。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org:8888');\nconsole.log(myURL.port);\n// 打印 8888\n\n// 默认端口会自动转换为空字符串\n// (HTTPS 协议的默认端口是 443)\nmyURL.port = '443';\nconsole.log(myURL.port);\n// 打印空字符串\nconsole.log(myURL.href);\n// 打印 https://example.org/\n\nmyURL.port = 1234;\nconsole.log(myURL.port);\n// 打印 1234\nconsole.log(myURL.href);\n// 打印 https://example.org:1234/\n\n// 完全无效的端口字符串被忽略\nmyURL.port = 'abcd';\nconsole.log(myURL.port);\n// 打印 1234\n\n// 前导数字被视为端口号\nmyURL.port = '5678abcd';\nconsole.log(myURL.port);\n// 打印 5678\n\n// 非整数会被截断\nmyURL.port = 1234.5678;\nconsole.log(myURL.port);\n// 打印 1234\n\n// 超出范围且不以科学记数法表示的数字将被忽略。\nmyURL.port = 1e10; // 10000000000, 将按如下所述进行范围检查\nconsole.log(myURL.port);\n// 打印 1234\n</code></pre>\n<p>包含小数点的数字，例如浮点数或科学记数法表示的数字，也不例外。\n小数点前的数字将被设置为 URL 的端口，假设它们是有效的：</p>\n<pre><code class=\"language-js\">myURL.port = 4.567e21;\nconsole.log(myURL.port);\n// 打印 4 (因为它是字符串 '4.567e21' 中的前导数字)\n</code></pre>"
+                },
+                {
+                  "textRaw": "`protocol` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的协议部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org');\nconsole.log(myURL.protocol);\n// 打印 https:\n\nmyURL.protocol = 'ftp';\nconsole.log(myURL.href);\n// 打印 ftp://example.org/\n</code></pre>\n<p>分配给 <code>protocol</code> 属性的无效 URL 协议值将被忽略。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "特殊方案",
+                      "name": "特殊方案",
+                      "meta": {
+                        "changes": [
+                          {
+                            "version": "v15.0.0",
+                            "pr-url": "https://github.com/nodejs/node/pull/33325",
+                            "description": "The scheme \"gopher\" is no longer special."
+                          }
+                        ]
+                      },
+                      "desc": "<p>[WHATWG URL 标准][] 认为少数 URL 协议方案在解析和序列化方式上是<strong>特殊的</strong>。当使用这些特殊协议之一解析 URL 时，<code>url.protocol</code> 属性可以更改为另一个特殊协议，但不能更改为非特殊协议，反之亦然。</p>\n<p>例如，从 <code>http</code> 更改为 <code>https</code> 是有效的：</p>\n<pre><code class=\"language-js\">const u = new URL('http://example.org');\nu.protocol = 'https';\nconsole.log(u.href);\n// https://example.org/\n</code></pre>\n<p>但是，从 <code>http</code> 更改为一个假设的 <code>fish</code> 协议是无效的，因为新协议不是特殊的。</p>\n<pre><code class=\"language-js\">const u = new URL('http://example.org');\nu.protocol = 'fish';\nconsole.log(u.href);\n// http://example.org/\n</code></pre>\n<p>同样，从非特殊协议更改为特殊协议也是不允许的：</p>\n<pre><code class=\"language-js\">const u = new URL('fish://example.org');\nu.protocol = 'http';\nconsole.log(u.href);\n// fish://example.org\n</code></pre>\n<p>根据 WHATWG URL 标准，特殊协议方案包括 <code>ftp</code>、<code>file</code>、<code>http</code>、<code>https</code>、<code>ws</code> 和 <code>wss</code>。</p>",
+                      "type": "module",
+                      "displayName": "特殊方案"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "`search` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的序列化查询部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/abc?123');\nconsole.log(myURL.search);\n// 打印 ?123\n\nmyURL.search = 'abc=xyz';\nconsole.log(myURL.href);\n// 打印 https://example.org/abc?abc=xyz\n</code></pre>\n<p>出现在分配给 <code>search</code> 属性的值中的任何无效 URL 字符都将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href=\"#urlparseurlstring-parsequerystring-slashesdenotehost\"><code>url.parse()</code></a> 和 <a href=\"#urlformaturlobject\"><code>url.format()</code></a> 方法产生的结果略有不同。</p>"
+                },
+                {
+                  "textRaw": "`searchParams` 类型：{URLSearchParams}",
+                  "type": "URLSearchParams",
+                  "name": "类型：",
+                  "desc": "<p>获取表示 URL 查询参数的 <a href=\"#class-urlsearchparams\"><code>URLSearchParams</code></a> 对象。此属性是只读的，但它提供的 <code>URLSearchParams</code> 对象可用于改变 URL 实例；要替换 URL 的整个查询参数，请使用 <a href=\"#urlsearch\"><code>url.search</code></a> setter。有关详细信息，请参阅 <a href=\"#class-urlsearchparams\"><code>URLSearchParams</code></a> 文档。</p>\n<p>使用 <code>.searchParams</code> 修改 <code>URL</code> 时要小心，因为根据 WHATWG 规范，<code>URLSearchParams</code> 对象使用不同的规则来确定哪些字符需要百分比编码。例如，<code>URL</code> 对象不会对 ASCII 波浪号 (<code>~</code>) 字符进行百分比编码，而 <code>URLSearchParams</code> 总是会编码它：</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/abc?foo=~bar');\n\nconsole.log(myURL.search);  // 打印 ?foo=~bar\n\n// 通过 searchParams 修改 URL...\nmyURL.searchParams.sort();\n\nconsole.log(myURL.search);  // 打印 ?foo=%7Ebar\n</code></pre>"
+                },
+                {
+                  "textRaw": "`username` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "desc": "<p>获取和设置 URL 的用户名部分。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://abc:xyz@example.com');\nconsole.log(myURL.username);\n// 打印 abc\n\nmyURL.username = '123';\nconsole.log(myURL.href);\n// 打印 https://123:xyz@example.com/\n</code></pre>\n<p>出现在分配给 <code>username</code> 属性的值中的任何无效 URL 字符都将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href=\"#urlparseurlstring-parsequerystring-slashesdenotehost\"><code>url.parse()</code></a> 和 <a href=\"#urlformaturlobject\"><code>url.format()</code></a> 方法产生的结果略有不同。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`url.toString()`",
+                  "type": "method",
+                  "name": "toString",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{string}",
+                          "name": "返回：",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>URL</code> 对象上的 <code>toString()</code> 方法返回序列化的 URL。返回的值等同于 <a href=\"#urlhref\"><code>url.href</code></a> 和 <a href=\"#urltojson\"><code>url.toJSON()</code></a> 的值。</p>"
+                },
+                {
+                  "textRaw": "`url.toJSON()`",
+                  "type": "method",
+                  "name": "toJSON",
+                  "meta": {
+                    "added": [
+                      "v7.7.0",
+                      "v6.13.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{string}",
+                          "name": "返回：",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>URL</code> 对象上的 <code>toJSON()</code> 方法返回序列化的 URL。返回的值等同于 <a href=\"#urlhref\"><code>url.href</code></a> 和 <a href=\"#urltostring\"><code>url.toString()</code></a> 的值。</p>\n<p>当使用 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify\"><code>JSON.stringify()</code></a> 序列化 <code>URL</code> 对象时，会自动调用此方法。</p>\n<pre><code class=\"language-js\">const myURLs = [\n  new URL('https://www.example.com'),\n  new URL('https://test.example.org'),\n];\nconsole.log(JSON.stringify(myURLs));\n// 打印 [\"https://www.example.com/\",\"https://test.example.org/\"]\n</code></pre>"
+                },
+                {
+                  "textRaw": "`URL.createObjectURL(blob)`",
+                  "type": "method",
+                  "name": "createObjectURL",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v24.0.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/57513",
+                        "description": "Marking the API stable."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`blob` {Blob}",
+                          "name": "blob",
+                          "type": "Blob"
+                        },
+                        {
+                          "textRaw": "返回：{string}",
+                          "name": "返回：",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个 <code>'blob:nodedata:...'</code> URL 字符串，表示给定的 <a href=\"buffer.html#class-blob\" class=\"type\">&lt;Blob&gt;</a> 对象，并可用于稍后检索该 <code>Blob</code>。</p>\n<pre><code class=\"language-js\">const {\n  Blob,\n  resolveObjectURL,\n} = require('node:buffer');\n\nconst blob = new Blob(['hello']);\nconst id = URL.createObjectURL(blob);\n\n// 稍后...\n\nconst otherBlob = resolveObjectURL(id);\nconsole.log(otherBlob.size);\n</code></pre>\n<p>已注册的 <a href=\"buffer.html#class-blob\" class=\"type\">&lt;Blob&gt;</a> 存储的数据将保留在内存中，直到调用 <code>URL.revokeObjectURL()</code> 将其移除。</p>\n<p><code>Blob</code> 对象在当前线程内注册。如果使用工作线程，在一个工作线程内注册的 <code>Blob</code> 对象将无法被其他工作线程或主线程访问。</p>"
+                },
+                {
+                  "textRaw": "`URL.revokeObjectURL(id)`",
+                  "type": "method",
+                  "name": "revokeObjectURL",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v24.0.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/57513",
+                        "description": "Marking the API stable."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`id` {string} 先前调用 `URL.createObjectURL()` 返回的 `'blob:nodedata:...` URL 字符串。",
+                          "name": "id",
+                          "type": "string",
+                          "desc": "先前调用 `URL.createObjectURL()` 返回的 `'blob:nodedata:...` URL 字符串。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>移除由给定 ID 标识的已存储 <a href=\"buffer.html#class-blob\" class=\"type\">&lt;Blob&gt;</a>。尝试撤销未注册的 ID 将静默失败。</p>"
+                },
+                {
+                  "textRaw": "`URL.canParse(input[, base])`",
+                  "type": "method",
+                  "name": "canParse",
+                  "meta": {
+                    "added": [
+                      "v19.9.0",
+                      "v18.17.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string} 要解析的绝对或相对输入 URL。如果 `input` 是相对的，则必须提供 `base`。如果 `input` 是绝对的，则忽略 `base`。如果 `input` 不是字符串，会先[转换为字符串][]。",
+                          "name": "input",
+                          "type": "string",
+                          "desc": "要解析的绝对或相对输入 URL。如果 `input` 是相对的，则必须提供 `base`。如果 `input` 是绝对的，则忽略 `base`。如果 `input` 不是字符串，会先[转换为字符串][]。"
+                        },
+                        {
+                          "textRaw": "`base` {string} 如果 `input` 不是绝对 URL，则用于解析的基础 URL。如果 `base` 不是字符串，会先[转换为字符串][]。",
+                          "name": "base",
+                          "type": "string",
+                          "desc": "如果 `input` 不是绝对 URL，则用于解析的基础 URL。如果 `base` 不是字符串，会先[转换为字符串][]。"
+                        },
+                        {
+                          "textRaw": "返回：{boolean}",
+                          "name": "返回：",
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>检查相对于 <code>base</code> 的 <code>input</code> 是否可以解析为 <code>URL</code>。</p>\n<pre><code class=\"language-js\">const isValid = URL.canParse('/foo', 'https://example.org/'); // true\n\nconst isNotValid = URL.canParse('/foo'); // false\n</code></pre>"
+                },
+                {
+                  "textRaw": "`URL.parse(input[, base])`",
+                  "type": "method",
+                  "name": "parse",
+                  "meta": {
+                    "added": [
+                      "v22.1.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string} 要解析的绝对或相对输入 URL。如果 `input` 是相对的，则必须提供 `base`。如果 `input` 是绝对的，则忽略 `base`。如果 `input` 不是字符串，会先[转换为字符串][]。",
+                          "name": "input",
+                          "type": "string",
+                          "desc": "要解析的绝对或相对输入 URL。如果 `input` 是相对的，则必须提供 `base`。如果 `input` 是绝对的，则忽略 `base`。如果 `input` 不是字符串，会先[转换为字符串][]。"
+                        },
+                        {
+                          "textRaw": "`base` {string} 如果 `input` 不是绝对 URL，则用于解析的基础 URL。如果 `base` 不是字符串，会先[转换为字符串][]。",
+                          "name": "base",
+                          "type": "string",
+                          "desc": "如果 `input` 不是绝对 URL，则用于解析的基础 URL。如果 `base` 不是字符串，会先[转换为字符串][]。"
+                        },
+                        {
+                          "textRaw": "返回：{URL|null}",
+                          "name": "返回：",
+                          "type": "URL|null"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将字符串解析为 URL。如果提供了 <code>base</code>，它将用作解析非绝对 <code>input</code> URL 的基础 URL。如果参数无法解析为有效的 URL，则返回 <code>null</code>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`URL`"
+            },
+            {
+              "textRaw": "类：`URLPattern`",
+              "name": "类：`urlpattern`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p><code>URLPattern</code> API 提供了一个接口，用于将 URL 或 URL 部分与模式进行匹配。</p>\n<pre><code class=\"language-js\">const myPattern = new URLPattern('https://nodejs.org/docs/latest/api/*.html');\nconsole.log(myPattern.exec('https://nodejs.org/docs/latest/api/dns.html'));\n// 打印：\n// {\n//  \"hash\": { \"groups\": {  \"0\": \"\" },  \"input\": \"\" },\n//  \"hostname\": { \"groups\": {}, \"input\": \"nodejs.org\" },\n//  \"inputs\": [\n//    \"https://nodejs.org/docs/latest/api/dns.html\"\n//  ],\n//  \"password\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"pathname\": { \"groups\": { \"0\": \"dns\" }, \"input\": \"/docs/latest/api/dns.html\" },\n//  \"port\": { \"groups\": {}, \"input\": \"\" },\n//  \"protocol\": { \"groups\": {}, \"input\": \"https\" },\n//  \"search\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"username\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" }\n// }\n\nconsole.log(myPattern.test('https://nodejs.org/docs/latest/api/dns.html'));\n// 打印：true\n</code></pre>",
+              "ctors": [
+                {
+                  "textRaw": "`new URLPattern()`",
+                  "type": "ctor",
+                  "name": "URLPattern",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>实例化一个新的空 <code>URLPattern</code> 对象。</p>"
+                },
+                {
+                  "textRaw": "`new URLPattern(string[, baseURL][, options])`",
+                  "type": "ctor",
+                  "name": "URLPattern",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`string` {string} 一个 URL 字符串",
+                          "name": "string",
+                          "type": "string",
+                          "desc": "一个 URL 字符串"
+                        },
+                        {
+                          "textRaw": "`baseURL` {string | undefined} 一个基础 URL 字符串",
+                          "name": "baseURL",
+                          "type": "string | undefined",
+                          "desc": "一个基础 URL 字符串"
+                        },
+                        {
+                          "textRaw": "`options` {Object} 选项",
+                          "name": "options",
+                          "type": "Object",
+                          "desc": "选项"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将 <code>string</code> 解析为 URL，并使用它实例化一个新的 <code>URLPattern</code> 对象。</p>\n<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>\n<p>选项可以具有 <code>ignoreCase</code> 布尔属性，如果设置为 true，则启用不区分大小写的匹配。</p>\n<p>构造函数可能抛出 <code>TypeError</code> 以指示解析失败。</p>"
+                },
+                {
+                  "textRaw": "`new URLPattern(obj[, baseURL][, options])`",
+                  "type": "ctor",
+                  "name": "URLPattern",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`obj` {Object} 一个输入模式",
+                          "name": "obj",
+                          "type": "Object",
+                          "desc": "一个输入模式"
+                        },
+                        {
+                          "textRaw": "`baseURL` {string | undefined} 一个基础 URL 字符串",
+                          "name": "baseURL",
+                          "type": "string | undefined",
+                          "desc": "一个基础 URL 字符串"
+                        },
+                        {
+                          "textRaw": "`options` {Object} 选项",
+                          "name": "options",
+                          "type": "Object",
+                          "desc": "选项"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将 <code>Object</code> 解析为输入模式，并使用它实例化一个新的 <code>URLPattern</code> 对象。对象成员可以是 <code>protocol</code>、<code>username</code>、<code>password</code>、<code>hostname</code>、<code>port</code>、<code>pathname</code>、<code>search</code>、<code>hash</code> 或 <code>baseURL</code> 中的任何一个。</p>\n<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>\n<p>选项可以具有 <code>ignoreCase</code> 布尔属性，如果设置为 true，则启用不区分大小写的匹配。</p>\n<p>构造函数可能抛出 <code>TypeError</code> 以指示解析失败。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`urlPattern.exec(input[, baseURL])`",
+                  "type": "method",
+                  "name": "exec",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string | Object} 一个 URL 或 URL 部分",
+                          "name": "input",
+                          "type": "string | Object",
+                          "desc": "一个 URL 或 URL 部分"
+                        },
+                        {
+                          "textRaw": "`baseURL` {string | undefined} 一个基础 URL 字符串",
+                          "name": "baseURL",
+                          "type": "string | undefined",
+                          "desc": "一个基础 URL 字符串"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>输入可以是一个字符串或提供各个 URL 部分的对象。对象成员可以是 <code>protocol</code>、<code>username</code>、<code>password</code>、<code>hostname</code>、<code>port</code>、<code>pathname</code>、<code>search</code>、<code>hash</code> 或 <code>baseURL</code> 中的任何一个。</p>\n<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>\n<p>返回一个对象，其中包含一个 <code>inputs</code> 键，其值为传递给函数的参数数组，以及 URL 组件的键，这些键包含匹配的输入和匹配的组。</p>\n<pre><code class=\"language-js\">const myPattern = new URLPattern('https://nodejs.org/docs/latest/api/*.html');\nconsole.log(myPattern.exec('https://nodejs.org/docs/latest/api/dns.html'));\n// 打印：\n// {\n//  \"hash\": { \"groups\": {  \"0\": \"\" },  \"input\": \"\" },\n//  \"hostname\": { \"groups\": {}, \"input\": \"nodejs.org\" },\n//  \"inputs\": [\n//    \"https://nodejs.org/docs/latest/api/dns.html\"\n//  ],\n//  \"password\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"pathname\": { \"groups\": { \"0\": \"dns\" }, \"input\": \"/docs/latest/api/dns.html\" },\n//  \"port\": { \"groups\": {}, \"input\": \"\" },\n//  \"protocol\": { \"groups\": {}, \"input\": \"https\" },\n//  \"search\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" },\n//  \"username\": { \"groups\": { \"0\": \"\" }, \"input\": \"\" }\n// }\n</code></pre>"
+                },
+                {
+                  "textRaw": "`urlPattern.test(input[, baseURL])`",
+                  "type": "method",
+                  "name": "test",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`input` {string | Object} 一个 URL 或 URL 部分",
+                          "name": "input",
+                          "type": "string | Object",
+                          "desc": "一个 URL 或 URL 部分"
+                        },
+                        {
+                          "textRaw": "`baseURL` {string | undefined} 一个基础 URL 字符串",
+                          "name": "baseURL",
+                          "type": "string | undefined",
+                          "desc": "一个基础 URL 字符串"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>输入可以是一个字符串或提供各个 URL 部分的对象。对象成员可以是 <code>protocol</code>、<code>username</code>、<code>password</code>、<code>hostname</code>、<code>port</code>、<code>pathname</code>、<code>search</code>、<code>hash</code> 或 <code>baseURL</code> 中的任何一个。</p>\n<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>\n<p>返回一个布尔值，指示输入是否与当前模式匹配。</p>\n<pre><code class=\"language-js\">const myPattern = new URLPattern('https://nodejs.org/docs/latest/api/*.html');\nconsole.log(myPattern.test('https://nodejs.org/docs/latest/api/dns.html'));\n// 打印：true\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`URLPattern`"
+            },
+            {
+              "textRaw": "类：`URLSearchParams`",
+              "name": "类：`urlsearchparams`",
+              "meta": {
+                "added": [
+                  "v7.5.0",
+                  "v6.13.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v10.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/18281",
+                    "description": "The class is now available on the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>URLSearchParams</code> API 提供对 <code>URL</code> 查询的读写访问。<code>URLSearchParams</code> 类也可以独立使用，通过以下四种构造函数之一。<code>URLSearchParams</code> 类在全局对象上也可用。</p>\n<p>WHATWG <code>URLSearchParams</code> 接口和 <a href=\"querystring.html\"><code>querystring</code></a> 模块有相似的目的，但 <a href=\"querystring.html\"><code>querystring</code></a> 模块的目的更通用，因为它允许自定义分隔符字符（<code>&#x26;</code> 和 <code>=</code>）。另一方面，此 API 是纯粹为 URL 查询字符串设计的。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/?abc=123');\nconsole.log(myURL.searchParams.get('abc'));\n// 打印 123\n\nmyURL.searchParams.append('abc', 'xyz');\nconsole.log(myURL.href);\n// 打印 https://example.org/?abc=123&#x26;abc=xyz\n\nmyURL.searchParams.delete('abc');\nmyURL.searchParams.set('a', 'b');\nconsole.log(myURL.href);\n// 打印 https://example.org/?a=b\n\nconst newSearchParams = new URLSearchParams(myURL.searchParams);\n// 上述代码等同于\n// const newSearchParams = new URLSearchParams(myURL.search);\n\nnewSearchParams.append('a', 'c');\nconsole.log(myURL.href);\n// 打印 https://example.org/?a=b\nconsole.log(newSearchParams.toString());\n// 打印 a=b&#x26;a=c\n\n// newSearchParams.toString() 被隐式调用\nmyURL.search = newSearchParams;\nconsole.log(myURL.href);\n// 打印 https://example.org/?a=b&#x26;a=c\nnewSearchParams.delete('a');\nconsole.log(myURL.href);\n// 打印 https://example.org/?a=b&#x26;a=c\n</code></pre>",
+              "ctors": [
+                {
+                  "textRaw": "`new URLSearchParams()`",
+                  "type": "ctor",
+                  "name": "URLSearchParams",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>实例化一个新的空 <code>URLSearchParams</code> 对象。</p>"
+                },
+                {
+                  "textRaw": "`new URLSearchParams(string)`",
+                  "type": "ctor",
+                  "name": "URLSearchParams",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`string` {string} 一个查询字符串",
+                          "name": "string",
+                          "type": "string",
+                          "desc": "一个查询字符串"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将 <code>string</code> 解析为查询字符串，并使用它实例化一个新的 <code>URLSearchParams</code> 对象。前导的 <code>'?'</code>（如果存在）将被忽略。</p>\n<pre><code class=\"language-js\">let params;\n\nparams = new URLSearchParams('user=abc&#x26;query=xyz');\nconsole.log(params.get('user'));\n// 打印 'abc'\nconsole.log(params.toString());\n// 打印 'user=abc&#x26;query=xyz'\n\nparams = new URLSearchParams('?user=abc&#x26;query=xyz');\nconsole.log(params.toString());\n// 打印 'user=abc&#x26;query=xyz'\n</code></pre>"
+                },
+                {
+                  "textRaw": "`new URLSearchParams(obj)`",
+                  "type": "ctor",
+                  "name": "URLSearchParams",
+                  "meta": {
+                    "added": [
+                      "v7.10.0",
+                      "v6.13.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`obj` {Object} 表示键值对集合的对象",
+                          "name": "obj",
+                          "type": "Object",
+                          "desc": "表示键值对集合的对象"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>使用查询哈希映射实例化一个新的 <code>URLSearchParams</code> 对象。<code>obj</code> 的每个属性的键和值总是被强制转换为字符串。</p>\n<p>与 <a href=\"querystring.html\"><code>querystring</code></a> 模块不同，不允许以数组值形式出现的重复键。数组使用 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toString\"><code>array.toString()</code></a> 进行字符串化，这只是用逗号连接所有数组元素。</p>\n<pre><code class=\"language-js\">const params = new URLSearchParams({\n  user: 'abc',\n  query: ['first', 'second'],\n});\nconsole.log(params.getAll('query'));\n// 打印 [ 'first,second' ]\nconsole.log(params.toString());\n// 打印 'user=abc&#x26;query=first%2Csecond'\n</code></pre>"
+                },
+                {
+                  "textRaw": "`new URLSearchParams(iterable)`",
+                  "type": "ctor",
+                  "name": "URLSearchParams",
+                  "meta": {
+                    "added": [
+                      "v7.10.0",
+                      "v6.13.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`iterable` {Iterable} 一个可迭代对象，其元素是键值对",
+                          "name": "iterable",
+                          "type": "Iterable",
+                          "desc": "一个可迭代对象，其元素是键值对"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>以类似于 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map\" class=\"type\">&lt;Map&gt;</a> 构造函数的方式，使用可迭代映射实例化一个新的 <code>URLSearchParams</code> 对象。<code>iterable</code> 可以是一个 <code>Array</code> 或任何可迭代对象。这意味着 <code>iterable</code> 可以是另一个 <code>URLSearchParams</code>，在这种情况下，构造函数将简单地创建提供的 <code>URLSearchParams</code> 的克隆。<code>iterable</code> 的元素是键值对，并且它们本身可以是任何可迭代对象。</p>\n<p>允许重复的键。</p>\n<pre><code class=\"language-js\">let params;\n\n// 使用数组\nparams = new URLSearchParams([\n  ['user', 'abc'],\n  ['query', 'first'],\n  ['query', 'second'],\n]);\nconsole.log(params.toString());\n// 打印 'user=abc&#x26;query=first&#x26;query=second'\n\n// 使用 Map 对象\nconst map = new Map();\nmap.set('user', 'abc');\nmap.set('query', 'xyz');\nparams = new URLSearchParams(map);\nconsole.log(params.toString());\n// 打印 'user=abc&#x26;query=xyz'\n\n// 使用生成器函数\nfunction* getQueryPairs() {\n  yield ['user', 'abc'];\n  yield ['query', 'first'];\n  yield ['query', 'second'];\n}\nparams = new URLSearchParams(getQueryPairs());\nconsole.log(params.toString());\n// 打印 'user=abc&#x26;query=first&#x26;query=second'\n\n// 每个键值对必须恰好有两个元素\nnew URLSearchParams([\n  ['user', 'abc', 'error'],\n]);\n// 抛出 TypeError [ERR_INVALID_TUPLE]：\n//        每个查询对必须是一个可迭代的 [name, value] 元组\n</code></pre>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`urlSearchParams.append(name, value)`",
+                  "type": "method",
+                  "name": "append",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`value` {string}",
+                          "name": "value",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>向查询字符串追加一个新的名称-值对。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.delete(name[, value])`",
+                  "type": "method",
+                  "name": "delete",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": [
+                          "v20.2.0",
+                          "v18.18.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/47885",
+                        "description": "Add support for optional `value` argument."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`value` {string}",
+                          "name": "value",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>如果提供了 <code>value</code>，则移除所有名称为 <code>name</code> 且值为 <code>value</code> 的名称-值对。</p>\n<p>如果未提供 <code>value</code>，则移除所有名称为 <code>name</code> 的名称-值对。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.entries()`",
+                  "type": "method",
+                  "name": "entries",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{Iterator}",
+                          "name": "返回：",
+                          "type": "Iterator"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回一个 ES6 <code>Iterator</code>，遍历查询中的每个名称-值对。迭代器的每个项目是一个 JavaScript <code>Array</code>。<code>Array</code> 的第一个项目是 <code>name</code>，第二个项目是 <code>value</code>。</p>\n<p><a href=\"#urlsearchparamssymboliterator\"><code>urlSearchParams[Symbol.iterator]()</code></a> 的别名。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.forEach(fn[, thisArg])`",
+                  "type": "method",
+                  "name": "forEach",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": "v18.0.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/41678",
+                        "description": "Passing an invalid callback to the `fn` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`fn` {Function} 为查询中的每个名称-值对调用",
+                          "name": "fn",
+                          "type": "Function",
+                          "desc": "为查询中的每个名称-值对调用"
+                        },
+                        {
+                          "textRaw": "`thisArg` {Object} 当调用 `fn` 时用作 `this` 值",
+                          "name": "thisArg",
+                          "type": "Object",
+                          "desc": "当调用 `fn` 时用作 `this` 值"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>遍历查询中的每个名称-值对并调用给定的函数。</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://example.org/?a=b&#x26;c=d');\nmyURL.searchParams.forEach((value, name, searchParams) => {\n  console.log(name, value, myURL.searchParams === searchParams);\n});\n// 打印：\n//   a b true\n//   c d true\n</code></pre>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.get(name)`",
+                  "type": "method",
+                  "name": "get",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "返回：{string | null} 一个字符串，如果没有具有给定 `name` 的名称-值对，则为 `null`。",
+                          "name": "返回：",
+                          "type": "string | null",
+                          "desc": "一个字符串，如果没有具有给定 `name` 的名称-值对，则为 `null`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回第一个名称为 <code>name</code> 的名称-值对的值。如果没有这样的对，则返回 <code>null</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.getAll(name)`",
+                  "type": "method",
+                  "name": "getAll",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "返回：{string\\[]}",
+                          "name": "返回：",
+                          "type": "string\\[]"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回所有名称为 <code>name</code> 的名称-值对的值。如果没有这样的对，则返回一个空数组。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.has(name[, value])`",
+                  "type": "method",
+                  "name": "has",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": [
+                          "v20.2.0",
+                          "v18.18.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/47885",
+                        "description": "Add support for optional `value` argument."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`value` {string}",
+                          "name": "value",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "返回：{boolean}",
+                          "name": "返回：",
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>检查 <code>URLSearchParams</code> 对象是否包含基于 <code>name</code> 和可选的 <code>value</code> 参数的键值对。</p>\n<p>如果提供了 <code>value</code>，当存在具有相同 <code>name</code> 和 <code>value</code> 的名称-值对时返回 <code>true</code>。</p>\n<p>如果未提供 <code>value</code>，当至少存在一个名称为 <code>name</code> 的名称-值对时返回 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.keys()`",
+                  "type": "method",
+                  "name": "keys",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{Iterator}",
+                          "name": "返回：",
+                          "type": "Iterator"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回一个 ES6 <code>Iterator</code>，遍历每个名称-值对的名称。</p>\n<pre><code class=\"language-js\">const params = new URLSearchParams('foo=bar&#x26;foo=baz');\nfor (const name of params.keys()) {\n  console.log(name);\n}\n// 打印：\n//   foo\n//   foo\n</code></pre>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.set(name, value)`",
+                  "type": "method",
+                  "name": "set",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`value` {string}",
+                          "name": "value",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将 <code>URLSearchParams</code> 对象中与 <code>name</code> 关联的值设置为 <code>value</code>。如果存在任何名称为 <code>name</code> 的预先存在的名称-值对，则将第一个这样的对的值设置为 <code>value</code> 并移除所有其他对。如果没有，则将名称-值对追加到查询字符串。</p>\n<pre><code class=\"language-js\">const params = new URLSearchParams();\nparams.append('foo', 'bar');\nparams.append('foo', 'baz');\nparams.append('abc', 'def');\nconsole.log(params.toString());\n// 打印 foo=bar&#x26;foo=baz&#x26;abc=def\n\nparams.set('foo', 'def');\nparams.set('xyz', 'opq');\nconsole.log(params.toString());\n// 打印 foo=def&#x26;abc=def&#x26;xyz=opq\n</code></pre>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.sort()`",
+                  "type": "method",
+                  "name": "sort",
+                  "meta": {
+                    "added": [
+                      "v7.7.0",
+                      "v6.13.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>按名称就地排序所有现有的名称-值对。排序使用[稳定排序算法][]完成，因此具有相同名称的名称-值对之间的相对顺序得以保留。</p>\n<p>此方法特别可用于增加缓存命中率。</p>\n<pre><code class=\"language-js\">const params = new URLSearchParams('query[]=abc&#x26;type=search&#x26;query[]=123');\nparams.sort();\nconsole.log(params.toString());\n// 打印 query%5B%5D=abc&#x26;query%5B%5D=123&#x26;type=search\n</code></pre>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.toString()`",
+                  "type": "method",
+                  "name": "toString",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{string}",
+                          "name": "返回：",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回序列化为字符串的搜索参数，必要时对字符进行百分比编码。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams.values()`",
+                  "type": "method",
+                  "name": "values",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{Iterator}",
+                          "name": "返回：",
+                          "type": "Iterator"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回一个 ES6 <code>Iterator</code>，遍历每个名称-值对的值。</p>"
+                },
+                {
+                  "textRaw": "`urlSearchParams[Symbol.iterator]()`",
+                  "type": "method",
+                  "name": "[Symbol.iterator]",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{Iterator}",
+                          "name": "返回：",
+                          "type": "Iterator"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回一个 ES6 <code>Iterator</code>，遍历查询字符串中的每个名称-值对。迭代器的每个项目是一个 JavaScript <code>Array</code>。<code>Array</code> 的第一个项目是 <code>name</code>，第二个项目是 <code>value</code>。</p>\n<p><a href=\"#urlsearchparamsentries\"><code>urlSearchParams.entries()</code></a> 的别名。</p>\n<pre><code class=\"language-js\">const params = new URLSearchParams('foo=bar&#x26;xyz=baz');\nfor (const [name, value] of params) {\n  console.log(name, value);\n}\n// 打印：\n//   foo bar\n//   xyz baz\n</code></pre>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`urlSearchParams.size`",
+                  "name": "size",
+                  "meta": {
+                    "added": [
+                      "v19.8.0",
+                      "v18.16.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>参数条目的总数。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`URLSearchParams`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`url.domainToASCII(domain)`",
+              "type": "method",
+              "name": "domainToASCII",
+              "meta": {
+                "added": [
+                  "v7.4.0",
+                  "v6.13.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v20.0.0",
+                      "v18.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/47339",
+                    "description": "ICU requirement is removed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`domain` {string}",
+                      "name": "domain",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回：{string}",
+                      "name": "返回：",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回 <code>domain</code> 的 <a href=\"https://tools.ietf.org/html/rfc5891#section-4.4\">Punycode</a> ASCII 序列化。如果 <code>domain</code> 是无效域名，则返回空字符串。</p>\n<p>它执行与 <a href=\"#urldomaintounicodedomain\"><code>url.domainToUnicode()</code></a> 相反的操作。</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n\nconsole.log(url.domainToASCII('español.com'));\n// 打印 xn--espaol-zwa.com\nconsole.log(url.domainToASCII('中文.com'));\n// 打印 xn--fiq228c.com\nconsole.log(url.domainToASCII('xn--iñvalid.com'));\n// 打印空字符串\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n\nconsole.log(url.domainToASCII('español.com'));\n// 打印 xn--espaol-zwa.com\nconsole.log(url.domainToASCII('中文.com'));\n// 打印 xn--fiq228c.com\nconsole.log(url.domainToASCII('xn--iñvalid.com'));\n// 打印空字符串\n</code></pre>"
+            },
+            {
+              "textRaw": "`url.domainToUnicode(domain)`",
+              "type": "method",
+              "name": "domainToUnicode",
+              "meta": {
+                "added": [
+                  "v7.4.0",
+                  "v6.13.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v20.0.0",
+                      "v18.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/47339",
+                    "description": "ICU requirement is removed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`domain` {string}",
+                      "name": "domain",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回：{string}",
+                      "name": "返回：",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回 <code>domain</code> 的 Unicode 序列化。如果 <code>domain</code> 是无效域名，则返回空字符串。</p>\n<p>它执行与 <a href=\"#urldomaintoasciidomain\"><code>url.domainToASCII()</code></a> 相反的操作。</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\n\nconsole.log(url.domainToUnicode('xn--espaol-zwa.com'));\n// 打印 español.com\nconsole.log(url.domainToUnicode('xn--fiq228c.com'));\n// 打印 中文.com\nconsole.log(url.domainToUnicode('xn--iñvalid.com'));\n// 打印空字符串\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\n\nconsole.log(url.domainToUnicode('xn--espaol-zwa.com'));\n// 打印 español.com\nconsole.log(url.domainToUnicode('xn--fiq228c.com'));\n// 打印 中文.com\nconsole.log(url.domainToUnicode('xn--iñvalid.com'));\n// 打印空字符串\n</code></pre>"
+            },
+            {
+              "textRaw": "`url.fileURLToPath(url[, options])`",
+              "type": "method",
+              "name": "fileURLToPath",
+              "meta": {
+                "added": [
+                  "v10.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.1.0",
+                      "v20.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52509",
+                    "description": "The `options` argument can now be used to determine how to parse the `path` argument."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`url` {URL | string} 要转换为路径的文件 URL 字符串或 URL 对象。",
+                      "name": "url",
+                      "type": "URL | string",
+                      "desc": "要转换为路径的文件 URL 字符串或 URL 对象。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`windows` {boolean|undefined} 如果为 `true`，则 `path` 应作为 Windows 文件路径返回，`false` 表示 posix，`undefined` 表示系统默认值。 **默认值：** `undefined`。",
+                          "name": "windows",
+                          "type": "boolean|undefined",
+                          "desc": "如果为 `true`，则 `path` 应作为 Windows 文件路径返回，`false` 表示 posix，`undefined` 表示系统默认值。 **默认值：** `undefined`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回：{string} 完全解析的特定于平台的 Node.js 文件路径。",
+                      "name": "返回：",
+                      "type": "string",
+                      "desc": "完全解析的特定于平台的 Node.js 文件路径。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此函数确保百分比编码字符的正确解码，并确保跨平台有效的绝对路径字符串。</p>\n<pre><code class=\"language-mjs\">import { fileURLToPath } from 'node:url';\n\nconst __filename = fileURLToPath(import.meta.url);\n\nnew URL('file:///C:/path/').pathname;      // 错误：/C:/path/\nfileURLToPath('file:///C:/path/');         // 正确：C:\\path\\ (Windows)\n\nnew URL('file://nas/foo.txt').pathname;    // 错误：/foo.txt\nfileURLToPath('file://nas/foo.txt');       // 正确：\\\\nas\\foo.txt (Windows)\n\nnew URL('file:///你好.txt').pathname;      // 错误：/%E4%BD%A0%E5%A5%BD.txt\nfileURLToPath('file:///你好.txt');         // 正确：/你好.txt (POSIX)\n\nnew URL('file:///hello world').pathname;   // 错误：/hello%20world\nfileURLToPath('file:///hello world');      // 正确：/hello world (POSIX)\n</code></pre>\n<pre><code class=\"language-cjs\">const { fileURLToPath } = require('node:url');\nnew URL('file:///C:/path/').pathname;      // 错误：/C:/path/\nfileURLToPath('file:///C:/path/');         // 正确：C:\\path\\ (Windows)\n\nnew URL('file://nas/foo.txt').pathname;    // 错误：/foo.txt\nfileURLToPath('file://nas/foo.txt');       // 正确：\\\\nas\\foo.txt (Windows)\n\nnew URL('file:///你好.txt').pathname;      // 错误：/%E4%BD%A0%E5%A5%BD.txt\nfileURLToPath('file:///你好.txt');         // 正确：/你好.txt (POSIX)\n\nnew URL('file:///hello world').pathname;   // 错误：/hello%20world\nfileURLToPath('file:///hello world');      // 正确：/hello world (POSIX)\n</code></pre>"
+            },
+            {
+              "textRaw": "`url.fileURLToPathBuffer(url[, options])`",
+              "type": "method",
+              "name": "fileURLToPathBuffer",
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<!--\nadded: v24.3.0\n-->\n<ul>\n<li><code>url</code> <a href=\"url.html#the-whatwg-url-api\" class=\"type\">&lt;URL&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 要转换为路径的文件 URL 字符串或 URL 对象。</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>windows</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> 如果为 <code>true</code>，则 <code>path</code> 应作为 Windows 文件路径返回，<code>false</code> 表示 posix，<code>undefined</code> 表示系统默认值。\n<strong>默认值：</strong> <code>undefined</code>。</li>\n</ul>\n</li>\n<li>返回：<a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> 完全解析的特定于平台的 Node.js 文件路径作为 <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>。</li>\n</ul>\n<p>类似于 <code>url.fileURLToPath(...)</code>，但返回的是路径的 <code>Buffer</code> 表示形式，而不是字符串。当输入 URL 包含不是有效 UTF-8 / Unicode 序列的百分比编码段时，此转换很有用。</p>"
+            },
+            {
+              "textRaw": "`url.format(URL[, options])`",
+              "type": "method",
+              "name": "format",
+              "meta": {
+                "added": [
+                  "v7.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`URL` {URL} 一个 [WHATWG URL][] 对象",
+                      "name": "URL",
+                      "type": "URL",
+                      "desc": "一个 [WHATWG URL][] 对象"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`auth` {boolean} 如果序列化的 URL 字符串应包括用户名和密码，则为 `true`，否则为 `false`。**默认值：** `true`。",
+                          "name": "auth",
+                          "type": "boolean",
+                          "desc": "如果序列化的 URL 字符串应包括用户名和密码，则为 `true`，否则为 `false`。**默认值：** `true`。"
+                        },
+                        {
+                          "textRaw": "`fragment` {boolean} 如果序列化的 URL 字符串应包括片段，则为 `true`，否则为 `false`。**默认值：** `true`。",
+                          "name": "fragment",
+                          "type": "boolean",
+                          "desc": "如果序列化的 URL 字符串应包括片段，则为 `true`，否则为 `false`。**默认值：** `true`。"
+                        },
+                        {
+                          "textRaw": "`search` {boolean} 如果序列化的 URL 字符串应包括搜索查询，则为 `true`，否则为 `false`。**默认值：** `true`。",
+                          "name": "search",
+                          "type": "boolean",
+                          "desc": "如果序列化的 URL 字符串应包括搜索查询，则为 `true`，否则为 `false`。**默认值：** `true`。"
+                        },
+                        {
+                          "textRaw": "`unicode` {boolean} 如果出现在 URL 字符串的主机组件中的 Unicode 字符应直接编码，而不是进行 Punycode 编码，则为 `true`。**默认值：** `false`。",
+                          "name": "unicode",
+                          "type": "boolean",
+                          "desc": "如果出现在 URL 字符串的主机组件中的 Unicode 字符应直接编码，而不是进行 Punycode 编码，则为 `true`。**默认值：** `false`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回：{string}",
+                      "name": "返回：",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回 <a href=\"#the-whatwg-url-api\">WHATWG URL</a> 对象的 URL <code>String</code> 表示形式的可自定义序列化。</p>\n<p>URL 对象既有 <code>toString()</code> 方法，也有 <code>href</code> 属性，它们都返回 URL 的字符串序列化。然而，这些方式在任何方面都不可自定义。<code>url.format(URL[, options])</code> 方法允许对输出进行基本自定义。</p>\n<pre><code class=\"language-mjs\">import url from 'node:url';\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(myURL.href);\n// 打印 https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(myURL.toString());\n// 打印 https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(url.format(myURL, { fragment: false, unicode: true, auth: false }));\n// 打印 'https://測試/?abc'\n</code></pre>\n<pre><code class=\"language-cjs\">const url = require('node:url');\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(myURL.href);\n// 打印 https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(myURL.toString());\n// 打印 https://a:b@xn--g6w251d/?abc#foo\n\nconsole.log(url.format(myURL, { fragment: false, unicode: true, auth: false }));\n// 打印 'https://測試/?abc'\n</code></pre>"
+            },
+            {
+              "textRaw": "`url.pathToFileURL(path[, options])`",
+              "type": "method",
+              "name": "pathToFileURL",
+              "meta": {
+                "added": [
+                  "v10.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.1.0",
+                      "v20.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52509",
+                    "description": "The `options` argument can now be used to determine how to return the `path` value."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`path` {string} 要转换为文件 URL 的路径。",
+                      "name": "path",
+                      "type": "string",
+                      "desc": "要转换为文件 URL 的路径。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`windows` {boolean|undefined} 如果为 `true`，则 `path` 应被视为 Windows 文件路径，`false` 表示 posix，`undefined` 表示系统默认值。 **默认值：** `undefined`。",
+                          "name": "windows",
+                          "type": "boolean|undefined",
+                          "desc": "如果为 `true`，则 `path` 应被视为 Windows 文件路径，`false` 表示 posix，`undefined` 表示系统默认值。 **默认值：** `undefined`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回：{URL} 文件 URL 对象。",
+                      "name": "返回：",
+                      "type": "URL",
+                      "desc": "文件 URL 对象。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此函数确保 <code>path</code> 被绝对解析，并且在转换为文件 URL 时正确编码 URL 控制字符。</p>\n<pre><code class=\"language-mjs\">import { pathToFileURL } from 'node:url';\n\nnew URL('/foo#1', 'file:');           // 错误：file:///foo#1\npathToFileURL('/foo#1');              // 正确：file:///foo%231 (POSIX)\n\nnew URL('/some/path%.c', 'file:');    // 错误：file:///some/path%.c\npathToFileURL('/some/path%.c');       // 正确：file:///some/path%25.c (POSIX)\n</code></pre>\n<pre><code class=\"language-cjs\">const { pathToFileURL } = require('node:url');\nnew URL(__filename);                  // 错误：抛出 (POSIX)\nnew URL(__filename);                  // 错误：C:\\... (Windows)\npathToFileURL(__filename);            // 正确：file:///... (POSIX)\npathToFileURL(__filename);            // 正确：file:///C:/... (Windows)\n\nnew URL('/foo#1', 'file:');           // 错误：file:///foo#1\npathToFileURL('/foo#1');              // 正确：file:///foo%231 (POSIX)\n\nnew URL('/some/path%.c', 'file:');    // 错误：file:///some/path%.c\npathToFileURL('/some/path%.c');       // 正确：file:///some/path%25.c (POSIX)\n</code></pre>"
+            },
+            {
+              "textRaw": "`url.urlToHttpOptions(url)`",
+              "type": "method",
+              "name": "urlToHttpOptions",
+              "meta": {
+                "added": [
+                  "v15.7.0",
+                  "v14.18.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v19.9.0",
+                      "v18.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/46989",
+                    "description": "The returned object will also contain all the own enumerable properties of the `url` argument."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`url` {URL} 要转换为选项对象的 [WHATWG URL][] 对象。",
+                      "name": "url",
+                      "type": "URL",
+                      "desc": "要转换为选项对象的 [WHATWG URL][] 对象。"
+                    },
+                    {
+                      "textRaw": "返回：{Object} 选项对象",
+                      "name": "返回：",
+                      "type": "Object",
+                      "desc": "选项对象",
+                      "options": [
+                        {
+                          "textRaw": "`protocol` {string} 要使用的协议。",
+                          "name": "protocol",
+                          "type": "string",
+                          "desc": "要使用的协议。"
+                        },
+                        {
+                          "textRaw": "`hostname` {string} 要发出请求的服务器的域名或 IP 地址。",
+                          "name": "hostname",
+                          "type": "string",
+                          "desc": "要发出请求的服务器的域名或 IP 地址。"
+                        },
+                        {
+                          "textRaw": "`hash` {string} URL 的片段部分。",
+                          "name": "hash",
+                          "type": "string",
+                          "desc": "URL 的片段部分。"
+                        },
+                        {
+                          "textRaw": "`search` {string} URL 的序列化查询部分。",
+                          "name": "search",
+                          "type": "string",
+                          "desc": "URL 的序列化查询部分。"
+                        },
+                        {
+                          "textRaw": "`pathname` {string} URL 的路径部分。",
+                          "name": "pathname",
+                          "type": "string",
+                          "desc": "URL 的路径部分。"
+                        },
+                        {
+                          "textRaw": "`path` {string} 请求路径。如果存在查询字符串，则应包括查询字符串。例如 `'/index.html?page=12'`。当请求路径包含非法字符时，将抛出异常。目前，仅拒绝空格，但未来可能会更改。",
+                          "name": "path",
+                          "type": "string",
+                          "desc": "请求路径。如果存在查询字符串，则应包括查询字符串。例如 `'/index.html?page=12'`。当请求路径包含非法字符时，将抛出异常。目前，仅拒绝空格，但未来可能会更改。"
+                        },
+                        {
+                          "textRaw": "`href` {string} 序列化的 URL。",
+                          "name": "href",
+                          "type": "string",
+                          "desc": "序列化的 URL。"
+                        },
+                        {
+                          "textRaw": "`port` {number} 远程服务器的端口。",
+                          "name": "port",
+                          "type": "number",
+                          "desc": "远程服务器的端口。"
+                        },
+                        {
+                          "textRaw": "`auth` {string} 基本身份验证，即 `'user:password'`，用于计算 Authorization 头。",
+                          "name": "auth",
+                          "type": "string",
+                          "desc": "基本身份验证，即 `'user:password'`，用于计算 Authorization 头。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此实用函数将 URL 对象转换为 <a href=\"http.html#httprequestoptions-callback\"><code>http.request()</code></a> 和 <a href=\"https.html#httpsrequestoptions-callback\"><code>https.request()</code></a> API 所期望的普通选项对象。</p>\n<pre><code class=\"language-mjs\">import { urlToHttpOptions } from 'node:url';\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(urlToHttpOptions(myURL));\n/*\n{\n  protocol: 'https:',\n  hostname: 'xn--g6w251d',\n  hash: '#foo',\n  search: '?abc',\n  pathname: '/',\n  path: '/?abc',\n  href: 'https://a:b@xn--g6w251d/?abc#foo',\n  auth: 'a:b'\n}\n*/\n</code></pre>\n<pre><code class=\"language-cjs\">const { urlToHttpOptions } = require('node:url');\nconst myURL = new URL('https://a:b@測試?abc#foo');\n\nconsole.log(urlToHttpOptions(myURL));\n/*\n{\n  protocol: 'https:',\n  hostname: 'xn--g6w251d',\n  hash: '#foo',\n  search: '?abc',\n  pathname: '/',\n  path: '/?abc',\n  href: 'https://a:b@xn--g6w251d/?abc#foo',\n  auth: 'a:b'\n}\n*/\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "WHATWG URL API"
+        },
+        {
+          "textRaw": "旧版 URL API",
+          "name": "旧版_url_api",
+          "meta": {
+            "changes": [
+              {
+                "version": [
+                  "v15.13.0",
+                  "v14.17.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/37784",
+                "description": "Deprecation revoked. Status changed to \"Legacy\"."
+              },
+              {
+                "version": "v11.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/22715",
+                "description": "This API is deprecated."
+              }
+            ]
+          },
+          "stability": 3,
+          "stabilityText": "Legacy: 改用 WHATWG URL API。",
+          "modules": [
+            {
+              "textRaw": "旧版 `urlObject`",
+              "name": "旧版_`urlobject`",
+              "meta": {
+                "changes": [
+                  {
+                    "version": [
+                      "v15.13.0",
+                      "v14.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37784",
+                    "description": "Deprecation revoked. Status changed to \"Legacy\"."
+                  },
+                  {
+                    "version": "v11.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/22715",
+                    "description": "The Legacy URL API is deprecated. Use the WHATWG URL API."
+                  }
+                ]
+              },
+              "desc": "<p>旧版 <code>urlObject</code> (<code>require('node:url').Url</code> 或 <code>import { Url } from 'node:url'</code>) 由 <code>url.parse()</code> 函数创建并返回。</p>",
+              "properties": [
+                {
+                  "textRaw": "`urlObject.auth`",
+                  "name": "auth",
+                  "desc": "<p><code>auth</code> 属性是 URL 的用户名和密码部分，也称为 <em>userinfo</em>。这个字符串子集跟在协议和双斜杠（如果存在）之后，并在主机组件之前，由 <code>@</code> 分隔。字符串要么是用户名，要么是由 <code>:</code> 分隔的用户名和密码。</p>\n<p>例如：<code>'user:pass'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.hash`",
+                  "name": "hash",
+                  "desc": "<p><code>hash</code> 属性是 URL 的片段标识符部分，包括前导 <code>#</code> 字符。</p>\n<p>例如：<code>'#hash'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.host`",
+                  "name": "host",
+                  "desc": "<p><code>host</code> 属性是 URL 的完整小写主机部分，包括指定的 <code>port</code>。</p>\n<p>例如：<code>'sub.example.com:8080'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.hostname`",
+                  "name": "hostname",
+                  "desc": "<p><code>hostname</code> 属性是 <code>host</code> 组件的小写主机名部分，<strong>不</strong>包括 <code>port</code>。</p>\n<p>例如：<code>'sub.example.com'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.href`",
+                  "name": "href",
+                  "desc": "<p><code>href</code> 属性是已解析的完整 URL 字符串，其中 <code>protocol</code> 和 <code>host</code> 组件都转换为小写。</p>\n<p>例如：<code>'http://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.path`",
+                  "name": "path",
+                  "desc": "<p><code>path</code> 属性是 <code>pathname</code> 和 <code>search</code> 组件的连接。</p>\n<p>例如：<code>'/p/a/t/h?query=string'</code>。</p>\n<p>不对 <code>path</code> 进行解码。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.pathname`",
+                  "name": "pathname",
+                  "desc": "<p><code>pathname</code> 属性由 URL 的整个路径部分组成。这是主机（包括 <code>port</code>）之后和查询或哈希组件开始之前的所有内容，由 ASCII 问号 (<code>?</code>) 或哈希 (<code>#</code>) 字符分隔。</p>\n<p>例如：<code>'/p/a/t/h'</code>。</p>\n<p>不对路径字符串进行解码。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.port`",
+                  "name": "port",
+                  "desc": "<p><code>port</code> 属性是 <code>host</code> 组件的数字端口部分。</p>\n<p>例如：<code>'8080'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.protocol`",
+                  "name": "protocol",
+                  "desc": "<p><code>protocol</code> 属性标识 URL 的小写协议方案。</p>\n<p>例如：<code>'http:'</code>。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.query`",
+                  "name": "query",
+                  "desc": "<p><code>query</code> 属性是不带前导 ASCII 问号 (<code>?</code>) 的查询字符串，或者是由 <a href=\"querystring.html\"><code>querystring</code></a> 模块的 <code>parse()</code> 方法返回的对象。<code>query</code> 属性是字符串还是对象由传递给 <code>url.parse()</code> 的 <code>parseQueryString</code> 参数决定。</p>\n<p>例如：<code>'query=string'</code> 或 <code>{'query': 'string'}</code>。</p>\n<p>如果作为字符串返回，则不对查询字符串进行解码。如果作为对象返回，则键和值都会被解码。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.search`",
+                  "name": "search",
+                  "desc": "<p><code>search</code> 属性由 URL 的整个“查询字符串”部分组成，包括前导 ASCII 问号 (<code>?</code>) 字符。</p>\n<p>例如：<code>'?query=string'</code>。</p>\n<p>不对查询字符串进行解码。</p>"
+                },
+                {
+                  "textRaw": "`urlObject.slashes`",
+                  "name": "slashes",
+                  "desc": "<p><code>slashes</code> 属性是一个 <code>boolean</code>，如果协议后的冒号需要两个 ASCII 正斜杠字符 (<code>/</code>)，则值为 <code>true</code>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "旧版 `urlObject`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`url.format(urlObject)`",
+              "type": "method",
+              "name": "format",
+              "meta": {
+                "added": [
+                  "v0.1.25"
+                ],
+                "changes": [
+                  {
+                    "version": "v17.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/38631",
+                    "description": "Now throws an `ERR_INVALID_URL` exception when Punycode conversion of a hostname introduces changes that could cause the URL to be re-parsed differently."
+                  },
+                  {
+                    "version": [
+                      "v15.13.0",
+                      "v14.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37784",
+                    "description": "Deprecation revoked. Status changed to \"Legacy\"."
+                  },
+                  {
+                    "version": "v11.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/22715",
+                    "description": "The Legacy URL API is deprecated. Use the WHATWG URL API."
+                  },
+                  {
+                    "version": "v7.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/7234",
+                    "description": "URLs with a `file:` scheme will now always use the correct number of slashes regardless of `slashes` option. A falsy `slashes` option with no protocol is now also respected at all times."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`urlObject` {Object|string} 一个 URL 对象（由 `url.parse()` 返回或以其他方式构造）。如果是一个字符串，则通过将其传递给 `url.parse()` 转换为对象。",
+                      "name": "urlObject",
+                      "type": "Object|string",
+                      "desc": "一个 URL 对象（由 `url.parse()` 返回或以其他方式构造）。如果是一个字符串，则通过将其传递给 `url.parse()` 转换为对象。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>url.format()</code> 方法返回从 <code>urlObject</code> 派生的格式化 URL 字符串。</p>\n<pre><code class=\"language-js\">const url = require('node:url');\nurl.format({\n  protocol: 'https',\n  hostname: 'example.com',\n  pathname: '/some/path',\n  query: {\n    page: 1,\n    format: 'json',\n  },\n});\n\n// => 'https://example.com/some/path?page=1&#x26;format=json'\n</code></pre>\n<p>如果 <code>urlObject</code> 不是对象或字符串，<code>url.format()</code> 将抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>\n<p>格式化过程按如下方式进行：</p>\n<ul>\n<li>创建一个新的空字符串 <code>result</code>。</li>\n<li>如果 <code>urlObject.protocol</code> 是一个字符串，则将其按原样追加到 <code>result</code>。</li>\n<li>否则，如果 <code>urlObject.protocol</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</li>\n<li>对于所有<strong>不以</strong> ASCII 冒号 (<code>:</code>) 字符结尾的 <code>urlObject.protocol</code> 字符串值，字面字符串 <code>:</code> 将被追加到 <code>result</code>。</li>\n<li>如果以下任一条件为真，则字面字符串 <code>//</code> 将被追加到 <code>result</code>：\n<ul>\n<li><code>urlObject.slashes</code> 属性为 true；</li>\n<li><code>urlObject.protocol</code> 以 <code>http</code>、<code>https</code>、<code>ftp</code>、<code>gopher</code> 或 <code>file</code> 开头；</li>\n</ul>\n</li>\n<li>如果 <code>urlObject.auth</code> 属性的值为真值，并且 <code>urlObject.host</code> 或 <code>urlObject.hostname</code> 不是 <code>undefined</code>，则 <code>urlObject.auth</code> 的值将被强制转换为字符串并追加到 <code>result</code>，后跟字面字符串 <code>@</code>。</li>\n<li>如果 <code>urlObject.host</code> 属性是 <code>undefined</code>，则：\n<ul>\n<li>如果 <code>urlObject.hostname</code> 是字符串，则将其追加到 <code>result</code>。</li>\n<li>否则，如果 <code>urlObject.hostname</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</li>\n<li>如果 <code>urlObject.port</code> 属性值为真值，并且 <code>urlObject.hostname</code> 不是 <code>undefined</code>：\n<ul>\n<li>字面字符串 <code>:</code> 被追加到 <code>result</code>，并且</li>\n<li><code>urlObject.port</code> 的值被强制转换为字符串并追加到 <code>result</code>。</li>\n</ul>\n</li>\n</ul>\n</li>\n<li>否则，如果 <code>urlObject.host</code> 属性值为真值，则 <code>urlObject.host</code> 的值被强制转换为字符串并追加到 <code>result</code>。</li>\n<li>如果 <code>urlObject.pathname</code> 属性是一个非空字符串：\n<ul>\n<li>如果 <code>urlObject.pathname</code> <strong>不以</strong> ASCII 正斜杠 (<code>/</code>) 开头，则字面字符串 <code>'/'</code> 被追加到 <code>result</code>。</li>\n<li><code>urlObject.pathname</code> 的值被追加到 <code>result</code>。</li>\n</ul>\n</li>\n<li>否则，如果 <code>urlObject.pathname</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</li>\n<li>如果 <code>urlObject.search</code> 属性是 <code>undefined</code> 并且 <code>urlObject.query</code> 属性是一个 <code>Object</code>，则字面字符串 <code>?</code> 被追加到 <code>result</code>，后跟调用 <a href=\"querystring.html\"><code>querystring</code></a> 模块的 <code>stringify()</code> 方法并传递 <code>urlObject.query</code> 值的输出。</li>\n<li>否则，如果 <code>urlObject.search</code> 是一个字符串：\n<ul>\n<li>如果 <code>urlObject.search</code> 的值<strong>不以</strong> ASCII 问号 (<code>?</code>) 字符开头，则字面字符串 <code>?</code> 被追加到 <code>result</code>。</li>\n<li><code>urlObject.search</code> 的值被追加到 <code>result</code>。</li>\n</ul>\n</li>\n<li>否则，如果 <code>urlObject.search</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</li>\n<li>如果 <code>urlObject.hash</code> 属性是一个字符串：\n<ul>\n<li>如果 <code>urlObject.hash</code> 的值<strong>不以</strong> ASCII 哈希 (<code>#</code>) 字符开头，则字面字符串 <code>#</code> 被追加到 <code>result</code>。</li>\n<li><code>urlObject.hash</code> 的值被追加到 <code>result</code>。</li>\n</ul>\n</li>\n<li>否则，如果 <code>urlObject.hash</code> 属性不是 <code>undefined</code> 且不是字符串，则抛出 <a href=\"errors.html#class-error\"><code>Error</code></a>。</li>\n<li>返回 <code>result</code>。</li>\n</ul>"
+            },
+            {
+              "textRaw": "`url.parse(urlString[, parseQueryString[, slashesDenoteHost]])`",
+              "type": "method",
+              "name": "parse",
+              "meta": {
+                "added": [
+                  "v0.1.25"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v19.0.0",
+                      "v18.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/44919",
+                    "description": "Documentation-only deprecation."
+                  },
+                  {
+                    "version": [
+                      "v15.13.0",
+                      "v14.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37784",
+                    "description": "Deprecation revoked. Status changed to \"Legacy\"."
+                  },
+                  {
+                    "version": "v11.14.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/26941",
+                    "description": "The `pathname` property on the returned URL object is now `/` when there is no path and the protocol scheme is `ws:` or `wss:`."
+                  },
+                  {
+                    "version": "v11.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/22715",
+                    "description": "The Legacy URL API is deprecated. Use the WHATWG URL API."
+                  },
+                  {
+                    "version": "v9.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/13606",
+                    "description": "The `search` property on the returned URL object is now `null` when no query string is present."
+                  }
+                ]
+              },
+              "stability": 0,
+              "stabilityText": "Deprecated: 改用 WHATWG URL API。",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`urlString` {string} 要解析的 URL 字符串。",
+                      "name": "urlString",
+                      "type": "string",
+                      "desc": "要解析的 URL 字符串。"
+                    },
+                    {
+                      "textRaw": "`parseQueryString` {boolean} 如果为 `true`，则 `query` 属性将始终设置为由 [`querystring`][] 模块的 `parse()` 方法返回的对象。如果为 `false`，返回的 URL 对象上的 `query` 属性将是未解析、未解码的字符串。**默认值：** `false`。",
+                      "name": "parseQueryString",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，则 `query` 属性将始终设置为由 [`querystring`][] 模块的 `parse()` 方法返回的对象。如果为 `false`，返回的 URL 对象上的 `query` 属性将是未解析、未解码的字符串。**默认值：** `false`。"
+                    },
+                    {
+                      "textRaw": "`slashesDenoteHost` {boolean} 如果为 `true`，则字面字符串 `//` 之后且下一个 `/` 之前的第一个标记将被解释为 `host`。例如，给定 `//foo/bar`，结果将是 `{host: 'foo', pathname: '/bar'}` 而不是 `{pathname: '//foo/bar'}`。**默认值：** `false`。",
+                      "name": "slashesDenoteHost",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，则字面字符串 `//` 之后且下一个 `/` 之前的第一个标记将被解释为 `host`。例如，给定 `//foo/bar`，结果将是 `{host: 'foo', pathname: '/bar'}` 而不是 `{pathname: '//foo/bar'}`。**默认值：** `false`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>url.parse()</code> 方法获取一个 URL 字符串，解析它，并返回一个 URL 对象。</p>\n<p>如果 <code>urlString</code> 不是字符串，则抛出 <code>TypeError</code>。</p>\n<p>如果 <code>auth</code> 属性存在但无法解码，则抛出 <code>URIError</code>。</p>\n<p><code>url.parse()</code> 使用宽松的、非标准算法来解析 URL 字符串。它容易出现安全问题，例如[主机名欺骗][]以及用户名和密码的错误处理。不要用于不可信的输入。不会为 <code>url.parse()</code> 的漏洞发布 CVE。请改用 <a href=\"#the-whatwg-url-api\">WHATWG URL</a> API，例如：</p>\n<pre><code class=\"language-js\">function getURL(req) {\n  const proto = req.headers['x-forwarded-proto'] || 'https';\n  const host = req.headers['x-forwarded-host'] || req.headers.host || 'example.com';\n  return new URL(req.url || '/', `${proto}://${host}`);\n}\n</code></pre>\n<p>上面的示例假设反向代理将格式正确的头转发到您的 Node.js 服务器。如果您没有使用反向代理，应使用以下示例：</p>\n<pre><code class=\"language-js\">function getURL(req) {\n  return new URL(req.url || '/', 'https://example.com');\n}\n</code></pre>"
+            },
+            {
+              "textRaw": "`url.resolve(from, to)`",
+              "type": "method",
+              "name": "resolve",
+              "meta": {
+                "added": [
+                  "v0.1.25"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v15.13.0",
+                      "v14.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37784",
+                    "description": "Deprecation revoked. Status changed to \"Legacy\"."
+                  },
+                  {
+                    "version": "v11.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/22715",
+                    "description": "The Legacy URL API is deprecated. Use the WHATWG URL API."
+                  },
+                  {
+                    "version": "v6.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/8215",
+                    "description": "The `auth` fields are now kept intact when `from` and `to` refer to the same host."
+                  },
+                  {
+                    "version": [
+                      "v6.5.0",
+                      "v4.6.2"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/8214",
+                    "description": "The `port` field is copied correctly now."
+                  },
+                  {
+                    "version": "v6.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/1480",
+                    "description": "The `auth` fields is cleared now the `to` parameter contains a hostname."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`from` {string} 如果 `to` 是相对 URL，则使用的基础 URL。",
+                      "name": "from",
+                      "type": "string",
+                      "desc": "如果 `to` 是相对 URL，则使用的基础 URL。"
+                    },
+                    {
+                      "textRaw": "`to` {string} 要解析的目标 URL。",
+                      "name": "to",
+                      "type": "string",
+                      "desc": "要解析的目标 URL。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>url.resolve()</code> 方法以类似于 Web 浏览器解析锚标签的方式，相对于基础 URL 解析目标 URL。</p>\n<pre><code class=\"language-js\">const url = require('node:url');\nurl.resolve('/one/two/three', 'four');         // '/one/two/four'\nurl.resolve('http://example.com/', '/one');    // 'http://example.com/one'\nurl.resolve('http://example.com/one', '/two'); // 'http://example.com/two'\n</code></pre>\n<p>要使用 WHATWG URL API 实现相同的结果：</p>\n<pre><code class=\"language-js\">function resolve(from, to) {\n  const resolvedUrl = new URL(to, new URL(from, 'resolve://'));\n  if (resolvedUrl.protocol === 'resolve:') {\n    // `from` 是一个相对 URL。\n    const { pathname, search, hash } = resolvedUrl;\n    return pathname + search + hash;\n  }\n  return resolvedUrl.toString();\n}\n\nresolve('/one/two/three', 'four');         // '/one/two/four'\nresolve('http://example.com/', '/one');    // 'http://example.com/one'\nresolve('http://example.com/one', '/two'); // 'http://example.com/two'\n</code></pre>\n<p><a id=\"whatwg-percent-encoding\"></a></p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "旧版 URL API"
+        },
+        {
+          "textRaw": "URL 中的百分比编码",
+          "name": "url_中的百分比编码",
+          "desc": "<p>URL 只允许包含特定范围的字符。任何超出该范围的字符都必须进行编码。这些字符的编码方式以及要对哪些字符进行编码完全取决于字符在 URL 结构中的位置。</p>",
+          "modules": [
+            {
+              "textRaw": "旧版 API",
+              "name": "旧版_api",
+              "desc": "<p>在旧版 API 中，URL 对象的属性中的空格 (<code>' '</code>) 和以下字符将自动转义：</p>\n<pre><code class=\"language-text\">&#x3C; > \" ` \\r \\n \\t { } | \\ ^ '\n</code></pre>\n<p>例如，ASCII 空格字符 (<code>' '</code>) 被编码为 <code>%20</code>。ASCII 正斜杠 (<code>/</code>) 字符被编码为 <code>%3C</code>。</p>",
+              "type": "module",
+              "displayName": "旧版 API"
+            },
+            {
+              "textRaw": "WHATWG API",
+              "name": "whatwg_api",
+              "desc": "<p>[WHATWG URL 标准][] 使用比旧版 API 更具选择性和细粒度的方法来选择编码字符。</p>\n<p>WHATWG 算法定义了四个“百分比编码集”，描述了必须进行百分比编码的字符范围：</p>\n<ul>\n<li>\n<p><strong>C0 控制百分比编码集</strong> 包括 U+0000 到 U+001F（含）范围内的码点以及所有大于 U+007E (~) 的码点。</p>\n</li>\n<li>\n<p><strong>片段百分比编码集</strong> 包括 <strong>C0 控制百分比编码集</strong> 和码点 U+0020 空格、U+0022 (\")、U+003C (&#x3C;)、U+003E (>)、和 U+0060 (`)。</p>\n</li>\n<li>\n<p><strong>路径百分比编码集</strong> 包括 <strong>C0 控制百分比编码集</strong> 和码点 U+0020 空格、U+0022 (\")、U+0023 (#)、U+003C (&#x3C;)、U+003E (>)、U+003F (?)、U+0060 (`)、U+007B ({)、和 U+007D (})。</p>\n</li>\n<li>\n<p><strong>用户信息编码集</strong> 包括 <strong>路径百分比编码集</strong> 和码点 U+002F (/)、U+003A (:)、U+003B (;)、U+003D (=)、U+0040 (@)、U+005B ([) 到 U+005E(^)、和 U+007C (|)。</p>\n</li>\n</ul>\n<p><strong>用户信息百分比编码集</strong> 专门用于在 URL 内编码的用户名和密码。<strong>路径百分比编码集</strong> 用于大多数 URL 的路径。<strong>片段百分比编码集</strong> 用于 URL 片段。<strong>C0 控制百分比编码集</strong> 用于主机和路径在某些特定条件下，以及所有其他情况。</p>\n<p>当非 ASCII 字符出现在主机名中时，主机名使用 <a href=\"https://tools.ietf.org/html/rfc5891#section-4.4\">Punycode</a> 算法进行编码。但请注意，主机名<strong>可能</strong>同时包含 Punycode 编码和百分比编码的字符：</p>\n<pre><code class=\"language-js\">const myURL = new URL('https://%CF%80.example.com/foo');\nconsole.log(myURL.href);\n// 打印 https://xn--1xa.example.com/foo\nconsole.log(myURL.origin);\n// 打印 https://xn--1xa.example.com\n</code></pre>",
+              "type": "module",
+              "displayName": "WHATWG API"
+            }
+          ],
+          "type": "module",
+          "displayName": "URL 中的百分比编码"
+        }
+      ],
+      "type": "module",
+      "displayName": "URL"
+    }
+  ]
+}

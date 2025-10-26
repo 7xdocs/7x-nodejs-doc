@@ -1,0 +1,244 @@
+{
+  "type": "module",
+  "source": "doc/api/single-executable-applications.md",
+  "modules": [
+    {
+      "textRaw": "单可执行应用",
+      "name": "单可执行应用",
+      "introduced_in": "v19.7.0",
+      "meta": {
+        "added": [
+          "v19.7.0",
+          "v18.16.0"
+        ],
+        "changes": [
+          {
+            "version": "v20.6.0",
+            "pr-url": "https://github.com/nodejs/node/pull/46824",
+            "description": "Added support for \"useSnapshot\"."
+          },
+          {
+            "version": "v20.6.0",
+            "pr-url": "https://github.com/nodejs/node/pull/48191",
+            "description": "Added support for \"useCodeCache\"."
+          }
+        ]
+      },
+      "stability": 1,
+      "stabilityText": ".1 - Active development",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/src/node_sea.cc\">src/node_sea.cc</a></p>\n<p>此功能允许将 Node.js 应用方便地分发到未安装 Node.js 的系统上。</p>\n<p>Node.js 支持通过注入由 Node.js 准备好的数据块（可以包含捆绑的脚本）到 <code>node</code> 二进制文件中来创建[单可执行应用][]。在启动时，程序会检查是否注入了任何内容。如果找到了数据块，则执行数据块中的脚本。否则 Node.js 将正常操作。</p>\n<p>单可执行应用功能目前仅支持使用 <a href=\"modules.html#modules-commonjs-modules\">CommonJS</a> 模块系统运行单个嵌入脚本。</p>\n<p>用户可以使用 <code>node</code> 二进制文件本身以及任何能够向二进制文件中注入资源的工具，从他们捆绑的脚本创建单可执行应用。</p>\n<p>以下是使用其中一种工具 <a href=\"https://github.com/nodejs/postject\">postject</a> 创建单可执行应用的步骤：</p>\n<ol>\n<li>\n<p>创建一个 JavaScript 文件：</p>\n<pre><code class=\"language-bash\">echo 'console.log(`Hello, ${process.argv[2]}!`);' > hello.js\n</code></pre>\n</li>\n<li>\n<p>创建一个配置文件，构建可以注入到单可执行应用的数据块（详情请参阅[生成单可执行应用准备数据块][]）：</p>\n<pre><code class=\"language-bash\">echo '{ \"main\": \"hello.js\", \"output\": \"sea-prep.blob\" }' > sea-config.json\n</code></pre>\n</li>\n<li>\n<p>生成要注入的数据块：</p>\n<pre><code class=\"language-bash\">node --experimental-sea-config sea-config.json\n</code></pre>\n</li>\n<li>\n<p>创建 <code>node</code> 可执行文件的副本，并根据需要命名：</p>\n<ul>\n<li>在非 Windows 系统上：</li>\n</ul>\n<pre><code class=\"language-bash\">cp $(command -v node) hello\n</code></pre>\n<ul>\n<li>在 Windows 上：</li>\n</ul>\n<pre><code class=\"language-text\">node -e \"require('fs').copyFileSync(process.execPath, 'hello.exe')\"\n</code></pre>\n<p><code>.exe</code> 扩展名是必需的。</p>\n</li>\n<li>\n<p>移除二进制文件的签名（仅限 macOS 和 Windows）：</p>\n<ul>\n<li>在 macOS 上：</li>\n</ul>\n<pre><code class=\"language-bash\">codesign --remove-signature hello\n</code></pre>\n<ul>\n<li>在 Windows 上（可选）：</li>\n</ul>\n<p>可以使用已安装的 <a href=\"https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/\">Windows SDK</a> 中的 <a href=\"https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool\">signtool</a>。如果跳过此步骤，请忽略 postject 发出的任何与签名相关的警告。</p>\n<pre><code class=\"language-powershell\">signtool remove /s hello.exe\n</code></pre>\n</li>\n<li>\n<p>通过运行 <code>postject</code> 并指定以下选项，将数据块注入到复制的二进制文件中：</p>\n<ul>\n<li><code>hello</code> / <code>hello.exe</code> - 第 4 步中创建的 <code>node</code> 可执行文件副本的名称。</li>\n<li><code>NODE_SEA_BLOB</code> - 二进制文件中资源 / 注释 / 段的名称，数据块的内容将存储在此。</li>\n<li><code>sea-prep.blob</code> - 第 1 步中创建的数据块的名称。</li>\n<li><code>--sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2</code> - Node.js 项目用于检测文件是否已被注入的[熔断器][]。</li>\n<li><code>--macho-segment-name NODE_SEA</code>（仅在 macOS 上需要）- 二进制文件中段的名称，数据块的内容将存储在此。</li>\n</ul>\n<p>总结一下，以下是各平台所需的命令：</p>\n<ul>\n<li>\n<p>在 Linux 上：</p>\n<pre><code class=\"language-bash\">npx postject hello NODE_SEA_BLOB sea-prep.blob \\\n    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2\n</code></pre>\n</li>\n<li>\n<p>在 Windows - PowerShell 上：</p>\n<pre><code class=\"language-powershell\">npx postject hello.exe NODE_SEA_BLOB sea-prep.blob `\n    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2\n</code></pre>\n</li>\n<li>\n<p>在 Windows - 命令提示符上：</p>\n<pre><code class=\"language-text\">npx postject hello.exe NODE_SEA_BLOB sea-prep.blob ^\n    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2\n</code></pre>\n</li>\n<li>\n<p>在 macOS 上：</p>\n<pre><code class=\"language-bash\">npx postject hello NODE_SEA_BLOB sea-prep.blob \\\n    --sentinel-fuse NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2 \\\n    --macho-segment-name NODE_SEA\n</code></pre>\n</li>\n</ul>\n</li>\n<li>\n<p>为二进制文件签名（仅限 macOS 和 Windows）：</p>\n<ul>\n<li>在 macOS 上：</li>\n</ul>\n<pre><code class=\"language-bash\">codesign --sign - hello\n</code></pre>\n<ul>\n<li>在 Windows 上（可选）：</li>\n</ul>\n<p>需要有证书才能工作。但是，未签名的二进制文件仍然可以运行。</p>\n<pre><code class=\"language-powershell\">signtool sign /fd SHA256 hello.exe\n</code></pre>\n</li>\n<li>\n<p>运行二进制文件：</p>\n<ul>\n<li>在非 Windows 系统上</li>\n</ul>\n<pre><code class=\"language-console\">$ ./hello world\nHello, world!\n</code></pre>\n<ul>\n<li>在 Windows 上</li>\n</ul>\n<pre><code class=\"language-console\">$ .\\hello.exe world\nHello, world!\n</code></pre>\n</li>\n</ol>",
+      "modules": [
+        {
+          "textRaw": "生成单可执行应用准备数据块",
+          "name": "生成单可执行应用准备数据块",
+          "desc": "<p>可以使用用于构建单可执行应用的 Node.js 二进制文件的 <code>--experimental-sea-config</code> 标志来生成要注入到应用程序中的单可执行应用准备数据块。它接受一个 JSON 格式的配置文件路径。如果传递给它的路径不是绝对路径，Node.js 将使用相对于当前工作目录的路径。</p>\n<p>配置目前读取以下顶级字段：</p>\n<pre><code class=\"language-json\">{\n  \"main\": \"/path/to/bundled/script.js\",\n  \"output\": \"/path/to/write/the/generated/blob.blob\",\n  \"disableExperimentalSEAWarning\": true, // Default: false\n  \"useSnapshot\": false,  // Default: false\n  \"useCodeCache\": true, // Default: false\n  \"execArgv\": [\"--no-warnings\", \"--max-old-space-size=4096\"], // Optional\n  \"execArgvExtension\": \"env\", // Default: \"env\", options: \"none\", \"env\", \"cli\"\n  \"assets\": {  // Optional\n    \"a.dat\": \"/path/to/a.dat\",\n    \"b.txt\": \"/path/to/b.txt\"\n  }\n}\n</code></pre>\n<p>如果路径不是绝对路径，Node.js 将使用相对于当前工作目录的路径。用于生成数据块的 Node.js 二进制文件的版本必须与将要注入数据块的二进制文件版本相同。</p>\n<p>注意：当生成跨平台的 SEA（例如，在 <code>darwin-arm64</code> 上生成用于 <code>linux-x64</code> 的 SEA）时，必须将 <code>useCodeCache</code> 和 <code>useSnapshot</code> 设置为 false，以避免生成不兼容的可执行文件。因为代码缓存和快照只能在编译它们的同一平台上加载，生成的可执行文件在启动时尝试加载在不同平台上构建的代码缓存或快照时可能会崩溃。</p>",
+          "modules": [
+            {
+              "textRaw": "资源",
+              "name": "资源",
+              "desc": "<p>用户可以通过在配置中添加一个键值路径字典作为 <code>assets</code> 字段来包含资源。在构建时，Node.js 会从指定路径读取资源并将它们捆绑到准备数据块中。在生成的可执行文件中，用户可以使用 <a href=\"#seagetassetkey-encoding\"><code>sea.getAsset()</code></a> 和 <a href=\"#seagetassetasblobkey-options\"><code>sea.getAssetAsBlob()</code></a> API 来检索资源。</p>\n<pre><code class=\"language-json\">{\n  \"main\": \"/path/to/bundled/script.js\",\n  \"output\": \"/path/to/write/the/generated/blob.blob\",\n  \"assets\": {\n    \"a.jpg\": \"/path/to/a.jpg\",\n    \"b.txt\": \"/path/to/b.txt\"\n  }\n}\n</code></pre>\n<p>单可执行应用可以按如下方式访问资源：</p>\n<pre><code class=\"language-cjs\">const { getAsset, getAssetAsBlob, getRawAsset, getAssetKeys } = require('node:sea');\n// 获取所有资源键。\nconst keys = getAssetKeys();\nconsole.log(keys); // ['a.jpg', 'b.txt']\n// 返回 ArrayBuffer 中数据的副本。\nconst image = getAsset('a.jpg');\n// 将资源解码为 UTF8 字符串返回。\nconst text = getAsset('b.txt', 'utf8');\n// 返回包含资源的 Blob。\nconst blob = getAssetAsBlob('a.jpg');\n// 返回包含原始资源的 ArrayBuffer，不进行复制。\nconst raw = getRawAsset('a.jpg');\n</code></pre>\n<p>有关更多信息，请参阅 <a href=\"#seagetassetkey-encoding\"><code>sea.getAsset()</code></a>、<a href=\"#seagetassetasblobkey-options\"><code>sea.getAssetAsBlob()</code></a>、<a href=\"#seagetrawassetkey\"><code>sea.getRawAsset()</code></a> 和 <a href=\"#seagetassetkeys\"><code>sea.getAssetKeys()</code></a> API 的文档。</p>",
+              "type": "module",
+              "displayName": "资源"
+            },
+            {
+              "textRaw": "启动快照支持",
+              "name": "启动快照支持",
+              "desc": "<p><code>useSnapshot</code> 字段可用于启用启动快照支持。在这种情况下，当最终的可执行文件启动时，<code>main</code> 脚本不会运行。相反，它会在构建机器上生成单可执行应用准备数据块时运行。生成的准备数据块将包含一个捕获了 <code>main</code> 脚本初始化状态的快照。带有注入的准备数据块的最终可执行文件将在运行时反序列化该快照。</p>\n<p>当 <code>useSnapshot</code> 为 true 时，主脚本必须调用 <a href=\"v8.html#v8startupsnapshotsetdeserializemainfunctioncallback-data\"><code>v8.startupSnapshot.setDeserializeMainFunction()</code></a> API 来配置在最终可执行文件被用户启动时需要运行的代码。</p>\n<p>在单可执行应用中使用快照的典型模式是：</p>\n<ol>\n<li>在构建时，在构建机器上，运行主脚本以将堆初始化到准备好接收用户输入的状态。该脚本还应使用 <a href=\"v8.html#v8startupsnapshotsetdeserializemainfunctioncallback-data\"><code>v8.startupSnapshot.setDeserializeMainFunction()</code></a> 配置一个主函数。此函数将被编译并序列化到快照中，但在构建时不会调用。</li>\n<li>在运行时，主函数将在用户机器的反序列化堆上运行，以处理用户输入并生成输出。</li>\n</ol>\n<p>启动快照脚本的一般约束也适用于用于为单可执行应用构建快照的主脚本，并且主脚本可以使用 <a href=\"v8.html#startup-snapshot-api\"><code>v8.startupSnapshot</code> API</a> 来适应这些约束。请参阅[Node.js 中的启动快照支持文档][]。</p>",
+              "type": "module",
+              "displayName": "启动快照支持"
+            },
+            {
+              "textRaw": "V8 代码缓存支持",
+              "name": "v8_代码缓存支持",
+              "desc": "<p>当在配置中将 <code>useCodeCache</code> 设置为 <code>true</code> 时，在生成单可执行应用准备数据块期间，Node.js 将编译 <code>main</code> 脚本以生成 V8 代码缓存。生成的代码缓存将成为准备数据块的一部分，并被注入到最终的可执行文件中。当单可执行应用启动时，Node.js 将使用代码缓存来加速编译，而不是从头开始编译 <code>main</code> 脚本，然后执行该脚本，这将提高启动性能。</p>\n<p><strong>注意：</strong> 当 <code>useCodeCache</code> 为 <code>true</code> 时，<code>import()</code> 不起作用。</p>",
+              "type": "module",
+              "displayName": "V8 代码缓存支持"
+            },
+            {
+              "textRaw": "执行参数",
+              "name": "执行参数",
+              "desc": "<p><code>execArgv</code> 字段可用于指定 Node.js 特定的参数，这些参数将在单可执行应用启动时自动应用。这允许应用程序开发人员配置 Node.js 运行时选项，而无需最终用户了解这些标志。</p>\n<p>例如，以下配置：</p>\n<pre><code class=\"language-json\">{\n  \"main\": \"/path/to/bundled/script.js\",\n  \"output\": \"/path/to/write/the/generated/blob.blob\",\n  \"execArgv\": [\"--no-warnings\", \"--max-old-space-size=2048\"]\n}\n</code></pre>\n<p>将指示 SEA 在启动时使用 <code>--no-warnings</code> 和 <code>--max-old-space-size=2048</code> 标志。在可执行文件中嵌入的脚本中，可以使用 <code>process.execArgv</code> 属性访问这些标志：</p>\n<pre><code class=\"language-js\">// 如果使用 `sea user-arg1 user-arg2` 启动可执行文件\nconsole.log(process.execArgv);\n// 打印：['--no-warnings', '--max-old-space-size=2048']\nconsole.log(process.argv);\n// 打印 ['/path/to/sea', 'path/to/sea', 'user-arg1', 'user-arg2']\n</code></pre>\n<p>用户提供的参数位于 <code>process.argv</code> 数组中，从索引 2 开始，类似于使用以下命令启动应用程序时的情况：</p>\n<pre><code class=\"language-console\">node --no-warnings --max-old-space-size=2048 /path/to/bundled/script.js user-arg1 user-arg2\n</code></pre>",
+              "type": "module",
+              "displayName": "执行参数"
+            },
+            {
+              "textRaw": "执行参数扩展",
+              "name": "执行参数扩展",
+              "desc": "<p><code>execArgvExtension</code> 字段控制如何在 <code>execArgv</code> 字段指定的参数之外提供额外的执行参数。它接受以下三个字符串值之一：</p>\n<ul>\n<li><code>\"none\"</code>：不允许扩展。将仅使用 <code>execArgv</code> 中指定的参数，并且将忽略 <code>NODE_OPTIONS</code> 环境变量。</li>\n<li><code>\"env\"</code>：<em>（默认）</em> <code>NODE_OPTIONS</code> 环境变量可以扩展执行参数。这是为了保持向后兼容性的默认行为。</li>\n<li><code>\"cli\"</code>：可以使用 <code>--node-options=\"--flag1 --flag2\"</code> 启动可执行文件，这些标志将被解析为 Node.js 的执行参数，而不是传递给用户脚本。这允许使用 <code>NODE_OPTIONS</code> 环境变量不支持的参数。</li>\n</ul>\n<p>例如，使用 <code>\"execArgvExtension\": \"cli\"</code>：</p>\n<pre><code class=\"language-json\">{\n  \"main\": \"/path/to/bundled/script.js\",\n  \"output\": \"/path/to/write/the/generated/blob.blob\",\n  \"execArgv\": [\"--no-warnings\"],\n  \"execArgvExtension\": \"cli\"\n}\n</code></pre>\n<p>可执行文件可以这样启动：</p>\n<pre><code class=\"language-console\">./my-sea --node-options=\"--trace-exit\" user-arg1 user-arg2\n</code></pre>\n<p>这将等同于运行：</p>\n<pre><code class=\"language-console\">node --no-warnings --trace-exit /path/to/bundled/script.js user-arg1 user-arg2\n</code></pre>",
+              "type": "module",
+              "displayName": "执行参数扩展"
+            }
+          ],
+          "type": "module",
+          "displayName": "生成单可执行应用准备数据块"
+        },
+        {
+          "textRaw": "在注入的主脚本中",
+          "name": "在注入的主脚本中",
+          "modules": [
+            {
+              "textRaw": "单可执行应用 API",
+              "name": "单可执行应用_api",
+              "desc": "<p><code>node:sea</code> 内置模块允许从嵌入到可执行文件中的 JavaScript 主脚本与单可执行应用进行交互。</p>",
+              "methods": [
+                {
+                  "textRaw": "`sea.isSea()`",
+                  "type": "method",
+                  "name": "isSea",
+                  "meta": {
+                    "added": [
+                      "v21.7.0",
+                      "v20.12.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{boolean} 此脚本是否在单可执行应用内运行。",
+                          "name": "返回：",
+                          "type": "boolean",
+                          "desc": "此脚本是否在单可执行应用内运行。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "type": "module",
+              "displayName": "单可执行应用 API"
+            },
+            {
+              "textRaw": "注入的主脚本中的 `require(id)` 不是基于文件的",
+              "name": "注入的主脚本中的_`require(id)`_不是基于文件的",
+              "desc": "<p>注入的主脚本中的 <code>require()</code> 与可用于非注入模块的 <a href=\"modules.html#requireid\"><code>require()</code></a> 不同。它也没有非注入的 <a href=\"modules.html#requireid\"><code>require()</code></a> 所具有的任何属性，除了 <a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a>。它只能用于加载内置模块。尝试加载只能在文件系统中找到的模块将抛出错误。</p>\n<p>用户可以将他们的应用程序捆绑到一个独立的 JavaScript 文件中以注入到可执行文件中，而不是依赖基于文件的 <code>require()</code>。这也确保了更确定的依赖关系图。</p>\n<p>但是，如果仍然需要基于文件的 <code>require()</code>，也可以实现：</p>\n<pre><code class=\"language-js\">const { createRequire } = require('node:module');\nrequire = createRequire(__filename);\n</code></pre>",
+              "type": "module",
+              "displayName": "注入的主脚本中的 `require(id)` 不是基于文件的"
+            },
+            {
+              "textRaw": "注入的主脚本中的 `__filename` 和 `module.filename`",
+              "name": "注入的主脚本中的_`__filename`_和_`module.filename`",
+              "desc": "<p>注入的主脚本中的 <code>__filename</code> 和 <code>module.filename</code> 的值等于 <a href=\"process.html#processexecpath\"><code>process.execPath</code></a>。</p>",
+              "type": "module",
+              "displayName": "注入的主脚本中的 `__filename` 和 `module.filename`"
+            },
+            {
+              "textRaw": "注入的主脚本中的 `__dirname`",
+              "name": "注入的主脚本中的_`__dirname`",
+              "desc": "<p>注入的主脚本中的 <code>__dirname</code> 的值等于 <a href=\"process.html#processexecpath\"><code>process.execPath</code></a> 的目录名。</p>",
+              "type": "module",
+              "displayName": "注入的主脚本中的 `__dirname`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`sea.getAsset(key[, encoding])`",
+              "type": "method",
+              "name": "getAsset",
+              "meta": {
+                "added": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>此方法可用于检索在构建时配置为捆绑到单可执行应用中的资源。\n当找不到匹配的资源时会抛出错误。</p>\n<ul>\n<li><code>key</code>  <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 在单可执行应用配置的 <code>assets</code> 字段指定的字典中的资源键。</li>\n<li><code>encoding</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 如果指定，资源将被解码为字符串。支持 <code>TextDecoder</code> 接受的任何编码。如果未指定，则返回包含资源副本的 <code>ArrayBuffer</code>。</li>\n<li>返回：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a></li>\n</ul>"
+            },
+            {
+              "textRaw": "`sea.getAssetAsBlob(key[, options])`",
+              "type": "method",
+              "name": "getAssetAsBlob",
+              "meta": {
+                "added": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>与 <a href=\"#seagetassetkey-encoding\"><code>sea.getAsset()</code></a> 类似，但返回一个 <a href=\"buffer.html#class-blob\" class=\"type\">&lt;Blob&gt;</a>。\n当找不到匹配的资源时会抛出错误。</p>\n<ul>\n<li><code>key</code>  <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 在单可执行应用配置的 <code>assets</code> 字段指定的字典中的资源键。</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> Blob 的可选 MIME 类型。</li>\n</ul>\n</li>\n<li>返回：<a href=\"buffer.html#class-blob\" class=\"type\">&lt;Blob&gt;</a></li>\n</ul>"
+            },
+            {
+              "textRaw": "`sea.getRawAsset(key)`",
+              "type": "method",
+              "name": "getRawAsset",
+              "meta": {
+                "added": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>此方法可用于检索在构建时配置为捆绑到单可执行应用中的资源。\n当找不到匹配的资源时会抛出错误。</p>\n<p>与 <code>sea.getAsset()</code> 或 <code>sea.getAssetAsBlob()</code> 不同，此方法不返回副本。相反，它返回可执行文件内捆绑的原始资源。</p>\n<p>目前，用户应避免写入返回的 ArrayBuffer。如果注入的段未标记为可写或未正确对齐，写入返回的 ArrayBuffer 很可能导致崩溃。</p>\n<ul>\n<li><code>key</code>  <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 在单可执行应用配置的 <code>assets</code> 字段指定的字典中的资源键。</li>\n<li>返回：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a></li>\n</ul>"
+            },
+            {
+              "textRaw": "`sea.getAssetKeys()`",
+              "type": "method",
+              "name": "getAssetKeys",
+              "meta": {
+                "added": [
+                  "v24.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回 {string\\[]} 包含嵌入到可执行文件中的所有资源键的数组。如果未嵌入任何资源，则返回空数组。",
+                      "name": "返回",
+                      "type": "string\\[]",
+                      "desc": "包含嵌入到可执行文件中的所有资源键的数组。如果未嵌入任何资源，则返回空数组。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法可用于检索嵌入到单可执行应用中的所有资源键的数组。\n当不在单可执行应用内运行时，会抛出错误。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "在注入的主脚本中"
+        },
+        {
+          "textRaw": "注意",
+          "name": "注意",
+          "modules": [
+            {
+              "textRaw": "单可执行应用创建过程",
+              "name": "单可执行应用创建过程",
+              "desc": "<p>旨在创建单可执行 Node.js 应用的工具必须将使用 <code>--experimental-sea-config</code> 准备的 blob 内容注入到：</p>\n<ul>\n<li>如果 <code>node</code> 二进制文件是 <a href=\"https://en.wikipedia.org/wiki/Portable_Executable\">PE</a> 文件，则注入到名为 <code>NODE_SEA_BLOB</code> 的资源中</li>\n<li>如果 <code>node</code> 二进制文件是 <a href=\"https://en.wikipedia.org/wiki/Mach-O\">Mach-O</a> 文件，则注入到 <code>NODE_SEA</code> 段中名为 <code>NODE_SEA_BLOB</code> 的节中</li>\n<li>如果 <code>node</code> 二进制文件是 <a href=\"https://en.wikipedia.org/wiki/Executable_and_Linkable_Format\">ELF</a> 文件，则注入到名为 <code>NODE_SEA_BLOB</code> 的注释中</li>\n</ul>\n<p>在二进制文件中搜索 <code>NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2:0</code> [熔断器][]字符串，并将最后一个字符翻转为 <code>1</code> 以指示已注入资源。</p>",
+              "type": "module",
+              "displayName": "单可执行应用创建过程"
+            },
+            {
+              "textRaw": "平台支持",
+              "name": "平台支持",
+              "desc": "<p>单可执行支持仅在以下平台上定期在 CI 上进行测试：</p>\n<ul>\n<li>Windows</li>\n<li>macOS</li>\n<li>Linux（Node.js [支持的所有发行版][]，除了 Alpine；以及 Node.js [支持的所有架构][]，除了 s390x）</li>\n</ul>\n<p>这是由于缺乏更好的工具来生成可用于在其他平台上测试此功能的单可执行文件。</p>\n<p>欢迎提出关于其他资源注入工具/工作流程的建议。请访问 <a href=\"https://github.com/nodejs/single-executable/discussions\">https://github.com/nodejs/single-executable/discussions</a> 开始讨论以帮助我们记录它们。</p>",
+              "type": "module",
+              "displayName": "平台支持"
+            }
+          ],
+          "type": "module",
+          "displayName": "注意"
+        }
+      ],
+      "type": "module",
+      "displayName": "单可执行应用"
+    }
+  ]
+}

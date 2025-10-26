@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>环境变量 | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/environment_variables.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  
+</head>
+<body class="alt apidoc" id="api-section-environment_variables">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables active">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="environment_variables" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><a href="#">环境变量</a>
+<ul>
+<li><a href="#cli-">CLI 环境变量</a></li>
+<li><a href="#processenv"><code>process.env</code></a></li>
+<li><span class="stability_2"><a href="#dotenv">DotEnv</a></span>
+<ul>
+<li><a href="#env-">.env 文件</a>
+<ul>
+<li><a href="#_1">变量名</a></li>
+<li><a href="#_2">变量值</a></li>
+<li><a href="#_3">空格</a></li>
+<li><a href="#_4">注释</a></li>
+<li><a href="#export-"><code>export</code> 前缀</a></li>
+</ul>
+</li>
+<li><a href="#cli-_1">CLI 选项</a></li>
+<li><a href="#-api">编程 API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables active">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/environment_variables.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/environment_variables.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/environment_variables.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/environment_variables.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/environment_variables.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/environment_variables.html">20.x <b>LTS</b></a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="environment_variables.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/environment_variables.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><a href="#">环境变量</a>
+<ul>
+<li><a href="#cli-">CLI 环境变量</a></li>
+<li><a href="#processenv"><code>process.env</code></a></li>
+<li><span class="stability_2"><a href="#dotenv">DotEnv</a></span>
+<ul>
+<li><a href="#env-">.env 文件</a>
+<ul>
+<li><a href="#_1">变量名</a></li>
+<li><a href="#_2">变量值</a></li>
+<li><a href="#_3">空格</a></li>
+<li><a href="#_4">注释</a></li>
+<li><a href="#export-"><code>export</code> 前缀</a></li>
+</ul>
+</li>
+<li><a href="#cli-_1">CLI 选项</a></li>
+<li><a href="#-api">编程 API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>环境变量<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables"></a></h2>
+<p>环境变量是与 Node.js 进程运行环境相关联的变量。</p>
+<section><h3>CLI 环境变量<span><a class="mark" href="#cli-" id="cli-">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_cli"></a></h3>
+<p>有一组环境变量可以定义，用于自定义 Node.js 的行为，更多详细信息请参阅 <a href="cli.html#environment-variables_1">CLI 环境变量文档</a>。</p>
+</section><section><h3><code>process.env</code><span><a class="mark" href="#processenv" id="processenv">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_process_env"></a></h3>
+<p>与环境变量交互的基本 API 是 <code>process.env</code>，它包含一个预填充了用户环境变量的对象，这些变量可以被修改和扩展。</p>
+<p>更多详细信息请参阅 <a href="process.html#processenv"><code>process.env</code> 文档</a>。</p>
+</section><section><h3>DotEnv<span><a class="mark" href="#dotenv" id="dotenv">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_dotenv"></a></h3>
+<p>一组用于处理在 <code>.env</code> 文件中定义的额外环境变量的实用工具。</p>
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+
+<div>
+<h4>.env 文件<span><a class="mark" href="#env-" id="env-">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_env"></a></h4>
+<p><code>.env</code> 文件（也称为 dotenv 文件）是定义环境变量的文件，Node.js 应用程序随后可以与之交互（由 <a href="https://github.com/motdotla/dotenv">dotenv</a> 包推广）。</p>
+<p>以下是一个基础 <code>.env</code> 文件内容的示例：</p>
+<pre><code class="language-text">MY_VAR_A = "my variable A"
+MY_VAR_B = "my variable B"</code> <button class="copy-button">copy</button></pre>
+<p>这种类型的文件在各种不同的编程语言和平台中使用，但没有正式的规范，因此 Node.js 定义了自己的规范，如下所述。</p>
+<p><code>.env</code> 文件是一个包含键值对的文件，每个对由一个变量名后跟等号（<code>=</code>），再后跟变量值表示。</p>
+<p>此类文件的名称通常是 <code>.env</code> 或以 <code>.env</code> 开头（例如 <code>.env.dev</code>，其中 <code>dev</code> 表示特定的目标环境）。这是推荐的命名方案，但不是强制性的，dotenv 文件可以有任何任意的文件名。</p>
+<div>
+<h5>变量名<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_1"></a></h5>
+<p>有效的变量名只能包含字母（大写或小写）、数字和下划线（<code>_</code>），并且不能以数字开头。</p>
+<p>更具体地说，有效的变量名必须匹配以下正则表达式：</p>
+<pre><code class="language-text">^[a-zA-Z_]+[a-zA-Z0-9_]*$</code> <button class="copy-button">copy</button></pre>
+<p>推荐的约定是使用大写字母和下划线，必要时使用数字，但任何符合上述定义的变量名都可以正常工作。</p>
+<p>例如，以下是一些有效的变量名：<code>MY_VAR</code>, <code>MY_VAR_1</code>, <code>my_var</code>, <code>my_var_1</code>, <code>myVar</code>, <code>My_Var123</code>，而这些是无效的：<code>1_VAR</code>, <code>'my-var'</code>, <code>"my var"</code>, <code>VAR_#1</code>。</p>
+</div><div>
+<h5>变量值<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_2"></a></h5>
+<p>变量值由任意文本组成，可以选择用单引号（<code>'</code>）或双引号（<code>"</code>）括起来。</p>
+<p>带引号的变量可以跨越多行，而不带引号的变量则仅限于单行。</p>
+<p>请注意，当被 Node.js 解析时，所有值都被解释为文本，这意味着任何值都会在 Node.js 内部生成一个 JavaScript 字符串。例如，以下值：<code>0</code>, <code>true</code> 和 <code>{ "hello": "world" }</code> 将分别生成字面字符串 <code>'0'</code>, <code>'true'</code> 和 <code>'{ "hello": "world" }'</code>，而不是数字零、布尔值 <code>true</code> 和具有 <code>hello</code> 属性的对象。</p>
+<p>有效变量的示例：</p>
+<pre><code class="language-text">MY_SIMPLE_VAR = a simple single line variable
+MY_EQUALS_VAR = "this variable contains an = sign!"
+MY_HASH_VAR = 'this variable contains a # symbol!'
+MY_MULTILINE_VAR = '
+this is a multiline variable containing
+two separate lines\nSorry, I meant three lines'</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5>空格<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_3"></a></h5>
+<p>变量键和值周围的前导和尾随空白字符将被忽略，除非它们被引号括起来。</p>
+<p>例如：</p>
+<pre><code class="language-text">   MY_VAR_A   =    my variable a
+    MY_VAR_B   =    '   my variable b   '</code> <button class="copy-button">copy</button></pre>
+<p>将被视为等同于：</p>
+<pre><code class="language-text">MY_VAR_A = my variable a
+MY_VAR_B = '   my variable b   '</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5>注释<span><a class="mark" href="#_4" id="_4">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_4"></a></h5>
+<p>井号（<code>#</code>）字符表示注释的开始，意味着该行的其余部分将被完全忽略。</p>
+<p>然而，在引号内找到的井号被视为任何其他标准字符。</p>
+<p>例如：</p>
+<pre><code class="language-text"># This is a comment
+MY_VAR = my variable # This is also a comment
+MY_VAR_A = "# this is NOT a comment"</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>export</code> 前缀<span><a class="mark" href="#export-" id="export-">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_export"></a></h5>
+<p><code>export</code> 关键字可以选择性地添加到变量声明的前面，该关键字将被文件的所有处理完全忽略。</p>
+<p>这很有用，使得该文件可以在 shell 终端中直接 sourcing，而无需修改。</p>
+<p>示例：</p>
+<pre><code class="language-text">export MY_VAR = my variable</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4>CLI 选项<span><a class="mark" href="#cli-_1" id="cli-_1">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_cli_1"></a></h4>
+<p>可以通过以下 CLI 选项之一使用 <code>.env</code> 文件来填充 <code>process.env</code> 对象：</p>
+<ul>
+<li>
+<p><a href="cli.html#--env-filefile"><code>--env-file=file</code></a></p>
+</li>
+<li>
+<p><a href="cli.html#--env-file-if-existsfile"><code>--env-file-if-exists=file</code></a></p>
+</li>
+</ul>
+</div><div>
+<h4>编程 API<span><a class="mark" href="#-api" id="-api">#</a></span><a aria-hidden="true" class="legacy" id="environment_variables_api"></a></h4>
+<p>以下两个函数允许您直接与 <code>.env</code> 文件交互：</p>
+<ul>
+<li>
+<p><a href="process.html#processloadenvfilepath"><code>process.loadEnvFile</code></a> 加载一个 <code>.env</code> 文件并将其变量填充到 <code>process.env</code> 中</p>
+</li>
+<li>
+<p><a href="util.html#utilparseenvcontent"><code>util.parseEnv</code></a> 解析 <code>.env</code> 文件的原始内容，并将其值返回到一个对象中</p>
+</li>
+</ul></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

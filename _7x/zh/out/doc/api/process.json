@@ -1,0 +1,2690 @@
+{
+  "type": "module",
+  "source": "doc/api/process.md",
+  "globals": [
+    {
+      "textRaw": "Process",
+      "name": "Process",
+      "introduced_in": "v0.10.0",
+      "type": "global",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/process.js\">lib/process.js</a></p>\n<p><code>process</code> 对象提供有关当前 Node.js 进程的信息并对其进行控制。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "Process 事件",
+          "name": "process_事件",
+          "desc": "<p><code>process</code> 对象是 <a href=\"events.html#class-eventemitter\"><code>EventEmitter</code></a> 的一个实例。</p>",
+          "modules": [
+            {
+              "textRaw": "事件: `'beforeExit'`",
+              "name": "事件:_`'beforeexit'`",
+              "meta": {
+                "added": [
+                  "v0.11.12"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当 Node.js 清空其事件循环并且没有额外的工作需要调度时，会发出 <code>'beforeExit'</code> 事件。通常，当没有安排工作时 Node.js 进程会退出，但是在 <code>'beforeExit'</code> 事件上注册的监听器可以进行异步调用，从而使 Node.js 进程继续。</p>\n<p>监听器回调函数被调用时，会将 <a href=\"#processexitcode_1\"><code>process.exitCode</code></a> 的值作为唯一参数传入。</p>\n<p>对于导致显式终止的条件，例如调用 <a href=\"#processexitcode\"><code>process.exit()</code></a> 或未捕获的异常，不会发出 <code>'beforeExit'</code> 事件。</p>\n<p>除非意图是调度额外的工作，否则不应将 <code>'beforeExit'</code> 用作 <code>'exit'</code> 事件的替代方案。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('beforeExit', (code) => {\n  console.log('Process beforeExit event with code: ', code);\n});\n\nprocess.on('exit', (code) => {\n  console.log('Process exit event with code: ', code);\n});\n\nconsole.log('This message is displayed first.');\n\n// 打印:\n// This message is displayed first.\n// Process beforeExit event with code: 0\n// Process exit event with code: 0\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('beforeExit', (code) => {\n  console.log('Process beforeExit event with code: ', code);\n});\n\nprocess.on('exit', (code) => {\n  console.log('Process exit event with code: ', code);\n});\n\nconsole.log('This message is displayed first.');\n\n// 打印:\n// This message is displayed first.\n// Process beforeExit event with code: 0\n// Process exit event with code: 0\n</code></pre>",
+              "type": "module",
+              "displayName": "事件: `'beforeExit'`"
+            },
+            {
+              "textRaw": "事件: `'disconnect'`",
+              "name": "事件:_`'disconnect'`",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果 Node.js 进程是使用 IPC 通道生成的（请参阅 [子进程][] 和 [集群][] 文档），则当 IPC 通道关闭时，将发出 <code>'disconnect'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件: `'disconnect'`"
+            },
+            {
+              "textRaw": "事件: `'exit'`",
+              "name": "事件:_`'exit'`",
+              "meta": {
+                "added": [
+                  "v0.1.7"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a></li>\n</ul>\n<p>当 Node.js 进程由于以下原因之一即将退出时，会发出 <code>'exit'</code> 事件：</p>\n<ul>\n<li>显式调用 <code>process.exit()</code> 方法；</li>\n<li>Node.js 事件循环不再需要执行任何额外的工作。</li>\n</ul>\n<p>此时无法阻止事件循环的退出，并且一旦所有 <code>'exit'</code> 监听器运行完毕，Node.js 进程将终止。</p>\n<p>监听器回调函数被调用时，会传入由 <a href=\"#processexitcode_1\"><code>process.exitCode</code></a> 属性指定的退出码，或者传给 <a href=\"#processexitcode\"><code>process.exit()</code></a> 方法的 <code>exitCode</code> 参数。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('exit', (code) => {\n  console.log(`About to exit with code: ${code}`);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('exit', (code) => {\n  console.log(`About to exit with code: ${code}`);\n});\n</code></pre>\n<p>监听器函数<strong>必须</strong>只执行<strong>同步</strong>操作。Node.js 进程将在调用 <code>'exit'</code> 事件监听器后立即退出，导致事件循环中仍然排队的任何额外工作被丢弃。\n例如，在以下示例中，超时将永远不会发生：</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('exit', (code) => {\n  setTimeout(() => {\n    console.log('This will not run');\n  }, 0);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('exit', (code) => {\n  setTimeout(() => {\n    console.log('This will not run');\n  }, 0);\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件: `'exit'`"
+            },
+            {
+              "textRaw": "事件: `'message'`",
+              "name": "事件:_`'message'`",
+              "meta": {
+                "added": [
+                  "v0.5.10"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>message</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> 解析后的 JSON 对象或可序列化的原始值。</li>\n<li><code>sendHandle</code> <a href=\"net.html#class-netserver\" class=\"type\">&lt;net.Server&gt;</a> | <a href=\"net.html#class-netsocket\" class=\"type\">&lt;net.Socket&gt;</a> 一个 <a href=\"net.html#class-netserver\"><code>net.Server</code></a> 或 <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> 对象，或 undefined。</li>\n</ul>\n<p>如果 Node.js 进程是使用 IPC 通道生成的（请参阅 [子进程][] 和 [集群][] 文档），则当子进程收到父进程使用 <a href=\"child_process.html#subprocesssendmessage-sendhandle-options-callback\"><code>childprocess.send()</code></a> 发送的消息时，会发出 <code>'message'</code> 事件。</p>\n<p>消息会经过序列化和解析。结果消息可能与最初发送的消息不同。</p>\n<p>如果在生成进程时将 <code>serialization</code> 选项设置为 <code>advanced</code>，则 <code>message</code> 参数可以包含 JSON 无法表示的数据。\n有关更多详细信息，请参阅 [<code>child_process</code> 的高级序列化][]。</p>",
+              "type": "module",
+              "displayName": "事件: `'message'`"
+            },
+            {
+              "textRaw": "事件: `'multipleResolves'`",
+              "name": "事件:_`'multipleresolves'`",
+              "meta": {
+                "added": [
+                  "v10.12.0"
+                ],
+                "deprecated": [
+                  "v17.6.0",
+                  "v16.15.0"
+                ],
+                "changes": []
+              },
+              "stability": 0,
+              "stabilityText": "Deprecated",
+              "desc": "<ul>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 决议类型。<code>'resolve'</code> 或 <code>'reject'</code> 之一。</li>\n<li><code>promise</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a> 多次 resolved 或 rejected 的 promise。</li>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> 在原始 resolve 之后，promise 被 resolve 或 reject 时所带的值。</li>\n</ul>\n<p>每当一个 <code>Promise</code> 满足以下情况时，就会发出 <code>'multipleResolves'</code> 事件：</p>\n<ul>\n<li>被 resolve 多次。</li>\n<li>被 reject 多次。</li>\n<li>在 resolve 之后被 reject。</li>\n<li>在 reject 之后被 resolve。</li>\n</ul>\n<p>这对于在使用 <code>Promise</code> 构造函数时跟踪应用程序中的潜在错误非常有用，因为多次决议会被静默吞掉。但是，此事件的发生并不一定表示错误。例如，<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race\"><code>Promise.race()</code></a> 可以触发 <code>'multipleResolves'</code> 事件。</p>\n<p>由于在上述 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race\"><code>Promise.race()</code></a> 示例等情况下该事件的不可靠性，它已被弃用。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('multipleResolves', (type, promise, reason) => {\n  console.error(type, promise, reason);\n  setImmediate(() => process.exit(1));\n});\n\nasync function main() {\n  try {\n    return await new Promise((resolve, reject) => {\n      resolve('First call');\n      resolve('Swallowed resolve');\n      reject(new Error('Swallowed reject'));\n    });\n  } catch {\n    throw new Error('Failed');\n  }\n}\n\nmain().then(console.log);\n// resolve: Promise { 'First call' } 'Swallowed resolve'\n// reject: Promise { 'First call' } Error: Swallowed reject\n//     at Promise (*)\n//     at new Promise (&#x3C;anonymous>)\n//     at main (*)\n// First call\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('multipleResolves', (type, promise, reason) => {\n  console.error(type, promise, reason);\n  setImmediate(() => process.exit(1));\n});\n\nasync function main() {\n  try {\n    return await new Promise((resolve, reject) => {\n      resolve('First call');\n      resolve('Swallowed resolve');\n      reject(new Error('Swallowed reject'));\n    });\n  } catch {\n    throw new Error('Failed');\n  }\n}\n\nmain().then(console.log);\n// resolve: Promise { 'First call' } 'Swallowed resolve'\n// reject: Promise { 'First call' } Error: Swallowed reject\n//     at Promise (*)\n//     at new Promise (&#x3C;anonymous>)\n//     at main (*)\n// First call\n</code></pre>",
+              "type": "module",
+              "displayName": "事件: `'multipleResolves'`"
+            },
+            {
+              "textRaw": "事件: `'rejectionHandled'`",
+              "name": "事件:_`'rejectionhandled'`",
+              "meta": {
+                "added": [
+                  "v1.4.1"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>promise</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a> 被延迟处理的 promise。</li>\n</ul>\n<p>每当一个 <code>Promise</code> 被 reject 并且错误处理程序（例如使用 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch\"><code>promise.catch()</code></a>）附加到它的时间晚于 Node.js 事件循环的一个回合时，就会发出 <code>'rejectionHandled'</code> 事件。</p>\n<p>该 <code>Promise</code> 对象之前应该在 <code>'unhandledRejection'</code> 事件中发出过，但在处理过程中获得了 rejection 处理程序。</p>\n<p>对于 <code>Promise</code> 链，没有顶层概念可以在那里始终处理 rejections。由于其固有的异步性质，<code>Promise</code> rejection 可以在未来的某个时间点被处理，可能比发出 <code>'unhandledRejection'</code> 事件的事件循环回合要晚得多。</p>\n<p>另一种说法是，与同步代码中存在不断增长的未处理异常列表不同，对于 Promise，可能存在一个增长和缩小的未处理 rejection 列表。</p>\n<p>在同步代码中，当未处理异常列表增长时，会发出 <code>'uncaughtException'</code> 事件。</p>\n<p>在异步代码中，当未处理 rejection 列表增长时，会发出 <code>'unhandledRejection'</code> 事件，而当未处理 rejection 列表缩小时，会发出 <code>'rejectionHandled'</code> 事件。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nconst unhandledRejections = new Map();\nprocess.on('unhandledRejection', (reason, promise) => {\n  unhandledRejections.set(promise, reason);\n});\nprocess.on('rejectionHandled', (promise) => {\n  unhandledRejections.delete(promise);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nconst unhandledRejections = new Map();\nprocess.on('unhandledRejection', (reason, promise) => {\n  unhandledRejections.set(promise, reason);\n});\nprocess.on('rejectionHandled', (promise) => {\n  unhandledRejections.delete(promise);\n});\n</code></pre>\n<p>在这个例子中，<code>unhandledRejections</code> <code>Map</code> 会随着时间的推移而增长和缩小，反映了开始时未处理然后变为已处理的 rejections。可以定期（对于长时间运行的应用程序来说可能最好）或在进程退出时（对于脚本来说可能最方便）在错误日志中记录此类错误。</p>",
+              "type": "module",
+              "displayName": "事件: `'rejectionHandled'`"
+            },
+            {
+              "textRaw": "事件: `'workerMessage'`",
+              "name": "事件:_`'workermessage'`",
+              "meta": {
+                "added": [
+                  "v22.5.0",
+                  "v20.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> 使用 <a href=\"worker_threads.html#workerpostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> 传输的值。</li>\n<li><code>source</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 发送方工作线程的 ID，主线程为 <code>0</code>。</li>\n</ul>\n<p>对于另一方使用 <a href=\"worker_threads.html#workerpostmessagetothreadthreadid-value-transferlist-timeout\"><code>postMessageToThread()</code></a> 发送的任何传入消息，都会发出 <code>'workerMessage'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件: `'workerMessage'`"
+            },
+            {
+              "textRaw": "事件: `'uncaughtException'`",
+              "name": "事件:_`'uncaughtexception'`",
+              "meta": {
+                "added": [
+                  "v0.1.18"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v12.0.0",
+                      "v10.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/26599",
+                    "description": "Added the `origin` argument."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li><code>err</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> 未捕获的异常。</li>\n<li><code>origin</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 指示异常是源自未处理的 rejection 还是源自同步错误。可以是 <code>'uncaughtException'</code> 或 <code>'unhandledRejection'</code>。后者在基于 <code>Promise</code> 的异步上下文中发生异常（或者如果 <code>Promise</code> 被 reject）且 <a href=\"cli.html#--unhandled-rejectionsmode\"><code>--unhandled-rejections</code></a> 标志设置为 <code>strict</code> 或 <code>throw</code>（这是默认值）并且 rejection 未被处理时使用，或者在命令行入口点的 ES 模块静态加载阶段发生 rejection 时使用。</li>\n</ul>\n<p>当未捕获的 JavaScript 异常一直冒泡回到事件循环时，会发出 <code>'uncaughtException'</code> 事件。默认情况下，Node.js 通过将堆栈跟踪打印到 <code>stderr</code> 并以代码 1 退出来处理此类异常，覆盖任何先前设置的 <a href=\"#processexitcode_1\"><code>process.exitCode</code></a>。\n为 <code>'uncaughtException'</code> 事件添加处理程序会覆盖此默认行为。或者，在 <code>'uncaughtException'</code> 处理程序中更改 <a href=\"#processexitcode_1\"><code>process.exitCode</code></a>，这将导致进程以提供的退出码退出。否则，在存在此类处理程序的情况下，进程将以 0 退出。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport fs from 'node:fs';\n\nprocess.on('uncaughtException', (err, origin) => {\n  fs.writeSync(\n    process.stderr.fd,\n    `Caught exception: ${err}\\n` +\n    `Exception origin: ${origin}\\n`,\n  );\n});\n\nsetTimeout(() => {\n  console.log('This will still run.');\n}, 500);\n\n// 故意引发异常，但不捕获它。\nnonexistentFunc();\nconsole.log('This will not run.');\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\nconst fs = require('node:fs');\n\nprocess.on('uncaughtException', (err, origin) => {\n  fs.writeSync(\n    process.stderr.fd,\n    `Caught exception: ${err}\\n` +\n    `Exception origin: ${origin}\\n`,\n  );\n});\n\nsetTimeout(() => {\n  console.log('This will still run.');\n}, 500);\n\n// 故意引发异常，但不捕获它。\nnonexistentFunc();\nconsole.log('This will not run.');\n</code></pre>\n<p>可以通过安装 <code>'uncaughtExceptionMonitor'</code> 监听器来监视 <code>'uncaughtException'</code> 事件，而不覆盖退出进程的默认行为。</p>",
+              "modules": [
+                {
+                  "textRaw": "警告：正确使用 `'uncaughtException'`",
+                  "name": "警告：正确使用_`'uncaughtexception'`",
+                  "desc": "<p><code>'uncaughtException'</code> 是一种粗糙的异常处理机制，仅打算作为最后手段使用。该事件<em>不应</em>用作 <code>On Error Resume Next</code> 的等效物。未处理的异常本质上意味着应用程序处于未定义状态。尝试在不从异常中正确恢复的情况下恢复应用程序代码可能导致额外的不可预见和不可预测的问题。</p>\n<p>从事件处理程序中抛出的异常将不会被捕获。相反，进程将以非零退出码退出，并打印堆栈跟踪。这是为了避免无限递归。</p>\n<p>在未捕获异常后尝试正常恢复类似于在升级计算机时拔掉电源线。十次中有九次，什么也不会发生。但第十次，系统会损坏。</p>\n<p><code>'uncaughtException'</code> 的正确用法是在关闭进程之前对已分配的资源（例如文件描述符、句柄等）执行同步清理。<strong>在 <code>'uncaughtException'</code> 之后恢复正常操作是不安全的。</strong></p>\n<p>为了以更可靠的方式重启崩溃的应用程序，无论是否发出 <code>'uncaughtException'</code>，都应在单独的进程中使用外部监视器来检测应用程序故障并根据需要恢复或重启。</p>",
+                  "type": "module",
+                  "displayName": "警告：正确使用 `'uncaughtException'`"
+                }
+              ],
+              "type": "module",
+              "displayName": "事件: `'uncaughtException'`"
+            },
+            {
+              "textRaw": "事件: `'uncaughtExceptionMonitor'`",
+              "name": "事件:_`'uncaughtexceptionmonitor'`",
+              "meta": {
+                "added": [
+                  "v13.7.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>err</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> 未捕获的异常。</li>\n<li><code>origin</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 指示异常是源自未处理的 rejection 还是源自同步错误。可以是 <code>'uncaughtException'</code> 或 <code>'unhandledRejection'</code>。后者在基于 <code>Promise</code> 的异步上下文中发生异常（或者如果 <code>Promise</code> 被 reject）且 <a href=\"cli.html#--unhandled-rejectionsmode\"><code>--unhandled-rejections</code></a> 标志设置为 <code>strict</code> 或 <code>throw</code>（这是默认值）并且 rejection 未被处理时使用，或者在命令行入口点的 ES 模块静态加载阶段发生 rejection 时使用。</li>\n</ul>\n<p>在发出 <code>'uncaughtException'</code> 事件或调用通过 <a href=\"#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> 安装的钩子之前，会发出 <code>'uncaughtExceptionMonitor'</code> 事件。</p>\n<p>安装 <code>'uncaughtExceptionMonitor'</code> 监听器不会改变一旦发出 <code>'uncaughtException'</code> 事件时的行为。如果未安装 <code>'uncaughtException'</code> 监听器，进程仍然会崩溃。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('uncaughtExceptionMonitor', (err, origin) => {\n  MyMonitoringTool.logSync(err, origin);\n});\n\n// 故意引发异常，但不捕获它。\nnonexistentFunc();\n// 仍然会使 Node.js 崩溃\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('uncaughtExceptionMonitor', (err, origin) => {\n  MyMonitoringTool.logSync(err, origin);\n});\n\n// 故意引发异常，但不捕获它。\nnonexistentFunc();\n// 仍然会使 Node.js 崩溃\n</code></pre>",
+              "type": "module",
+              "displayName": "事件: `'uncaughtExceptionMonitor'`"
+            },
+            {
+              "textRaw": "事件: `'unhandledRejection'`",
+              "name": "事件:_`'unhandledrejection'`",
+              "meta": {
+                "added": [
+                  "v1.4.1"
+                ],
+                "changes": [
+                  {
+                    "version": "v7.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/8217",
+                    "description": "Not handling `Promise` rejections is deprecated."
+                  },
+                  {
+                    "version": "v6.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/8223",
+                    "description": "Unhandled `Promise` rejections will now emit a process warning."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li><code>reason</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> promise 被 reject 时传入的对象（通常是 <a href=\"errors.html#class-error\"><code>Error</code></a> 对象）。</li>\n<li><code>promise</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a> 被 reject 的 promise。</li>\n</ul>\n<p>每当一个 <code>Promise</code> 被 reject 并且在事件循环的一个回合内没有错误处理程序附加到该 promise 时，就会发出 <code>'unhandledRejection'</code> 事件。在使用 Promise 编程时，异常被封装为 \"rejected promises\"。Rejections 可以使用 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch\"><code>promise.catch()</code></a> 捕获和处理，并通过 <code>Promise</code> 链传播。<code>'unhandledRejection'</code> 事件对于检测和跟踪那些被 reject 且其 rejection 尚未处理的 promise 非常有用。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('unhandledRejection', (reason, promise) => {\n  console.log('Unhandled Rejection at:', promise, 'reason:', reason);\n  // 应用程序特定的日志记录、抛出错误或其他逻辑在这里\n});\n\nsomePromise.then((res) => {\n  return reportToUser(JSON.pasre(res)); // 注意拼写错误 (`pasre`)\n}); // 没有 `.catch()` 或 `.then()`\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('unhandledRejection', (reason, promise) => {\n  console.log('Unhandled Rejection at:', promise, 'reason:', reason);\n  // 应用程序特定的日志记录、抛出错误或其他逻辑在这里\n});\n\nsomePromise.then((res) => {\n  return reportToUser(JSON.pasre(res)); // 注意拼写错误 (`pasre`)\n}); // 没有 `.catch()` 或 `.then()`\n</code></pre>\n<p>以下情况也会触发发出 <code>'unhandledRejection'</code> 事件：</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nfunction SomeResource() {\n  // 最初将加载状态设置为一个被 reject 的 promise\n  this.loaded = Promise.reject(new Error('Resource not yet loaded!'));\n}\n\nconst resource = new SomeResource();\n// resource.loaded 上至少一个回合内没有 .catch 或 .then\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nfunction SomeResource() {\n  // 最初将加载状态设置为一个被 reject 的 promise\n  this.loaded = Promise.reject(new Error('Resource not yet loaded!'));\n}\n\nconst resource = new SomeResource();\n// resource.loaded 上至少一个回合内没有 .catch 或 .then\n</code></pre>\n<p>在这个例子中，可以将 rejection 作为开发人员错误进行跟踪，这通常是其他 <code>'unhandledRejection'</code> 事件的情况。为了解决此类故障，可以将一个非操作性的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch\"><code>.catch(() => { })</code></a> 处理程序附加到 <code>resource.loaded</code>，这将防止发出 <code>'unhandledRejection'</code> 事件。</p>\n<p>如果发出 <code>'unhandledRejection'</code> 事件但未处理，它将被作为未捕获的异常抛出。这种行为以及其他 <code>'unhandledRejection'</code> 事件的行为可以通过 <a href=\"cli.html#--unhandled-rejectionsmode\"><code>--unhandled-rejections</code></a> 标志更改。</p>",
+              "type": "module",
+              "displayName": "事件: `'unhandledRejection'`"
+            },
+            {
+              "textRaw": "事件: `'warning'`",
+              "name": "事件:_`'warning'`",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>warning</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> 警告的关键属性包括：\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 警告的名称。<strong>默认值:</strong> <code>'Warning'</code>。</li>\n<li><code>message</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 系统提供的警告描述。</li>\n<li><code>stack</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 代码中发出警告位置的堆栈跟踪。</li>\n</ul>\n</li>\n</ul>\n<p>每当 Node.js 发出进程警告时，就会发出 <code>'warning'</code> 事件。</p>\n<p>进程警告类似于错误，因为它描述了引起用户注意的异常情况。但是，警告不是 Node.js 和 JavaScript 错误处理流程的正常组成部分。每当 Node.js 检测到可能导致次优应用程序性能、错误或安全漏洞的不良编码实践时，它都会发出警告。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('warning', (warning) => {\n  console.warn(warning.name);    // 打印警告名称\n  console.warn(warning.message); // 打印警告消息\n  console.warn(warning.stack);   // 打印堆栈跟踪\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('warning', (warning) => {\n  console.warn(warning.name);    // 打印警告名称\n  console.warn(warning.message); // 打印警告消息\n  console.warn(warning.stack);   // 打印堆栈跟踪\n});\n</code></pre>\n<p>默认情况下，Node.js 会将进程警告打印到 <code>stderr</code>。<code>--no-warnings</code> 命令行选项可用于抑制默认控制台输出，但 <code>process</code> 对象仍会发出 <code>'warning'</code> 事件。目前，除了弃用警告之外，还无法抑制特定的警告类型。要抑制弃用警告，请查看 <a href=\"cli.html#--no-deprecation\"><code>--no-deprecation</code></a> 标志。</p>\n<p>以下示例说明了当向事件添加了过多监听器时打印到 <code>stderr</code> 的警告：</p>\n<pre><code class=\"language-console\">$ node\n> events.defaultMaxListeners = 1;\n> process.on('foo', () => {});\n> process.on('foo', () => {});\n> (node:38638) MaxListenersExceededWarning: Possible EventEmitter memory leak\ndetected. 2 foo listeners added. Use emitter.setMaxListeners() to increase limit\n</code></pre>\n<p>相反，以下示例关闭了默认警告输出，并向 <code>'warning'</code> 事件添加了自定义处理程序：</p>\n<pre><code class=\"language-console\">$ node --no-warnings\n> const p = process.on('warning', (warning) => console.warn('Do not do that!'));\n> events.defaultMaxListeners = 1;\n> process.on('foo', () => {});\n> process.on('foo', () => {});\n> Do not do that!\n</code></pre>\n<p><code>--trace-warnings</code> 命令行选项可用于使警告的默认控制台输出包含警告的完整堆栈跟踪。</p>\n<p>使用 <code>--throw-deprecation</code> 命令行标志启动 Node.js 将导致自定义弃用警告被作为异常抛出。</p>\n<p>使用 <code>--trace-deprecation</code> 命令行标志将导致自定义弃用信息与堆栈跟踪一起打印到 <code>stderr</code>。</p>\n<p>使用 <code>--no-deprecation</code> 命令行标志将抑制所有自定义弃用信息的报告。</p>\n<p><code>*-deprecation</code> 命令行标志仅影响使用名称 <code>'DeprecationWarning'</code> 的警告。</p>",
+              "modules": [
+                {
+                  "textRaw": "发出自定义警告",
+                  "name": "发出自定义警告",
+                  "desc": "<p>请参阅 <a href=\"#processemitwarningwarning-type-code-ctor\"><code>process.emitWarning()</code></a> 方法以发出自定义或应用程序特定的警告。</p>",
+                  "type": "module",
+                  "displayName": "发出自定义警告"
+                },
+                {
+                  "textRaw": "Node.js 警告名称",
+                  "name": "node.js_警告名称",
+                  "desc": "<p>Node.js 发出的警告类型（由 <code>name</code> 属性标识）没有严格的指导方针。可以随时添加新类型的警告。最常见的一些警告类型包括：</p>\n<ul>\n<li><code>'DeprecationWarning'</code> - 表示使用了已弃用的 Node.js API 或功能。此类警告必须包含一个 <code>'code'</code> 属性来标识[弃用代码][]。</li>\n<li><code>'ExperimentalWarning'</code> - 表示使用了实验性的 Node.js API 或功能。此类功能必须谨慎使用，因为它们可能随时更改，并且不受与受支持功能相同的严格语义版本控制和长期支持策略的约束。</li>\n<li><code>'MaxListenersExceededWarning'</code> - 表示在 <code>EventEmitter</code> 或 <code>EventTarget</code> 上为给定事件注册了过多监听器。这通常是内存泄漏的迹象。</li>\n<li><code>'TimeoutOverflowWarning'</code> - 表示向 <code>setTimeout()</code> 或 <code>setInterval()</code> 函数提供了无法容纳在 32 位有符号整数内的数值。</li>\n<li><code>'TimeoutNegativeWarning'</code> - 表示向 <code>setTimeout()</code> 或 <code>setInterval()</code> 函数提供了负数。</li>\n<li><code>'TimeoutNaNWarning'</code> - 表示向 <code>setTimeout()</code> 或 <code>setInterval()</code> 函数提供了非数字值。</li>\n<li><code>'UnsupportedWarning'</code> - 表示使用了不受支持的选项或功能，该选项或功能将被忽略而不是被视为错误。一个例子是在使用 HTTP/2 兼容性 API 时使用 HTTP 响应状态消息。</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "Node.js 警告名称"
+                }
+              ],
+              "type": "module",
+              "displayName": "事件: `'warning'`"
+            },
+            {
+              "textRaw": "事件: `'worker'`",
+              "name": "事件:_`'worker'`",
+              "meta": {
+                "added": [
+                  "v16.2.0",
+                  "v14.18.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>worker</code> <a href=\"worker_threads.html#class-worker\" class=\"type\">&lt;Worker&gt;</a> 已创建的 <a href=\"worker_threads.html#class-worker\" class=\"type\">&lt;Worker&gt;</a>。</li>\n</ul>\n<p>在创建新的 <a href=\"worker_threads.html#class-worker\" class=\"type\">&lt;Worker&gt;</a> 线程后，会发出 <code>'worker'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件: `'worker'`"
+            }
+          ],
+          "events": [
+            {
+              "textRaw": "信号事件",
+              "name": "SIGINT, SIGHUP, etc.",
+              "type": "event",
+              "params": [],
+              "desc": "<p>当 Node.js 进程收到信号时，会发出信号事件。请参阅 <a href=\"http://man7.org/linux/man-pages/man7/signal.7.html\"><code>signal(7)</code></a> 以获取标准 POSIX 信号名称的列表，例如 <code>'SIGINT'</code>、<code>'SIGHUP'</code> 等。</p>\n<p>信号在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>\n<p>信号处理程序将接收信号的名称（<code>'SIGINT'</code>、<code>'SIGTERM'</code> 等）作为第一个参数。</p>\n<p>每个事件的名称将是大写的信号通用名称（例如，对于 <code>SIGINT</code> 信号，事件名为 <code>'SIGINT'</code>）。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\n// 开始从 stdin 读取，这样进程就不会退出。\nprocess.stdin.resume();\n\nprocess.on('SIGINT', () => {\n  console.log('Received SIGINT. Press Control-D to exit.');\n});\n\n// 使用单个函数处理多个信号\nfunction handle(signal) {\n  console.log(`Received ${signal}`);\n}\n\nprocess.on('SIGINT', handle);\nprocess.on('SIGTERM', handle);\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\n// 开始从 stdin 读取，这样进程就不会退出。\nprocess.stdin.resume();\n\nprocess.on('SIGINT', () => {\n  console.log('Received SIGINT. Press Control-D to exit.');\n});\n\n// 使用单个函数处理多个信号\nfunction handle(signal) {\n  console.log(`Received ${signal}`);\n}\n\nprocess.on('SIGINT', handle);\nprocess.on('SIGTERM', handle);\n</code></pre>\n<ul>\n<li><code>'SIGUSR1'</code> 由 Node.js 保留用于启动[调试器][]。可以安装监听器，但这样做可能会干扰调试器。</li>\n<li><code>'SIGTERM'</code> 和 <code>'SIGINT'</code> 在非 Windows 平台上有默认处理程序，这些处理程序在退出前重置终端模式，退出码为 <code>128 + 信号编号</code>。如果这些信号之一安装了监听器，则其默认行为将被移除（Node.js 将不再退出）。</li>\n<li><code>'SIGPIPE'</code> 默认被忽略。它可以安装监听器。</li>\n<li><code>'SIGHUP'</code> 在 Windows 上当控制台窗口关闭时生成，在其他平台上的各种类似条件下也会生成。参见 <a href=\"http://man7.org/linux/man-pages/man7/signal.7.html\"><code>signal(7)</code></a>。它可以安装监听器，但是 Node.js 将在大约 10 秒后被 Windows 无条件终止。在非 Windows 平台上，<code>SIGHUP</code> 的默认行为是终止 Node.js，但一旦安装了监听器，其默认行为将被移除。</li>\n<li><code>'SIGTERM'</code> 在 Windows 上不受支持，可以监听它。</li>\n<li>来自终端的 <code>'SIGINT'</code> 在所有平台上都受支持，通常可以通过 <kbd>Ctrl</kbd>+<kbd>C</kbd> 生成（尽管这可能是可配置的）。当[终端原始模式][]启用并使用 <kbd>Ctrl</kbd>+<kbd>C</kbd> 时，不会生成它。</li>\n<li><code>'SIGBREAK'</code> 在 Windows 上当按下 <kbd>Ctrl</kbd>+<kbd>Break</kbd> 时传递。在非 Windows 平台上，可以监听它，但无法发送或生成它。</li>\n<li><code>'SIGWINCH'</code> 在控制台调整大小时传递。在 Windows 上，这只会发生在写入控制台且光标移动时，或者在原始模式下使用可读 tty 时。</li>\n<li><code>'SIGKILL'</code> 无法安装监听器，它将在所有平台上无条件终止 Node.js。</li>\n<li><code>'SIGSTOP'</code> 无法安装监听器。</li>\n<li><code>'SIGBUS'</code>、<code>'SIGFPE'</code>、<code>'SIGSEGV'</code> 和 <code>'SIGILL'</code>，当不是使用 <a href=\"http://man7.org/linux/man-pages/man2/kill.2.html\"><code>kill(2)</code></a> 人为引发时，本质上会使进程处于无法安全调用 JS 监听器的状态。这样做可能导致进程停止响应。</li>\n<li><code>0</code> 可以发送用于测试进程是否存在，如果进程存在则没有效果，但如果进程不存在则会抛出错误。</li>\n</ul>\n<p>Windows 不支持信号，因此没有等同于通过信号终止的方式，但 Node.js 通过 <a href=\"#processkillpid-signal\"><code>process.kill()</code></a> 和 <a href=\"child_process.html#subprocesskillsignal\"><code>subprocess.kill()</code></a> 提供了一些模拟：</p>\n<ul>\n<li>发送 <code>SIGINT</code>、<code>SIGTERM</code> 和 <code>SIGKILL</code> 将导致目标进程无条件终止，之后子进程将报告该进程被信号终止。</li>\n<li>发送信号 <code>0</code> 可以作为跨平台独立方式测试进程是否存在。</li>\n</ul>"
+            }
+          ],
+          "type": "module",
+          "displayName": "Process 事件"
+        },
+        {
+          "textRaw": "退出码",
+          "name": "退出码",
+          "desc": "<p>当没有更多异步操作挂起时，Node.js 通常会以 <code>0</code> 状态码退出。在其他情况下使用以下状态码：</p>\n<ul>\n<li><code>1</code> <strong>未捕获的致命异常</strong>：存在未捕获的异常，并且未被域或 <a href=\"#event-uncaughtexception\"><code>'uncaughtException'</code></a> 事件处理程序处理。</li>\n<li><code>2</code>：未使用（由 Bash 保留用于内置误用）</li>\n<li><code>3</code> <strong>内部 JavaScript 解析错误</strong>：Node.js 引导过程中的 JavaScript 源代码内部导致解析错误。这极为罕见，通常只能在 Node.js 本身的开发过程中发生。</li>\n<li><code>4</code> <strong>内部 JavaScript 评估失败</strong>：Node.js 引导过程中的 JavaScript 源代码在评估时未能返回函数值。这极为罕见，通常只能在 Node.js 本身的开发过程中发生。</li>\n<li><code>5</code> <strong>致命错误</strong>：V8 中存在致命不可恢复的错误。通常会打印一条消息到 stderr，前缀为 <code>FATAL ERROR</code>。</li>\n<li><code>6</code> <strong>非函数的内部异常处理程序</strong>：存在未捕获的异常，但内部致命异常处理函数不知何故被设置为非函数，无法调用。</li>\n<li><code>7</code> <strong>内部异常处理程序运行时失败</strong>：存在未捕获的异常，并且内部致命异常处理函数本身在尝试处理它时抛出错误。例如，如果 <a href=\"#event-uncaughtexception\"><code>'uncaughtException'</code></a> 或 <code>domain.on('error')</code> 处理程序抛出错误，就会发生这种情况。</li>\n<li><code>8</code>：未使用。在 Node.js 的早期版本中，退出码 8 有时表示未捕获的异常。</li>\n<li><code>9</code> <strong>无效参数</strong>：指定了未知选项，或需要值的选项未提供值。</li>\n<li><code>10</code> <strong>内部 JavaScript 运行时失败</strong>：Node.js 引导过程中的 JavaScript 源代码在调用引导函数时抛出错误。这极为罕见，通常只能在 Node.js 本身的开发过程中发生。</li>\n<li><code>12</code> <strong>无效的调试参数</strong>：设置了 <code>--inspect</code> 和/或 <code>--inspect-brk</code> 选项，但选择的端口号无效或不可用。</li>\n<li><code>13</code> <strong>未解决的顶级 Await</strong>：在顶层代码的函数外部使用了 <code>await</code>，但传递的 <code>Promise</code> 从未解决。</li>\n<li><code>14</code> <strong>快照失败</strong>：Node.js 启动构建 V8 启动快照但失败，因为应用程序状态的某些要求未满足。</li>\n<li><code>>128</code> <strong>信号退出</strong>：如果 Node.js 收到致命信号，例如 <code>SIGKILL</code> 或 <code>SIGHUP</code>，则其退出码将为 <code>128</code> 加上信号代码的值。这是标准的 POSIX 实践，因为退出码被定义为 7 位整数，而信号退出设置高位，然后包含信号代码的值。例如，信号 <code>SIGABRT</code> 的值为 <code>6</code>，因此预期的退出码将为 <code>128</code> + <code>6</code>，即 <code>134</code>。</li>\n</ul>",
+          "type": "module",
+          "displayName": "退出码"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`process.abort()`",
+          "type": "method",
+          "name": "abort",
+          "meta": {
+            "added": [
+              "v0.7.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>process.abort()</code> 方法导致 Node.js 进程立即退出并生成核心文件。</p>\n<p>此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.availableMemory()`",
+          "type": "method",
+          "name": "availableMemory",
+          "meta": {
+            "added": [
+              "v22.0.0",
+              "v20.13.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57765",
+                "description": "Change stability index for this feature from Experimental to Stable."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "类型: {number}",
+                  "name": "类型",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>获取进程仍然可用的空闲内存量（以字节为单位）。</p>\n<p>有关更多信息，请参阅 <a href=\"https://docs.libuv.org/en/v1.x/misc.html#c.uv_get_available_memory\"><code>uv_get_available_memory</code></a>。</p>"
+        },
+        {
+          "textRaw": "`process.chdir(directory)`",
+          "type": "method",
+          "name": "chdir",
+          "meta": {
+            "added": [
+              "v0.1.17"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`directory` {string}",
+                  "name": "directory",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.chdir()</code> 方法更改 Node.js 进程的当前工作目录，如果失败（例如，如果指定的 <code>directory</code> 不存在）则抛出异常。</p>\n<pre><code class=\"language-mjs\">import { chdir, cwd } from 'node:process';\n\nconsole.log(`Starting directory: ${cwd()}`);\ntry {\n  chdir('/tmp');\n  console.log(`New directory: ${cwd()}`);\n} catch (err) {\n  console.error(`chdir: ${err}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { chdir, cwd } = require('node:process');\n\nconsole.log(`Starting directory: ${cwd()}`);\ntry {\n  chdir('/tmp');\n  console.log(`New directory: ${cwd()}`);\n} catch (err) {\n  console.error(`chdir: ${err}`);\n}\n</code></pre>\n<p>此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.constrainedMemory()`",
+          "type": "method",
+          "name": "constrainedMemory",
+          "meta": {
+            "added": [
+              "v19.6.0",
+              "v18.15.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57765",
+                "description": "Change stability index for this feature from Experimental to Stable."
+              },
+              {
+                "version": [
+                  "v22.0.0",
+                  "v20.13.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/52039",
+                "description": "Aligned return value with `uv_get_constrained_memory`."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "类型: {number}",
+                  "name": "类型",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>根据操作系统施加的限制，获取进程可用的内存量（以字节为单位）。如果没有这样的约束，或者约束未知，则返回 <code>0</code>。</p>\n<p>有关更多信息，请参阅 <a href=\"https://docs.libuv.org/en/v1.x/misc.html#c.uv_get_constrained_memory\"><code>uv_get_constrained_memory</code></a>。</p>"
+        },
+        {
+          "textRaw": "`process.cpuUsage([previousValue])`",
+          "type": "method",
+          "name": "cpuUsage",
+          "meta": {
+            "added": [
+              "v6.1.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`previousValue` {Object} 之前调用 `process.cpuUsage()` 的返回值",
+                  "name": "previousValue",
+                  "type": "Object",
+                  "desc": "之前调用 `process.cpuUsage()` 的返回值"
+                },
+                {
+                  "textRaw": "返回: {Object}",
+                  "name": "返回",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`user` {integer}",
+                      "name": "user",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`system` {integer}",
+                      "name": "system",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.cpuUsage()</code> 方法返回当前进程的用户和系统 CPU 时间使用情况，在一个具有 <code>user</code> 和 <code>system</code> 属性的对象中，这些属性的值是以微秒（百万分之一秒）为单位的时间值。这些值分别测量在用户和系统代码中花费的时间，如果多个 CPU 核心为此进程执行工作，则可能最终大于实际经过的时间。</p>\n<p>可以将之前调用 <code>process.cpuUsage()</code> 的结果作为参数传递给该函数，以获取差值读数。</p>\n<pre><code class=\"language-mjs\">import { cpuUsage } from 'node:process';\n\nconst startUsage = cpuUsage();\n// { user: 38579, system: 6986 }\n\n// 让 CPU 旋转 500 毫秒\nconst now = Date.now();\nwhile (Date.now() - now &#x3C; 500);\n\nconsole.log(cpuUsage(startUsage));\n// { user: 514883, system: 11226 }\n</code></pre>\n<pre><code class=\"language-cjs\">const { cpuUsage } = require('node:process');\n\nconst startUsage = cpuUsage();\n// { user: 38579, system: 6986 }\n\n// 让 CPU 旋转 500 毫秒\nconst now = Date.now();\nwhile (Date.now() - now &#x3C; 500);\n\nconsole.log(cpuUsage(startUsage));\n// { user: 514883, system: 11226 }\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.cwd()`",
+          "type": "method",
+          "name": "cwd",
+          "meta": {
+            "added": [
+              "v0.1.8"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {string}",
+                  "name": "返回",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.cwd()</code> 方法返回 Node.js 进程的当前工作目录。</p>\n<pre><code class=\"language-mjs\">import { cwd } from 'node:process';\n\nconsole.log(`Current directory: ${cwd()}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { cwd } = require('node:process');\n\nconsole.log(`Current directory: ${cwd()}`);\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.disconnect()`",
+          "type": "method",
+          "name": "disconnect",
+          "meta": {
+            "added": [
+              "v0.7.2"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p>如果 Node.js 进程是使用 IPC 通道生成的（请参阅[子进程][]和[集群][]文档），<code>process.disconnect()</code> 方法将关闭到父进程的 IPC 通道，允许子进程在没有任何其他连接保持其活动状态时正常退出。</p>\n<p>调用 <code>process.disconnect()</code> 的效果与从父进程调用 <a href=\"child_process.html#subprocessdisconnect\"><code>ChildProcess.disconnect()</code></a> 相同。</p>\n<p>如果 Node.js 进程不是使用 IPC 通道生成的，<code>process.disconnect()</code> 将是 <code>undefined</code>。</p>"
+        },
+        {
+          "textRaw": "`process.dlopen(module, filename[, flags])`",
+          "type": "method",
+          "name": "dlopen",
+          "meta": {
+            "added": [
+              "v0.1.16"
+            ],
+            "changes": [
+              {
+                "version": "v9.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/12794",
+                "description": "Added support for the `flags` argument."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`module` {Object}",
+                  "name": "module",
+                  "type": "Object"
+                },
+                {
+                  "textRaw": "`filename` {string}",
+                  "name": "filename",
+                  "type": "string"
+                },
+                {
+                  "textRaw": "`flags` {os.constants.dlopen} **默认值:** `os.constants.dlopen.RTLD_LAZY`",
+                  "name": "flags",
+                  "type": "os.constants.dlopen",
+                  "desc": "**默认值:** `os.constants.dlopen.RTLD_LAZY`"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.dlopen()</code> 方法允许动态加载共享对象。它主要由 <code>require()</code> 用于加载 C++ 插件，不应直接使用，除非在特殊情况下。换句话说，<a href=\"globals.html#require\"><code>require()</code></a> 应优先于 <code>process.dlopen()</code>，除非有特定原因，例如自定义 dlopen 标志或从 ES 模块加载。</p>\n<p><code>flags</code> 参数是一个整数，允许指定 dlopen 行为。有关详细信息，请参阅 <a href=\"os.html#dlopen-constants\"><code>os.constants.dlopen</code></a> 文档。</p>\n<p>调用 <code>process.dlopen()</code> 的一个重要要求是必须传递 <code>module</code> 实例。然后通过 <code>module.exports</code> 可以访问 C++ 插件导出的函数。</p>\n<p>下面的示例显示了如何加载一个名为 <code>local.node</code> 的 C++ 插件，该插件导出一个 <code>foo</code> 函数。通过传递 <code>RTLD_NOW</code> 常量，所有符号在调用返回之前加载。在此示例中，假定该常量可用。</p>\n<pre><code class=\"language-mjs\">import { dlopen } from 'node:process';\nimport { constants } from 'node:os';\nimport { fileURLToPath } from 'node:url';\n\nconst module = { exports: {} };\ndlopen(module, fileURLToPath(new URL('local.node', import.meta.url)),\n       constants.dlopen.RTLD_NOW);\nmodule.exports.foo();\n</code></pre>\n<pre><code class=\"language-cjs\">const { dlopen } = require('node:process');\nconst { constants } = require('node:os');\nconst { join } = require('node:path');\n\nconst module = { exports: {} };\ndlopen(module, join(__dirname, 'local.node'), constants.dlopen.RTLD_NOW);\nmodule.exports.foo();\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.emitWarning(warning[, options])`",
+          "type": "method",
+          "name": "emitWarning",
+          "meta": {
+            "added": [
+              "v8.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`warning` {string|Error} 要发出的警告。",
+                  "name": "warning",
+                  "type": "string|Error",
+                  "desc": "要发出的警告。"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`type` {string} 当 `warning` 是 `String` 时，`type` 是用于发出的警告*类型*的名称。**默认值:** `'Warning'`。",
+                      "name": "type",
+                      "type": "string",
+                      "desc": "当 `warning` 是 `String` 时，`type` 是用于发出的警告*类型*的名称。**默认值:** `'Warning'`。"
+                    },
+                    {
+                      "textRaw": "`code` {string} 正在发出的警告实例的唯一标识符。",
+                      "name": "code",
+                      "type": "string",
+                      "desc": "正在发出的警告实例的唯一标识符。"
+                    },
+                    {
+                      "textRaw": "`ctor` {Function} 当 `warning` 是 `String` 时，`ctor` 是一个可选函数，用于限制生成的堆栈跟踪。**默认值:** `process.emitWarning`。",
+                      "name": "ctor",
+                      "type": "Function",
+                      "desc": "当 `warning` 是 `String` 时，`ctor` 是一个可选函数，用于限制生成的堆栈跟踪。**默认值:** `process.emitWarning`。"
+                    },
+                    {
+                      "textRaw": "`detail` {string} 要包含在错误中的附加文本。",
+                      "name": "detail",
+                      "type": "string",
+                      "desc": "要包含在错误中的附加文本。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.emitWarning()</code> 方法可用于发出自定义或应用程序特定的进程警告。可以通过向 <a href=\"#event-warning\"><code>'warning'</code></a> 事件添加处理程序来监听这些警告。</p>\n<pre><code class=\"language-mjs\">import { emitWarning } from 'node:process';\n\n// 发出带有代码和附加详细信息的警告。\nemitWarning('Something happened!', {\n  code: 'MY_WARNING',\n  detail: 'This is some additional information',\n});\n// 发出:\n// (node:56338) [MY_WARNING] Warning: Something happened!\n// This is some additional information\n</code></pre>\n<pre><code class=\"language-cjs\">const { emitWarning } = require('node:process');\n\n// 发出带有代码和附加详细信息的警告。\nemitWarning('Something happened!', {\n  code: 'MY_WARNING',\n  detail: 'This is some additional information',\n});\n// 发出:\n// (node:56338) [MY_WARNING] Warning: Something happened!\n// This is some additional information\n</code></pre>\n<p>在此示例中，<code>process.emitWarning()</code> 在内部生成一个 <code>Error</code> 对象，并将其传递给 <a href=\"#event-warning\"><code>'warning'</code></a> 处理程序。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('warning', (warning) => {\n  console.warn(warning.name);    // 'Warning'\n  console.warn(warning.message); // 'Something happened!'\n  console.warn(warning.code);    // 'MY_WARNING'\n  console.warn(warning.stack);   // 堆栈跟踪\n  console.warn(warning.detail);  // 'This is some additional information'\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('warning', (warning) => {\n  console.warn(warning.name);    // 'Warning'\n  console.warn(warning.message); // 'Something happened!'\n  console.warn(warning.code);    // 'MY_WARNING'\n  console.warn(warning.stack);   // 堆栈跟踪\n  console.warn(warning.detail);  // 'This is some additional information'\n});\n</code></pre>\n<p>如果 <code>warning</code> 作为 <code>Error</code> 对象传递，则忽略 <code>options</code> 参数。</p>"
+        },
+        {
+          "textRaw": "`process.emitWarning(warning[, type[, code]][, ctor])`",
+          "type": "method",
+          "name": "emitWarning",
+          "meta": {
+            "added": [
+              "v6.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`warning` {string|Error} 要发出的警告。",
+                  "name": "warning",
+                  "type": "string|Error",
+                  "desc": "要发出的警告。"
+                },
+                {
+                  "textRaw": "`type` {string} 当 `warning` 是 `String` 时，`type` 是用于发出的警告*类型*的名称。**默认值:** `'Warning'`。",
+                  "name": "type",
+                  "type": "string",
+                  "desc": "当 `warning` 是 `String` 时，`type` 是用于发出的警告*类型*的名称。**默认值:** `'Warning'`。"
+                },
+                {
+                  "textRaw": "`code` {string} 正在发出的警告实例的唯一标识符。",
+                  "name": "code",
+                  "type": "string",
+                  "desc": "正在发出的警告实例的唯一标识符。"
+                },
+                {
+                  "textRaw": "`ctor` {Function} 当 `warning` 是 `String` 时，`ctor` 是一个可选函数，用于限制生成的堆栈跟踪。**默认值:** `process.emitWarning`。",
+                  "name": "ctor",
+                  "type": "Function",
+                  "desc": "当 `warning` 是 `String` 时，`ctor` 是一个可选函数，用于限制生成的堆栈跟踪。**默认值:** `process.emitWarning`。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.emitWarning()</code> 方法可用于发出自定义或应用程序特定的进程警告。可以通过向 <a href=\"#event-warning\"><code>'warning'</code></a> 事件添加处理程序来监听这些警告。</p>\n<pre><code class=\"language-mjs\">import { emitWarning } from 'node:process';\n\n// 使用字符串发出警告。\nemitWarning('Something happened!');\n// 发出: (node: 56338) Warning: Something happened!\n</code></pre>\n<pre><code class=\"language-cjs\">const { emitWarning } = require('node:process');\n\n// 使用字符串发出警告。\nemitWarning('Something happened!');\n// 发出: (node: 56338) Warning: Something happened!\n</code></pre>\n<pre><code class=\"language-mjs\">import { emitWarning } from 'node:process';\n\n// 使用字符串和类型发出警告。\nemitWarning('Something Happened!', 'CustomWarning');\n// 发出: (node:56338) CustomWarning: Something Happened!\n</code></pre>\n<pre><code class=\"language-cjs\">const { emitWarning } = require('node:process');\n\n// 使用字符串和类型发出警告。\nemitWarning('Something Happened!', 'CustomWarning');\n// 发出: (node:56338) CustomWarning: Something Happened!\n</code></pre>\n<pre><code class=\"language-mjs\">import { emitWarning } from 'node:process';\n\nemitWarning('Something happened!', 'CustomWarning', 'WARN001');\n// 发出: (node:56338) [WARN001] CustomWarning: Something happened!\n</code></pre>\n<pre><code class=\"language-cjs\">const { emitWarning } = require('node:process');\n\nprocess.emitWarning('Something happened!', 'CustomWarning', 'WARN001');\n// 发出: (node:56338) [WARN001] CustomWarning: Something happened!\n</code></pre>\n<p>在每个先前的示例中，<code>process.emitWarning()</code> 在内部生成一个 <code>Error</code> 对象，并将其传递给 <a href=\"#event-warning\"><code>'warning'</code></a> 处理程序。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.on('warning', (warning) => {\n  console.warn(warning.name);\n  console.warn(warning.message);\n  console.warn(warning.code);\n  console.warn(warning.stack);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('warning', (warning) => {\n  console.warn(warning.name);\n  console.warn(warning.message);\n  console.warn(warning.code);\n  console.warn(warning.stack);\n});\n</code></pre>\n<p>如果 <code>warning</code> 作为 <code>Error</code> 对象传递，它将未经修改地传递给 <code>'warning'</code> 事件处理程序（可选的 <code>type</code>、<code>code</code> 和 <code>ctor</code> 参数将被忽略）：</p>\n<pre><code class=\"language-mjs\">import { emitWarning } from 'node:process';\n\n// 使用 Error 对象发出警告。\nconst myWarning = new Error('Something happened!');\n// 使用 Error name 属性指定类型名称\nmyWarning.name = 'CustomWarning';\nmyWarning.code = 'WARN001';\n\nemitWarning(myWarning);\n// 发出: (node:56338) [WARN001] CustomWarning: Something happened!\n</code></pre>\n<pre><code class=\"language-cjs\">const { emitWarning } = require('node:process');\n\n// 使用 Error 对象发出警告。\nconst myWarning = new Error('Something happened!');\n// 使用 Error name 属性指定类型名称\nmyWarning.name = 'CustomWarning';\nmyWarning.code = 'WARN001';\n\nemitWarning(myWarning);\n// 发出: (node:56338) [WARN001] CustomWarning: Something happened!\n</code></pre>\n<p>如果 <code>warning</code> 不是字符串或 <code>Error</code> 对象，则抛出 <code>TypeError</code>。</p>\n<p>虽然进程警告使用 <code>Error</code> 对象，但进程警告机制<strong>不是</strong>正常错误处理机制的替代品。</p>\n<p>如果警告 <code>type</code> 为 <code>'DeprecationWarning'</code>，则实施以下附加处理：</p>\n<ul>\n<li>如果使用了 <code>--throw-deprecation</code> 命令行标志，则弃用警告将作为异常抛出，而不是作为事件发出。</li>\n<li>如果使用了 <code>--no-deprecation</code> 命令行标志，则弃用警告被抑制。</li>\n<li>如果使用了 <code>--trace-deprecation</code> 命令行标志，则弃用警告将连同完整堆栈跟踪一起打印到 <code>stderr</code>。</li>\n</ul>",
+          "modules": [
+            {
+              "textRaw": "避免重复警告",
+              "name": "避免重复警告",
+              "desc": "<p>作为最佳实践，每个进程只应发出一次警告。为此，请将 <code>emitWarning()</code> 放在布尔值后面。</p>\n<pre><code class=\"language-mjs\">import { emitWarning } from 'node:process';\n\nfunction emitMyWarning() {\n  if (!emitMyWarning.warned) {\n    emitMyWarning.warned = true;\n    emitWarning('Only warn once!');\n  }\n}\nemitMyWarning();\n// 发出: (node: 56339) Warning: Only warn once!\nemitMyWarning();\n// 不发出任何内容\n</code></pre>\n<pre><code class=\"language-cjs\">const { emitWarning } = require('node:process');\n\nfunction emitMyWarning() {\n  if (!emitMyWarning.warned) {\n    emitMyWarning.warned = true;\n    emitWarning('Only warn once!');\n  }\n}\nemitMyWarning();\n// 发出: (node: 56339) Warning: Only warn once!\nemitMyWarning();\n// 不发出任何内容\n</code></pre>",
+              "type": "module",
+              "displayName": "避免重复警告"
+            }
+          ]
+        },
+        {
+          "textRaw": "`process.execve(file[, args[, env]])`",
+          "type": "method",
+          "name": "execve",
+          "meta": {
+            "added": [
+              "v23.11.0",
+              "v22.15.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`file` {string} 要运行的可执行文件的名称或路径。",
+                  "name": "file",
+                  "type": "string",
+                  "desc": "要运行的可执行文件的名称或路径。"
+                },
+                {
+                  "textRaw": "`args` {string\\[]} 字符串参数列表。任何参数都不能包含空字节 (`\\u0000`)。",
+                  "name": "args",
+                  "type": "string\\[]",
+                  "desc": "字符串参数列表。任何参数都不能包含空字节 (`\\u0000`)。"
+                },
+                {
+                  "textRaw": "`env` {Object} 环境键值对。 任何键或值都不能包含空字节 (`\\u0000`)。 **默认值:** `process.env`。",
+                  "name": "env",
+                  "type": "Object",
+                  "desc": "环境键值对。 任何键或值都不能包含空字节 (`\\u0000`)。 **默认值:** `process.env`。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>用新进程替换当前进程。</p>\n<p>这是通过使用 <code>execve</code> POSIX 函数实现的，因此不会保留当前进程的任何内存或其他资源，除了标准输入、标准输出和标准错误文件描述符。</p>\n<p>当进程被交换时，系统会丢弃所有其他资源，不会触发任何退出或关闭事件，也不会运行任何清理处理程序。</p>\n<p>除非发生错误，否则此函数永远不会返回。</p>\n<p>此函数在 Windows 或 IBM i 上不可用。</p>"
+        },
+        {
+          "textRaw": "`process.exit([code])`",
+          "type": "method",
+          "name": "exit",
+          "meta": {
+            "added": [
+              "v0.1.13"
+            ],
+            "changes": [
+              {
+                "version": "v20.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/43716",
+                "description": "Only accepts a code of type number, or of type string if it represents an integer."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`code` {integer|string|null|undefined} 退出码。对于字符串类型，只允许整数字符串（例如，'1'）。**默认值:** `0`。",
+                  "name": "code",
+                  "type": "integer|string|null|undefined",
+                  "desc": "退出码。对于字符串类型，只允许整数字符串（例如，'1'）。**默认值:** `0`。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.exit()</code> 方法指示 Node.js 以 <code>code</code> 的退出状态同步终止进程。如果省略 <code>code</code>，则退出使用 'success' 代码 <code>0</code> 或 <code>process.exitCode</code> 的值（如果已设置）。在所有 <a href=\"#event-exit\"><code>'exit'</code></a> 事件监听器被调用之前，Node.js 不会终止。</p>\n<p>以 'failure' 代码退出：</p>\n<pre><code class=\"language-mjs\">import { exit } from 'node:process';\n\nexit(1);\n</code></pre>\n<pre><code class=\"language-cjs\">const { exit } = require('node:process');\n\nexit(1);\n</code></pre>\n<p>执行 Node.js 的 shell 应将退出码视为 <code>1</code>。</p>\n<p>调用 <code>process.exit()</code> 将强制进程尽快退出，即使仍有尚未完全完成的异步操作挂起，包括对 <code>process.stdout</code> 和 <code>process.stderr</code> 的 I/O 操作。</p>\n<p>在大多数情况下，实际上不需要显式调用 <code>process.exit()</code>。Node.js 进程将在事件循环中没有额外工作挂起时自行退出。可以设置 <code>process.exitCode</code> 属性来告诉进程在正常退出时使用哪个退出码。</p>\n<p>例如，以下示例说明了 <em>误用</em> <code>process.exit()</code> 方法可能导致打印到 stdout 的数据被截断和丢失：</p>\n<pre><code class=\"language-mjs\">import { exit } from 'node:process';\n\n// 这是一个 *不要* 做的示例：\nif (someConditionNotMet()) {\n  printUsageToStdout();\n  exit(1);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { exit } = require('node:process');\n\n// 这是一个 *不要* 做的示例：\nif (someConditionNotMet()) {\n  printUsageToStdout();\n  exit(1);\n}\n</code></pre>\n<p>这是因为写入 <code>process.stdout</code> 在 Node.js 中有时是 <em>异步的</em>，并且可能发生在 Node.js 事件循环的多个时钟周期内。然而，调用 <code>process.exit()</code> 会强制进程在那些额外的写入到 <code>stdout</code> 能够执行之前退出。</p>\n<p>与其直接调用 <code>process.exit()</code>，代码 <em>应该</em> 设置 <code>process.exitCode</code> 并通过避免为事件循环调度任何额外工作来允许进程自然退出：</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\n// 如何正确设置退出码，同时让进程优雅退出。\nif (someConditionNotMet()) {\n  printUsageToStdout();\n  process.exitCode = 1;\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\n// 如何正确设置退出码，同时让进程优雅退出。\nif (someConditionNotMet()) {\n  printUsageToStdout();\n  process.exitCode = 1;\n}\n</code></pre>\n<p>如果由于错误条件需要终止 Node.js 进程，抛出 <em>未捕获</em> 错误并允许进程相应地终止比调用 <code>process.exit()</code> 更安全。</p>\n<p>在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中，此函数停止当前线程而不是当前进程。</p>"
+        },
+        {
+          "textRaw": "`process.finalization.register(ref, callback)`",
+          "type": "method",
+          "name": "register",
+          "meta": {
+            "added": [
+              "v22.5.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".1 - Active Development",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`ref` {Object | Function} 正在被跟踪的资源的引用。",
+                  "name": "ref",
+                  "type": "Object | Function",
+                  "desc": "正在被跟踪的资源的引用。"
+                },
+                {
+                  "textRaw": "`callback` {Function} 当资源被终结时要调用的回调函数。",
+                  "name": "callback",
+                  "type": "Function",
+                  "desc": "当资源被终结时要调用的回调函数。",
+                  "options": [
+                    {
+                      "textRaw": "`ref` {Object | Function} 正在被跟踪的资源的引用。",
+                      "name": "ref",
+                      "type": "Object | Function",
+                      "desc": "正在被跟踪的资源的引用。"
+                    },
+                    {
+                      "textRaw": "`event` {string} 触发终结的事件。默认为 'exit'。",
+                      "name": "event",
+                      "type": "string",
+                      "desc": "触发终结的事件。默认为 'exit'。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果 <code>ref</code> 对象在进程发出 <code>exit</code> 事件时未被垃圾回收，则此函数注册一个回调以被调用。如果对象 <code>ref</code> 在发出 <code>exit</code> 事件之前被垃圾回收，则回调将从终结注册表中移除，并且不会在进程退出时被调用。</p>\n<p>在回调内部，你可以释放由 <code>ref</code> 对象分配的资源。请注意，应用于 <code>beforeExit</code> 事件的所有限制也适用于 <code>callback</code> 函数，这意味着在特殊情况下回调可能不会被调用。</p>\n<p>这个函数的想法是帮助你在进程开始退出时释放资源，但如果对象不再被使用，也让对象被垃圾回收。</p>\n<p>例如：你可以注册一个包含缓冲区的对象，你希望确保在进程退出时释放该缓冲区，但如果对象在进程退出之前被垃圾回收，我们就不再需要释放缓冲区，所以在这种情况下，我们只需从终结注册表中移除回调。</p>\n<pre><code class=\"language-cjs\">const { finalization } = require('node:process');\n\n// 请确保传递给 finalization.register() 的函数不会围绕不必要的对象创建闭包。\nfunction onFinalize(obj, event) {\n  // 你可以对对象做任何你想做的事情\n  obj.dispose();\n}\n\nfunction setup() {\n  // 这个对象可以被安全地垃圾回收，\n  // 并且产生的关闭函数将不会被调用。\n  // 没有泄漏。\n  const myDisposableObject = {\n    dispose() {\n      // 同步释放你的资源\n    },\n  };\n\n  finalization.register(myDisposableObject, onFinalize);\n}\n\nsetup();\n</code></pre>\n<pre><code class=\"language-mjs\">import { finalization } from 'node:process';\n\n// 请确保传递给 finalization.register() 的函数不会围绕不必要的对象创建闭包。\nfunction onFinalize(obj, event) {\n  // 你可以对对象做任何你想做的事情\n  obj.dispose();\n}\n\nfunction setup() {\n  // 这个对象可以被安全地垃圾回收，\n  // 并且产生的关闭函数将不会被调用。\n  // 没有泄漏。\n  const myDisposableObject = {\n    dispose() {\n      // 同步释放你的资源\n    },\n  };\n\n  finalization.register(myDisposableObject, onFinalize);\n}\n\nsetup();\n</code></pre>\n<p>上面的代码依赖于以下假设：</p>\n<ul>\n<li>避免使用箭头函数</li>\n<li>建议常规函数在全局上下文（根）中</li>\n</ul>\n<p>常规函数 <em>可能</em> 引用 <code>obj</code> 所在的上下文，使得 <code>obj</code> 无法被垃圾回收。</p>\n<p>箭头函数将持有先前的上下文。例如，考虑：</p>\n<pre><code class=\"language-js\">class Test {\n  constructor() {\n    finalization.register(this, (ref) => ref.dispose());\n\n    // 即使是这样的做法也强烈不鼓励\n    // finalization.register(this, () => this.dispose());\n  }\n  dispose() {}\n}\n</code></pre>\n<p>这个对象被垃圾回收的可能性很小（不是不可能），但如果没有被回收，当调用 <code>process.exit</code> 时，<code>dispose</code> 将被调用。</p>\n<p>请小心，不要依赖此功能来处理关键资源的处置，因为不能保证在所有情况下都会调用回调。</p>"
+        },
+        {
+          "textRaw": "`process.finalization.registerBeforeExit(ref, callback)`",
+          "type": "method",
+          "name": "registerBeforeExit",
+          "meta": {
+            "added": [
+              "v22.5.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".1 - Active Development",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`ref` {Object | Function} 正在被跟踪的资源的引用。",
+                  "name": "ref",
+                  "type": "Object | Function",
+                  "desc": "正在被跟踪的资源的引用。"
+                },
+                {
+                  "textRaw": "`callback` {Function} 当资源被终结时要调用的回调函数。",
+                  "name": "callback",
+                  "type": "Function",
+                  "desc": "当资源被终结时要调用的回调函数。",
+                  "options": [
+                    {
+                      "textRaw": "`ref` {Object | Function} 正在被跟踪的资源的引用。",
+                      "name": "ref",
+                      "type": "Object | Function",
+                      "desc": "正在被跟踪的资源的引用。"
+                    },
+                    {
+                      "textRaw": "`event` {string} 触发终结的事件。默认为 'beforeExit'。",
+                      "name": "event",
+                      "type": "string",
+                      "desc": "触发终结的事件。默认为 'beforeExit'。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p>此函数的行为与 <code>register</code> 完全相同，只是如果 <code>ref</code> 对象未被垃圾回收，则当进程发出 <code>beforeExit</code> 事件时将调用回调。</p>\n<p>请注意，应用于 <code>beforeExit</code> 事件的所有限制也适用于 <code>callback</code> 函数，这意味着在特殊情况下回调可能不会被调用。</p>"
+        },
+        {
+          "textRaw": "`process.finalization.unregister(ref)`",
+          "type": "method",
+          "name": "unregister",
+          "meta": {
+            "added": [
+              "v22.5.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".1 - Active Development",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`ref` {Object | Function} 先前注册的资源的引用。",
+                  "name": "ref",
+                  "type": "Object | Function",
+                  "desc": "先前注册的资源的引用。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>此函数从终结注册表中移除对象的注册，因此回调将不再被调用。</p>\n<pre><code class=\"language-cjs\">const { finalization } = require('node:process');\n\n// 请确保传递给 finalization.register() 的函数不会围绕不必要的对象创建闭包。\nfunction onFinalize(obj, event) {\n  // 你可以对对象做任何你想做的事情\n  obj.dispose();\n}\n\nfunction setup() {\n  // 这个对象可以被安全地垃圾回收，\n  // 并且产生的关闭函数将不会被调用。\n  // 没有泄漏。\n  const myDisposableObject = {\n    dispose() {\n      // 同步释放你的资源\n    },\n  };\n\n  finalization.register(myDisposableObject, onFinalize);\n\n  // 做一些事情\n\n  myDisposableObject.dispose();\n  finalization.unregister(myDisposableObject);\n}\n\nsetup();\n</code></pre>\n<pre><code class=\"language-mjs\">import { finalization } from 'node:process';\n\n// 请确保传递给 finalization.register() 的函数不会围绕不必要的对象创建闭包。\nfunction onFinalize(obj, event) {\n  // 你可以对对象做任何你想做的事情\n  obj.dispose();\n}\n\nfunction setup() {\n  // 这个对象可以被安全地垃圾回收，\n  // 并且产生的关闭函数将不会被调用。\n  // 没有泄漏。\n  const myDisposableObject = {\n    dispose() {\n      // 同步释放你的资源\n    },\n  };\n\n  // 请确保传递给 finalization.register() 的函数不会围绕不必要的对象创建闭包。\n  function onFinalize(obj, event) {\n    // 你可以对对象做任何你想做的事情\n    obj.dispose();\n  }\n\n  finalization.register(myDisposableObject, onFinalize);\n\n  // 做一些事情\n\n  myDisposableObject.dispose();\n  finalization.unregister(myDisposableObject);\n}\n\nsetup();\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.getActiveResourcesInfo()`",
+          "type": "method",
+          "name": "getActiveResourcesInfo",
+          "meta": {
+            "added": [
+              "v17.3.0",
+              "v16.14.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57765",
+                "description": "Change stability index for this feature from Experimental to Stable."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {string\\[]}",
+                  "name": "返回",
+                  "type": "string\\[]"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.getActiveResourcesInfo()</code> 方法返回一个字符串数组，包含当前保持事件循环活动的活动资源的类型。</p>\n<pre><code class=\"language-mjs\">import { getActiveResourcesInfo } from 'node:process';\nimport { setTimeout } from 'node:timers';\n\nconsole.log('Before:', getActiveResourcesInfo());\nsetTimeout(() => {}, 1000);\nconsole.log('After:', getActiveResourcesInfo());\n// 打印:\n//   Before: [ 'CloseReq', 'TTYWrap', 'TTYWrap', 'TTYWrap' ]\n//   After: [ 'CloseReq', 'TTYWrap', 'TTYWrap', 'TTYWrap', 'Timeout' ]\n</code></pre>\n<pre><code class=\"language-cjs\">const { getActiveResourcesInfo } = require('node:process');\nconst { setTimeout } = require('node:timers');\n\nconsole.log('Before:', getActiveResourcesInfo());\nsetTimeout(() => {}, 1000);\nconsole.log('After:', getActiveResourcesInfo());\n// 打印:\n//   Before: [ 'TTYWrap', 'TTYWrap', 'TTYWrap' ]\n//   After: [ 'TTYWrap', 'TTYWrap', 'TTYWrap', 'Timeout' ]\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.getBuiltinModule(id)`",
+          "type": "method",
+          "name": "getBuiltinModule",
+          "meta": {
+            "added": [
+              "v22.3.0",
+              "v20.16.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`id` {string} 被请求的内置模块的 ID。",
+                  "name": "id",
+                  "type": "string",
+                  "desc": "被请求的内置模块的 ID。"
+                },
+                {
+                  "textRaw": "返回: {Object|undefined}",
+                  "name": "返回",
+                  "type": "Object|undefined"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.getBuiltinModule(id)</code> 提供了一种在全局可用函数中加载内置模块的方法。需要支持其他环境的 ES 模块可以使用它在 Node.js 中运行时有条件地加载 Node.js 内置模块，而无需处理在非 Node.js 环境中 <code>import</code> 可能引发的解析错误，或者使用动态 <code>import()</code>，这要么将模块转换为异步模块，要么将同步 API 转换为异步 API。</p>\n<pre><code class=\"language-mjs\">if (globalThis.process?.getBuiltinModule) {\n  // 在 Node.js 中运行，使用 Node.js fs 模块。\n  const fs = globalThis.process.getBuiltinModule('fs');\n  // 如果需要 `require()` 来加载用户模块，使用 createRequire()\n  const module = globalThis.process.getBuiltinModule('module');\n  const require = module.createRequire(import.meta.url);\n  const foo = require('foo');\n}\n</code></pre>\n<p>如果 <code>id</code> 指定了当前 Node.js 进程中可用的内置模块，<code>process.getBuiltinModule(id)</code> 方法返回相应的内置模块。如果 <code>id</code> 不对应任何内置模块，则返回 <code>undefined</code>。</p>\n<p><code>process.getBuiltinModule(id)</code> 接受 <a href=\"module.html#moduleisbuiltinmodulename\"><code>module.isBuiltin(id)</code></a> 识别的内置模块 ID。一些内置模块必须使用 <code>node:</code> 前缀加载，请参阅[带有强制 <code>node:</code> 前缀的内置模块][]。\n<code>process.getBuiltinModule(id)</code> 返回的引用总是指向对应于 <code>id</code> 的内置模块，即使用户修改了 <a href=\"modules.html#requirecache\"><code>require.cache</code></a> 使得 <code>require(id)</code> 返回其他内容。</p>"
+        },
+        {
+          "textRaw": "`process.getegid()`",
+          "type": "method",
+          "name": "getegid",
+          "meta": {
+            "added": [
+              "v2.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>process.getegid()</code> 方法返回 Node.js 进程的数字有效组标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/getegid.2.html\"><code>getegid(2)</code></a>。）</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getegid) {\n  console.log(`Current gid: ${process.getegid()}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getegid) {\n  console.log(`Current gid: ${process.getegid()}`);\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。</p>"
+        },
+        {
+          "textRaw": "`process.geteuid()`",
+          "type": "method",
+          "name": "geteuid",
+          "meta": {
+            "added": [
+              "v2.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {Object}",
+                  "name": "返回",
+                  "type": "Object"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.geteuid()</code> 方法返回进程的数字有效用户标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/geteuid.2.html\"><code>geteuid(2)</code></a>。）</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.geteuid) {\n  console.log(`Current uid: ${process.geteuid()}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.geteuid) {\n  console.log(`Current uid: ${process.geteuid()}`);\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。</p>"
+        },
+        {
+          "textRaw": "`process.getgid()`",
+          "type": "method",
+          "name": "getgid",
+          "meta": {
+            "added": [
+              "v0.1.31"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {Object}",
+                  "name": "返回",
+                  "type": "Object"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.getgid()</code> 方法返回进程的数字组标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/getgid.2.html\"><code>getgid(2)</code></a>。）</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getgid) {\n  console.log(`Current gid: ${process.getgid()}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getgid) {\n  console.log(`Current gid: ${process.getgid()}`);\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。</p>"
+        },
+        {
+          "textRaw": "`process.getgroups()`",
+          "type": "method",
+          "name": "getgroups",
+          "meta": {
+            "added": [
+              "v0.9.4"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {integer\\[]}",
+                  "name": "返回",
+                  "type": "integer\\[]"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.getgroups()</code> 方法返回一个包含补充组 ID 的数组。POSIX 未指定是否包含有效组 ID，但 Node.js 确保它始终包含。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getgroups) {\n  console.log(process.getgroups()); // [ 16, 21, 297 ]\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getgroups) {\n  console.log(process.getgroups()); // [ 16, 21, 297 ]\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。</p>"
+        },
+        {
+          "textRaw": "`process.getuid()`",
+          "type": "method",
+          "name": "getuid",
+          "meta": {
+            "added": [
+              "v0.1.28"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {integer}",
+                  "name": "返回",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.getuid()</code> 方法返回进程的数字用户标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/getuid.2.html\"><code>getuid(2)</code></a>。）</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n}\n</code></pre>\n<p>此函数在 Windows 上不可用。</p>"
+        },
+        {
+          "textRaw": "`process.hasUncaughtExceptionCaptureCallback()`",
+          "type": "method",
+          "name": "hasUncaughtExceptionCaptureCallback",
+          "meta": {
+            "added": [
+              "v9.3.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {boolean}",
+                  "name": "返回",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>指示是否已使用 <a href=\"#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> 设置了回调。</p>"
+        },
+        {
+          "textRaw": "`process.hrtime([time])`",
+          "type": "method",
+          "name": "hrtime",
+          "meta": {
+            "added": [
+              "v0.7.6"
+            ],
+            "changes": []
+          },
+          "stability": 3,
+          "stabilityText": "Legacy. Use [`process.hrtime.bigint()`][] instead.",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`time` {integer\\[]} 之前调用 `process.hrtime()` 的结果",
+                  "name": "time",
+                  "type": "integer\\[]",
+                  "desc": "之前调用 `process.hrtime()` 的结果"
+                },
+                {
+                  "textRaw": "返回: {integer\\[]}",
+                  "name": "返回",
+                  "type": "integer\\[]"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>这是在 JavaScript 中引入 <code>bigint</code> 之前 <a href=\"#processhrtimebigint\"><code>process.hrtime.bigint()</code></a> 的旧版本。</p>\n<p><code>process.hrtime()</code> 方法返回当前高分辨率实时时间，单位为 <code>[seconds, nanoseconds]</code> 元组 <code>Array</code>，其中 <code>nanoseconds</code> 是实时中无法以秒精度表示的剩余部分。</p>\n<p><code>time</code> 是一个可选参数，必须是先前 <code>process.hrtime()</code> 调用的结果，用于与当前时间进行差异比较。如果传入的参数不是元组 <code>Array</code>，将抛出 <code>TypeError</code>。传入用户定义的数组而不是先前调用 <code>process.hrtime()</code> 的结果将导致未定义的行为。</p>\n<p>这些时间相对于过去的任意时间，与一天中的时间无关，因此不受时钟漂移的影响。主要用途是测量时间间隔之间的性能：</p>\n<pre><code class=\"language-mjs\">import { hrtime } from 'node:process';\n\nconst NS_PER_SEC = 1e9;\nconst time = hrtime();\n// [ 1800216, 25 ]\n\nsetTimeout(() => {\n  const diff = hrtime(time);\n  // [ 1, 552 ]\n\n  console.log(`Benchmark took ${diff[0] * NS_PER_SEC + diff[1]} nanoseconds`);\n  // Benchmark took 1000000552 nanoseconds\n}, 1000);\n</code></pre>\n<pre><code class=\"language-cjs\">const { hrtime } = require('node:process');\n\nconst NS_PER_SEC = 1e9;\nconst time = hrtime();\n// [ 1800216, 25 ]\n\nsetTimeout(() => {\n  const diff = hrtime(time);\n  // [ 1, 552 ]\n\n  console.log(`Benchmark took ${diff[0] * NS_PER_SEC + diff[1]} nanoseconds`);\n  // Benchmark took 1000000552 nanoseconds\n}, 1000);\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.hrtime.bigint()`",
+          "type": "method",
+          "name": "bigint",
+          "meta": {
+            "added": [
+              "v10.7.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {bigint}",
+                  "name": "返回",
+                  "type": "bigint"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><a href=\"#processhrtimetime\"><code>process.hrtime()</code></a> 方法的 <code>bigint</code> 版本，以纳秒为单位返回当前高分辨率实时时间作为 <code>bigint</code>。</p>\n<p>与 <a href=\"#processhrtimetime\"><code>process.hrtime()</code></a> 不同，它不支持额外的 <code>time</code> 参数，因为差值可以直接通过两个 <code>bigint</code> 的减法计算得出。</p>\n<pre><code class=\"language-mjs\">import { hrtime } from 'node:process';\n\nconst start = hrtime.bigint();\n// 191051479007711n\n\nsetTimeout(() => {\n  const end = hrtime.bigint();\n  // 191052633396993n\n\n  console.log(`Benchmark took ${end - start} nanoseconds`);\n  // Benchmark took 1154389282 nanoseconds\n}, 1000);\n</code></pre>\n<pre><code class=\"language-cjs\">const { hrtime } = require('node:process');\n\nconst start = hrtime.bigint();\n// 191051479007711n\n\nsetTimeout(() => {\n  const end = hrtime.bigint();\n  // 191052633396993n\n\n  console.log(`Benchmark took ${end - start} nanoseconds`);\n  // Benchmark took 1154389282 nanoseconds\n}, 1000);\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.initgroups(user, extraGroup)`",
+          "type": "method",
+          "name": "initgroups",
+          "meta": {
+            "added": [
+              "v0.9.4"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`user` {string|number} 用户名或数字标识符。",
+                  "name": "user",
+                  "type": "string|number",
+                  "desc": "用户名或数字标识符。"
+                },
+                {
+                  "textRaw": "`extraGroup` {string|number} 组名或数字标识符。",
+                  "name": "extraGroup",
+                  "type": "string|number",
+                  "desc": "组名或数字标识符。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.initgroups()</code> 方法读取 <code>/etc/group</code> 文件并初始化组访问列表，使用用户所属的所有组。这是一个特权操作，要求 Node.js 进程具有 <code>root</code> 访问权限或 <code>CAP_SETGID</code> 能力。</p>\n<p>删除权限时要小心：</p>\n<pre><code class=\"language-mjs\">import { getgroups, initgroups, setgid } from 'node:process';\n\nconsole.log(getgroups());         // [ 0 ]\ninitgroups('nodeuser', 1000);     // 切换用户\nconsole.log(getgroups());         // [ 27, 30, 46, 1000, 0 ]\nsetgid(1000);                     // 删除 root gid\nconsole.log(getgroups());         // [ 27, 30, 46, 1000 ]\n</code></pre>\n<pre><code class=\"language-cjs\">const { getgroups, initgroups, setgid } = require('node:process');\n\nconsole.log(getgroups());         // [ 0 ]\ninitgroups('nodeuser', 1000);     // 切换用户\nconsole.log(getgroups());         // [ 27, 30, 46, 1000, 0 ]\nsetgid(1000);                     // 删除 root gid\nconsole.log(getgroups());         // [ 27, 30, 46, 1000 ]\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。\n此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.kill(pid[, signal])`",
+          "type": "method",
+          "name": "kill",
+          "meta": {
+            "added": [
+              "v0.0.6"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`pid` {number} 进程 ID",
+                  "name": "pid",
+                  "type": "number",
+                  "desc": "进程 ID"
+                },
+                {
+                  "textRaw": "`signal` {string|number} 要发送的信号，可以是字符串或数字。**默认值:** `'SIGTERM'`。",
+                  "name": "signal",
+                  "type": "string|number",
+                  "desc": "要发送的信号，可以是字符串或数字。**默认值:** `'SIGTERM'`。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.kill()</code> 方法将 <code>signal</code> 发送给由 <code>pid</code> 标识的进程。</p>\n<p>信号名称是字符串，例如 <code>'SIGINT'</code> 或 <code>'SIGHUP'</code>。有关更多信息，请参阅[信号事件][]和 <a href=\"http://man7.org/linux/man-pages/man2/kill.2.html\"><code>kill(2)</code></a>。</p>\n<p>如果目标 <code>pid</code> 不存在，此方法将抛出错误。作为特殊情况，可以使用 <code>0</code> 信号来测试进程是否存在。Windows 平台如果 <code>pid</code> 用于杀死进程组，将抛出错误。</p>\n<p>尽管此函数的名称是 <code>process.kill()</code>，但它实际上只是一个信号发送器，就像 <code>kill</code> 系统调用一样。发送的信号可能对目标进程执行除杀死之外的其他操作。</p>\n<pre><code class=\"language-mjs\">import process, { kill } from 'node:process';\n\nprocess.on('SIGHUP', () => {\n  console.log('Got SIGHUP signal.');\n});\n\nsetTimeout(() => {\n  console.log('Exiting.');\n  process.exit(0);\n}, 100);\n\nkill(process.pid, 'SIGHUP');\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.on('SIGHUP', () => {\n  console.log('Got SIGHUP signal.');\n});\n\nsetTimeout(() => {\n  console.log('Exiting.');\n  process.exit(0);\n}, 100);\n\nprocess.kill(process.pid, 'SIGHUP');\n</code></pre>\n<p>当 Node.js 进程收到 <code>SIGUSR1</code> 时，Node.js 将启动调试器。请参阅[信号事件][]。</p>"
+        },
+        {
+          "textRaw": "`process.loadEnvFile(path)`",
+          "type": "method",
+          "name": "loadEnvFile",
+          "meta": {
+            "added": [
+              "v21.7.0",
+              "v20.12.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.10.0",
+                "pr-url": "https://github.com/nodejs/node/pull/59925",
+                "description": "This API is no longer experimental."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`path` {string | URL | Buffer | undefined}. **默认值:** `'./.env'`",
+                  "name": "path",
+                  "type": "string | URL | Buffer | undefined",
+                  "desc": ". **默认值:** `'./.env'`"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>将 <code>.env</code> 文件加载到 <code>process.env</code> 中。在 <code>.env</code> 文件中使用 <code>NODE_OPTIONS</code> 不会对 Node.js 产生任何影响。</p>\n<pre><code class=\"language-cjs\">const { loadEnvFile } = require('node:process');\nloadEnvFile();\n</code></pre>\n<pre><code class=\"language-mjs\">import { loadEnvFile } from 'node:process';\nloadEnvFile();\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.memoryUsage()`",
+          "type": "method",
+          "name": "memoryUsage",
+          "meta": {
+            "added": [
+              "v0.1.16"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v13.9.0",
+                  "v12.17.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/31550",
+                "description": "Added `arrayBuffers` to the returned object."
+              },
+              {
+                "version": "v7.2.0",
+                "pr-url": "https://github.com/nodejs/node/pull/9587",
+                "description": "Added `external` to the returned object."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {Object}",
+                  "name": "返回",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`rss` {integer}",
+                      "name": "rss",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`heapTotal` {integer}",
+                      "name": "heapTotal",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`heapUsed` {integer}",
+                      "name": "heapUsed",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`external` {integer}",
+                      "name": "external",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`arrayBuffers` {integer}",
+                      "name": "arrayBuffers",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回一个描述 Node.js 进程内存使用情况的对象，单位为字节。</p>\n<pre><code class=\"language-mjs\">import { memoryUsage } from 'node:process';\n\nconsole.log(memoryUsage());\n// 打印:\n// {\n//  rss: 4935680,\n//  heapTotal: 1826816,\n//  heapUsed: 650472,\n//  external: 49879,\n//  arrayBuffers: 9386\n// }\n</code></pre>\n<pre><code class=\"language-cjs\">const { memoryUsage } = require('node:process');\n\nconsole.log(memoryUsage());\n// 打印:\n// {\n//  rss: 4935680,\n//  heapTotal: 1826816,\n//  heapUsed: 650472,\n//  external: 49879,\n//  arrayBuffers: 9386\n// }\n</code></pre>\n<ul>\n<li><code>heapTotal</code> 和 <code>heapUsed</code> 指的是 V8 的内存使用情况。</li>\n<li><code>external</code> 指的是绑定到由 V8 管理的 JavaScript 对象的 C++ 对象的内存使用情况。</li>\n<li><code>rss</code>，常驻集大小，是进程在主内存设备中占据的空间量（这是总分配内存的一个子集），包括所有 C++ 和 JavaScript 对象和代码。</li>\n<li><code>arrayBuffers</code> 指的是为 <code>ArrayBuffer</code> 和 <code>SharedArrayBuffer</code> 分配的内存，包括所有 Node.js <a href=\"buffer.html\"><code>Buffer</code></a>。这也包含在 <code>external</code> 值中。当 Node.js 作为嵌入式库使用时，此值可能为 <code>0</code>，因为在这种情况下可能不会跟踪 <code>ArrayBuffer</code> 的分配。</li>\n</ul>\n<p>当使用 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程时，<code>rss</code> 将是整个进程的有效值，而其他字段仅引用当前线程。</p>\n<p><code>process.memoryUsage()</code> 方法遍历每个页面以收集有关内存使用情况的信息，这取决于程序内存分配可能会很慢。</p>",
+          "modules": [
+            {
+              "textRaw": "关于 process.memoryUsage 的说明",
+              "name": "关于_process.memoryusage_的说明",
+              "desc": "<p>在 Linux 或其他通常使用 glibc 的系统上，应用程序可能尽管 <code>heapTotal</code> 稳定，但 <code>rss</code> 持续增长，这是由于 glibc <code>malloc</code> 实现导致的碎片化。请参阅 <a href=\"https://github.com/nodejs/node/issues/21973\">nodejs/node#21973</a> 了解如何切换到替代的 <code>malloc</code> 实现以解决性能问题。</p>",
+              "type": "module",
+              "displayName": "关于 process.memoryUsage 的说明"
+            }
+          ]
+        },
+        {
+          "textRaw": "`process.memoryUsage.rss()`",
+          "type": "method",
+          "name": "rss",
+          "meta": {
+            "added": [
+              "v15.6.0",
+              "v14.18.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {integer}",
+                  "name": "返回",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.memoryUsage.rss()</code> 方法返回一个整数，表示常驻集大小（RSS），单位为字节。</p>\n<p>常驻集大小是进程在主内存设备中占据的空间量（这是总分配内存的一个子集），包括所有 C++ 和 JavaScript 对象和代码。</p>\n<p>这与 <code>process.memoryUsage()</code> 提供的 <code>rss</code> 属性值相同，但 <code>process.memoryUsage.rss()</code> 更快。</p>\n<pre><code class=\"language-mjs\">import { memoryUsage } from 'node:process';\n\nconsole.log(memoryUsage.rss());\n// 35655680\n</code></pre>\n<pre><code class=\"language-cjs\">const { memoryUsage } = require('node:process');\n\nconsole.log(memoryUsage.rss());\n// 35655680\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.nextTick(callback[, ...args])`",
+          "type": "method",
+          "name": "nextTick",
+          "meta": {
+            "added": [
+              "v0.1.26"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v22.7.0",
+                  "v20.18.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/51280",
+                "description": "Changed stability to Legacy."
+              },
+              {
+                "version": "v18.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/41678",
+                "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+              },
+              {
+                "version": "v1.8.1",
+                "pr-url": "https://github.com/nodejs/node/pull/1077",
+                "description": "Additional arguments after `callback` are now supported."
+              }
+            ]
+          },
+          "stability": 3,
+          "stabilityText": "Legacy. Use [`queueMicrotask()`][] instead.",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`callback` {Function}",
+                  "name": "callback",
+                  "type": "Function"
+                },
+                {
+                  "textRaw": "`...args` {any} 调用 `callback` 时传入的额外参数",
+                  "name": "...args",
+                  "type": "any",
+                  "desc": "调用 `callback` 时传入的额外参数"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.nextTick()</code> 将 <code>callback</code> 添加到 \"next tick queue\"。这个队列在当前 JavaScript 栈上的操作运行完成后、事件循环继续之前被完全排空。如果递归调用 <code>process.nextTick()</code>，可能会创建无限循环。有关更多背景信息，请参阅[事件循环][]指南。</p>\n<pre><code class=\"language-mjs\">import { nextTick } from 'node:process';\n\nconsole.log('start');\nnextTick(() => {\n  console.log('nextTick callback');\n});\nconsole.log('scheduled');\n// 输出:\n// start\n// scheduled\n// nextTick callback\n</code></pre>\n<pre><code class=\"language-cjs\">const { nextTick } = require('node:process');\n\nconsole.log('start');\nnextTick(() => {\n  console.log('nextTick callback');\n});\nconsole.log('scheduled');\n// 输出:\n// start\n// scheduled\n// nextTick callback\n</code></pre>\n<p>这在开发 API 时非常重要，以便让用户有机会在对象构造之后、任何 I/O 发生之前分配事件处理程序：</p>\n<pre><code class=\"language-mjs\">import { nextTick } from 'node:process';\n\nfunction MyThing(options) {\n  this.setupOptions(options);\n\n  nextTick(() => {\n    this.startDoingStuff();\n  });\n}\n\nconst thing = new MyThing();\nthing.getReadyForStuff();\n\n// thing.startDoingStuff() 现在被调用，而不是之前。\n</code></pre>\n<pre><code class=\"language-cjs\">const { nextTick } = require('node:process');\n\nfunction MyThing(options) {\n  this.setupOptions(options);\n\n  nextTick(() => {\n    this.startDoingStuff();\n  });\n}\n\nconst thing = new MyThing();\nthing.getReadyForStuff();\n\n// thing.startDoingStuff() 现在被调用，而不是之前。\n</code></pre>\n<p>对于 API，要么 100% 同步，要么 100% 异步，这一点非常重要。考虑这个例子：</p>\n<pre><code class=\"language-js\">// 警告！不要使用！不安全的危险！\nfunction maybeSync(arg, cb) {\n  if (arg) {\n    cb();\n    return;\n  }\n\n  fs.stat('file', cb);\n}\n</code></pre>\n<p>这个 API 是危险的，因为在以下情况下：</p>\n<pre><code class=\"language-js\">const maybeTrue = Math.random() > 0.5;\n\nmaybeSync(maybeTrue, () => {\n  foo();\n});\n\nbar();\n</code></pre>\n<p>不清楚是 <code>foo()</code> 还是 <code>bar()</code> 会先被调用。</p>\n<p>以下方法要好得多：</p>\n<pre><code class=\"language-mjs\">import { nextTick } from 'node:process';\n\nfunction definitelyAsync(arg, cb) {\n  if (arg) {\n    nextTick(cb);\n    return;\n  }\n\n  fs.stat('file', cb);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { nextTick } = require('node:process');\n\nfunction definitelyAsync(arg, cb) {\n  if (arg) {\n    nextTick(cb);\n    return;\n  }\n\n  fs.stat('file', cb);\n}\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "何时使用 `queueMicrotask()` 与 `process.nextTick()`",
+              "name": "何时使用_`queuemicrotask()`_与_`process.nexttick()`",
+              "desc": "<p><a href=\"globals.html#queuemicrotaskcallback\"><code>queueMicrotask()</code></a> API 是 <code>process.nextTick()</code> 的替代方案，它不使用 \"next tick queue\"，而是使用用于执行已解析 promise 的 then、catch 和 finally 处理程序的相同微任务队列来延迟函数的执行。</p>\n<p>在 Node.js 中，每次排空 \"next tick queue\" 后，微任务队列会立即被排空。</p>\n<p>所以在 CJS 模块中，<code>process.nextTick()</code> 回调总是在 <code>queueMicrotask()</code> 回调之前运行。然而，由于 ESM 模块已经作为微任务队列的一部分被处理，在那里 <code>queueMicrotask()</code> 回调总是在 <code>process.nextTick()</code> 回调之前执行，因为 Node.js 已经在排空微任务队列的过程中。</p>\n<pre><code class=\"language-mjs\">import { nextTick } from 'node:process';\n\nPromise.resolve().then(() => console.log('resolve'));\nqueueMicrotask(() => console.log('microtask'));\nnextTick(() => console.log('nextTick'));\n// 输出:\n// resolve\n// microtask\n// nextTick\n</code></pre>\n<pre><code class=\"language-cjs\">const { nextTick } = require('node:process');\n\nPromise.resolve().then(() => console.log('resolve'));\nqueueMicrotask(() => console.log('microtask'));\nnextTick(() => console.log('nextTick'));\n// 输出:\n// nextTick\n// resolve\n// microtask\n</code></pre>\n<p>对于_大多数_用户层面的用例，<code>queueMicrotask()</code> API 提供了一种可移植且可靠的延迟执行机制，适用于多个 JavaScript 平台环境，应优先于 <code>process.nextTick()</code>。在简单场景中，<code>queueMicrotask()</code> 可以作为 <code>process.nextTick()</code> 的直接替代品。</p>\n<pre><code class=\"language-js\">console.log('start');\nqueueMicrotask(() => {\n  console.log('microtask callback');\n});\nconsole.log('scheduled');\n// 输出:\n// start\n// scheduled\n// microtask callback\n</code></pre>\n<p>两个 API 之间一个值得注意的区别是 <code>process.nextTick()</code> 允许指定额外的值，这些值将在延迟函数被调用时作为参数传递给该函数。使用 <code>queueMicrotask()</code> 实现相同的结果需要使用闭包或绑定函数：</p>\n<pre><code class=\"language-js\">function deferred(a, b) {\n  console.log('microtask', a + b);\n}\n\nconsole.log('start');\nqueueMicrotask(deferred.bind(undefined, 1, 2));\nconsole.log('scheduled');\n// 输出:\n// start\n// scheduled\n// microtask 3\n</code></pre>\n<p>在 next tick 队列和微任务队列中引发的错误处理方式有细微差别。在排队的微任务回调中引发的错误应在排队的回调中尽可能处理。如果未处理，可以使用 <code>process.on('uncaughtException')</code> 事件处理程序来捕获和处理错误。</p>\n<p>如果有疑问，除非需要 <code>process.nextTick()</code> 的特定功能，否则请使用 <code>queueMicrotask()</code>。</p>",
+              "type": "module",
+              "displayName": "何时使用 `queueMicrotask()` 与 `process.nextTick()`"
+            }
+          ]
+        },
+        {
+          "textRaw": "`process.ref(maybeRefable)`",
+          "type": "method",
+          "name": "ref",
+          "meta": {
+            "added": [
+              "v23.6.0",
+              "v22.14.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`maybeRefable` {any} 一个可能是 \"可引用\" 的对象。",
+                  "name": "maybeRefable",
+                  "type": "any",
+                  "desc": "一个可能是 \"可引用\" 的对象。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果一个对象实现了 Node.js \"可引用协议\"，那么它就是 \"可引用\" 的。具体来说，这意味着该对象实现了 <code>Symbol.for('nodejs.ref')</code> 和 <code>Symbol.for('nodejs.unref')</code> 方法。\"已引用\" 的对象将保持 Node.js 事件循环活动，而 \"未引用\" 的对象则不会。历史上，这是通过在对象上直接使用 <code>ref()</code> 和 <code>unref()</code> 方法来实现的。然而，这种模式正在被弃用，转而支持 \"可引用协议\"，以便更好地支持那些 API 无法修改以添加 <code>ref()</code> 和 <code>unref()</code> 方法但仍需要支持该行为的 Web 平台 API 类型。</p>"
+        },
+        {
+          "textRaw": "`process.resourceUsage()`",
+          "type": "method",
+          "name": "resourceUsage",
+          "meta": {
+            "added": [
+              "v12.6.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {Object} 当前进程的资源使用情况。所有这些值都来自 `uv_getrusage` 调用，该调用返回一个 [`uv_rusage_t` 结构体][uv_rusage_t]。",
+                  "name": "返回",
+                  "type": "Object",
+                  "desc": "当前进程的资源使用情况。所有这些值都来自 `uv_getrusage` 调用，该调用返回一个 [`uv_rusage_t` 结构体][uv_rusage_t]。",
+                  "options": [
+                    {
+                      "textRaw": "`userCPUTime` {integer} 映射到以微秒计算的 `ru_utime`。它与 [`process.cpuUsage().user`][process.cpuUsage] 的值相同。",
+                      "name": "userCPUTime",
+                      "type": "integer",
+                      "desc": "映射到以微秒计算的 `ru_utime`。它与 [`process.cpuUsage().user`][process.cpuUsage] 的值相同。"
+                    },
+                    {
+                      "textRaw": "`systemCPUTime` {integer} 映射到以微秒计算的 `ru_stime`。它与 [`process.cpuUsage().system`][process.cpuUsage] 的值相同。",
+                      "name": "systemCPUTime",
+                      "type": "integer",
+                      "desc": "映射到以微秒计算的 `ru_stime`。它与 [`process.cpuUsage().system`][process.cpuUsage] 的值相同。"
+                    },
+                    {
+                      "textRaw": "`maxRSS` {integer} 映射到 `ru_maxrss`，即使用的最大常驻集大小，单位为千字节（1024 字节）。",
+                      "name": "maxRSS",
+                      "type": "integer",
+                      "desc": "映射到 `ru_maxrss`，即使用的最大常驻集大小，单位为千字节（1024 字节）。"
+                    },
+                    {
+                      "textRaw": "`sharedMemorySize` {integer} 映射到 `ru_ixrss`，但不受任何平台支持。",
+                      "name": "sharedMemorySize",
+                      "type": "integer",
+                      "desc": "映射到 `ru_ixrss`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`unsharedDataSize` {integer} 映射到 `ru_idrss`，但不受任何平台支持。",
+                      "name": "unsharedDataSize",
+                      "type": "integer",
+                      "desc": "映射到 `ru_idrss`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`unsharedStackSize` {integer} 映射到 `ru_isrss`，但不受任何平台支持。",
+                      "name": "unsharedStackSize",
+                      "type": "integer",
+                      "desc": "映射到 `ru_isrss`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`minorPageFault` {integer} 映射到 `ru_minflt`，即进程的次要页面错误次数，有关更多详细信息，请参阅[此文章][wikipedia_minor_fault]。",
+                      "name": "minorPageFault",
+                      "type": "integer",
+                      "desc": "映射到 `ru_minflt`，即进程的次要页面错误次数，有关更多详细信息，请参阅[此文章][wikipedia_minor_fault]。"
+                    },
+                    {
+                      "textRaw": "`majorPageFault` {integer} 映射到 `ru_majflt`，即进程的主要页面错误次数，有关更多详细信息，请参阅[此文章][wikipedia_major_fault]。此字段在 Windows 上不受支持。",
+                      "name": "majorPageFault",
+                      "type": "integer",
+                      "desc": "映射到 `ru_majflt`，即进程的主要页面错误次数，有关更多详细信息，请参阅[此文章][wikipedia_major_fault]。此字段在 Windows 上不受支持。"
+                    },
+                    {
+                      "textRaw": "`swappedOut` {integer} 映射到 `ru_nswap`，但不受任何平台支持。",
+                      "name": "swappedOut",
+                      "type": "integer",
+                      "desc": "映射到 `ru_nswap`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`fsRead` {integer} 映射到 `ru_inblock`，即文件系统必须执行输入的次数。",
+                      "name": "fsRead",
+                      "type": "integer",
+                      "desc": "映射到 `ru_inblock`，即文件系统必须执行输入的次数。"
+                    },
+                    {
+                      "textRaw": "`fsWrite` {integer} 映射到 `ru_oublock`，即文件系统必须执行输出的次数。",
+                      "name": "fsWrite",
+                      "type": "integer",
+                      "desc": "映射到 `ru_oublock`，即文件系统必须执行输出的次数。"
+                    },
+                    {
+                      "textRaw": "`ipcSent` {integer} 映射到 `ru_msgsnd`，但不受任何平台支持。",
+                      "name": "ipcSent",
+                      "type": "integer",
+                      "desc": "映射到 `ru_msgsnd`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`ipcReceived` {integer} 映射到 `ru_msgrcv`，但不受任何平台支持。",
+                      "name": "ipcReceived",
+                      "type": "integer",
+                      "desc": "映射到 `ru_msgrcv`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`signalsCount` {integer} 映射到 `ru_nsignals`，但不受任何平台支持。",
+                      "name": "signalsCount",
+                      "type": "integer",
+                      "desc": "映射到 `ru_nsignals`，但不受任何平台支持。"
+                    },
+                    {
+                      "textRaw": "`voluntaryContextSwitches` {integer} 映射到 `ru_nvcsw`，即由于进程在其时间片完成之前自愿放弃处理器（通常是为了等待资源可用）而导致的 CPU 上下文切换次数。此字段在 Windows 上不受支持。",
+                      "name": "voluntaryContextSwitches",
+                      "type": "integer",
+                      "desc": "映射到 `ru_nvcsw`，即由于进程在其时间片完成之前自愿放弃处理器（通常是为了等待资源可用）而导致的 CPU 上下文切换次数。此字段在 Windows 上不受支持。"
+                    },
+                    {
+                      "textRaw": "`involuntaryContextSwitches` {integer} 映射到 `ru_nivcsw`，即由于更高优先级的进程变得可运行或因为当前进程超出其时间片而导致的 CPU 上下文切换次数。此字段在 Windows 上不受支持。",
+                      "name": "involuntaryContextSwitches",
+                      "type": "integer",
+                      "desc": "映射到 `ru_nivcsw`，即由于更高优先级的进程变得可运行或因为当前进程超出其时间片而导致的 CPU 上下文切换次数。此字段在 Windows 上不受支持。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<pre><code class=\"language-mjs\">import { resourceUsage } from 'node:process';\n\nconsole.log(resourceUsage());\n/*\n  将输出:\n  {\n    userCPUTime: 82872,\n    systemCPUTime: 4143,\n    maxRSS: 33164,\n    sharedMemorySize: 0,\n    unsharedDataSize: 0,\n    unsharedStackSize: 0,\n    minorPageFault: 2469,\n    majorPageFault: 0,\n    swappedOut: 0,\n    fsRead: 0,\n    fsWrite: 8,\n    ipcSent: 0,\n    ipcReceived: 0,\n    signalsCount: 0,\n    voluntaryContextSwitches: 79,\n    involuntaryContextSwitches: 1\n  }\n*/\n</code></pre>\n<pre><code class=\"language-cjs\">const { resourceUsage } = require('node:process');\n\nconsole.log(resourceUsage());\n/*\n  将输出:\n  {\n    userCPUTime: 82872,\n    systemCPUTime: 4143,\n    maxRSS: 33164,\n    sharedMemorySize: 0,\n    unsharedDataSize: 0,\n    unsharedStackSize: 0,\n    minorPageFault: 2469,\n    majorPageFault: 0,\n    swappedOut: 0,\n    fsRead: 0,\n    fsWrite: 8,\n    ipcSent: 0,\n    ipcReceived: 0,\n    signalsCount: 0,\n    voluntaryContextSwitches: 79,\n    involuntaryContextSwitches: 1\n  }\n*/\n</code></pre>"
+        },
+        {
+          "textRaw": "`process.send(message[, sendHandle[, options]][, callback])`",
+          "type": "method",
+          "name": "send",
+          "meta": {
+            "added": [
+              "v0.5.9"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`message` {Object}",
+                  "name": "message",
+                  "type": "Object"
+                },
+                {
+                  "textRaw": "`sendHandle` {net.Server|net.Socket}",
+                  "name": "sendHandle",
+                  "type": "net.Server|net.Socket"
+                },
+                {
+                  "textRaw": "`options` {Object} 用于参数化某些类型句柄的发送。`options` 支持以下属性：",
+                  "name": "options",
+                  "type": "Object",
+                  "desc": "用于参数化某些类型句柄的发送。`options` 支持以下属性：",
+                  "options": [
+                    {
+                      "textRaw": "`keepOpen` {boolean} 在传递 `net.Socket` 实例时可使用的值。当为 `true` 时，套接字在发送进程中保持打开状态。**默认值:** `false`。",
+                      "name": "keepOpen",
+                      "type": "boolean",
+                      "desc": "在传递 `net.Socket` 实例时可使用的值。当为 `true` 时，套接字在发送进程中保持打开状态。**默认值:** `false`。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "`callback` {Function}",
+                  "name": "callback",
+                  "type": "Function"
+                },
+                {
+                  "textRaw": "返回: {boolean}",
+                  "name": "返回",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果 Node.js 是使用 IPC 通道生成的，则 <code>process.send()</code> 方法可用于向父进程发送消息。消息将作为父进程的 <a href=\"child_process.html#class-childprocess\"><code>ChildProcess</code></a> 对象上的 <a href=\"child_process.html#event-message\"><code>'message'</code></a> 事件接收。</p>\n<p>如果 Node.js 不是使用 IPC 通道生成的，<code>process.send</code> 将是 <code>undefined</code>。</p>\n<p>消息经过序列化和解析。结果消息可能与最初发送的消息不同。</p>"
+        },
+        {
+          "textRaw": "`process.setegid(id)`",
+          "type": "method",
+          "name": "setegid",
+          "meta": {
+            "added": [
+              "v2.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`id` {string|number} 组名或 ID",
+                  "name": "id",
+                  "type": "string|number",
+                  "desc": "组名或 ID"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.setegid()</code> 方法设置进程的有效组标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/setegid.2.html\"><code>setegid(2)</code></a>。）<code>id</code> 可以作为数字 ID 或组名字符串传递。如果指定了组名，则此方法在解析关联的数字 ID 时会阻塞。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getegid &#x26;&#x26; process.setegid) {\n  console.log(`Current gid: ${process.getegid()}`);\n  try {\n    process.setegid(501);\n    console.log(`New gid: ${process.getegid()}`);\n  } catch (err) {\n    console.error(`Failed to set gid: ${err}`);\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getegid &#x26;&#x26; process.setegid) {\n  console.log(`Current gid: ${process.getegid()}`);\n  try {\n    process.setegid(501);\n    console.log(`New gid: ${process.getegid()}`);\n  } catch (err) {\n    console.error(`Failed to set gid: ${err}`);\n  }\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。\n此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.seteuid(id)`",
+          "type": "method",
+          "name": "seteuid",
+          "meta": {
+            "added": [
+              "v2.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`id` {string|number} 用户名或 ID",
+                  "name": "id",
+                  "type": "string|number",
+                  "desc": "用户名或 ID"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.seteuid()</code> 方法设置进程的有效用户标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/seteuid.2.html\"><code>seteuid(2)</code></a>。）<code>id</code> 可以作为数字 ID 或用户名字符串传递。如果指定了用户名，则该方法在解析关联的数字 ID 时会阻塞。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.geteuid &#x26;&#x26; process.seteuid) {\n  console.log(`Current uid: ${process.geteuid()}`);\n  try {\n    process.seteuid(501);\n    console.log(`New uid: ${process.geteuid()}`);\n  } catch (err) {\n    console.error(`Failed to set uid: ${err}`);\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.geteuid &#x26;&#x26; process.seteuid) {\n  console.log(`Current uid: ${process.geteuid()}`);\n  try {\n    process.seteuid(501);\n    console.log(`New uid: ${process.geteuid()}`);\n  } catch (err) {\n    console.error(`Failed to set uid: ${err}`);\n  }\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。\n此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.setgid(id)`",
+          "type": "method",
+          "name": "setgid",
+          "meta": {
+            "added": [
+              "v0.1.31"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`id` {string|number} 组名或 ID",
+                  "name": "id",
+                  "type": "string|number",
+                  "desc": "组名或 ID"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.setgid()</code> 方法设置进程的组标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/setgid.2.html\"><code>setgid(2)</code></a>。）<code>id</code> 可以作为数字 ID 或组名字符串传递。如果指定了组名，则此方法在解析关联的数字 ID 时会阻塞。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getgid &#x26;&#x26; process.setgid) {\n  console.log(`Current gid: ${process.getgid()}`);\n  try {\n    process.setgid(501);\n    console.log(`New gid: ${process.getgid()}`);\n  } catch (err) {\n    console.error(`Failed to set gid: ${err}`);\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getgid &#x26;&#x26; process.setgid) {\n  console.log(`Current gid: ${process.getgid()}`);\n  try {\n    process.setgid(501);\n    console.log(`New gid: ${process.getgid()}`);\n  } catch (err) {\n    console.error(`Failed to set gid: ${err}`);\n  }\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。\n此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.setgroups(groups)`",
+          "type": "method",
+          "name": "setgroups",
+          "meta": {
+            "added": [
+              "v0.9.4"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`groups` {integer\\[]}",
+                  "name": "groups",
+                  "type": "integer\\[]"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.setgroups()</code> 方法设置 Node.js 进程的补充组 ID。这是一个特权操作，要求 Node.js 进程具有 <code>root</code> 或 <code>CAP_SETGID</code> 能力。</p>\n<p><code>groups</code> 数组可以包含数字组 ID、组名或两者。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getgroups &#x26;&#x26; process.setgroups) {\n  try {\n    process.setgroups([501]);\n    console.log(process.getgroups()); // 新的组\n  } catch (err) {\n    console.error(`Failed to set groups: ${err}`);\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getgroups &#x26;&#x26; process.setgroups) {\n  try {\n    process.setgroups([501]);\n    console.log(process.getgroups()); // 新的组\n  } catch (err) {\n    console.error(`Failed to set groups: ${err}`);\n  }\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。\n此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.setuid(id)`",
+          "type": "method",
+          "name": "setuid",
+          "meta": {
+            "added": [
+              "v0.1.28"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`id` {integer | string}",
+                  "name": "id",
+                  "type": "integer | string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.setuid(id)</code> 方法设置进程的用户标识。（参见 <a href=\"http://man7.org/linux/man-pages/man2/setuid.2.html\"><code>setuid(2)</code></a>。）<code>id</code> 可以作为数字 ID 或用户名字符串传递。如果指定了用户名，则该方法在解析关联的数字 ID 时会阻塞。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nif (process.getuid &#x26;&#x26; process.setuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n  try {\n    process.setuid(501);\n    console.log(`New uid: ${process.getuid()}`);\n  } catch (err) {\n    console.error(`Failed to set uid: ${err}`);\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nif (process.getuid &#x26;&#x26; process.setuid) {\n  console.log(`Current uid: ${process.getuid()}`);\n  try {\n    process.setuid(501);\n    console.log(`New uid: ${process.getuid()}`);\n  } catch (err) {\n    console.error(`Failed to set uid: ${err}`);\n  }\n}\n</code></pre>\n<p>此函数仅在 POSIX 平台上可用（即不可在 Windows 或 Android 上使用）。\n此功能在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中不可用。</p>"
+        },
+        {
+          "textRaw": "`process.setSourceMapsEnabled(val)`",
+          "type": "method",
+          "name": "setSourceMapsEnabled",
+          "meta": {
+            "added": [
+              "v16.6.0",
+              "v14.18.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental: Use [`module.setSourceMapsSupport()`][] instead.",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`val` {boolean}",
+                  "name": "val",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>此函数启用或禁用栈跟踪的[源映射][]支持。</p>\n<p>它提供与使用命令行选项 <code>--enable-source-maps</code> 启动 Node.js 进程相同的功能。</p>\n<p>只有在启用源映射后加载的 JavaScript 文件中的源映射才会被解析和加载。</p>\n<p>这意味着使用选项 <code>{ nodeModules: true, generatedCode: true }</code> 调用 <code>module.setSourceMapsSupport()</code>。</p>"
+        },
+        {
+          "textRaw": "`process.setUncaughtExceptionCaptureCallback(fn)`",
+          "type": "method",
+          "name": "setUncaughtExceptionCaptureCallback",
+          "meta": {
+            "added": [
+              "v9.3.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`fn` {Function|null}",
+                  "name": "fn",
+                  "type": "Function|null"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.setUncaughtExceptionCaptureCallback()</code> 函数设置一个函数，当发生未捕获的异常时将调用该函数，该函数将接收异常值本身作为其第一个参数。</p>\n<p>如果设置了这样的函数，则不会发出 <a href=\"#event-uncaughtexception\"><code>'uncaughtException'</code></a> 事件。如果从命令行传递了 <code>--abort-on-uncaught-exception</code> 或通过 <a href=\"v8.html#v8setflagsfromstringflags\"><code>v8.setFlagsFromString()</code></a> 设置，则进程不会中止。为异常配置的操作（例如报告生成）也会受到影响</p>\n<p>要取消设置捕获函数，可以使用 <code>process.setUncaughtExceptionCaptureCallback(null)</code>。使用非 <code>null</code> 参数调用此方法而另一个捕获函数已设置时，将抛出错误。</p>\n<p>使用此函数与使用已弃用的 <a href=\"domain.html\"><code>domain</code></a> 内置模块互斥。</p>"
+        },
+        {
+          "textRaw": "`process.threadCpuUsage([previousValue])`",
+          "type": "method",
+          "name": "threadCpuUsage",
+          "meta": {
+            "added": [
+              "v23.9.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`previousValue` {Object} 之前调用 `process.threadCpuUsage()` 的返回值",
+                  "name": "previousValue",
+                  "type": "Object",
+                  "desc": "之前调用 `process.threadCpuUsage()` 的返回值"
+                },
+                {
+                  "textRaw": "返回: {Object}",
+                  "name": "返回",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`user` {integer}",
+                      "name": "user",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "`system` {integer}",
+                      "name": "system",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.threadCpuUsage()</code> 方法返回当前工作线程的用户和系统 CPU 时间使用情况，在一个具有 <code>user</code> 和 <code>system</code> 属性的对象中，这些属性的值是以微秒（百万分之一秒）为单位的时间值。</p>\n<p>可以将之前调用 <code>process.threadCpuUsage()</code> 的结果作为参数传递给该函数，以获取差值读数。</p>"
+        },
+        {
+          "textRaw": "`process.umask()`",
+          "type": "method",
+          "name": "umask",
+          "meta": {
+            "added": [
+              "v0.1.19"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v14.0.0",
+                  "v12.19.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/32499",
+                "description": "Calling `process.umask()` with no arguments is deprecated."
+              }
+            ]
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. Calling `process.umask()` with no argument causes the process-wide umask to be written twice. This introduces a race condition between threads, and is a potential security vulnerability. There is no safe, cross-platform alternative API.",
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>process.umask()</code> 返回 Node.js 进程的文件模式创建掩码。子进程从父进程继承掩码。</p>"
+        },
+        {
+          "textRaw": "`process.umask(mask)`",
+          "type": "method",
+          "name": "umask",
+          "meta": {
+            "added": [
+              "v0.1.19"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`mask` {string|integer}",
+                  "name": "mask",
+                  "type": "string|integer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.umask(mask)</code> 设置 Node.js 进程的文件模式创建掩码。子进程从父进程继承掩码。返回之前的掩码。</p>\n<pre><code class=\"language-mjs\">import { umask } from 'node:process';\n\nconst newmask = 0o022;\nconst oldmask = umask(newmask);\nconsole.log(\n  `Changed umask from ${oldmask.toString(8)} to ${newmask.toString(8)}`,\n);\n</code></pre>\n<pre><code class=\"language-cjs\">const { umask } = require('node:process');\n\nconst newmask = 0o022;\nconst oldmask = umask(newmask);\nconsole.log(\n  `Changed umask from ${oldmask.toString(8)} to ${newmask.toString(8)}`,\n);\n</code></pre>\n<p>在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中，<code>process.umask(mask)</code> 将抛出异常。</p>"
+        },
+        {
+          "textRaw": "`process.unref(maybeRefable)`",
+          "type": "method",
+          "name": "unref",
+          "meta": {
+            "added": [
+              "v23.6.0",
+              "v22.14.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`maybeUnfefable` {any} 一个可能是 \"未引用\" 的对象。",
+                  "name": "maybeUnfefable",
+                  "type": "any",
+                  "desc": "一个可能是 \"未引用\" 的对象。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果一个对象实现了 Node.js \"可引用协议\"，那么它就是 \"可取消引用\" 的。具体来说，这意味着该对象实现了 <code>Symbol.for('nodejs.ref')</code> 和 <code>Symbol.for('nodejs.unref')</code> 方法。\"已引用\" 的对象将保持 Node.js 事件循环活动，而 \"未引用\" 的对象则不会。历史上，这是通过在对象上直接使用 <code>ref()</code> 和 <code>unref()</code> 方法来实现的。然而，这种模式正在被弃用，转而支持 \"可引用协议\"，以便更好地支持那些 API 无法修改以添加 <code>ref()</code> 和 <code>unref()</code> 方法但仍需要支持该行为的 Web 平台 API 类型。</p>"
+        },
+        {
+          "textRaw": "`process.uptime()`",
+          "type": "method",
+          "name": "uptime",
+          "meta": {
+            "added": [
+              "v0.5.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回: {number}",
+                  "name": "返回",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>process.uptime()</code> 方法返回当前 Node.js 进程已运行的秒数。</p>\n<p>返回值包括秒的小数部分。使用 <code>Math.floor()</code> 获取整秒数。</p>"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`allowedNodeEnvironmentFlags` 类型: {Set}",
+          "type": "Set",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v10.10.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.allowedNodeEnvironmentFlags</code> 属性是一个特殊的、只读的 <code>Set</code>，包含 <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a> 环境变量中允许的标志。</p>\n<p><code>process.allowedNodeEnvironmentFlags</code> 扩展了 <code>Set</code>，但覆盖了 <code>Set.prototype.has</code> 以识别几种不同的可能标志表示形式。在以下情况下，<code>process.allowedNodeEnvironmentFlags.has()</code> 将返回 <code>true</code>：</p>\n<ul>\n<li>标志可以省略前导单 (<code>-</code>) 或双 (<code>--</code>) 破折号；例如，<code>inspect-brk</code> 代表 <code>--inspect-brk</code>，或 <code>r</code> 代表 <code>-r</code>。</li>\n<li>传递给 V8 的标志（如 <code>--v8-options</code> 中所列）可以用一个或多个_非前导_下划线替换破折号，反之亦然；例如，<code>--perf_basic_prof</code>、<code>--perf-basic-prof</code>、<code>--perf_basic-prof</code> 等。</li>\n<li>标志可以包含一个或多个等号 (<code>=</code>) 字符；第一个等号之后的所有字符（包括第一个等号）将被忽略；例如，<code>--stack-trace-limit=100</code>。</li>\n<li>标志<em>必须</em>在 <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a> 中允许。</li>\n</ul>\n<p>当遍历 <code>process.allowedNodeEnvironmentFlags</code> 时，标志只会出现<em>一次</em>；每个标志将以一个或多个破折号开头。传递给 V8 的标志将包含下划线而不是非前导破折号：</p>\n<pre><code class=\"language-mjs\">import { allowedNodeEnvironmentFlags } from 'node:process';\n\nallowedNodeEnvironmentFlags.forEach((flag) => {\n  // -r\n  // --inspect-brk\n  // --abort_on_uncaught_exception\n  // ...\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { allowedNodeEnvironmentFlags } = require('node:process');\n\nallowedNodeEnvironmentFlags.forEach((flag) => {\n  // -r\n  // --inspect-brk\n  // --abort_on_uncaught_exception\n  // ...\n});\n</code></pre>\n<p><code>process.allowedNodeEnvironmentFlags</code> 的 <code>add()</code>、<code>clear()</code> 和 <code>delete()</code> 方法不执行任何操作，并且会静默失败。</p>\n<p>如果 Node.js 编译时<em>没有</em> <a href=\"cli.html#node_optionsoptions\"><code>NODE_OPTIONS</code></a> 支持（在 <a href=\"#processconfig\"><code>process.config</code></a> 中显示），<code>process.allowedNodeEnvironmentFlags</code> 将包含<em>本来</em>允许的内容。</p>"
+        },
+        {
+          "textRaw": "`arch` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>运行 Node.js 二进制文件的操作系统 CPU 架构。可能的值有：<code>'arm'</code>、<code>'arm64'</code>、<code>'ia32'</code>、<code>'loong64'</code>、<code>'mips'</code>、<code>'mipsel'</code>、<code>'ppc64'</code>、<code>'riscv64'</code>、<code>'s390'</code>、<code>'s390x'</code> 和 <code>'x64'</code>。</p>\n<pre><code class=\"language-mjs\">import { arch } from 'node:process';\n\nconsole.log(`This processor architecture is ${arch}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { arch } = require('node:process');\n\nconsole.log(`This processor architecture is ${arch}`);\n</code></pre>"
+        },
+        {
+          "textRaw": "`argv` 类型: {string\\[]}",
+          "type": "string\\[]",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.27"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.argv</code> 属性返回一个数组，其中包含启动 Node.js 进程时传递的命令行参数。第一个元素将是 <a href=\"#processexecpath\"><code>process.execPath</code></a>。如果需要访问 <code>argv[0]</code> 的原始值，请参阅 <code>process.argv0</code>。第二个元素将是正在执行的 JavaScript 文件的路径。其余元素将是任何其他命令行参数。</p>\n<p>例如，假设以下 <code>process-args.js</code> 脚本：</p>\n<pre><code class=\"language-mjs\">import { argv } from 'node:process';\n\n// 打印 process.argv\nargv.forEach((val, index) => {\n  console.log(`${index}: ${val}`);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { argv } = require('node:process');\n\n// 打印 process.argv\nargv.forEach((val, index) => {\n  console.log(`${index}: ${val}`);\n});\n</code></pre>\n<p>启动 Node.js 进程如下：</p>\n<pre><code class=\"language-bash\">node process-args.js one two=three four\n</code></pre>\n<p>将生成输出：</p>\n<pre><code class=\"language-text\">0: /usr/local/bin/node\n1: /Users/mjr/work/node/process-args.js\n2: one\n3: two=three\n4: four\n</code></pre>"
+        },
+        {
+          "textRaw": "`argv0` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v6.4.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.argv0</code> 属性存储了 Node.js 启动时传递的 <code>argv[0]</code> 原始值的只读副本。</p>\n<pre><code class=\"language-console\">$ bash -c 'exec -a customArgv0 ./node'\n> process.argv[0]\n'/Volumes/code/external/node/out/Release/node'\n> process.argv0\n'customArgv0'\n</code></pre>"
+        },
+        {
+          "textRaw": "`channel` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v7.1.0"
+            ],
+            "changes": [
+              {
+                "version": "v14.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/30165",
+                "description": "The object no longer accidentally exposes native C++ bindings."
+              }
+            ]
+          },
+          "desc": "<p>如果 Node.js 进程是使用 IPC 通道生成的（请参阅[子进程][]文档），则 <code>process.channel</code> 属性是对 IPC 通道的引用。如果不存在 IPC 通道，则此属性为 <code>undefined</code>。</p>",
+          "methods": [
+            {
+              "textRaw": "`process.channel.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v7.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>如果之前调用过 <code>.unref()</code>，此方法会使 IPC 通道保持进程的事件循环运行。</p>\n<p>通常，这是通过 <code>process</code> 对象上的 <code>'disconnect'</code> 和 <code>'message'</code> 监听器的数量来管理的。但是，此方法可用于显式请求特定行为。</p>"
+            },
+            {
+              "textRaw": "`process.channel.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v7.1.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>此方法使 IPC 通道不保持进程的事件循环运行，并允许其在通道打开时完成。</p>\n<p>通常，这是通过 <code>process</code> 对象上的 <code>'disconnect'</code> 和 <code>'message'</code> 监听器的数量来管理的。但是，此方法可用于显式请求特定行为。</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`config` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.7.7"
+            ],
+            "changes": [
+              {
+                "version": "v19.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/43627",
+                "description": "The `process.config` object is now frozen."
+              },
+              {
+                "version": "v16.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/36902",
+                "description": "Modifying process.config has been deprecated."
+              }
+            ]
+          },
+          "desc": "<p><code>process.config</code> 属性返回一个冻结的 <code>Object</code>，其中包含用于编译当前 Node.js 可执行文件的配置选项的 JavaScript 表示形式。这与运行 <code>./configure</code> 脚本时生成的 <code>config.gypi</code> 文件相同。</p>\n<p>可能的输出示例看起来像：</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  target_defaults:\n   { cflags: [],\n     default_configuration: 'Release',\n     defines: [],\n     include_dirs: [],\n     libraries: [] },\n  variables:\n   {\n     host_arch: 'x64',\n     napi_build_version: 5,\n     node_install_npm: 'true',\n     node_prefix: '',\n     node_shared_cares: 'false',\n     node_shared_http_parser: 'false',\n     node_shared_libuv: 'false',\n     node_shared_zlib: 'false',\n     node_use_openssl: 'true',\n     node_shared_openssl: 'false',\n     target_arch: 'x64',\n     v8_use_snapshot: 1\n   }\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`connected` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.7.2"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果 Node.js 进程是使用 IPC 通道生成的（请参阅[子进程][]和[集群][]文档），只要 IPC 通道连接，<code>process.connected</code> 属性将返回 <code>true</code>，并在调用 <code>process.disconnect()</code> 后返回 <code>false</code>。</p>\n<p>一旦 <code>process.connected</code> 为 <code>false</code>，就无法再使用 <code>process.send()</code> 通过 IPC 通道发送消息。</p>"
+        },
+        {
+          "textRaw": "`debugPort` 类型: {number}",
+          "type": "number",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.7.2"
+            ],
+            "changes": []
+          },
+          "desc": "<p>启用时 Node.js 调试器使用的端口。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\n\nprocess.debugPort = 5858;\n</code></pre>\n<pre><code class=\"language-cjs\">const process = require('node:process');\n\nprocess.debugPort = 5858;\n</code></pre>"
+        },
+        {
+          "textRaw": "`env` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.27"
+            ],
+            "changes": [
+              {
+                "version": "v11.14.0",
+                "pr-url": "https://github.com/nodejs/node/pull/26544",
+                "description": "Worker threads will now use a copy of the parent thread's `process.env` by default, configurable through the `env` option of the `Worker` constructor."
+              },
+              {
+                "version": "v10.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/18990",
+                "description": "Implicit conversion of variable value to string is deprecated."
+              }
+            ]
+          },
+          "desc": "<p><code>process.env</code> 属性返回包含用户环境的对象。参见 <a href=\"http://man7.org/linux/man-pages/man7/environ.7.html\"><code>environ(7)</code></a>。</p>\n<p>此对象的示例看起来像：</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  TERM: 'xterm-256color',\n  SHELL: '/usr/local/bin/bash',\n  USER: 'maciej',\n  PATH: '~/.bin/:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin',\n  PWD: '/Users/maciej',\n  EDITOR: 'vim',\n  SHLVL: '1',\n  HOME: '/Users/maciej',\n  LOGNAME: 'maciej',\n  _: '/usr/local/bin/node'\n}\n</code></pre>\n<p>可以修改此对象，但此类修改不会反映到 Node.js 进程之外，或者（除非明确请求）到其他 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程。\n换句话说，以下示例将不起作用：</p>\n<pre><code class=\"language-bash\">node -e 'process.env.foo = \"bar\"' &#x26;&#x26; echo $foo\n</code></pre>\n<p>而以下示例会：</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.foo = 'bar';\nconsole.log(env.foo);\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.foo = 'bar';\nconsole.log(env.foo);\n</code></pre>\n<p>在 <code>process.env</code> 上分配属性会隐式地将值转换为字符串。<strong>此行为已弃用。</strong> 未来版本的 Node.js 可能在值不是字符串、数字或布尔值时抛出错误。</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.test = null;\nconsole.log(env.test);\n// => 'null'\nenv.test = undefined;\nconsole.log(env.test);\n// => 'undefined'\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.test = null;\nconsole.log(env.test);\n// => 'null'\nenv.test = undefined;\nconsole.log(env.test);\n// => 'undefined'\n</code></pre>\n<p>使用 <code>delete</code> 从 <code>process.env</code> 中删除属性。</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.TEST = 1;\ndelete env.TEST;\nconsole.log(env.TEST);\n// => undefined\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.TEST = 1;\ndelete env.TEST;\nconsole.log(env.TEST);\n// => undefined\n</code></pre>\n<p>在 Windows 操作系统上，环境变量不区分大小写。</p>\n<pre><code class=\"language-mjs\">import { env } from 'node:process';\n\nenv.TEST = 1;\nconsole.log(env.test);\n// => 1\n</code></pre>\n<pre><code class=\"language-cjs\">const { env } = require('node:process');\n\nenv.TEST = 1;\nconsole.log(env.test);\n// => 1\n</code></pre>\n<p>除非在创建 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 实例时明确指定，否则每个 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程都有自己的 <code>process.env</code> 副本，基于其父线程的 <code>process.env</code>，或者作为 <code>env</code> 选项传递给 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 构造函数的任何内容。对 <code>process.env</code> 的更改在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程之间不可见，只有主线程可以进行对操作系统或原生插件可见的更改。在 Windows 上，<a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 实例上的 <code>process.env</code> 副本以区分大小写的方式运行，与主线程不同。</p>"
+        },
+        {
+          "textRaw": "`execArgv` 类型: {string\\[]}",
+          "type": "string\\[]",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.7.7"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.execArgv</code> 属性返回在启动 Node.js 进程时传递的一组 Node.js 特定的命令行选项。这些选项不会出现在 <a href=\"#processargv\"><code>process.argv</code></a> 属性返回的数组中，并且不包括 Node.js 可执行文件、脚本名称或脚本名称之后的任何选项。这些选项对于生成具有与父进程相同执行环境的子进程非常有用。</p>\n<pre><code class=\"language-bash\">node --icu-data-dir=./foo --require ./bar.js script.js --version\n</code></pre>\n<p>结果在 <code>process.execArgv</code> 中：</p>\n<pre><code class=\"language-json\">[\"--icu-data-dir=./foo\", \"--require\", \"./bar.js\"]\n</code></pre>\n<p>而 <code>process.argv</code> 中：</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">['/usr/local/bin/node', 'script.js', '--version']\n</code></pre>\n<p>有关工作线程与此属性的详细行为，请参阅 [<code>Worker</code> 构造函数][]。</p>"
+        },
+        {
+          "textRaw": "`execPath` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.100"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.execPath</code> 属性返回启动 Node.js 进程的可执行文件的绝对路径名。符号链接（如果有）会被解析。</p>\n<!-- eslint-disable @stylistic/js/semi -->\n<pre><code class=\"language-js\">'/usr/local/bin/node'\n</code></pre>"
+        },
+        {
+          "textRaw": "`exitCode` 类型: {integer|string|null|undefined} 退出码。对于字符串类型，只允许整数字符串（例如，'1'）。**默认值:** `undefined`。",
+          "type": "integer|string|null|undefined",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.11.8"
+            ],
+            "changes": [
+              {
+                "version": "v20.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/43716",
+                "description": "Only accepts a code of type number, or of type string if it represents an integer."
+              }
+            ]
+          },
+          "desc": "<p>当进程要么优雅退出，要么通过 <a href=\"#processexitcode\"><code>process.exit()</code></a> 退出而未指定代码时，将作为进程退出码的数字。</p>\n<p>可以通过分配值给 <code>process.exitCode</code> 或通过传递参数给 <a href=\"#processexitcode\"><code>process.exit()</code></a> 来更新 <code>process.exitCode</code> 的值：</p>\n<pre><code class=\"language-console\">$ node -e 'process.exitCode = 9'; echo $?\n9\n$ node -e 'process.exit(42)'; echo $?\n42\n$ node -e 'process.exitCode = 9; process.exit(42)'; echo $?\n42\n</code></pre>\n<p>当发生不可恢复的错误时，Node.js 也可以隐式地设置该值（例如，遇到未解决的顶级 await）。然而显式操作退出码总是优先于隐式操作：</p>\n<pre><code class=\"language-console\">$ node --input-type=module -e 'await new Promise(() => {})'; echo $?\n13\n$ node --input-type=module -e 'process.exitCode = 9; await new Promise(() => {})'; echo $?\n9\n</code></pre>",
+          "shortDesc": "退出码。对于字符串类型，只允许整数字符串（例如，'1'）。**默认值:** `undefined`。"
+        },
+        {
+          "textRaw": "`cached_builtins` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v12.0.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果当前 Node.js 构建缓存了内置模块，则为 <code>true</code> 的布尔值。</p>"
+        },
+        {
+          "textRaw": "`debug` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.5.5"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果当前 Node.js 构建是调试构建，则为 <code>true</code> 的布尔值。</p>"
+        },
+        {
+          "textRaw": "`inspector` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v11.10.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果当前 Node.js 构建包含检查器，则为 <code>true</code> 的布尔值。</p>"
+        },
+        {
+          "textRaw": "`ipv6` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.5.3"
+            ],
+            "deprecated": [
+              "v23.4.0",
+              "v22.13.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. This property is always true, and any checks based on it are redundant.",
+          "desc": "<p>如果当前 Node.js 构建包含对 IPv6 的支持，则为 <code>true</code> 的布尔值。</p>\n<p>由于所有 Node.js 构建都具有 IPv6 支持，此值始终为 <code>true</code>。</p>"
+        },
+        {
+          "textRaw": "`require_module` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v23.0.0",
+              "v22.10.0",
+              "v20.19.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果当前 Node.js 构建支持[使用 <code>require()</code> 加载 ECMAScript 模块][]，则为 <code>true</code> 的布尔值。</p>"
+        },
+        {
+          "textRaw": "`tls` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.5.3"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果当前 Node.js 构建包含对 TLS 的支持，则为 <code>true</code> 的布尔值。</p>"
+        },
+        {
+          "textRaw": "`tls_alpn` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v4.8.0"
+            ],
+            "deprecated": [
+              "v23.4.0",
+              "v22.13.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. Use `process.features.tls` instead.",
+          "desc": "<p>如果当前 Node.js 构建包含对 TLS 中 ALPN 的支持，则为 <code>true</code> 的布尔值。</p>\n<p>在 Node.js 11.0.0 及更高版本中，OpenSSL 依赖项具有无条件的 ALPN 支持。因此，此值与 <code>process.features.tls</code> 的值相同。</p>"
+        },
+        {
+          "textRaw": "`tls_ocsp` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.11.13"
+            ],
+            "deprecated": [
+              "v23.4.0",
+              "v22.13.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. Use `process.features.tls` instead.",
+          "desc": "<p>如果当前 Node.js 构建包含对 TLS 中 OCSP 的支持，则为 <code>true</code> 的布尔值。</p>\n<p>在 Node.js 11.0.0 及更高版本中，OpenSSL 依赖项具有无条件的 OCSP 支持。因此，此值与 <code>process.features.tls</code> 的值相同。</p>"
+        },
+        {
+          "textRaw": "`tls_sni` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.5.3"
+            ],
+            "deprecated": [
+              "v23.4.0",
+              "v22.13.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. Use `process.features.tls` instead.",
+          "desc": "<p>如果当前 Node.js 构建包含对 TLS 中 SNI 的支持，则为 <code>true</code> 的布尔值。</p>\n<p>在 Node.js 11.0.0 及更高版本中，OpenSSL 依赖项具有无条件的 SNI 支持。因此，此值与 <code>process.features.tls</code> 的值相同。</p>"
+        },
+        {
+          "textRaw": "`typescript` 类型: {boolean|string}",
+          "type": "boolean|string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v23.0.0",
+              "v22.10.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".2 - Release candidate",
+          "desc": "<p>默认情况下为 <code>\"strip\"</code> 的值，如果 Node.js 使用 <code>--experimental-transform-types</code> 运行，则为 <code>\"transform\"</code>，如果 Node.js 使用 <code>--no-experimental-strip-types</code> 运行，则为 <code>false</code>。</p>"
+        },
+        {
+          "textRaw": "`uv` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.5.3"
+            ],
+            "deprecated": [
+              "v23.4.0",
+              "v22.13.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. This property is always true, and any checks based on it are redundant.",
+          "desc": "<p>如果当前 Node.js 构建包含对 libuv 的支持，则为 <code>true</code> 的布尔值。</p>\n<p>由于不可能在没有 libuv 的情况下构建 Node.js，此值始终为 <code>true</code>。</p>"
+        },
+        {
+          "textRaw": "`mainModule` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.17"
+            ],
+            "deprecated": [
+              "v14.0.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated: Use [`require.main`][] instead.",
+          "desc": "<p><code>process.mainModule</code> 属性提供了一种检索 <a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a> 的替代方式。区别在于，如果主模块在运行时发生更改，<a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a> 可能仍然引用在更改发生之前所需模块中的原始主模块。通常，可以安全地假设两者引用的是同一个模块。</p>\n<p>与 <a href=\"modules.html#accessing-the-main-module\"><code>require.main</code></a> 一样，如果没有入口脚本，<code>process.mainModule</code> 将是 <code>undefined</code>。</p>"
+        },
+        {
+          "textRaw": "`noDeprecation` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.noDeprecation</code> 属性指示是否在当前 Node.js 进程上设置了 <code>--no-deprecation</code> 标志。有关此标志行为的更多信息，请参阅 <a href=\"#event-warning\"><code>'warning'</code></a> 事件和 <a href=\"#processemitwarningwarning-type-code-ctor\"><code>emitWarning()</code> 方法</a> 的文档。</p>"
+        },
+        {
+          "textRaw": "`permission` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v20.0.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>此 API 可通过 <a href=\"cli.html#--permission\"><code>--permission</code></a> 标志使用。</p>\n<p><code>process.permission</code> 是一个对象，其方法用于管理当前进程的权限。其他文档可在[权限模型][]中找到。</p>",
+          "methods": [
+            {
+              "textRaw": "`process.permission.has(scope[, reference])`",
+              "type": "method",
+              "name": "has",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`scope` {string}",
+                      "name": "scope",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`reference` {string}",
+                      "name": "reference",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>验证进程能够访问给定的作用域和引用。如果未提供引用，则假定为全局作用域，例如，<code>process.permission.has('fs.read')</code> 将检查进程是否具有所有文件系统读取权限。</p>\n<p>引用的含义基于提供的作用域。例如，当作用域为文件系统时，引用表示文件和文件夹。</p>\n<p>可用的作用域有：</p>\n<ul>\n<li><code>fs</code> - 所有文件系统</li>\n<li><code>fs.read</code> - 文件系统读取操作</li>\n<li><code>fs.write</code> - 文件系统写入操作</li>\n<li><code>child</code> - 子进程生成操作</li>\n<li><code>worker</code> - 工作线程生成操作</li>\n</ul>\n<pre><code class=\"language-js\">// 检查进程是否有权限读取 README 文件\nprocess.permission.has('fs.read', './README.md');\n// 检查进程是否有读取权限操作\nprocess.permission.has('fs.read');\n</code></pre>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`pid` 类型: {integer}",
+          "type": "integer",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.15"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.pid</code> 属性返回进程的 PID。</p>\n<pre><code class=\"language-mjs\">import { pid } from 'node:process';\n\nconsole.log(`This process is pid ${pid}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { pid } = require('node:process');\n\nconsole.log(`This process is pid ${pid}`);\n</code></pre>"
+        },
+        {
+          "textRaw": "`platform` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.16"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.platform</code> 属性返回一个字符串，标识为其编译 Node.js 二进制文件的操作系统平台。</p>\n<p>当前可能的值有：</p>\n<ul>\n<li><code>'aix'</code></li>\n<li><code>'darwin'</code></li>\n<li><code>'freebsd'</code></li>\n<li><code>'linux'</code></li>\n<li><code>'openbsd'</code></li>\n<li><code>'sunos'</code></li>\n<li><code>'win32'</code></li>\n</ul>\n<pre><code class=\"language-mjs\">import { platform } from 'node:process';\n\nconsole.log(`This platform is ${platform}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { platform } = require('node:process');\n\nconsole.log(`This platform is ${platform}`);\n</code></pre>\n<p>如果 Node.js 是在 Android 操作系统上构建的，也可能返回 <code>'android'</code> 值。然而，Node.js 中的 Android 支持<a href=\"https://github.com/nodejs/node/blob/HEAD/BUILDING.md#android\">是实验性的</a>。</p>"
+        },
+        {
+          "textRaw": "`ppid` 类型: {integer}",
+          "type": "integer",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v9.2.0",
+              "v8.10.0",
+              "v6.13.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.ppid</code> 属性返回当前进程的父进程的 PID。</p>\n<pre><code class=\"language-mjs\">import { ppid } from 'node:process';\n\nconsole.log(`The parent process is pid ${ppid}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { ppid } = require('node:process');\n\nconsole.log(`The parent process is pid ${ppid}`);\n</code></pre>"
+        },
+        {
+          "textRaw": "`release` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v3.0.0"
+            ],
+            "changes": [
+              {
+                "version": "v4.2.0",
+                "pr-url": "https://github.com/nodejs/node/pull/3212",
+                "description": "The `lts` property is now supported."
+              }
+            ]
+          },
+          "desc": "<p><code>process.release</code> 属性返回一个 <code>Object</code>，包含与当前发布相关的元数据，包括源代码 tarball 和仅头文件 tarball 的 URL。</p>\n<p><code>process.release</code> 包含以下属性：</p>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 一个始终为 <code>'node'</code> 的值。</li>\n<li><code>sourceUrl</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 指向包含当前发布源代码的 <em><code>.tar.gz</code></em> 文件的绝对 URL。</li>\n<li><code>headersUrl</code><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 指向仅包含当前发布源代码头文件的 <em><code>.tar.gz</code></em> 文件的绝对 URL。此文件比完整的源代码文件小得多，可用于编译 Node.js 原生插件。</li>\n<li><code>libUrl</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> 指向与当前发布架构和版本匹配的 <em><code>node.lib</code></em> 文件的绝对 URL。此文件用于编译 Node.js 原生插件。<em>此属性仅存在于 Node.js 的 Windows 构建上，在所有其他平台上将缺失。</em></li>\n<li><code>lts</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> 一个字符串标签，标识此发布的 <a href=\"https://github.com/nodejs/Release\">LTS</a> 标签。此属性仅存在于 LTS 发布中，对于所有其他发布类型（包括 <em>Current</em> 发布）为 <code>undefined</code>。有效值包括 LTS 发布代码名称（包括不再支持的代码名称）。\n<ul>\n<li><code>'Fermium'</code> 用于从 14.15.0 开始的 14.x LTS 线。</li>\n<li><code>'Gallium'</code> 用于从 16.13.0 开始的 16.x LTS 线。</li>\n<li><code>'Hydrogen'</code> 用于从 18.12.0 开始的 18.x LTS 线。\n对于其他 LTS 发布代码名称，请参阅 <a href=\"https://github.com/nodejs/node/blob/HEAD/doc/changelogs/CHANGELOG_ARCHIVE.md\">Node.js 更新日志存档</a></li>\n</ul>\n</li>\n</ul>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  name: 'node',\n  lts: 'Hydrogen',\n  sourceUrl: 'https://nodejs.org/download/release/v18.12.0/node-v18.12.0.tar.gz',\n  headersUrl: 'https://nodejs.org/download/release/v18.12.0/node-v18.12.0-headers.tar.gz',\n  libUrl: 'https://nodejs.org/download/release/v18.12.0/win-x64/node.lib'\n}\n</code></pre>\n<p>在来自非发布版本源代码树的自定义构建中，可能只有 <code>name</code> 属性存在。不应依赖其他属性的存在。</p>"
+        },
+        {
+          "textRaw": "`report` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v11.8.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v13.12.0",
+                  "v12.17.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/32242",
+                "description": "This API is no longer experimental."
+              }
+            ]
+          },
+          "desc": "<p><code>process.report</code> 是一个对象，其方法用于为当前进程生成诊断报告。其他文档可在[报告文档][]中找到。</p>",
+          "properties": [
+            {
+              "textRaw": "`compact` 类型: {boolean}",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v13.12.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>以紧凑格式编写报告，单行 JSON，比设计用于人类阅读的默认多行格式更易于日志处理系统使用。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Reports are compact? ${report.compact}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Reports are compact? ${report.compact}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`directory` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>报告写入的目录。默认值为空字符串，表示报告写入 Node.js 进程的当前工作目录。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report directory is ${report.directory}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report directory is ${report.directory}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`filename` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>报告写入的文件名。如果设置为空字符串，输出文件名将由时间戳、PID 和序列号组成。默认值为空字符串。</p>\n<p>如果 <code>process.report.filename</code> 的值设置为 <code>'stdout'</code> 或 <code>'stderr'</code>，则报告将分别写入进程的 stdout 或 stderr。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report filename is ${report.filename}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report filename is ${report.filename}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`reportOnFatalError` 类型: {boolean}",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v15.0.0",
+                      "v14.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/35654",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>如果为 <code>true</code>，则在发生致命错误（如内存不足错误或失败的 C++ 断言）时生成诊断报告。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report on fatal error: ${report.reportOnFatalError}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report on fatal error: ${report.reportOnFatalError}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`reportOnSignal` 类型: {boolean}",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>如果为 <code>true</code>，则当进程收到 <code>process.report.signal</code> 指定的信号时生成诊断报告。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report on signal: ${report.reportOnSignal}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report on signal: ${report.reportOnSignal}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`reportOnUncaughtException` 类型: {boolean}",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>如果为 <code>true</code>，则在发生未捕获异常时生成诊断报告。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report on exception: ${report.reportOnUncaughtException}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report on exception: ${report.reportOnUncaughtException}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`excludeEnv` 类型: {boolean}",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v23.3.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果为 <code>true</code>，则生成不包含环境变量的诊断报告。</p>"
+            },
+            {
+              "textRaw": "`signal` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>用于触发创建诊断报告的信号。默认为 <code>'SIGUSR2'</code>。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nconsole.log(`Report signal: ${report.signal}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nconsole.log(`Report signal: ${report.signal}`);\n</code></pre>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`process.report.getReport([err])`",
+              "type": "method",
+              "name": "getReport",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`err` {Error} 用于报告 JavaScript 栈的自定义错误。",
+                      "name": "err",
+                      "type": "Error",
+                      "desc": "用于报告 JavaScript 栈的自定义错误。"
+                    },
+                    {
+                      "textRaw": "返回: {Object}",
+                      "name": "返回",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回运行进程诊断报告的 JavaScript 对象表示形式。报告的 JavaScript 栈跟踪取自 <code>err</code>（如果存在）。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\nimport util from 'node:util';\n\nconst data = report.getReport();\nconsole.log(data.header.nodejsVersion);\n\n// 类似于 process.report.writeReport()\nimport fs from 'node:fs';\nfs.writeFileSync('my-report.log', util.inspect(data), 'utf8');\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\nconst util = require('node:util');\n\nconst data = report.getReport();\nconsole.log(data.header.nodejsVersion);\n\n// 类似于 process.report.writeReport()\nconst fs = require('node:fs');\nfs.writeFileSync('my-report.log', util.inspect(data), 'utf8');\n</code></pre>\n<p>其他文档可在[报告文档][]中找到。</p>"
+            },
+            {
+              "textRaw": "`process.report.writeReport([filename][, err])`",
+              "type": "method",
+              "name": "writeReport",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`filename` {string} 报告写入的文件名。这应该是一个相对路径，将附加到 `process.report.directory` 指定的目录，或者如果未指定，则附加到 Node.js 进程的当前工作目录。",
+                      "name": "filename",
+                      "type": "string",
+                      "desc": "报告写入的文件名。这应该是一个相对路径，将附加到 `process.report.directory` 指定的目录，或者如果未指定，则附加到 Node.js 进程的当前工作目录。"
+                    },
+                    {
+                      "textRaw": "`err` {Error} 用于报告 JavaScript 栈的自定义错误。",
+                      "name": "err",
+                      "type": "Error",
+                      "desc": "用于报告 JavaScript 栈的自定义错误。"
+                    },
+                    {
+                      "textRaw": "返回: {string} 返回生成报告的文件名。",
+                      "name": "返回",
+                      "type": "string",
+                      "desc": "返回生成报告的文件名。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将诊断报告写入文件。如果未提供 <code>filename</code>，默认文件名包括日期、时间、PID 和序列号。报告的 JavaScript 栈跟踪取自 <code>err</code>（如果存在）。</p>\n<p>如果 <code>filename</code> 的值设置为 <code>'stdout'</code> 或 <code>'stderr'</code>，则报告将分别写入进程的 stdout 或 stderr。</p>\n<pre><code class=\"language-mjs\">import { report } from 'node:process';\n\nreport.writeReport();\n</code></pre>\n<pre><code class=\"language-cjs\">const { report } = require('node:process');\n\nreport.writeReport();\n</code></pre>\n<p>其他文档可在[报告文档][]中找到。</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`sourceMapsEnabled` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v20.7.0",
+              "v18.19.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental: Use [`module.getSourceMapsSupport()`][] instead.",
+          "desc": "<p><code>process.sourceMapsEnabled</code> 属性返回是否启用了栈跟踪的[源映射][]支持。</p>"
+        },
+        {
+          "textRaw": "`stderr` 类型: {Stream}",
+          "type": "Stream",
+          "name": "类型",
+          "desc": "<p><code>process.stderr</code> 属性返回连接到 <code>stderr</code>（fd <code>2</code>）的流。它是一个 <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a>（一个[双工][]流），除非 fd <code>2</code> 引用一个文件，在这种情况下它是一个[可写][]流。</p>\n<p><code>process.stderr</code> 在其他重要的方面与其他 Node.js 流不同。有关更多信息，请参阅[关于进程 I/O 的说明][]。</p>",
+          "properties": [
+            {
+              "textRaw": "`fd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "desc": "<p>此属性引用 <code>process.stderr</code> 的底层文件描述符的值。该值固定为 <code>2</code>。在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中，此字段不存在。</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`stdin` 类型: {Stream}",
+          "type": "Stream",
+          "name": "类型",
+          "desc": "<p><code>process.stdin</code> 属性返回连接到 <code>stdin</code>（fd <code>0</code>）的流。它是一个 <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a>（一个[双工][]流），除非 fd <code>0</code> 引用一个文件，在这种情况下它是一个[可读][]流。</p>\n<p>有关如何从 <code>stdin</code> 读取的详细信息，请参阅 <a href=\"stream.html#readablereadsize\"><code>readable.read()</code></a>。</p>\n<p>作为一个[双工][]流，<code>process.stdin</code> 也可以在 \"old\" 模式下使用，该模式兼容为 v0.10 之前的 Node.js 编写的脚本。有关更多信息，请参阅[流兼容性][]。</p>\n<p>在 \"old\" 流模式下，<code>stdin</code> 流默认是暂停的，因此必须调用 <code>process.stdin.resume()</code> 来从中读取。另请注意，调用 <code>process.stdin.resume()</code> 本身会将流切换到 \"old\" 模式。</p>",
+          "properties": [
+            {
+              "textRaw": "`fd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "desc": "<p>此属性引用 <code>process.stdin</code> 的底层文件描述符的值。该值固定为 <code>0</code>。在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中，此字段不存在。</p>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`stdout` 类型: {Stream}",
+          "type": "Stream",
+          "name": "类型",
+          "desc": "<p><code>process.stdout</code> 属性返回连接到 <code>stdout</code>（fd <code>1</code>）的流。它是一个 <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a>（一个[双工][]流），除非 fd <code>1</code> 引用一个文件，在这种情况下它是一个[可写][]流。</p>\n<p>例如，要将 <code>process.stdin</code> 复制到 <code>process.stdout</code>：</p>\n<pre><code class=\"language-mjs\">import { stdin, stdout } from 'node:process';\n\nstdin.pipe(stdout);\n</code></pre>\n<pre><code class=\"language-cjs\">const { stdin, stdout } = require('node:process');\n\nstdin.pipe(stdout);\n</code></pre>\n<p><code>process.stdout</code> 在其他重要的方面与其他 Node.js 流不同。有关更多信息，请参阅[关于进程 I/O 的说明][]。</p>",
+          "properties": [
+            {
+              "textRaw": "`fd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "desc": "<p>此属性引用 <code>process.stdout</code> 的底层文件描述符的值。该值固定为 <code>1</code>。在 <a href=\"worker_threads.html#class-worker\"><code>Worker</code></a> 线程中，此字段不存在。</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "关于进程 I/O 的说明",
+              "name": "关于进程_i/o_的说明",
+              "desc": "<p><code>process.stdout</code> 和 <code>process.stderr</code> 在重要方面与其他 Node.js 流不同：</p>\n<ol>\n<li>它们分别由 <a href=\"console.html#consolelogdata-args\"><code>console.log()</code></a> 和 <a href=\"console.html#consoleerrordata-args\"><code>console.error()</code></a> 内部使用。</li>\n<li>写入可能是同步的，取决于流连接到的对象以及系统是 Windows 还是 POSIX：\n<ul>\n<li>文件：在 Windows 和 POSIX 上都是_同步的_</li>\n<li>TTY（终端）：在 Windows 上是_异步的_，在 POSIX 上是_同步的_</li>\n<li>管道（和套接字）：在 Windows 上是_同步的_，在 POSIX 上是_异步的_</li>\n</ul>\n</li>\n</ol>\n<p>这些行为部分是由于历史原因，因为更改它们会产生向后不兼容性，但某些用户也期望这些行为。</p>\n<p>同步写入可以避免诸如使用 <code>console.log()</code> 或 <code>console.error()</code> 编写的输出意外交错的问题，或者如果在异步写入完成之前调用 <code>process.exit()</code> 则根本不写入的问题。有关更多信息，请参阅 <a href=\"#processexitcode\"><code>process.exit()</code></a>。</p>\n<p><em><strong>警告</strong></em>：同步写入会阻塞事件循环，直到写入完成。在输出到文件的情况下，这可能是瞬间的，但在高系统负载、接收端未被读取的管道或慢速终端或文件系统的情况下，事件循环可能经常被阻塞足够长的时间，从而产生严重的负面性能影响。在写入交互式终端会话时这可能不是问题，但在进行生产日志记录到进程输出流时要特别小心这一点。</p>\n<p>要检查流是否连接到 <a href=\"tty.html#tty\">TTY</a> 上下文，请检查 <code>isTTY</code> 属性。</p>\n<p>例如：</p>\n<pre><code class=\"language-console\">$ node -p \"Boolean(process.stdin.isTTY)\"\ntrue\n$ echo \"foo\" | node -p \"Boolean(process.stdin.isTTY)\"\nfalse\n$ node -p \"Boolean(process.stdout.isTTY)\"\ntrue\n$ node -p \"Boolean(process.stdout.isTTY)\" | cat\nfalse\n</code></pre>\n<p>有关更多信息，请参阅 <a href=\"tty.html#tty\">TTY</a> 文档。</p>",
+              "type": "module",
+              "displayName": "关于进程 I/O 的说明"
+            }
+          ]
+        },
+        {
+          "textRaw": "`throwDeprecation` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.9.12"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.throwDeprecation</code> 的初始值指示是否在当前 Node.js 进程上设置了 <code>--throw-deprecation</code> 标志。<code>process.throwDeprecation</code> 是可变的，因此是否弃用警告会导致错误可能在运行时被改变。有关更多信息，请参阅 <a href=\"#event-warning\"><code>'warning'</code></a> 事件和 <a href=\"#processemitwarningwarning-type-code-ctor\"><code>emitWarning()</code> 方法</a> 的文档。</p>\n<pre><code class=\"language-console\">$ node --throw-deprecation -p \"process.throwDeprecation\"\ntrue\n$ node -p \"process.throwDeprecation\"\nundefined\n$ node\n> process.emitWarning('test', 'DeprecationWarning');\nundefined\n> (node:26598) DeprecationWarning: test\n> process.throwDeprecation = true;\ntrue\n> process.emitWarning('test', 'DeprecationWarning');\nThrown:\n[DeprecationWarning: test] { name: 'DeprecationWarning' }\n</code></pre>"
+        },
+        {
+          "textRaw": "`title` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.104"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.title</code> 属性返回当前进程标题（即返回 <code>ps</code> 的当前值）。将新值赋给 <code>process.title</code> 会修改 <code>ps</code> 的当前值。</p>\n<p>当赋新值时，不同的平台会对标题施加不同的最大长度限制。通常这样的限制是相当有限的。例如，在 Linux 和 macOS 上，<code>process.title</code> 限制为二进制名称的大小加上命令行参数的长度，因为设置 <code>process.title</code> 会覆盖进程的 <code>argv</code> 内存。Node.js v0.8 允许更长的进程标题字符串，也覆盖了 <code>environ</code> 内存，但这在某些（相当模糊的）情况下可能不安全和令人困惑。</p>\n<p>将值赋给 <code>process.title</code> 可能不会在进程管理器应用程序（如 macOS Activity Monitor 或 Windows Services Manager）中产生准确的标签。</p>"
+        },
+        {
+          "textRaw": "`traceDeprecation` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.8.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.traceDeprecation</code> 属性指示是否在当前 Node.js 进程上设置了 <code>--trace-deprecation</code> 标志。有关此标志行为的更多信息，请参阅 <a href=\"#event-warning\"><code>'warning'</code></a> 事件和 <a href=\"#processemitwarningwarning-type-code-ctor\"><code>emitWarning()</code> 方法</a> 的文档。</p>"
+        },
+        {
+          "textRaw": "`version` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.1.3"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>process.version</code> 属性包含 Node.js 版本字符串。</p>\n<pre><code class=\"language-mjs\">import { version } from 'node:process';\n\nconsole.log(`Version: ${version}`);\n// Version: v14.8.0\n</code></pre>\n<pre><code class=\"language-cjs\">const { version } = require('node:process');\n\nconsole.log(`Version: ${version}`);\n// Version: v14.8.0\n</code></pre>\n<p>要获取没有前缀 <em>v</em> 的版本字符串，请使用 <code>process.versions.node</code>。</p>"
+        },
+        {
+          "textRaw": "`versions` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.2.0"
+            ],
+            "changes": [
+              {
+                "version": "v9.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/15785",
+                "description": "The `v8` property now includes a Node.js specific suffix."
+              },
+              {
+                "version": "v4.2.0",
+                "pr-url": "https://github.com/nodejs/node/pull/3102",
+                "description": "The `icu` property is now supported."
+              }
+            ]
+          },
+          "desc": "<p><code>process.versions</code> 属性返回一个对象，列出 Node.js 及其依赖项的版本字符串。<code>process.versions.modules</code> 指示当前的 ABI 版本，每当 C++ API 更改时都会增加。Node.js 将拒绝加载针对不同模块 ABI 版本编译的模块。</p>\n<pre><code class=\"language-mjs\">import { versions } from 'node:process';\n\nconsole.log(versions);\n</code></pre>\n<pre><code class=\"language-cjs\">const { versions } = require('node:process');\n\nconsole.log(versions);\n</code></pre>\n<p>将生成类似于以下的对象：</p>\n<pre><code class=\"language-console\">{ node: '23.0.0',\n  acorn: '8.11.3',\n  ada: '2.7.8',\n  ares: '1.28.1',\n  base64: '0.5.2',\n  brotli: '1.1.0',\n  cjs_module_lexer: '1.2.2',\n  cldr: '45.0',\n  icu: '75.1',\n  llhttp: '9.2.1',\n  modules: '127',\n  napi: '9',\n  nghttp2: '1.61.0',\n  nghttp3: '0.7.0',\n  ngtcp2: '1.3.0',\n  openssl: '3.0.13+quic',\n  simdjson: '3.8.0',\n  simdutf: '5.2.4',\n  sqlite: '3.46.0',\n  tz: '2024a',\n  undici: '6.13.0',\n  unicode: '15.1',\n  uv: '1.48.0',\n  uvwasi: '0.0.20',\n  v8: '12.4.254.14-node.11',\n  zlib: '1.3.0.1-motley-7d77fb7' }\n</code></pre>"
+        }
+      ]
+    }
+  ]
+}

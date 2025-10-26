@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Modules: CommonJS modules | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/modules.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  
+</head>
+<body class="alt apidoc" id="api-section-modules">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules active">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="modules" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#modules-commonjs-modules">Modules: CommonJS modules</a></span>
+<ul>
+<li><a href="#">启用</a></li>
+<li><a href="#_1">访问主模块</a></li>
+<li><a href="#_2">包管理器技巧</a></li>
+<li><span class="stability_1.2"><a href="#-require--ecmascript-">使用 <code>require()</code> 加载 ECMAScript 模块</a></span></li>
+<li><a href="#_3">整体流程</a></li>
+<li><a href="#_4">缓存</a>
+<ul>
+<li><a href="#_5">模块缓存的注意事项</a></li>
+</ul>
+</li>
+<li><a href="#_6">内置模块</a>
+<ul>
+<li><a href="#-node-">强制使用 <code>node:</code> 前缀的内置模块</a></li>
+</ul>
+</li>
+<li><a href="#_7">循环</a></li>
+<li><a href="#_8">文件模块</a></li>
+<li><span class="stability_3"><a href="#_9">文件夹作为模块</a></span></li>
+<li><a href="#-node_modules-">从 <code>node_modules</code> 文件夹加载</a></li>
+<li><a href="#_10">从全局文件夹加载</a></li>
+<li><a href="#_11">模块包装器</a></li>
+<li><a href="#_12">模块作用域</a>
+<ul>
+<li><a href="#__dirname"><code>__dirname</code></a></li>
+<li><a href="#__filename"><code>__filename</code></a></li>
+<li><a href="#exports"><code>exports</code></a></li>
+<li><a href="#module"><code>module</code></a></li>
+<li><a href="#requireid"><code>require(id)</code></a>
+<ul>
+<li><a href="#requirecache"><code>require.cache</code></a></li>
+<li><span class="stability_0"><a href="#requireextensions"><code>require.extensions</code></a></span></li>
+<li><a href="#requiremain"><code>require.main</code></a></li>
+<li><a href="#requireresolverequest-options"><code>require.resolve(request[, options])</code></a>
+<ul>
+<li><a href="#requireresolvepathsrequest"><code>require.resolve.paths(request)</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#module-"><code>module</code> 对象</a>
+<ul>
+<li><a href="#modulechildren"><code>module.children</code></a></li>
+<li><a href="#moduleexports"><code>module.exports</code></a>
+<ul>
+<li><a href="#exports-"><code>exports</code> 快捷方式</a></li>
+</ul>
+</li>
+<li><a href="#modulefilename"><code>module.filename</code></a></li>
+<li><a href="#moduleid"><code>module.id</code></a></li>
+<li><a href="#moduleispreloading"><code>module.isPreloading</code></a></li>
+<li><a href="#moduleloaded"><code>module.loaded</code></a></li>
+<li><span class="stability_0"><a href="#moduleparent"><code>module.parent</code></a></span></li>
+<li><a href="#modulepath"><code>module.path</code></a></li>
+<li><a href="#modulepaths"><code>module.paths</code></a></li>
+<li><a href="#modulerequireid"><code>module.require(id)</code></a></li>
+</ul>
+</li>
+<li><a href="#module-_1"><code>Module</code> 对象</a></li>
+<li><a href="#source-map-v3-">Source map v3 支持</a></li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules active">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/modules.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/modules.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/modules.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/modules.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/modules.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/modules.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/modules.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/modules.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/modules.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/modules.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/modules.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/modules.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/modules.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/modules.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/modules.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/modules.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/modules.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/modules.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/modules.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/modules.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/modules.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/modules.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/modules.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/modules.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="modules.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/modules.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#modules-commonjs-modules">Modules: CommonJS modules</a></span>
+<ul>
+<li><a href="#">启用</a></li>
+<li><a href="#_1">访问主模块</a></li>
+<li><a href="#_2">包管理器技巧</a></li>
+<li><span class="stability_1.2"><a href="#-require--ecmascript-">使用 <code>require()</code> 加载 ECMAScript 模块</a></span></li>
+<li><a href="#_3">整体流程</a></li>
+<li><a href="#_4">缓存</a>
+<ul>
+<li><a href="#_5">模块缓存的注意事项</a></li>
+</ul>
+</li>
+<li><a href="#_6">内置模块</a>
+<ul>
+<li><a href="#-node-">强制使用 <code>node:</code> 前缀的内置模块</a></li>
+</ul>
+</li>
+<li><a href="#_7">循环</a></li>
+<li><a href="#_8">文件模块</a></li>
+<li><span class="stability_3"><a href="#_9">文件夹作为模块</a></span></li>
+<li><a href="#-node_modules-">从 <code>node_modules</code> 文件夹加载</a></li>
+<li><a href="#_10">从全局文件夹加载</a></li>
+<li><a href="#_11">模块包装器</a></li>
+<li><a href="#_12">模块作用域</a>
+<ul>
+<li><a href="#__dirname"><code>__dirname</code></a></li>
+<li><a href="#__filename"><code>__filename</code></a></li>
+<li><a href="#exports"><code>exports</code></a></li>
+<li><a href="#module"><code>module</code></a></li>
+<li><a href="#requireid"><code>require(id)</code></a>
+<ul>
+<li><a href="#requirecache"><code>require.cache</code></a></li>
+<li><span class="stability_0"><a href="#requireextensions"><code>require.extensions</code></a></span></li>
+<li><a href="#requiremain"><code>require.main</code></a></li>
+<li><a href="#requireresolverequest-options"><code>require.resolve(request[, options])</code></a>
+<ul>
+<li><a href="#requireresolvepathsrequest"><code>require.resolve.paths(request)</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#module-"><code>module</code> 对象</a>
+<ul>
+<li><a href="#modulechildren"><code>module.children</code></a></li>
+<li><a href="#moduleexports"><code>module.exports</code></a>
+<ul>
+<li><a href="#exports-"><code>exports</code> 快捷方式</a></li>
+</ul>
+</li>
+<li><a href="#modulefilename"><code>module.filename</code></a></li>
+<li><a href="#moduleid"><code>module.id</code></a></li>
+<li><a href="#moduleispreloading"><code>module.isPreloading</code></a></li>
+<li><a href="#moduleloaded"><code>module.loaded</code></a></li>
+<li><span class="stability_0"><a href="#moduleparent"><code>module.parent</code></a></span></li>
+<li><a href="#modulepath"><code>module.path</code></a></li>
+<li><a href="#modulepaths"><code>module.paths</code></a></li>
+<li><a href="#modulerequireid"><code>module.require(id)</code></a></li>
+</ul>
+</li>
+<li><a href="#module-_1"><code>Module</code> 对象</a></li>
+<li><a href="#source-map-v3-">Source map v3 支持</a></li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Modules: CommonJS modules<span><a class="mark" href="#modules-commonjs-modules" id="modules-commonjs-modules">#</a></span><a aria-hidden="true" class="legacy" id="modules_modules_commonjs_modules"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+
+<p>CommonJS 模块是 Node.js 打包 JavaScript 代码的原始方式。Node.js 也支持浏览器和其他 JavaScript 运行时使用的 <a href="esm.html">ECMAScript modules</a> 标准。</p>
+<p>在 Node.js 中，每个文件被视为一个独立的模块。例如，考虑一个名为 <code>foo.js</code> 的文件：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> circle = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./circle.js'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`The area of a circle of radius 4 is <span class="hljs-subst">${circle.area(<span class="hljs-number">4</span>)}</span>`</span>);</code> <button class="copy-button">copy</button></pre>
+<p>在第一行，<code>foo.js</code> 加载了与 <code>foo.js</code> 在同一目录下的模块 <code>circle.js</code>。</p>
+<p>以下是 <code>circle.js</code> 的内容：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { <span class="hljs-variable constant_">PI</span> } = <span class="hljs-title class_">Math</span>;
+
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">area</span> = <span class="hljs-function">(<span class="hljs-params">r</span>) =></span> <span class="hljs-variable constant_">PI</span> * r ** <span class="hljs-number">2</span>;
+
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">circumference</span> = <span class="hljs-function">(<span class="hljs-params">r</span>) =></span> <span class="hljs-number">2</span> * <span class="hljs-variable constant_">PI</span> * r;</code> <button class="copy-button">copy</button></pre>
+<p>模块 <code>circle.js</code> 导出了函数 <code>area()</code> 和 <code>circumference()</code>。通过向特殊的 <code>exports</code> 对象指定额外的属性，函数和对象被添加到模块的根部。</p>
+<p>模块本地的变量将是私有的，因为模块被 Node.js 包装在一个函数中（参见 <a href="#the-module-wrapper">模块包装器</a>）。在这个例子中，变量 <code>PI</code> 对 <code>circle.js</code> 是私有的。</p>
+<p><code>module.exports</code> 属性可以被赋予一个新值（例如一个函数或对象）。</p>
+<p>在以下代码中，<code>bar.js</code> 使用了 <code>square</code> 模块，该模块导出了一个 Square 类：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-title class_">Square</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./square.js'</span>);
+<span class="hljs-keyword">const</span> mySquare = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Square</span>(<span class="hljs-number">2</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`The area of mySquare is <span class="hljs-subst">${mySquare.area()}</span>`</span>);</code> <button class="copy-button">copy</button></pre>
+<p><code>square</code> 模块在 <code>square.js</code> 中定义：</p>
+<pre><code class="language-js"><span class="hljs-comment">// Assigning to exports will not modify module, must use module.exports</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-keyword">class</span> <span class="hljs-title class_">Square</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">width</span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">width</span> = width;
+  }
+
+  <span class="hljs-title function_">area</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">width</span> ** <span class="hljs-number">2</span>;
+  }
+};</code> <button class="copy-button">copy</button></pre>
+<p>CommonJS 模块系统在 [<code>module</code> 核心模块][] 中实现。</p>
+<section><h3>启用<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="modules"></a></h3>
+
+<p>Node.js 有两个模块系统：CommonJS 模块和 <a href="esm.html">ECMAScript modules</a>。</p>
+<p>默认情况下，Node.js 会将以下文件视为 CommonJS 模块：</p>
+<ul>
+<li>
+<p>扩展名为 <code>.cjs</code> 的文件；</p>
+</li>
+<li>
+<p>扩展名为 <code>.js</code> 的文件，且最近的父 <code>package.json</code> 文件包含顶级字段 <a href="packages.html#type"><code>"type"</code></a>，其值为 <code>"commonjs"</code>。</p>
+</li>
+<li>
+<p>扩展名为 <code>.js</code> 或无扩展名的文件，且最近的父 <code>package.json</code> 文件不包含顶级字段 <a href="packages.html#type"><code>"type"</code></a>，或者在任何父文件夹中没有 <code>package.json</code> 文件；除非该文件包含除非被当作 ES 模块评估否则会出错的语法。包作者应包含 <a href="packages.html#type"><code>"type"</code></a> 字段，即使在所有源文件都是 CommonJS 的包中也是如此。明确说明包的 <code>type</code> 将使构建工具和加载器更容易确定包中的文件应如何被解释。</p>
+</li>
+<li>
+<p>扩展名不是 <code>.mjs</code>、<code>.cjs</code>、<code>.json</code>、<code>.node</code> 或 <code>.js</code> 的文件（当最近的父 <code>package.json</code> 文件包含顶级字段 <a href="packages.html#type"><code>"type"</code></a> 且值为 <code>"module"</code> 时，这些文件只有在通过 <code>require()</code> 引入时才会被识别为 CommonJS 模块，而不是当它们被用作程序的命令行入口点时）。</p>
+</li>
+</ul>
+<p>更多详情请参见 <a href="packages.html#determining-module-system">确定模块系统</a>。</p>
+<p>调用 <code>require()</code> 总是使用 CommonJS 模块加载器。调用 <code>import()</code> 总是使用 ECMAScript 模块加载器。</p>
+</section><section><h3>访问主模块<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="modules_1"></a></h3>
+
+<p>当一个文件直接通过 Node.js 运行时，<code>require.main</code> 被设置为其 <code>module</code>。这意味着可以通过测试 <code>require.main === module</code> 来判断一个文件是否被直接运行。</p>
+<p>对于文件 <code>foo.js</code>，如果通过 <code>node foo.js</code> 运行，这将为 <code>true</code>，但如果通过 <code>require('./foo')</code> 运行，则为 <code>false</code>。</p>
+<p>当入口点不是 CommonJS 模块时，<code>require.main</code> 是 <code>undefined</code>，并且主模块无法访问。</p>
+</section><section><h3>包管理器技巧<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="modules_2"></a></h3>
+
+<p>Node.js <code>require()</code> 函数的语义被设计得足够通用，以支持合理的目录结构。包管理器程序如 <code>dpkg</code>、<code>rpm</code> 和 <code>npm</code> 有望能够在不修改的情况下从 Node.js 模块构建原生包。</p>
+<p>下面我们给出一个可能可行的建议目录结构：</p>
+<p>假设我们希望在 <code>/usr/lib/node/&#x3C;some-package>/&#x3C;some-version></code> 文件夹中存放特定版本包的内容。</p>
+<p>包可以相互依赖。为了安装包 <code>foo</code>，可能需要安装特定版本的包 <code>bar</code>。<code>bar</code> 包本身可能有依赖关系，在某些情况下，这些依赖甚至可能冲突或形成循环依赖。</p>
+<p>因为 Node.js 会查找它加载的任何模块的 <code>realpath</code>（即解析符号链接），然后 <a href="#loading-from-node_modules-folders">在 <code>node_modules</code> 文件夹中查找它们的依赖项</a>，这种情况可以通过以下架构解决：</p>
+<ul>
+<li><code>/usr/lib/node/foo/1.2.3/</code>：<code>foo</code> 包的内容，版本 1.2.3。</li>
+<li><code>/usr/lib/node/bar/4.3.2/</code>：<code>foo</code> 所依赖的 <code>bar</code> 包的内容。</li>
+<li><code>/usr/lib/node/foo/1.2.3/node_modules/bar</code>：指向 <code>/usr/lib/node/bar/4.3.2/</code> 的符号链接。</li>
+<li><code>/usr/lib/node/bar/4.3.2/node_modules/*</code>：指向 <code>bar</code> 所依赖的包的符号链接。</li>
+</ul>
+<p>因此，即使遇到循环，或者存在依赖冲突，每个模块都能够获得一个可以使用的依赖版本。</p>
+<p>当 <code>foo</code> 包中的代码执行 <code>require('bar')</code> 时，它将获得符号链接到 <code>/usr/lib/node/foo/1.2.3/node_modules/bar</code> 的版本。然后，当 <code>bar</code> 包中的代码调用 <code>require('quux')</code> 时，它将获得符号链接到 <code>/usr/lib/node/bar/4.3.2/node_modules/quux</code> 的版本。</p>
+<p>此外，为了使模块查找过程更加优化，我们可以将包放在 <code>/usr/lib/node_modules/&#x3C;name>/&#x3C;version></code> 而不是直接放在 <code>/usr/lib/node</code> 中。然后 Node.js 将不会费心在 <code>/usr/node_modules</code> 或 <code>/node_modules</code> 中查找缺失的依赖项。</p>
+<p>为了使模块对 Node.js REPL 可用，可能还需要将 <code>/usr/lib/node_modules</code> 文件夹添加到 <code>$NODE_PATH</code> 环境变量中。由于使用 <code>node_modules</code> 文件夹的模块查找都是相对的，并且基于调用 <code>require()</code> 的文件的真实路径，包本身可以位于任何地方。</p>
+</section><section><h3>使用 <code>require()</code> 加载 ECMAScript 模块<span><a class="mark" href="#-require--ecmascript-" id="-require--ecmascript-">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_ecmascript"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.0.0, v22.12.0</td>
+<td><p>Support <code>'module.exports'</code> interop export in <code>require(esm)</code>.</p></td></tr>
+<tr><td>v23.5.0, v22.13.0, v20.19.0</td>
+<td><p>This feature no longer emits an experimental warning by default, though the warning can still be emitted by --trace-require-module.</p></td></tr>
+<tr><td>v23.0.0, v22.12.0, v20.19.0</td>
+<td><p>This feature is no longer behind the <code>--experimental-require-module</code> CLI flag.</p></td></tr>
+<tr><td>v22.0.0, v20.17.0</td>
+<td><p><span>Added in: v22.0.0, v20.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<p><code>.mjs</code> 扩展名保留给 <a href="esm.html">ECMAScript Modules</a>。关于哪些文件被解析为 ECMAScript 模块的更多信息，请参见 <a href="packages.html#determining-module-system">确定模块系统</a> 部分。</p>
+<p><code>require()</code> 仅支持加载满足以下要求的 ECMAScript 模块：</p>
+<ul>
+<li>模块是完全同步的（不包含顶级 <code>await</code>）；并且</li>
+<li>满足以下条件之一：
+<ol>
+<li>文件具有 <code>.mjs</code> 扩展名。</li>
+<li>文件具有 <code>.js</code> 扩展名，且最近的 <code>package.json</code> 包含 <code>"type": "module"</code>。</li>
+<li>文件具有 <code>.js</code> 扩展名，最近的 <code>package.json</code> 不包含 <code>"type": "commonjs"</code>，并且模块包含 ES 模块语法。</li>
+</ol>
+</li>
+</ul>
+<p>如果被加载的 ES 模块满足要求，<code>require()</code> 可以加载它并返回 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#module_namespace_object">模块命名空间对象</a>。在这种情况下，它类似于动态 <code>import()</code>，但是同步运行并直接返回命名空间对象。</p>
+<p>使用以下 ES 模块：</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// distance.mjs</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">distance</span>(<span class="hljs-params">a, b</span>) { <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">sqrt</span>((b.<span class="hljs-property">x</span> - a.<span class="hljs-property">x</span>) ** <span class="hljs-number">2</span> + (b.<span class="hljs-property">y</span> - a.<span class="hljs-property">y</span>) ** <span class="hljs-number">2</span>); }</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js mjs"><span class="hljs-comment">// point.mjs</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Point</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">x, y</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">x</span> = x; <span class="hljs-variable language_">this</span>.<span class="hljs-property">y</span> = y; }
+}</code> <button class="copy-button">copy</button></pre>
+<p>CommonJS 模块可以使用 <code>require()</code> 加载它们：</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> distance = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./distance.mjs'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(distance);
+<span class="hljs-comment">// [Module: null prototype] {</span>
+<span class="hljs-comment">//   distance: [Function: distance]</span>
+<span class="hljs-comment">// }</span>
+
+<span class="hljs-keyword">const</span> point = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./point.mjs'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(point);
+<span class="hljs-comment">// [Module: null prototype] {</span>
+<span class="hljs-comment">//   default: [class Point],</span>
+<span class="hljs-comment">//   __esModule: true,</span>
+<span class="hljs-comment">// }</span></code> <button class="copy-button">copy</button></pre>
+<p>为了与将 ES 模块转换为 CommonJS 的现有工具互操作，这些工具随后可以通过 <code>require()</code> 加载真正的 ES 模块，返回的命名空间将包含一个 <code>__esModule: true</code> 属性（如果它有 <code>default</code> 导出），以便由工具生成的消费代码能够识别真正 ES 模块中的默认导出。如果命名空间已经定义了 <code>__esModule</code>，则不会添加此属性。此属性是实验性的，未来可能会更改。它只应由遵循现有生态系统约定将 ES 模块转换为 CommonJS 模块的工具使用。直接以 CommonJS 编写的代码应避免依赖它。</p>
+<p>当 ES 模块同时包含命名导出和默认导出时，<code>require()</code> 返回的结果是 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import#module_namespace_object">模块命名空间对象</a>，它将默认导出放在 <code>.default</code> 属性中，类似于 <code>import()</code> 返回的结果。
+要自定义 <code>require(esm)</code> 直接返回的内容，ES 模块可以使用字符串名称 <code>"module.exports"</code> 导出所需的值。</p>
+<!-- eslint-disable @stylistic/js/semi -->
+<pre><code class="language-js mjs"><span class="hljs-comment">// point.mjs</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Point</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">x, y</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">x</span> = x; <span class="hljs-variable language_">this</span>.<span class="hljs-property">y</span> = y; }
+}
+
+<span class="hljs-comment">// `distance` is lost to CommonJS consumers of this module, unless it's</span>
+<span class="hljs-comment">// added to `Point` as a static property.</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">distance</span>(<span class="hljs-params">a, b</span>) { <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">sqrt</span>((b.<span class="hljs-property">x</span> - a.<span class="hljs-property">x</span>) ** <span class="hljs-number">2</span> + (b.<span class="hljs-property">y</span> - a.<span class="hljs-property">y</span>) ** <span class="hljs-number">2</span>); }
+<span class="hljs-keyword">export</span> { <span class="hljs-title class_">Point</span> <span class="hljs-keyword">as</span> <span class="hljs-string">'module.exports'</span> }</code> <button class="copy-button">copy</button></pre>
+<!-- eslint-disable node-core/no-duplicate-requires -->
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> <span class="hljs-title class_">Point</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./point.mjs'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Point</span>); <span class="hljs-comment">// [class Point]</span>
+
+<span class="hljs-comment">// Named exports are lost when 'module.exports' is used</span>
+<span class="hljs-keyword">const</span> { distance } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./point.mjs'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(distance); <span class="hljs-comment">// undefined</span></code> <button class="copy-button">copy</button></pre>
+<p>注意在上面的例子中，当使用 <code>module.exports</code> 导出名称时，命名导出将对 CommonJS 消费者丢失。为了允许 CommonJS 消费者继续访问命名导出，模块可以确保默认导出是一个对象，并将命名导出作为属性附加到该对象上。例如，对于上面的例子，<code>distance</code> 可以作为静态方法附加到默认导出 <code>Point</code> 类上。</p>
+<!-- eslint-disable @stylistic/js/semi -->
+<pre><code class="language-js mjs"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">distance</span>(<span class="hljs-params">a, b</span>) { <span class="hljs-keyword">return</span> <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">sqrt</span>((b.<span class="hljs-property">x</span> - a.<span class="hljs-property">x</span>) ** <span class="hljs-number">2</span> + (b.<span class="hljs-property">y</span> - a.<span class="hljs-property">y</span>) ** <span class="hljs-number">2</span>); }
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">default</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Point</span> {
+  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">x, y</span>) { <span class="hljs-variable language_">this</span>.<span class="hljs-property">x</span> = x; <span class="hljs-variable language_">this</span>.<span class="hljs-property">y</span> = y; }
+  <span class="hljs-keyword">static</span> distance = distance;
+}
+
+<span class="hljs-keyword">export</span> { <span class="hljs-title class_">Point</span> <span class="hljs-keyword">as</span> <span class="hljs-string">'module.exports'</span> }</code> <button class="copy-button">copy</button></pre>
+<!-- eslint-disable node-core/no-duplicate-requires -->
+<pre><code class="language-js cjs"><span class="hljs-keyword">const</span> <span class="hljs-title class_">Point</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./point.mjs'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">Point</span>); <span class="hljs-comment">// [class Point]</span>
+
+<span class="hljs-keyword">const</span> { distance } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./point.mjs'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(distance); <span class="hljs-comment">// [Function: distance]</span></code> <button class="copy-button">copy</button></pre>
+<p>如果被 <code>require()</code> 的模块包含顶级 <code>await</code>，或者它 <code>import</code> 的模块图包含顶级 <code>await</code>，将会抛出 <a href="errors.html#err_require_async_module"><code>ERR_REQUIRE_ASYNC_MODULE</code></a>。在这种情况下，用户应使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import"><code>import()</code></a> 加载异步模块。</p>
+<p>如果启用了 <code>--experimental-print-required-tla</code>，Node.js 将在评估之前评估模块，尝试定位顶级 await，并打印它们的位置以帮助用户修复它们，而不是抛出 <code>ERR_REQUIRE_ASYNC_MODULE</code>。</p>
+<p>使用 <code>require()</code> 加载 ES 模块的支持目前是实验性的，可以使用 <code>--no-experimental-require-module</code> 禁用。要打印使用此功能的位置，请使用 <a href="cli.html#--trace-require-modulemode"><code>--trace-require-module</code></a>。</p>
+<p>可以通过检查 <a href="process.html#processfeaturesrequire_module"><code>process.features.require_module</code></a> 是否为 <code>true</code> 来检测此功能。</p>
+</section><section><h3>整体流程<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="modules_3"></a></h3>
+
+<p>要获取调用 <code>require()</code> 时将加载的确切文件名，请使用 <code>require.resolve()</code> 函数。</p>
+<p>综合以上所有内容，以下是 <code>require()</code> 执行的高级算法伪代码：</p>
+<pre><code class="language-text">require(X) from module at path Y
+1. If X is a core module,
+   a. return the core module
+   b. STOP
+2. If X begins with '/'
+   a. set Y to the file system root
+3. If X is equal to '.', or X begins with './', '/' or '../'
+   a. LOAD_AS_FILE(Y + X)
+   b. LOAD_AS_DIRECTORY(Y + X)
+   c. THROW "not found"
+4. If X begins with '#'
+   a. LOAD_PACKAGE_IMPORTS(X, dirname(Y))
+5. LOAD_PACKAGE_SELF(X, dirname(Y))
+6. LOAD_NODE_MODULES(X, dirname(Y))
+7. THROW "not found"
+
+MAYBE_DETECT_AND_LOAD(X)
+1. If X parses as a CommonJS module, load X as a CommonJS module. STOP.
+2. Else, if the source code of X can be parsed as ECMAScript module using
+  &#x3C;a href="esm.md#resolver-algorithm-specification">DETECT_MODULE_SYNTAX defined in
+  the ESM resolver&#x3C;/a>,
+  a. Load X as an ECMAScript module. STOP.
+3. THROW the SyntaxError from attempting to parse X as CommonJS in 1. STOP.
+
+LOAD_AS_FILE(X)
+1. If X is a file, load X as its file extension format. STOP
+2. If X.js is a file,
+    a. Find the closest package scope SCOPE to X.
+    b. If no scope was found
+      1. MAYBE_DETECT_AND_LOAD(X.js)
+    c. If the SCOPE/package.json contains "type" field,
+      1. If the "type" field is "module", load X.js as an ECMAScript module. STOP.
+      2. If the "type" field is "commonjs", load X.js as a CommonJS module. STOP.
+    d. MAYBE_DETECT_AND_LOAD(X.js)
+3. If X.json is a file, load X.json to a JavaScript Object. STOP
+4. If X.node is a file, load X.node as binary addon. STOP
+
+LOAD_INDEX(X)
+1. If X/index.js is a file
+    a. Find the closest package scope SCOPE to X.
+    b. If no scope was found, load X/index.js as a CommonJS module. STOP.
+    c. If the SCOPE/package.json contains "type" field,
+      1. If the "type" field is "module", load X/index.js as an ECMAScript module. STOP.
+      2. Else, load X/index.js as a CommonJS module. STOP.
+2. If X/index.json is a file, parse X/index.json to a JavaScript object. STOP
+3. If X/index.node is a file, load X/index.node as binary addon. STOP
+
+LOAD_AS_DIRECTORY(X)
+1. If X/package.json is a file,
+   a. Parse X/package.json, and look for "main" field.
+   b. If "main" is a falsy value, GOTO 2.
+   c. let M = X + (json main field)
+   d. LOAD_AS_FILE(M)
+   e. LOAD_INDEX(M)
+   f. LOAD_INDEX(X) DEPRECATED
+   g. THROW "not found"
+2. LOAD_INDEX(X)
+
+LOAD_NODE_MODULES(X, START)
+1. let DIRS = NODE_MODULES_PATHS(START)
+2. for each DIR in DIRS:
+   a. LOAD_PACKAGE_EXPORTS(X, DIR)
+   b. LOAD_AS_FILE(DIR/X)
+   c. LOAD_AS_DIRECTORY(DIR/X)
+
+NODE_MODULES_PATHS(START)
+1. let PARTS = path split(START)
+2. let I = count of PARTS - 1
+3. let DIRS = []
+4. while I >= 0,
+   a. if PARTS[I] = "node_modules", GOTO d.
+   b. DIR = path join(PARTS[0 .. I] + "node_modules")
+   c. DIRS = DIR + DIRS
+   d. let I = I - 1
+5. return DIRS + GLOBAL_FOLDERS
+
+LOAD_PACKAGE_IMPORTS(X, DIR)
+1. Find the closest package scope SCOPE to DIR.
+2. If no scope was found, return.
+3. If the SCOPE/package.json "imports" is null or undefined, return.
+4. If `--experimental-require-module` is enabled
+  a. let CONDITIONS = ["node", "require", "module-sync"]
+  b. Else, let CONDITIONS = ["node", "require"]
+5. let MATCH = PACKAGE_IMPORTS_RESOLVE(X, pathToFileURL(SCOPE),
+  CONDITIONS) &#x3C;a href="esm.md#resolver-algorithm-specification">defined in the ESM resolver&#x3C;/a>.
+6. RESOLVE_ESM_MATCH(MATCH).
+
+LOAD_PACKAGE_EXPORTS(X, DIR)
+1. Try to interpret X as a combination of NAME and SUBPATH where the name
+   may have a @scope/ prefix and the subpath begins with a slash (`/`).
+2. If X does not match this pattern or DIR/NAME/package.json is not a file,
+   return.
+3. Parse DIR/NAME/package.json, and look for "exports" field.
+4. If "exports" is null or undefined, return.
+5. If `--experimental-require-module` is enabled
+  a. let CONDITIONS = ["node", "require", "module-sync"]
+  b. Else, let CONDITIONS = ["node", "require"]
+6. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(DIR/NAME), "." + SUBPATH,
+   `package.json` "exports", CONDITIONS) &#x3C;a href="esm.md#resolver-algorithm-specification">defined in the ESM resolver&#x3C;/a>.
+7. RESOLVE_ESM_MATCH(MATCH)
+
+LOAD_PACKAGE_SELF(X, DIR)
+1. Find the closest package scope SCOPE to DIR.
+2. If no scope was found, return.
+3. If the SCOPE/package.json "exports" is null or undefined, return.
+4. If the SCOPE/package.json "name" is not the first segment of X, return.
+5. let MATCH = PACKAGE_EXPORTS_RESOLVE(pathToFileURL(SCOPE),
+   "." + X.slice("name".length), `package.json` "exports", ["node", "require"])
+   &#x3C;a href="esm.md#resolver-algorithm-specification">defined in the ESM resolver&#x3C;/a>.
+6. RESOLVE_ESM_MATCH(MATCH)
+
+RESOLVE_ESM_MATCH(MATCH)
+1. let RESOLVED_PATH = fileURLToPath(MATCH)
+2. If the file at RESOLVED_PATH exists, load RESOLVED_PATH as its extension
+   format. STOP
+3. THROW "not found"</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>缓存<span><a class="mark" href="#_4" id="_4">#</a></span><a aria-hidden="true" class="legacy" id="modules_4"></a></h3>
+
+<p>模块在第一次加载后被缓存。这意味着（除其他外）每次调用 <code>require('foo')</code> 如果解析到同一个文件，将返回完全相同的对象。</p>
+<p>如果 <code>require.cache</code> 没有被修改，多次调用 <code>require('foo')</code> 不会导致模块代码被执行多次。这是一个重要的特性。有了它，可以返回"部分完成"的对象，从而允许加载传递依赖项，即使它们会导致循环。</p>
+<p>要让模块多次执行代码，请导出一个函数，然后调用该函数。</p>
+<div>
+<h4>模块缓存的注意事项<span><a class="mark" href="#_5" id="_5">#</a></span><a aria-hidden="true" class="legacy" id="modules_5"></a></h4>
+
+<p>模块基于其解析的文件名进行缓存。由于模块可能根据调用模块的位置（从 <code>node_modules</code> 文件夹加载）解析为不同的文件名，因此不能 <em>保证</em> <code>require('foo')</code> 如果解析到不同的文件将始终返回完全相同的对象。</p>
+<p>此外，在不区分大小写的文件系统或操作系统上，不同的解析文件名可能指向同一个文件，但缓存仍会将它们视为不同的模块并多次重新加载文件。例如，<code>require('./foo')</code> 和 <code>require('./FOO')</code> 返回两个不同的对象，无论 <code>./foo</code> 和 <code>./FOO</code> 是否是同一个文件。</p>
+</div>
+</section><section><h3>内置模块<span><a class="mark" href="#_6" id="_6">#</a></span><a aria-hidden="true" class="legacy" id="modules_6"></a></h3>
+
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0, v14.18.0</td>
+<td><p>Added <code>node:</code> import support to <code>require(...)</code>.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>Node.js 有几个编译到二进制文件中的模块。这些模块在本文档的其他地方有更详细的描述。</p>
+<p>内置模块在 Node.js 源代码中定义，并位于 <code>lib/</code> 文件夹中。</p>
+<p>可以使用 <code>node:</code> 前缀来识别内置模块，在这种情况下，它会绕过 <code>require</code> 缓存。例如，<code>require('node:http')</code> 将始终返回内置的 HTTP 模块，即使有同名的 <code>require.cache</code> 条目。</p>
+<p>某些内置模块在其标识符传递给 <code>require()</code> 时总是优先加载。例如，<code>require('http')</code> 将始终返回内置的 HTTP 模块，即使存在同名的文件。</p>
+<p>所有内置模块的列表可以从 <a href="module.html#modulebuiltinmodules"><code>module.builtinModules</code></a> 中检索。列出的模块都不带 <code>node:</code> 前缀，除了那些强制要求此类前缀的模块（如下一节所述）。</p>
+<div>
+<h4>强制使用 <code>node:</code> 前缀的内置模块<span><a class="mark" href="#-node-" id="-node-">#</a></span><a aria-hidden="true" class="legacy" id="modules_node"></a></h4>
+<p>当通过 <code>require()</code> 加载时，某些内置模块必须使用 <code>node:</code> 前缀请求。此要求的存在是为了防止新引入的内置模块与已经使用该名称的用户空间包发生冲突。目前需要 <code>node:</code> 前缀的内置模块有：</p>
+<ul>
+<li><a href="single-executable-applications.html#single-executable-application-api"><code>node:sea</code></a></li>
+<li><a href="sqlite.html"><code>node:sqlite</code></a></li>
+<li><a href="test.html"><code>node:test</code></a></li>
+<li><a href="test.html#test-reporters"><code>node:test/reporters</code></a></li>
+</ul>
+<p>这些模块的列表在 <a href="module.html#modulebuiltinmodules"><code>module.builtinModules</code></a> 中公开，包括前缀。</p>
+</div>
+</section><section><h3>循环<span><a class="mark" href="#_7" id="_7">#</a></span><a aria-hidden="true" class="legacy" id="modules_7"></a></h3>
+
+<p>当存在循环 <code>require()</code> 调用时，模块在返回时可能尚未完成执行。</p>
+<p>考虑这种情况：</p>
+<p><code>a.js</code>：</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'a starting'</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">false</span>;
+<span class="hljs-keyword">const</span> b = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./b.js'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'in a, b.done = %j'</span>, b.<span class="hljs-property">done</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">true</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'a done'</span>);</code> <button class="copy-button">copy</button></pre>
+<p><code>b.js</code>：</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'b starting'</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">false</span>;
+<span class="hljs-keyword">const</span> a = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./a.js'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'in b, a.done = %j'</span>, a.<span class="hljs-property">done</span>);
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">done</span> = <span class="hljs-literal">true</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'b done'</span>);</code> <button class="copy-button">copy</button></pre>
+<p><code>main.js</code>：</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'main starting'</span>);
+<span class="hljs-keyword">const</span> a = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./a.js'</span>);
+<span class="hljs-keyword">const</span> b = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./b.js'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'in main, a.done = %j, b.done = %j'</span>, a.<span class="hljs-property">done</span>, b.<span class="hljs-property">done</span>);</code> <button class="copy-button">copy</button></pre>
+<p>当 <code>main.js</code> 加载 <code>a.js</code> 时，<code>a.js</code> 依次加载 <code>b.js</code>。此时，<code>b.js</code> 尝试加载 <code>a.js</code>。为了防止无限循环，将 <code>a.js</code> 导出对象的 <strong>未完成副本</strong> 返回给 <code>b.js</code> 模块。然后 <code>b.js</code> 完成加载，并将其 <code>exports</code> 对象提供给 <code>a.js</code> 模块。</p>
+<p>到 <code>main.js</code> 加载两个模块时，它们都已完成。因此，这个程序的输出将是：</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node main.js</span>
+main starting
+a starting
+b starting
+in b, a.done = false
+b done
+in a, b.done = true
+a done
+in main, a.done = true, b.done = true</code> <button class="copy-button">copy</button></pre>
+<p>需要仔细规划以允许循环模块依赖在应用程序中正确工作。</p>
+</section><section><h3>文件模块<span><a class="mark" href="#_8" id="_8">#</a></span><a aria-hidden="true" class="legacy" id="modules_8"></a></h3>
+
+<p>如果未找到确切的文件名，Node.js 将尝试加载所需文件名并添加扩展名：<code>.js</code>、<code>.json</code>，最后是 <code>.node</code>。当加载具有不同扩展名的文件（例如 <code>.cjs</code>）时，必须将其全名传递给 <code>require()</code>，包括其文件扩展名（例如 <code>require('./file.cjs')</code>）。</p>
+<p><code>.json</code> 文件被解析为 JSON 文本文件，<code>.node</code> 文件被解释为使用 <code>process.dlopen()</code> 加载的编译插件模块。使用任何其他扩展名（或根本没有扩展名）的文件被解析为 JavaScript 文本文件。请参考 <a href="packages.html#determining-module-system">确定模块系统</a> 部分以了解将使用哪种解析目标。</p>
+<p>以 <code>'/'</code> 为前缀的必需模块是文件的绝对路径。例如，<code>require('/home/marco/foo.js')</code> 将加载 <code>/home/marco/foo.js</code> 文件。</p>
+<p>以 <code>'./'</code> 为前缀的必需模块相对于调用 <code>require()</code> 的文件。也就是说，<code>circle.js</code> 必须与 <code>foo.js</code> 在同一目录中，<code>require('./circle')</code> 才能找到它。</p>
+<p>没有以 <code>'/'</code>、<code>'./'</code> 或 <code>'../'</code> 开头来表示文件，模块必须是核心模块或从 <code>node_modules</code> 文件夹加载。</p>
+<p>如果给定路径不存在，<code>require()</code> 将抛出 <a href="errors.html#module_not_found"><code>MODULE_NOT_FOUND</code></a> 错误。</p>
+</section><section><h3>文件夹作为模块<span><a class="mark" href="#_9" id="_9">#</a></span><a aria-hidden="true" class="legacy" id="modules_9"></a></h3>
+
+<p></p><div class="api_stability api_stability_3"><a href="documentation.html#stability-index">Stability: 3</a> - Legacy: Use <a href="packages.html#subpath-exports">subpath exports</a> or <a href="packages.html#subpath-imports">subpath imports</a> instead.</div><p></p>
+<p>有三种方式可以将文件夹作为参数传递给 <code>require()</code>。</p>
+<p>第一种是在文件夹的根目录中创建一个 <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> 文件，该文件指定一个 <code>main</code> 模块。示例 <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> 文件可能如下所示：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span> <span class="hljs-attr">"name"</span> <span class="hljs-punctuation">:</span> <span class="hljs-string">"some-library"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"main"</span> <span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/some-library.js"</span> <span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>如果这是在 <code>./some-library</code> 文件夹中，那么 <code>require('./some-library')</code> 将尝试加载 <code>./some-library/lib/some-library.js</code>。</p>
+<p>如果目录中不存在 <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> 文件，或者 <a href="packages.html#main"><code>"main"</code></a> 条目缺失或无法解析，则 Node.js 将尝试从该目录加载 <code>index.js</code> 或 <code>index.node</code> 文件。例如，如果在前面的示例中没有 <a href="packages.html#nodejs-packagejson-field-definitions"><code>package.json</code></a> 文件，那么 <code>require('./some-library')</code> 将尝试加载：</p>
+<ul>
+<li><code>./some-library/index.js</code></li>
+<li><code>./some-library/index.node</code></li>
+</ul>
+<p>如果这些尝试失败，Node.js 将使用默认错误报告整个模块缺失：</p>
+<pre><code class="language-console">Error: Cannot find module 'some-library'</code> <button class="copy-button">copy</button></pre>
+<p>在上述所有三种情况下，<code>import('./some-library')</code> 调用将导致 <a href="errors.html#err_unsupported_dir_import"><code>ERR_UNSUPPORTED_DIR_IMPORT</code></a> 错误。使用包 <a href="packages.html#subpath-exports">子路径导出</a> 或 <a href="packages.html#subpath-imports">子路径导入</a> 可以提供与文件夹作为模块相同的包含组织好处，并且适用于 <code>require</code> 和 <code>import</code>。</p>
+</section><section><h3>从 <code>node_modules</code> 文件夹加载<span><a class="mark" href="#-node_modules-" id="-node_modules-">#</a></span><a aria-hidden="true" class="legacy" id="modules_node_modules"></a></h3>
+
+<p>如果传递给 <code>require()</code> 的模块标识符不是 <a href="#built-in-modules">内置</a> 模块，并且不以 <code>'/'</code>、<code>'../'</code> 或 <code>'./'</code> 开头，那么 Node.js 从当前模块的目录开始，添加 <code>/node_modules</code>，并尝试从该位置加载模块。Node.js 不会将 <code>node_modules</code> 附加到已经以 <code>node_modules</code> 结尾的路径。</p>
+<p>如果在那里找不到，那么它移动到父目录，依此类推，直到到达文件系统的根目录。</p>
+<p>例如，如果 <code>'/home/ry/projects/foo.js'</code> 处的文件调用 <code>require('bar.js')</code>，那么 Node.js 将按以下顺序查找以下位置：</p>
+<ul>
+<li><code>/home/ry/projects/node_modules/bar.js</code></li>
+<li><code>/home/ry/node_modules/bar.js</code></li>
+<li><code>/home/node_modules/bar.js</code></li>
+<li><code>/node_modules/bar.js</code></li>
+</ul>
+<p>这允许程序本地化它们的依赖项，这样它们就不会冲突。</p>
+<p>可以通过在模块名称后包含路径后缀来要求模块分发的特定文件或子模块。例如，<code>require('example-module/path/to/file')</code> 将解析 <code>path/to/file</code>，相对于 <code>example-module</code> 的位置。带后缀的路径遵循相同的模块解析语义。</p>
+</section><section><h3>从全局文件夹加载<span><a class="mark" href="#_10" id="_10">#</a></span><a aria-hidden="true" class="legacy" id="modules_10"></a></h3>
+
+<p>如果 <code>NODE_PATH</code> 环境变量设置为以冒号分隔的绝对路径列表，那么 Node.js 将在其他地方找不到模块时搜索这些路径。</p>
+<p>在 Windows 上，<code>NODE_PATH</code> 以分号 (<code>;</code>) 而不是冒号分隔。</p>
+<p><code>NODE_PATH</code> 最初是为了在当前 [模块解析][] 算法定义之前从不同路径加载模块而创建的。</p>
+<p><code>NODE_PATH</code> 仍然受支持，但现在不太必要，因为 Node.js 生态系统已经就定位依赖模块的约定达成一致。有时，依赖 <code>NODE_PATH</code> 的部署在人们不知道必须设置 <code>NODE_PATH</code> 时表现出令人惊讶的行为。有时模块的依赖关系发生变化，导致在搜索 <code>NODE_PATH</code> 时加载不同版本（甚至不同模块）的模块。</p>
+<p>此外，Node.js 将在以下 GLOBAL_FOLDERS 列表中搜索：</p>
+<ul>
+<li>1: <code>$HOME/.node_modules</code></li>
+<li>2: <code>$HOME/.node_libraries</code></li>
+<li>3: <code>$PREFIX/lib/node</code></li>
+</ul>
+<p>其中 <code>$HOME</code> 是用户的主目录，<code>$PREFIX</code> 是 Node.js 配置的 <code>node_prefix</code>。</p>
+<p>这些主要是由于历史原因。</p>
+<p>强烈建议将依赖项放在本地 <code>node_modules</code> 文件夹中。这些将加载得更快，更可靠。</p>
+</section><section><h3>模块包装器<span><a class="mark" href="#_11" id="_11">#</a></span><a aria-hidden="true" class="legacy" id="modules_11"></a></h3>
+
+<p>在模块代码执行之前，Node.js 会用一个函数包装器包装它，如下所示：</p>
+<pre><code class="language-js">(<span class="hljs-keyword">function</span>(<span class="hljs-params"><span class="hljs-built_in">exports</span>, <span class="hljs-built_in">require</span>, <span class="hljs-variable language_">module</span>, __filename, __dirname</span>) {
+<span class="hljs-comment">// Module code actually lives in here</span>
+});</code> <button class="copy-button">copy</button></pre>
+<p>通过这样做，Node.js 实现了以下几点：</p>
+<ul>
+<li>它将顶级变量（用 <code>var</code>、<code>const</code> 或 <code>let</code> 定义）的作用域限定在模块而不是全局对象。</li>
+<li>它有助于提供一些看起来是全局但实际上特定于模块的变量，例如：
+<ul>
+<li><code>module</code> 和 <code>exports</code> 对象，实现者可以使用它们从模块导出值。</li>
+<li>便利变量 <code>__filename</code> 和 <code>__dirname</code>，包含模块的绝对文件名和目录路径。</li>
+</ul>
+</li>
+</ul>
+</section><section><h3>模块作用域<span><a class="mark" href="#_12" id="_12">#</a></span><a aria-hidden="true" class="legacy" id="modules_12"></a></h3>
+<div>
+<h4><code>__dirname</code><span><a class="mark" href="#__dirname" id="__dirname">#</a></span><a aria-hidden="true" class="legacy" id="modules_dirname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.27</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>当前模块的目录名。这与 <a href="#__filename"><code>__filename</code></a> 的 <a href="path.html#pathdirnamepath"><code>path.dirname()</code></a> 相同。</p>
+<p>示例：从 <code>/Users/mjr</code> 运行 <code>node example.js</code></p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(__dirname);
+<span class="hljs-comment">// Prints: /Users/mjr</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(path.<span class="hljs-title function_">dirname</span>(__filename));
+<span class="hljs-comment">// Prints: /Users/mjr</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>__filename</code><span><a class="mark" href="#__filename" id="__filename">#</a></span><a aria-hidden="true" class="legacy" id="modules_filename"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.0.1</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>当前模块的文件名。这是当前模块文件的绝对路径，符号链接已解析。</p>
+<p>对于主程序，这不一定与命令行中使用的文件名相同。</p>
+<p>参见 <a href="#__dirname"><code>__dirname</code></a> 获取当前模块的目录名。</p>
+<p>示例：</p>
+<p>从 <code>/Users/mjr</code> 运行 <code>node example.js</code></p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(__filename);
+<span class="hljs-comment">// Prints: /Users/mjr/example.js</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(__dirname);
+<span class="hljs-comment">// Prints: /Users/mjr</span></code> <button class="copy-button">copy</button></pre>
+<p>给定两个模块：<code>a</code> 和 <code>b</code>，其中 <code>b</code> 是 <code>a</code> 的依赖项，并且存在以下目录结构：</p>
+<ul>
+<li><code>/Users/mjr/app/a.js</code></li>
+<li><code>/Users/mjr/app/node_modules/b/b.js</code></li>
+</ul>
+<p>在 <code>b.js</code> 内对 <code>__filename</code> 的引用将返回 <code>/Users/mjr/app/node_modules/b/b.js</code>，而在 <code>a.js</code> 内对 <code>__filename</code> 的引用将返回 <code>/Users/mjr/app/a.js</code>。</p>
+</div><div>
+<h4><code>exports</code><span><a class="mark" href="#exports" id="exports">#</a></span><a aria-hidden="true" class="legacy" id="modules_exports"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.12</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>对 <code>module.exports</code> 的引用，输入更短。有关何时使用 <code>exports</code> 和何时使用 <code>module.exports</code> 的详细信息，请参见 [exports 快捷方式][] 部分。</p>
+</div><div>
+<h4><code>module</code><span><a class="mark" href="#module" id="module">#</a></span><a aria-hidden="true" class="legacy" id="modules_module"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li>类型: <a href="modules.html#the-module-object" class="type">&#x3C;module></a></li>
+</ul>
+<p>对当前模块的引用，请参见关于 [<code>module</code> 对象][] 的部分。特别是，<code>module.exports</code> 用于定义模块导出什么并通过 <code>require()</code> 使其可用。</p>
+</div><div>
+<h4><code>require(id)</code><span><a class="mark" href="#requireid" id="requireid">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_id"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.13</span>
+</div>
+<ul>
+<li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 模块名或路径</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 导出的模块内容</li>
+</ul>
+<p>用于导入模块、<code>JSON</code> 和本地文件。可以从 <code>node_modules</code> 导入模块。可以使用相对路径（例如 <code>./</code>、<code>./foo</code>、<code>./bar/baz</code>、<code>../foo</code>）导入本地模块和 JSON 文件，该路径将根据 <a href="#__dirname"><code>__dirname</code></a> 命名的目录（如果已定义）或当前工作目录进行解析。POSIX 风格的相对路径以与操作系统无关的方式解析，这意味着上述示例在 Windows 上的工作方式与在 Unix 系统上的工作方式相同。</p>
+<pre><code class="language-js"><span class="hljs-comment">// Importing a local module with a path relative to the `__dirname` or current</span>
+<span class="hljs-comment">// working directory. (On Windows, this would resolve to .\path\myLocalModule.)</span>
+<span class="hljs-keyword">const</span> myLocalModule = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./path/myLocalModule'</span>);
+
+<span class="hljs-comment">// Importing a JSON file:</span>
+<span class="hljs-keyword">const</span> jsonData = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./path/filename.json'</span>);
+
+<span class="hljs-comment">// Importing a module from node_modules or Node.js built-in module:</span>
+<span class="hljs-keyword">const</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:crypto'</span>);</code> <button class="copy-button">copy</button></pre>
+<div>
+<h5><code>require.cache</code><span><a class="mark" href="#requirecache" id="requirecache">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_cache"></a></h5>
+<div class="api_metadata">
+<span>Added in: v0.3.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>模块在需要时缓存在此对象中。通过从此对象中删除键值，下一次 <code>require</code> 将重新加载模块。这不适用于 <a href="addons.html">原生插件</a>，重新加载会导致错误。</p>
+<p>添加或替换条目也是可能的。在检查内置模块之前会检查此缓存，如果将与内置模块名称匹配的名称添加到缓存中，则只有带 <code>node:</code> 前缀的 require 调用才会接收内置模块。请小心使用！</p>
+<!-- eslint-disable node-core/no-duplicate-requires, no-restricted-syntax -->
+<pre><code class="language-js"><span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:assert'</span>);
+<span class="hljs-keyword">const</span> realFs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+
+<span class="hljs-keyword">const</span> fakeFs = {};
+<span class="hljs-built_in">require</span>.<span class="hljs-property">cache</span>.<span class="hljs-property">fs</span> = { <span class="hljs-attr">exports</span>: fakeFs };
+
+assert.<span class="hljs-title function_">strictEqual</span>(<span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>), fakeFs);
+assert.<span class="hljs-title function_">strictEqual</span>(<span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>), realFs);</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>require.extensions</code><span><a class="mark" href="#requireextensions" id="requireextensions">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_extensions"></a></h5>
+<div class="api_metadata">
+<span>Added in: v0.3.0</span><span>Deprecated since: v0.10.6</span>
+</div>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated</div><p></p>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>指示 <code>require</code> 如何处理某些文件扩展名。</p>
+<p>将扩展名为 <code>.sjs</code> 的文件作为 <code>.js</code> 处理：</p>
+<pre><code class="language-js"><span class="hljs-built_in">require</span>.<span class="hljs-property">extensions</span>[<span class="hljs-string">'.sjs'</span>] = <span class="hljs-built_in">require</span>.<span class="hljs-property">extensions</span>[<span class="hljs-string">'.js'</span>];</code> <button class="copy-button">copy</button></pre>
+<p><strong>已弃用。</strong> 过去，此列表用于通过按需编译将非 JavaScript 模块加载到 Node.js 中。然而，在实践中，有更好的方法可以做到这一点，例如通过其他 Node.js 程序加载模块，或提前将它们编译为 JavaScript。</p>
+<p>避免使用 <code>require.extensions</code>。使用可能会导致细微的错误，并且解析扩展名会随着每个注册的扩展名而变慢。</p>
+</div><div>
+<h5><code>require.main</code><span><a class="mark" href="#requiremain" id="requiremain">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_main"></a></h5>
+<div class="api_metadata">
+<span>Added in: v0.1.17</span>
+</div>
+<ul>
+<li>类型: <a href="modules.html#the-module-object" class="type">&#x3C;module></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>表示 Node.js 进程启动时加载的入口脚本的 <code>Module</code> 对象，如果程序的入口点不是 CommonJS 模块，则为 <code>undefined</code>。参见 <a href="#accessing-the-main-module">"访问主模块"</a>。</p>
+<p>在 <code>entry.js</code> 脚本中：</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-built_in">require</span>.<span class="hljs-property">main</span>);</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-bash">node entry.js</code> <button class="copy-button">copy</button></pre>
+<!-- eslint-skip -->
+<pre><code class="language-js"><span class="hljs-title class_">Module</span> {
+  <span class="hljs-attr">id</span>: <span class="hljs-string">'.'</span>,
+  <span class="hljs-attr">path</span>: <span class="hljs-string">'/absolute/path/to'</span>,
+  <span class="hljs-attr">exports</span>: {},
+  <span class="hljs-attr">filename</span>: <span class="hljs-string">'/absolute/path/to/entry.js'</span>,
+  <span class="hljs-attr">loaded</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-attr">children</span>: [],
+  <span class="hljs-attr">paths</span>:
+   [ <span class="hljs-string">'/absolute/path/to/node_modules'</span>,
+     <span class="hljs-string">'/absolute/path/node_modules'</span>,
+     <span class="hljs-string">'/absolute/node_modules'</span>,
+     <span class="hljs-string">'/node_modules'</span> ] }</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>require.resolve(request[, options])</code><span><a class="mark" href="#requireresolverequest-options" id="requireresolverequest-options">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_resolve_request_options"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v8.9.0</td>
+<td><p>The <code>paths</code> option is now supported.</p></td></tr>
+<tr><td>v0.3.0</td>
+<td><p><span>Added in: v0.3.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>request</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的模块路径。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>paths</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 从中解析模块位置的路径。如果存在，这些路径将代替默认解析路径使用，但始终包含的 <a href="#loading-from-the-global-folders">GLOBAL_FOLDERS</a> 如 <code>$HOME/.node_modules</code> 除外。这些路径中的每一个都用作模块解析算法的起点，这意味着从此位置检查 <code>node_modules</code> 层次结构。</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>使用内部的 <code>require()</code> 机制来查找模块的位置，但不是加载模块，只是返回解析后的文件名。</p>
+<p>如果找不到模块，则抛出 <code>MODULE_NOT_FOUND</code> 错误。</p>
+<div>
+<h6><code>require.resolve.paths(request)</code><span><a class="mark" href="#requireresolvepathsrequest" id="requireresolvepathsrequest">#</a></span><a aria-hidden="true" class="legacy" id="modules_require_resolve_paths_request"></a></h6>
+<div class="api_metadata">
+<span>Added in: v8.9.0</span>
+</div>
+<ul>
+<li><code>request</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 正在检索其查找路径的模块路径。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></li>
+</ul>
+<p>返回一个包含在解析 <code>request</code> 期间搜索的路径的数组，如果 <code>request</code> 字符串引用核心模块（例如 <code>http</code> 或 <code>fs</code>），则返回 <code>null</code>。</p>
+</div></div></div>
+</section><section><h3><code>module</code> 对象<span><a class="mark" href="#module-" id="module-">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_1"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>在每个模块中，<code>module</code> 自由变量是对表示当前模块的对象的引用。为方便起见，<code>module.exports</code> 也可以通过 <code>exports</code> 模块全局访问。<code>module</code> 实际上不是全局的，而是每个模块本地的。</p>
+<div>
+<h4><code>module.children</code><span><a class="mark" href="#modulechildren" id="modulechildren">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_children"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li>类型: <a href="modules.html#the-module-object" class="type">&#x3C;module[]></a></li>
+</ul>
+<p>此模块首次需要的模块对象。</p>
+</div><div>
+<h4><code>module.exports</code><span><a class="mark" href="#moduleexports" id="moduleexports">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_exports"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p><code>module.exports</code> 对象由 <code>Module</code> 系统创建。有时这是不可接受的；许多人希望他们的模块是某个类的实例。为此，将所需的导出对象分配给 <code>module.exports</code>。将所需对象分配给 <code>exports</code> 只会重新绑定本地 <code>exports</code> 变量，这可能不是想要的。</p>
+<p>例如，假设我们正在制作一个名为 <code>a.js</code> 的模块：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> <span class="hljs-title class_">EventEmitter</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:events'</span>);
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EventEmitter</span>();
+
+<span class="hljs-comment">// Do some work, and after some time emit</span>
+<span class="hljs-comment">// the 'ready' event from the module itself.</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span>.<span class="hljs-title function_">emit</span>(<span class="hljs-string">'ready'</span>);
+}, <span class="hljs-number">1000</span>);</code> <button class="copy-button">copy</button></pre>
+<p>然后在另一个文件中我们可以这样做：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> a = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./a'</span>);
+a.<span class="hljs-title function_">on</span>(<span class="hljs-string">'ready'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'module "a" is ready'</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p>对 <code>module.exports</code> 的赋值必须立即完成。不能在任何回调中完成。这不起作用：</p>
+<p><code>x.js</code>：</p>
+<pre><code class="language-js"><span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = { <span class="hljs-attr">a</span>: <span class="hljs-string">'hello'</span> };
+}, <span class="hljs-number">0</span>);</code> <button class="copy-button">copy</button></pre>
+<p><code>y.js</code>：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> x = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./x'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(x.<span class="hljs-property">a</span>);</code> <button class="copy-button">copy</button></pre>
+<div>
+<h5><code>exports</code> 快捷方式<span><a class="mark" href="#exports-" id="exports-">#</a></span><a aria-hidden="true" class="legacy" id="modules_exports_1"></a></h5>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<p><code>exports</code> 变量在模块的文件级作用域内可用，并在模块评估之前被赋予 <code>module.exports</code> 的值。</p>
+<p>它允许一个快捷方式，因此 <code>module.exports.f = ...</code> 可以更简洁地写为 <code>exports.f = ...</code>。但是，请注意，像任何变量一样，如果为 <code>exports</code> 分配了新值，它不再绑定到 <code>module.exports</code>：</p>
+<pre><code class="language-js"><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span>.<span class="hljs-property">hello</span> = <span class="hljs-literal">true</span>; <span class="hljs-comment">// Exported from require of module</span>
+<span class="hljs-built_in">exports</span> = { <span class="hljs-attr">hello</span>: <span class="hljs-literal">false</span> };  <span class="hljs-comment">// Not exported, only available in the module</span></code> <button class="copy-button">copy</button></pre>
+<p>当 <code>module.exports</code> 属性被新对象完全替换时，通常也会重新分配 <code>exports</code>：</p>
+<!-- eslint-disable func-name-matching -->
+<pre><code class="language-js"><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-built_in">exports</span> = <span class="hljs-keyword">function</span> <span class="hljs-title function_">Constructor</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// ... etc.</span>
+};</code> <button class="copy-button">copy</button></pre>
+<p>为了说明行为，想象一下这个假设的 <code>require()</code> 实现，它与 <code>require()</code> 实际所做的非常相似：</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">require</span>(<span class="hljs-params"><span class="hljs-comment">/* ... */</span></span>) {
+  <span class="hljs-keyword">const</span> <span class="hljs-variable language_">module</span> = { <span class="hljs-attr">exports</span>: {} };
+  (<span class="hljs-function">(<span class="hljs-params"><span class="hljs-variable language_">module</span>, <span class="hljs-built_in">exports</span></span>) =></span> {
+    <span class="hljs-comment">// Module code here. In this example, define a function.</span>
+    <span class="hljs-keyword">function</span> <span class="hljs-title function_">someFunc</span>(<span class="hljs-params"></span>) {}
+    <span class="hljs-built_in">exports</span> = someFunc;
+    <span class="hljs-comment">// At this point, exports is no longer a shortcut to module.exports, and</span>
+    <span class="hljs-comment">// this module will still export an empty default object.</span>
+    <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = someFunc;
+    <span class="hljs-comment">// At this point, the module will now export someFunc, instead of the</span>
+    <span class="hljs-comment">// default object.</span>
+  })(<span class="hljs-variable language_">module</span>, <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span>);
+  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span>;
+}</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4><code>module.filename</code><span><a class="mark" href="#modulefilename" id="modulefilename">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_filename"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>模块的完全解析文件名。</p>
+</div><div>
+<h4><code>module.id</code><span><a class="mark" href="#moduleid" id="moduleid">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_id"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>模块的标识符。通常这是完全解析的文件名。</p>
+</div><div>
+<h4><code>module.isPreloading</code><span><a class="mark" href="#moduleispreloading" id="moduleispreloading">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_ispreloading"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.4.0, v14.17.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果模块在 Node.js 预加载阶段运行，则为 <code>true</code>。</li>
+</ul>
+</div><div>
+<h4><code>module.loaded</code><span><a class="mark" href="#moduleloaded" id="moduleloaded">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_loaded"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>模块是否已完成加载，或正在加载过程中。</p>
+</div><div>
+<h4><code>module.parent</code><span><a class="mark" href="#moduleparent" id="moduleparent">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_parent"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.16</span><span>Deprecated since: v14.6.0, v12.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated: Please use <a href="#requiremain"><code>require.main</code></a> and
+<a href="#modulechildren"><code>module.children</code></a> instead.</div><p></p>
+<ul>
+<li>类型: <a href="modules.html#the-module-object" class="type">&#x3C;module></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>第一个需要此模块的模块，如果当前模块是当前进程的入口点，则为 <code>null</code>，或者如果模块是由不是 CommonJS 模块的东西加载的（例如：REPL 或 <code>import</code>），则为 <code>undefined</code>。</p>
+</div><div>
+<h4><code>module.path</code><span><a class="mark" href="#modulepath" id="modulepath">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_path"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>模块的目录名。这通常与 <a href="#moduleid"><code>module.id</code></a> 的 <a href="path.html#pathdirnamepath"><code>path.dirname()</code></a> 相同。</p>
+</div><div>
+<h4><code>module.paths</code><span><a class="mark" href="#modulepaths" id="modulepaths">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_paths"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.4.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>模块的搜索路径。</p>
+</div><div>
+<h4><code>module.require(id)</code><span><a class="mark" href="#modulerequireid" id="modulerequireid">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_require_id"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.5.1</span>
+</div>
+<ul>
+<li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 导出的模块内容</li>
+</ul>
+<p><code>module.require()</code> 方法提供了一种加载模块的方式，就像从原始模块调用 <code>require()</code> 一样。</p>
+<p>为了做到这一点，有必要获取对 <code>module</code> 对象的引用。由于 <code>require()</code> 返回 <code>module.exports</code>，并且 <code>module</code> 通常 <em>仅</em> 在特定模块的代码中可用，因此必须显式导出才能使用。</p>
+</div>
+</section><section><h3><code>Module</code> 对象<span><a class="mark" href="#module-_1" id="module-_1">#</a></span><a aria-hidden="true" class="legacy" id="modules_module_2"></a></h3>
+<p>此部分已移至 <a href="module.html#the-module-object">Modules: <code>module</code> core module</a>。</p>
+<!-- Anchors to make sure old links find a target -->
+<ul>
+<li><a id="modules_module_builtinmodules" href="module.html#modulebuiltinmodules"><code>module.builtinModules</code></a></li>
+<li><a id="modules_module_createrequire_filename" href="module.html#modulecreaterequirefilename"><code>module.createRequire(filename)</code></a></li>
+<li><a id="modules_module_syncbuiltinesmexports" href="module.html#modulesyncbuiltinesmexports"><code>module.syncBuiltinESMExports()</code></a></li>
+</ul>
+</section><section><h3>Source map v3 支持<span><a class="mark" href="#source-map-v3-" id="source-map-v3-">#</a></span><a aria-hidden="true" class="legacy" id="modules_source_map_v3"></a></h3>
+<p>此部分已移至 <a href="module.html#source-map-support">Modules: <code>module</code> core module</a>。</p>
+<!-- Anchors to make sure old links find a target -->
+<ul>
+<li><a id="modules_module_findsourcemap_path_error" href="module.html#modulefindsourcemappath"><code>module.findSourceMap(path)</code></a></li>
+<li><a id="modules_class_module_sourcemap" href="module.html#class-modulesourcemap">Class: <code>module.SourceMap</code></a>
+<ul>
+<li><a id="modules_new_sourcemap_payload" href="module.html#new-sourcemappayload--linelengths-"><code>new SourceMap(payload)</code></a></li>
+<li><a id="modules_sourcemap_payload" href="module.html#sourcemappayload"><code>sourceMap.payload</code></a></li>
+<li><a id="modules_sourcemap_findentry_linenumber_columnnumber" href="module.html#sourcemapfindentrylineoffset-columnoffset"><code>sourceMap.findEntry(lineNumber, columnNumber)</code></a></li>
+</ul>
+</li>
+</ul></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>SQLite | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/sqlite.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:526px){.with-38-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:606px){.with-48-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:670px){.with-56-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-sqlite">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite active">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="sqlite" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_1.1"><a href="#sqlite">SQLite</a></span>
+<ul>
+<li><a href="#databasesync">类：<code>DatabaseSync</code></a>
+<ul>
+<li><a href="#new-databasesyncpath-options"><code>new DatabaseSync(path[, options])</code></a></li>
+<li><a href="#databaseaggregatename-options"><code>database.aggregate(name, options)</code></a></li>
+<li><a href="#databaseclose"><code>database.close()</code></a></li>
+<li><a href="#databaseloadextensionpath"><code>database.loadExtension(path)</code></a></li>
+<li><a href="#databaseenableloadextensionallow"><code>database.enableLoadExtension(allow)</code></a></li>
+<li><a href="#databaselocationdbname"><code>database.location([dbName])</code></a></li>
+<li><a href="#databaseexecsql"><code>database.exec(sql)</code></a></li>
+<li><a href="#databasefunctionname-options-function"><code>database.function(name[, options], function)</code></a></li>
+<li><a href="#databasesetauthorizercallback"><code>database.setAuthorizer(callback)</code></a></li>
+<li><a href="#databaseisopen"><code>database.isOpen</code></a></li>
+<li><a href="#databaseistransaction"><code>database.isTransaction</code></a></li>
+<li><a href="#databaseopen"><code>database.open()</code></a></li>
+<li><a href="#databasepreparesql"><code>database.prepare(sql)</code></a></li>
+<li><a href="#databasecreatesqltagstoremaxsize"><code>database.createSQLTagStore([maxSize])</code></a></li>
+<li><a href="#databasecreatesessionoptions"><code>database.createSession([options])</code></a></li>
+<li><a href="#databaseapplychangesetchangeset-options"><code>database.applyChangeset(changeset[, options])</code></a></li>
+<li><a href="#databasesymboldispose"><code>database[Symbol.dispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#session">类：<code>Session</code></a>
+<ul>
+<li><a href="#sessionchangeset"><code>session.changeset()</code></a></li>
+<li><a href="#sessionpatchset"><code>session.patchset()</code></a></li>
+<li><a href="#sessionclose"><code>session.close()</code>.</a></li>
+</ul>
+</li>
+<li><a href="#statementsync">类：<code>StatementSync</code></a></li>
+<li><a href="#sqltagstore">类：<code>SQLTagStore</code></a>
+<ul>
+<li><a href="#sqltagstoreallsqltemplate-values"><code>sqlTagStore.all(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstoregetsqltemplate-values"><code>sqlTagStore.get(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstoreiteratesqltemplate-values"><code>sqlTagStore.iterate(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstorerunsqltemplate-values"><code>sqlTagStore.run(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstoresize"><code>sqlTagStore.size()</code></a></li>
+<li><a href="#sqltagstorecapacity"><code>sqlTagStore.capacity</code></a></li>
+<li><a href="#sqltagstoredb"><code>sqlTagStore.db</code></a></li>
+<li><a href="#sqltagstorereset"><code>sqlTagStore.reset()</code></a></li>
+<li><a href="#sqltagstoreclear"><code>sqlTagStore.clear()</code></a></li>
+<li><a href="#statementallnamedparameters-anonymousparameters"><code>statement.all([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementcolumns"><code>statement.columns()</code></a></li>
+<li><a href="#statementexpandedsql"><code>statement.expandedSQL</code></a></li>
+<li><a href="#statementgetnamedparameters-anonymousparameters"><code>statement.get([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementiteratenamedparameters-anonymousparameters"><code>statement.iterate([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementrunnamedparameters-anonymousparameters"><code>statement.run([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementsetallowbarenamedparametersenabled"><code>statement.setAllowBareNamedParameters(enabled)</code></a></li>
+<li><a href="#statementsetallowunknownnamedparametersenabled"><code>statement.setAllowUnknownNamedParameters(enabled)</code></a></li>
+<li><a href="#statementsetreturnarraysenabled"><code>statement.setReturnArrays(enabled)</code></a></li>
+<li><a href="#statementsetreadbigintsenabled"><code>statement.setReadBigInts(enabled)</code></a></li>
+<li><a href="#statementsourcesql"><code>statement.sourceSQL</code></a></li>
+<li><a href="#javascript--sqlite-">JavaScript 和 SQLite 之间的类型转换</a></li>
+</ul>
+</li>
+<li><a href="#sqlitebackupsourcedb-path-options"><code>sqlite.backup(sourceDb, path[, options])</code></a></li>
+<li><a href="#sqliteconstants"><code>sqlite.constants</code></a>
+<ul>
+<li><a href="#sqlite-">SQLite 常量</a>
+<ul>
+<li><a href="#">冲突解决常量</a></li>
+<li><a href="#_1">授权常量</a>
+<ul>
+<li><a href="#_2">授权结果码</a></li>
+<li><a href="#_3">授权操作码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite active">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/sqlite.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/sqlite.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/sqlite.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/sqlite.html">22.x <b>LTS</b></a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="sqlite.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/sqlite.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_1.1"><a href="#sqlite">SQLite</a></span>
+<ul>
+<li><a href="#databasesync">类：<code>DatabaseSync</code></a>
+<ul>
+<li><a href="#new-databasesyncpath-options"><code>new DatabaseSync(path[, options])</code></a></li>
+<li><a href="#databaseaggregatename-options"><code>database.aggregate(name, options)</code></a></li>
+<li><a href="#databaseclose"><code>database.close()</code></a></li>
+<li><a href="#databaseloadextensionpath"><code>database.loadExtension(path)</code></a></li>
+<li><a href="#databaseenableloadextensionallow"><code>database.enableLoadExtension(allow)</code></a></li>
+<li><a href="#databaselocationdbname"><code>database.location([dbName])</code></a></li>
+<li><a href="#databaseexecsql"><code>database.exec(sql)</code></a></li>
+<li><a href="#databasefunctionname-options-function"><code>database.function(name[, options], function)</code></a></li>
+<li><a href="#databasesetauthorizercallback"><code>database.setAuthorizer(callback)</code></a></li>
+<li><a href="#databaseisopen"><code>database.isOpen</code></a></li>
+<li><a href="#databaseistransaction"><code>database.isTransaction</code></a></li>
+<li><a href="#databaseopen"><code>database.open()</code></a></li>
+<li><a href="#databasepreparesql"><code>database.prepare(sql)</code></a></li>
+<li><a href="#databasecreatesqltagstoremaxsize"><code>database.createSQLTagStore([maxSize])</code></a></li>
+<li><a href="#databasecreatesessionoptions"><code>database.createSession([options])</code></a></li>
+<li><a href="#databaseapplychangesetchangeset-options"><code>database.applyChangeset(changeset[, options])</code></a></li>
+<li><a href="#databasesymboldispose"><code>database[Symbol.dispose]()</code></a></li>
+</ul>
+</li>
+<li><a href="#session">类：<code>Session</code></a>
+<ul>
+<li><a href="#sessionchangeset"><code>session.changeset()</code></a></li>
+<li><a href="#sessionpatchset"><code>session.patchset()</code></a></li>
+<li><a href="#sessionclose"><code>session.close()</code>.</a></li>
+</ul>
+</li>
+<li><a href="#statementsync">类：<code>StatementSync</code></a></li>
+<li><a href="#sqltagstore">类：<code>SQLTagStore</code></a>
+<ul>
+<li><a href="#sqltagstoreallsqltemplate-values"><code>sqlTagStore.all(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstoregetsqltemplate-values"><code>sqlTagStore.get(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstoreiteratesqltemplate-values"><code>sqlTagStore.iterate(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstorerunsqltemplate-values"><code>sqlTagStore.run(sqlTemplate[, ...values])</code></a></li>
+<li><a href="#sqltagstoresize"><code>sqlTagStore.size()</code></a></li>
+<li><a href="#sqltagstorecapacity"><code>sqlTagStore.capacity</code></a></li>
+<li><a href="#sqltagstoredb"><code>sqlTagStore.db</code></a></li>
+<li><a href="#sqltagstorereset"><code>sqlTagStore.reset()</code></a></li>
+<li><a href="#sqltagstoreclear"><code>sqlTagStore.clear()</code></a></li>
+<li><a href="#statementallnamedparameters-anonymousparameters"><code>statement.all([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementcolumns"><code>statement.columns()</code></a></li>
+<li><a href="#statementexpandedsql"><code>statement.expandedSQL</code></a></li>
+<li><a href="#statementgetnamedparameters-anonymousparameters"><code>statement.get([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementiteratenamedparameters-anonymousparameters"><code>statement.iterate([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementrunnamedparameters-anonymousparameters"><code>statement.run([namedParameters][, ...anonymousParameters])</code></a></li>
+<li><a href="#statementsetallowbarenamedparametersenabled"><code>statement.setAllowBareNamedParameters(enabled)</code></a></li>
+<li><a href="#statementsetallowunknownnamedparametersenabled"><code>statement.setAllowUnknownNamedParameters(enabled)</code></a></li>
+<li><a href="#statementsetreturnarraysenabled"><code>statement.setReturnArrays(enabled)</code></a></li>
+<li><a href="#statementsetreadbigintsenabled"><code>statement.setReadBigInts(enabled)</code></a></li>
+<li><a href="#statementsourcesql"><code>statement.sourceSQL</code></a></li>
+<li><a href="#javascript--sqlite-">JavaScript 和 SQLite 之间的类型转换</a></li>
+</ul>
+</li>
+<li><a href="#sqlitebackupsourcedb-path-options"><code>sqlite.backup(sourceDb, path[, options])</code></a></li>
+<li><a href="#sqliteconstants"><code>sqlite.constants</code></a>
+<ul>
+<li><a href="#sqlite-">SQLite 常量</a>
+<ul>
+<li><a href="#">冲突解决常量</a></li>
+<li><a href="#_1">授权常量</a>
+<ul>
+<li><a href="#_2">授权结果码</a></li>
+<li><a href="#_3">授权操作码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>SQLite<span><a class="mark" href="#sqlite" id="sqlite">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqlite"></a></h2>
+
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development.</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/sqlite.js">lib/sqlite.js</a></p>
+<p><code>node:sqlite</code> 模块用于操作 SQLite 数据库。
+可以通过以下方式访问它：</p>
+
+<pre class="with-38-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> sqlite <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sqlite'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> sqlite = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sqlite'</span>);</code><button class="copy-button">copy</button></pre>
+<p>此模块仅在 <code>node:</code> 方案下可用。</p>
+<p>以下示例展示了使用 <code>node:sqlite</code> 模块打开一个内存数据库、向数据库写入数据，然后读取数据的基本用法。</p>
+
+<pre class="with-48-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">DatabaseSync</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sqlite'</span>;
+<span class="hljs-keyword">const</span> database = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+
+<span class="hljs-comment">// Execute SQL statements from strings.</span>
+database.<span class="hljs-title function_">exec</span>(<span class="hljs-string">`
+  CREATE TABLE data(
+    key INTEGER PRIMARY KEY,
+    value TEXT
+  ) STRICT
+`</span>);
+<span class="hljs-comment">// Create a prepared statement to insert data into the database.</span>
+<span class="hljs-keyword">const</span> insert = database.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'INSERT INTO data (key, value) VALUES (?, ?)'</span>);
+<span class="hljs-comment">// Execute the prepared statement with bound values.</span>
+insert.<span class="hljs-title function_">run</span>(<span class="hljs-number">1</span>, <span class="hljs-string">'hello'</span>);
+insert.<span class="hljs-title function_">run</span>(<span class="hljs-number">2</span>, <span class="hljs-string">'world'</span>);
+<span class="hljs-comment">// Create a prepared statement to read data from the database.</span>
+<span class="hljs-keyword">const</span> query = database.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'SELECT * FROM data ORDER BY key'</span>);
+<span class="hljs-comment">// Execute the prepared statement and log the result set.</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(query.<span class="hljs-title function_">all</span>());
+<span class="hljs-comment">// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]</span></code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">DatabaseSync</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sqlite'</span>);
+<span class="hljs-keyword">const</span> database = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+
+<span class="hljs-comment">// Execute SQL statements from strings.</span>
+database.<span class="hljs-title function_">exec</span>(<span class="hljs-string">`
+  CREATE TABLE data(
+    key INTEGER PRIMARY KEY,
+    value TEXT
+  ) STRICT
+`</span>);
+<span class="hljs-comment">// Create a prepared statement to insert data into the database.</span>
+<span class="hljs-keyword">const</span> insert = database.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'INSERT INTO data (key, value) VALUES (?, ?)'</span>);
+<span class="hljs-comment">// Execute the prepared statement with bound values.</span>
+insert.<span class="hljs-title function_">run</span>(<span class="hljs-number">1</span>, <span class="hljs-string">'hello'</span>);
+insert.<span class="hljs-title function_">run</span>(<span class="hljs-number">2</span>, <span class="hljs-string">'world'</span>);
+<span class="hljs-comment">// Create a prepared statement to read data from the database.</span>
+<span class="hljs-keyword">const</span> query = database.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'SELECT * FROM data ORDER BY key'</span>);
+<span class="hljs-comment">// Execute the prepared statement and log the result set.</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(query.<span class="hljs-title function_">all</span>());
+<span class="hljs-comment">// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]</span></code><button class="copy-button">copy</button></pre>
+<section><h3>类：<code>DatabaseSync</code><span><a class="mark" href="#databasesync" id="databasesync">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_databasesync"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>Add <code>timeout</code> option.</p></td></tr>
+<tr><td>v23.10.0, v22.15.0</td>
+<td><p>The <code>path</code> argument now supports Buffer and URL objects.</p></td></tr>
+<tr><td>v22.5.0</td>
+<td><p><span>Added in: v22.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>此类表示与 SQLite 数据库的单个[连接][]。此类暴露的所有 API 都是同步执行的。</p>
+<div>
+<h4><code>new DatabaseSync(path[, options])</code><span><a class="mark" href="#new-databasesyncpath-options" id="new-databasesyncpath-options">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_new_databasesync_path_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.4.0</td>
+<td><p>Add new SQLite database options.</p></td></tr>
+<tr><td>v22.5.0</td>
+<td><p><span>Added in: v22.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 数据库的路径。SQLite 数据库可以存储在文件中或完全[内存中][]。要使用文件支持的数据库，路径应为文件路径。要使用内存数据库，路径应为特殊名称 <code>':memory:'</code>。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 数据库连接的配置选项。支持以下选项：
+<ul>
+<li><code>open</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，数据库由构造函数打开。当此值为 <code>false</code> 时，必须通过 <code>open()</code> 方法打开数据库。<strong>默认值:</strong> <code>true</code>。</li>
+<li><code>readOnly</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，数据库以只读模式打开。如果数据库不存在，打开操作将失败。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>enableForeignKeyConstraints</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则启用外键约束。推荐启用，但为了兼容旧版数据库模式可以禁用它。外键约束的强制执行可以在打开数据库后使用 <a href="https://www.sqlite.org/pragma.html#pragma_foreign_keys"><code>PRAGMA foreign_keys</code></a> 来启用和禁用。<strong>默认值:</strong> <code>true</code>。</li>
+<li><code>enableDoubleQuotedStringLiterals</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，SQLite 将接受[双引号字符串字面量][]。不推荐启用，但为了兼容旧版数据库模式可以启用。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>allowExtension</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则启用 <code>loadExtension</code> SQL 函数和 <code>loadExtension()</code> 方法。之后可以调用 <code>enableLoadExtension(false)</code> 来禁用此功能。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>timeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> [繁忙超时][]时间，以毫秒为单位。这是 SQLite 在返回错误之前等待数据库锁释放的最长时间。<strong>默认值:</strong> <code>0</code>。</li>
+<li><code>readBigInts</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，整数字段将作为 JavaScript <code>BigInt</code> 值读取。如果为 <code>false</code>，整数字段将作为 JavaScript 数字读取。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>returnArrays</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，查询结果将以数组形式返回，而不是对象。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>allowBareNamedParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，允许绑定不带前缀字符的命名参数（例如，使用 <code>foo</code> 而不是 <code>:foo</code>）。<strong>默认值:</strong> <code>true</code>。</li>
+<li><code>allowUnknownNamedParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，绑定命名参数时忽略未知参数。如果为 <code>false</code>，对于未知命名参数会抛出异常。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+</ul>
+<p>构造一个新的 <code>DatabaseSync</code> 实例。</p>
+</div><div>
+<h4><code>database.aggregate(name, options)</code><span><a class="mark" href="#databaseaggregatename-options" id="databaseaggregatename-options">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_aggregate_name_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.0.0</span>
+</div>
+<p>向 SQLite 数据库注册一个新的聚合函数。此方法是 <a href="https://www.sqlite.org/c3ref/create_function.html"><code>sqlite3_create_window_function()</code></a> 的封装。</p>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要创建的 SQLite 函数的名称。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 函数配置设置。
+<ul>
+<li><code>deterministic</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则在创建的函数上设置 <a href="https://www.sqlite.org/c3ref/c_deterministic.html"><code>SQLITE_DETERMINISTIC</code></a> 标志。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>directOnly</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则在创建的函数上设置 <a href="https://www.sqlite.org/c3ref/c_deterministic.html"><code>SQLITE_DIRECTONLY</code></a> 标志。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>useBigIntArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，传递给 <code>options.step</code> 和 <code>options.inverse</code> 的整数参数将转换为 <code>BigInt</code>。如果为 <code>false</code>，整数参数将作为 JavaScript 数字传递。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>varargs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，<code>options.step</code> 和 <code>options.inverse</code> 可以用任意数量的参数调用（在零到 <a href="https://www.sqlite.org/limits.html#max_function_arg"><code>SQLITE_MAX_FUNCTION_ARG</code></a> 之间）。如果为 <code>false</code>，<code>inverse</code> 和 <code>step</code> 必须用恰好 <code>length</code> 个参数调用。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>start</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 聚合函数的初始值。聚合函数初始化时使用此值。当传递 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 时，初始值将是其返回值。</li>
+<li><code>step</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 为聚合中的每一行调用的函数。该函数接收当前状态和行值。此函数的返回值应为新状态。</li>
+<li><code>result</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 调用以获取聚合结果的函数。该函数接收最终状态并应返回聚合的结果。</li>
+<li><code>inverse</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 当提供此函数时，<code>aggregate</code> 方法将作为窗口函数工作。该函数接收当前状态和移除的行值。此函数的返回值应为新状态。</li>
+</ul>
+</li>
+</ul>
+<p>当用作窗口函数时，<code>result</code> 函数将被多次调用。</p>
+
+<pre class="with-48-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">DatabaseSync</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sqlite'</span>);
+
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">`
+  CREATE TABLE t3(x, y);
+  INSERT INTO t3 VALUES ('a', 4),
+                        ('b', 5),
+                        ('c', 3),
+                        ('d', 8),
+                        ('e', 1);
+`</span>);
+
+db.<span class="hljs-title function_">aggregate</span>(<span class="hljs-string">'sumint'</span>, {
+  <span class="hljs-attr">start</span>: <span class="hljs-number">0</span>,
+  <span class="hljs-attr">step</span>: <span class="hljs-function">(<span class="hljs-params">acc, value</span>) =></span> acc + value,
+});
+
+db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'SELECT sumint(y) as total FROM t3'</span>).<span class="hljs-title function_">get</span>(); <span class="hljs-comment">// { total: 21 }</span></code><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">DatabaseSync</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sqlite'</span>;
+
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">`
+  CREATE TABLE t3(x, y);
+  INSERT INTO t3 VALUES ('a', 4),
+                        ('b', 5),
+                        ('c', 3),
+                        ('d', 8),
+                        ('e', 1);
+`</span>);
+
+db.<span class="hljs-title function_">aggregate</span>(<span class="hljs-string">'sumint'</span>, {
+  <span class="hljs-attr">start</span>: <span class="hljs-number">0</span>,
+  <span class="hljs-attr">step</span>: <span class="hljs-function">(<span class="hljs-params">acc, value</span>) =></span> acc + value,
+});
+
+db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'SELECT sumint(y) as total FROM t3'</span>).<span class="hljs-title function_">get</span>(); <span class="hljs-comment">// { total: 21 }</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>database.close()</code><span><a class="mark" href="#databaseclose" id="databaseclose">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<p>关闭数据库连接。如果数据库未打开，则抛出异常。此方法是 <a href="https://www.sqlite.org/c3ref/close.html"><code>sqlite3_close_v2()</code></a> 的封装。</p>
+</div><div>
+<h4><code>database.loadExtension(path)</code><span><a class="mark" href="#databaseloadextensionpath" id="databaseloadextensionpath">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_loadextension_path"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.5.0, v22.13.0</span>
+</div>
+<ul>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要加载的共享库的路径。</li>
+</ul>
+<p>将共享库加载到数据库连接中。此方法是 <a href="https://www.sqlite.org/c3ref/load_extension.html"><code>sqlite3_load_extension()</code></a> 的封装。需要在构造 <code>DatabaseSync</code> 实例时启用 <code>allowExtension</code> 选项。</p>
+</div><div>
+<h4><code>database.enableLoadExtension(allow)</code><span><a class="mark" href="#databaseenableloadextensionallow" id="databaseenableloadextensionallow">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_enableloadextension_allow"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.5.0, v22.13.0</span>
+</div>
+<ul>
+<li><code>allow</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否允许加载扩展。</li>
+</ul>
+<p>启用或禁用 <code>loadExtension</code> SQL 函数和 <code>loadExtension()</code> 方法。当构造时 <code>allowExtension</code> 为 <code>false</code> 时，出于安全原因，您无法启用加载扩展。</p>
+</div><div>
+<h4><code>database.location([dbName])</code><span><a class="mark" href="#databaselocationdbname" id="databaselocationdbname">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_location_dbname"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.0.0</span>
+</div>
+<ul>
+<li><code>dbName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 数据库的名称。可以是 <code>'main'</code>（默认的主数据库）或任何其他使用 <a href="https://www.sqlite.org/lang_attach.html"><code>ATTACH DATABASE</code></a> 添加的数据库。<strong>默认值:</strong> <code>'main'</code>。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 数据库文件的位置。当使用内存数据库时，此方法返回 null。</li>
+</ul>
+<p>此方法是 <a href="https://sqlite.org/c3ref/db_filename.html"><code>sqlite3_db_filename()</code></a> 的封装。</p>
+</div><div>
+<h4><code>database.exec(sql)</code><span><a class="mark" href="#databaseexecsql" id="databaseexecsql">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_exec_sql"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li><code>sql</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要执行的 SQL 字符串。</li>
+</ul>
+<p>此方法允许执行一个或多个 SQL 语句而不返回任何结果。当执行从文件中读取的 SQL 语句时，此方法很有用。此方法是 <a href="https://www.sqlite.org/c3ref/exec.html"><code>sqlite3_exec()</code></a> 的封装。</p>
+</div><div>
+<h4><code>database.function(name[, options], function)</code><span><a class="mark" href="#databasefunctionname-options-function" id="databasefunctionname-options-function">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_function_name_options_function"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.5.0, v22.13.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要创建的 SQLite 函数的名称。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 函数的可选配置设置。支持以下属性：
+<ul>
+<li><code>deterministic</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则在创建的函数上设置 <a href="https://www.sqlite.org/c3ref/c_deterministic.html"><code>SQLITE_DETERMINISTIC</code></a> 标志。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>directOnly</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则在创建的函数上设置 <a href="https://www.sqlite.org/c3ref/c_deterministic.html"><code>SQLITE_DIRECTONLY</code></a> 标志。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>useBigIntArguments</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，传递给 <code>function</code> 的整数参数将转换为 <code>BigInt</code>。如果为 <code>false</code>，整数参数将作为 JavaScript 数字传递。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>varargs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，<code>function</code> 可以用任意数量的参数调用（在零到 <a href="https://www.sqlite.org/limits.html#max_function_arg"><code>SQLITE_MAX_FUNCTION_ARG</code></a> 之间）。如果为 <code>false</code>，<code>function</code> 必须用恰好 <code>function.length</code> 个参数调用。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+<li><code>function</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 调用 SQLite 函数时要调用的 JavaScript 函数。此函数的返回值应为有效的 SQLite 数据类型：请参阅 [JavaScript 和 SQLite 之间的类型转换][]。如果返回值为 <code>undefined</code>，则结果默认为 <code>NULL</code>。</li>
+</ul>
+<p>此方法用于创建 SQLite 用户定义函数。此方法是 <a href="https://www.sqlite.org/c3ref/create_function.html"><code>sqlite3_create_function_v2()</code></a> 的封装。</p>
+</div><div>
+<h4><code>database.setAuthorizer(callback)</code><span><a class="mark" href="#databasesetauthorizercallback" id="databasesetauthorizercallback">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_setauthorizer_callback"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.10.0</span>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 要设置的授权器函数，或 <code>null</code> 以清除当前授权器。</li>
+</ul>
+<p>设置一个授权器回调，当 SQLite 尝试通过预编译语句访问数据或修改数据库模式时，将调用此回调。这可用于实现安全策略、审计访问或限制某些操作。此方法是 <a href="https://sqlite.org/c3ref/set_authorizer.html"><code>sqlite3_set_authorizer()</code></a> 的封装。</p>
+<p>调用时，回调接收五个参数：</p>
+<ul>
+<li><code>actionCode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 正在执行的操作类型（例如，<code>SQLITE_INSERT</code>、<code>SQLITE_UPDATE</code>、<code>SQLITE_SELECT</code>）。</li>
+<li><code>arg1</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 第一个参数（依赖于上下文，通常是表名）。</li>
+<li><code>arg2</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 第二个参数（依赖于上下文，通常是列名）。</li>
+<li><code>dbName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 数据库的名称。</li>
+<li><code>triggerOrView</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 导致访问的触发器或视图的名称。</li>
+</ul>
+<p>回调必须返回以下常量之一：</p>
+<ul>
+<li><code>SQLITE_OK</code> - 允许操作。</li>
+<li><code>SQLITE_DENY</code> - 拒绝操作（导致错误）。</li>
+<li><code>SQLITE_IGNORE</code> - 忽略操作（静默跳过）。</li>
+</ul>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">DatabaseSync</span>, constants } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sqlite'</span>);
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+
+<span class="hljs-comment">// Set up an authorizer that denies all table creation</span>
+db.<span class="hljs-title function_">setAuthorizer</span>(<span class="hljs-function">(<span class="hljs-params">actionCode</span>) =></span> {
+  <span class="hljs-keyword">if</span> (actionCode === constants.<span class="hljs-property">SQLITE_CREATE_TABLE</span>) {
+    <span class="hljs-keyword">return</span> constants.<span class="hljs-property">SQLITE_DENY</span>;
+  }
+  <span class="hljs-keyword">return</span> constants.<span class="hljs-property">SQLITE_OK</span>;
+});
+
+<span class="hljs-comment">// This will work</span>
+db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'SELECT 1'</span>).<span class="hljs-title function_">get</span>();
+
+<span class="hljs-comment">// This will throw an error due to authorization denial</span>
+<span class="hljs-keyword">try</span> {
+  db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'CREATE TABLE blocked (id INTEGER)'</span>);
+} <span class="hljs-keyword">catch</span> (err) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Operation blocked:'</span>, err.<span class="hljs-property">message</span>);
+}</code><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">DatabaseSync</span>, constants } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sqlite'</span>;
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+
+<span class="hljs-comment">// Set up an authorizer that denies all table creation</span>
+db.<span class="hljs-title function_">setAuthorizer</span>(<span class="hljs-function">(<span class="hljs-params">actionCode</span>) =></span> {
+  <span class="hljs-keyword">if</span> (actionCode === constants.<span class="hljs-property">SQLITE_CREATE_TABLE</span>) {
+    <span class="hljs-keyword">return</span> constants.<span class="hljs-property">SQLITE_DENY</span>;
+  }
+  <span class="hljs-keyword">return</span> constants.<span class="hljs-property">SQLITE_OK</span>;
+});
+
+<span class="hljs-comment">// This will work</span>
+db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'SELECT 1'</span>).<span class="hljs-title function_">get</span>();
+
+<span class="hljs-comment">// This will throw an error due to authorization denial</span>
+<span class="hljs-keyword">try</span> {
+  db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'CREATE TABLE blocked (id INTEGER)'</span>);
+} <span class="hljs-keyword">catch</span> (err) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Operation blocked:'</span>, err.<span class="hljs-property">message</span>);
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>database.isOpen</code><span><a class="mark" href="#databaseisopen" id="databaseisopen">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_isopen"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.11.0, v22.15.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 数据库当前是否打开。</li>
+</ul>
+</div><div>
+<h4><code>database.isTransaction</code><span><a class="mark" href="#databaseistransaction" id="databaseistransaction">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_istransaction"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.0.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 数据库当前是否在事务中。此方法是 <a href="https://sqlite.org/c3ref/get_autocommit.html"><code>sqlite3_get_autocommit()</code></a> 的封装。</li>
+</ul>
+</div><div>
+<h4><code>database.open()</code><span><a class="mark" href="#databaseopen" id="databaseopen">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_open"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<p>打开 <code>DatabaseSync</code> 构造函数的 <code>path</code> 参数中指定的数据库。仅当数据库未通过构造函数打开时才应使用此方法。如果数据库已经打开，则抛出异常。</p>
+</div><div>
+<h4><code>database.prepare(sql)</code><span><a class="mark" href="#databasepreparesql" id="databasepreparesql">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_prepare_sql"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li><code>sql</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要编译为预编译语句的 SQL 字符串。</li>
+<li>返回值: <a href="sqlite.html#class-statementsync" class="type">&#x3C;StatementSync></a> 预编译语句。</li>
+</ul>
+<p>将 SQL 语句编译为[预编译语句][]。此方法是 <a href="https://www.sqlite.org/c3ref/prepare.html"><code>sqlite3_prepare_v2()</code></a> 的封装。</p>
+</div><div>
+<h4><code>database.createSQLTagStore([maxSize])</code><span><a class="mark" href="#databasecreatesqltagstoremaxsize" id="databasecreatesqltagstoremaxsize">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_createsqltagstore_maxsize"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li><code>maxSize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 要缓存的预编译语句的最大数量。<strong>默认值:</strong> <code>1000</code>。</li>
+<li>返回值: <a href="sqlite.html#class-sqltagstore" class="type">&#x3C;SQLTagStore></a> 一个新的 SQL 标签存储，用于缓存预编译语句。</li>
+</ul>
+<p>创建一个新的 <code>SQLTagStore</code>，它是一个用于存储预编译语句的 LRU（最近最少使用）缓存。这允许通过使用唯一标识符标记预编译语句来有效地重用它们。</p>
+<p>当执行带标签的 SQL 字面量时，<code>SQLTagStore</code> 会检查该特定 SQL 字符串的预编译语句是否已存在于缓存中。如果存在，则使用缓存的语句。如果不存在，则创建一个新的预编译语句，执行它，然后将其存储在缓存中以备将来使用。此机制有助于避免重复解析和准备相同 SQL 语句的开销。</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">DatabaseSync</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sqlite'</span>;
+
+<span class="hljs-keyword">const</span> db = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+<span class="hljs-keyword">const</span> sql = db.<span class="hljs-title function_">createSQLTagStore</span>();
+
+db.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'CREATE TABLE users (id INT, name TEXT)'</span>);
+
+<span class="hljs-comment">// Using the 'run' method to insert data.</span>
+<span class="hljs-comment">// The tagged literal is used to identify the prepared statement.</span>
+sql.<span class="hljs-property">run</span><span class="hljs-string">`INSERT INTO users VALUES (1, 'Alice')`</span>;
+sql.<span class="hljs-property">run</span><span class="hljs-string">`INSERT INTO users VALUES (2, 'Bob')`</span>;
+
+<span class="hljs-comment">// Using the 'get' method to retrieve a single row.</span>
+<span class="hljs-keyword">const</span> id = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">const</span> user = sql.<span class="hljs-property">get</span><span class="hljs-string">`SELECT * FROM users WHERE id = <span class="hljs-subst">${id}</span>`</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(user); <span class="hljs-comment">// { id: 1, name: 'Alice' }</span>
+
+<span class="hljs-comment">// Using the 'all' method to retrieve all rows.</span>
+<span class="hljs-keyword">const</span> allUsers = sql.<span class="hljs-property">all</span><span class="hljs-string">`SELECT * FROM users ORDER BY id`</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(allUsers);
+<span class="hljs-comment">// [</span>
+<span class="hljs-comment">//   { id: 1, name: 'Alice' },</span>
+<span class="hljs-comment">//   { id: 2, name: 'Bob' }</span>
+<span class="hljs-comment">// ]</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>database.createSession([options])</code><span><a class="mark" href="#databasecreatesessionoptions" id="databasecreatesessionoptions">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_createsession_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.3.0, v22.12.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 会话的配置选项。
+<ul>
+<li><code>table</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要跟踪更改的特定表。默认情况下，跟踪所有表的更改。</li>
+<li><code>db</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要跟踪的数据库的名称。当使用 <a href="https://www.sqlite.org/lang_attach.html"><code>ATTACH DATABASE</code></a> 添加了多个数据库时，这很有用。<strong>默认值</strong>: <code>'main'</code>。</li>
+</ul>
+</li>
+<li>返回值: <a href="sqlite.html#class-session" class="type">&#x3C;Session></a> 会话句柄。</li>
+</ul>
+<p>创建会话并将其附加到数据库。此方法是 <a href="https://www.sqlite.org/session/sqlite3session_create.html"><code>sqlite3session_create()</code></a> 和 <a href="https://www.sqlite.org/session/sqlite3session_attach.html"><code>sqlite3session_attach()</code></a> 的封装。</p>
+</div><div>
+<h4><code>database.applyChangeset(changeset[, options])</code><span><a class="mark" href="#databaseapplychangesetchangeset-options" id="databaseapplychangesetchangeset-options">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_applychangeset_changeset_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.3.0, v22.12.0</span>
+</div>
+<ul>
+<li><code>changeset</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a> 二进制变更集或补丁集。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 应用更改的配置选项。
+<ul>
+<li>
+<p><code>filter</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 跳过那些当目标表名提供给此函数时返回真值的更改。默认情况下，尝试所有更改。</p>
+</li>
+<li>
+<p><code>onConflict</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个决定如何处理冲突的函数。该函数接收一个参数，可以是以下值之一：</p>
+<ul>
+<li><code>SQLITE_CHANGESET_DATA</code>: <code>DELETE</code> 或 <code>UPDATE</code> 更改不包含预期的“之前”值。</li>
+<li><code>SQLITE_CHANGESET_NOTFOUND</code>: 与 <code>DELETE</code> 或 <code>UPDATE</code> 更改的主键匹配的行不存在。</li>
+<li><code>SQLITE_CHANGESET_CONFLICT</code>: <code>INSERT</code> 更改导致重复的主键值。</li>
+<li><code>SQLITE_CHANGESET_FOREIGN_KEY</code>: 应用更改将导致外键冲突。</li>
+<li><code>SQLITE_CHANGESET_CONSTRAINT</code>: 应用更改导致 <code>UNIQUE</code>、<code>CHECK</code> 或 <code>NOT NULL</code> 约束冲突。</li>
+</ul>
+<p>该函数应返回以下值之一：</p>
+<ul>
+<li><code>SQLITE_CHANGESET_OMIT</code>: 忽略冲突的更改。</li>
+<li><code>SQLITE_CHANGESET_REPLACE</code>: 用冲突的更改替换现有值（仅对 <code>SQLITE_CHANGESET_DATA</code> 或 <code>SQLITE_CHANGESET_CONFLICT</code> 冲突有效）。</li>
+<li><code>SQLITE_CHANGESET_ABORT</code>: 在冲突时中止并回滚数据库。</li>
+</ul>
+<p>当冲突处理程序中抛出错误或处理程序返回任何其他值时，应用变更集会中止并且数据库会回滚。</p>
+<p><strong>默认值</strong>: 返回 <code>SQLITE_CHANGESET_ABORT</code> 的函数。</p>
+</li>
+</ul>
+</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 变更集是否成功应用而未中止。</li>
+</ul>
+<p>如果数据库未打开，则抛出异常。此方法是 <a href="https://www.sqlite.org/session/sqlite3changeset_apply.html"><code>sqlite3changeset_apply()</code></a> 的封装。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> sourceDb = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+<span class="hljs-keyword">const</span> targetDb = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">':memory:'</span>);
+
+sourceDb.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'CREATE TABLE data(key INTEGER PRIMARY KEY, value TEXT)'</span>);
+targetDb.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'CREATE TABLE data(key INTEGER PRIMARY KEY, value TEXT)'</span>);
+
+<span class="hljs-keyword">const</span> session = sourceDb.<span class="hljs-title function_">createSession</span>();
+
+<span class="hljs-keyword">const</span> insert = sourceDb.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">'INSERT INTO data (key, value) VALUES (?, ?)'</span>);
+insert.<span class="hljs-title function_">run</span>(<span class="hljs-number">1</span>, <span class="hljs-string">'hello'</span>);
+insert.<span class="hljs-title function_">run</span>(<span class="hljs-number">2</span>, <span class="hljs-string">'world'</span>);
+
+<span class="hljs-keyword">const</span> changeset = session.<span class="hljs-title function_">changeset</span>();
+targetDb.<span class="hljs-title function_">applyChangeset</span>(changeset);
+<span class="hljs-comment">// Now that the changeset has been applied, targetDb contains the same data as sourceDb.</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>database[Symbol.dispose]()</code><span><a class="mark" href="#databasesymboldispose" id="databasesymboldispose">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_database_symbol_dispose"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.2.0</td>
+<td><p>No longer experimental.</p></td></tr>
+<tr><td>v23.11.0, v22.15.0</td>
+<td><p><span>Added in: v23.11.0, v22.15.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>关闭数据库连接。如果数据库连接已关闭，则此操作无效。</p>
+</div>
+</section><section><h3>类：<code>Session</code><span><a class="mark" href="#session" id="session">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_session"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.3.0, v22.12.0</span>
+</div>
+<div>
+<h4><code>session.changeset()</code><span><a class="mark" href="#sessionchangeset" id="sessionchangeset">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_session_changeset"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.3.0, v22.12.0</span>
+</div>
+<ul>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a> 可以应用于其他数据库的二进制变更集。</li>
+</ul>
+<p>检索自创建变更集以来所有更改的变更集。可以多次调用。如果数据库或会话未打开，则抛出异常。此方法是 <a href="https://www.sqlite.org/session/sqlite3session_changeset.html"><code>sqlite3session_changeset()</code></a> 的封装。</p>
+</div><div>
+<h4><code>session.patchset()</code><span><a class="mark" href="#sessionpatchset" id="sessionpatchset">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_session_patchset"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.3.0, v22.12.0</span>
+</div>
+<ul>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a> 可以应用于其他数据库的二进制补丁集。</li>
+</ul>
+<p>与上述方法类似，但生成更紧凑的补丁集。请参阅 SQLite 文档中的[变更集和补丁集][]。如果数据库或会话未打开，则抛出异常。此方法是 <a href="https://www.sqlite.org/session/sqlite3session_patchset.html"><code>sqlite3session_patchset()</code></a> 的封装。</p>
+</div><div>
+<h4><code>session.close()</code>.<span><a class="mark" href="#sessionclose" id="sessionclose">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_session_close"></a></h4>
+<p>关闭会话。如果数据库或会话未打开，则抛出异常。此方法是 <a href="https://www.sqlite.org/session/sqlite3session_delete.html"><code>sqlite3session_delete()</code></a> 的封装。</p>
+</div>
+</section><section><h3>类：<code>StatementSync</code><span><a class="mark" href="#statementsync" id="statementsync">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statementsync"></a></h3>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<p>此类表示单个[预编译语句][]。此类无法通过其构造函数实例化。相反，实例是通过 <code>database.prepare()</code> 方法创建的。此类暴露的所有 API 都是同步执行的。</p>
+<p>预编译语句是用于创建它的 SQL 的高效二进制表示。预编译语句是可参数化的，并且可以使用不同的绑定值多次调用。参数还提供针对 [SQL 注入][]攻击的保护。由于这些原因，在处理用户输入时，预编译语句优于手动构建的 SQL 字符串。</p>
+</section><section><h3>类：<code>SQLTagStore</code><span><a class="mark" href="#sqltagstore" id="sqltagstore">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore"></a></h3>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<p>此类表示用于存储预编译语句的单个 LRU（最近最少使用）缓存。</p>
+<p>此类的实例通过 database.createSQLTagStore() 方法创建，而不是使用构造函数。存储根据提供的 SQL 查询字符串缓存预编译语句。当再次看到相同的查询时，存储会检索缓存的语句并通过参数绑定安全地应用新值，从而防止 SQL 注入等攻击。</p>
+<p>缓存有一个 maxSize，默认为 1000 个语句，但可以提供自定义大小（例如，database.createSQLTagStore(100)）。此类暴露的所有 API 都是同步执行的。</p>
+<div>
+<h4><code>sqlTagStore.all(sqlTemplate[, ...values])</code><span><a class="mark" href="#sqltagstoreallsqltemplate-values" id="sqltagstoreallsqltemplate-values">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_all_sqltemplate_values"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li><code>sqlTemplate</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" class="type">&#x3C;Template Literal></a> 包含 SQL 查询的模板字面量。</li>
+<li><code>...values</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 要插入到模板字面量中的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> 表示查询返回的行的对象数组。</li>
+</ul>
+<p>执行给定的 SQL 查询并将所有结果行作为对象数组返回。</p>
+</div><div>
+<h4><code>sqlTagStore.get(sqlTemplate[, ...values])</code><span><a class="mark" href="#sqltagstoregetsqltemplate-values" id="sqltagstoregetsqltemplate-values">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_get_sqltemplate_values"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li><code>sqlTemplate</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" class="type">&#x3C;Template Literal></a> 包含 SQL 查询的模板字面量。</li>
+<li><code>...values</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 要插入到模板字面量中的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 表示查询返回的第一行的对象，如果没有返回行，则为 <code>undefined</code>。</li>
+</ul>
+<p>执行给定的 SQL 查询并将第一个结果行作为对象返回。</p>
+</div><div>
+<h4><code>sqlTagStore.iterate(sqlTemplate[, ...values])</code><span><a class="mark" href="#sqltagstoreiteratesqltemplate-values" id="sqltagstoreiteratesqltemplate-values">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_iterate_sqltemplate_values"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li><code>sqlTemplate</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" class="type">&#x3C;Template Literal></a> 包含 SQL 查询的模板字面量。</li>
+<li><code>...values</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 要插入到模板字面量中的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" class="type">&#x3C;Iterator></a> 一个迭代器，生成表示查询返回的行的对象。</li>
+</ul>
+<p>执行给定的 SQL 查询并返回一个遍历结果行的迭代器。</p>
+</div><div>
+<h4><code>sqlTagStore.run(sqlTemplate[, ...values])</code><span><a class="mark" href="#sqltagstorerunsqltemplate-values" id="sqltagstorerunsqltemplate-values">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_run_sqltemplate_values"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li><code>sqlTemplate</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals" class="type">&#x3C;Template Literal></a> 包含 SQL 查询的模板字面量。</li>
+<li><code>...values</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 要插入到模板字面量中的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含有关执行信息的对象，包括 <code>changes</code> 和 <code>lastInsertRowid</code>。</li>
+</ul>
+<p>执行给定的 SQL 查询，预期不返回任何行（例如，INSERT、UPDATE、DELETE）。</p>
+</div><div>
+<h4><code>sqlTagStore.size()</code><span><a class="mark" href="#sqltagstoresize" id="sqltagstoresize">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_size"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 当前缓存中的预编译语句数量。</li>
+</ul>
+<p>一个只读属性，返回当前缓存中的预编译语句数量。</p>
+</div><div>
+<h4><code>sqlTagStore.capacity</code><span><a class="mark" href="#sqltagstorecapacity" id="sqltagstorecapacity">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_capacity"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 缓存可以容纳的预编译语句的最大数量。</li>
+</ul>
+<p>一个只读属性，返回缓存可以容纳的预编译语句的最大数量。</p>
+</div><div>
+<h4><code>sqlTagStore.db</code><span><a class="mark" href="#sqltagstoredb" id="sqltagstoredb">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_db"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<ul>
+<li><a href="sqlite.html#class-databasesync" class="type">&#x3C;DatabaseSync></a> 创建此 <code>SQLTagStore</code> 的 <code>DatabaseSync</code> 实例。</li>
+</ul>
+<p>一个只读属性，返回与此 <code>SQLTagStore</code> 关联的 <code>DatabaseSync</code> 对象。</p>
+</div><div>
+<h4><code>sqlTagStore.reset()</code><span><a class="mark" href="#sqltagstorereset" id="sqltagstorereset">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_reset"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<p>重置 LRU 缓存，清除所有存储的预编译语句。</p>
+</div><div>
+<h4><code>sqlTagStore.clear()</code><span><a class="mark" href="#sqltagstoreclear" id="sqltagstoreclear">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqltagstore_clear"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.9.0</span>
+</div>
+<p><code>sqlTagStore.reset()</code> 的别名。</p>
+</div><div>
+<h4><code>statement.all([namedParameters][, ...anonymousParameters])</code><span><a class="mark" href="#statementallnamedparameters-anonymousparameters" id="statementallnamedparameters-anonymousparameters">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_all_namedparameters_anonymousparameters"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.7.0, v22.14.0</td>
+<td><p>Add support for <code>DataView</code> and typed array objects for <code>anonymousParameters</code>.</p></td></tr>
+<tr><td>v22.5.0</td>
+<td><p><span>Added in: v22.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>namedParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于绑定命名参数的可选对象。此对象的键用于配置映射。</li>
+<li><code>...anonymousParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> 零个或多个要绑定到匿名参数的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> 对象数组。每个对象对应于执行预编译语句返回的一行。每个对象的键和值对应于行的列名和值。</li>
+</ul>
+<p>此方法执行预编译语句并将所有结果作为对象数组返回。如果预编译语句未返回任何结果，则此方法返回空数组。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>
+</div><div>
+<h4><code>statement.columns()</code><span><a class="mark" href="#statementcolumns" id="statementcolumns">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_columns"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.11.0</span>
+</div>
+<ul>
+<li>
+<p>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> 对象数组。每个对象对应于预编译语句中的一列，并包含以下属性：</p>
+<ul>
+<li><code>column</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 源表中列的非别名名称，如果列是表达式或子查询的结果，则为 <code>null</code>。此属性是 <a href="https://www.sqlite.org/c3ref/column_database_name.html"><code>sqlite3_column_origin_name()</code></a> 的结果。</li>
+<li><code>database</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 源数据库的非别名名称，如果列是表达式或子查询的结果，则为 <code>null</code>。此属性是 <a href="https://www.sqlite.org/c3ref/column_database_name.html"><code>sqlite3_column_database_name()</code></a> 的结果。</li>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 在 <code>SELECT</code> 语句的结果集中分配给列的名称。此属性是 <a href="https://www.sqlite.org/c3ref/column_name.html"><code>sqlite3_column_name()</code></a> 的结果。</li>
+<li><code>table</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 源表的非别名名称，如果列是表达式或子查询的结果，则为 <code>null</code>。此属性是 <a href="https://www.sqlite.org/c3ref/column_database_name.html"><code>sqlite3_column_table_name()</code></a> 的结果。</li>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 列的声明数据类型，如果列是表达式或子查询的结果，则为 <code>null</code>。此属性是 <a href="https://www.sqlite.org/c3ref/column_decltype.html"><code>sqlite3_column_decltype()</code></a> 的结果。</li>
+</ul>
+</li>
+</ul>
+<p>此方法用于检索有关预编译语句返回的列的信息。</p>
+</div><div>
+<h4><code>statement.expandedSQL</code><span><a class="mark" href="#statementexpandedsql" id="statementexpandedsql">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_expandedsql"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 扩展后包含参数值的源 SQL。</li>
+</ul>
+<p>预编译语句的源 SQL 文本，其中参数占位符被替换为最近执行此预编译语句时使用的值。此属性是 <a href="https://www.sqlite.org/c3ref/expanded_sql.html"><code>sqlite3_expanded_sql()</code></a> 的封装。</p>
+</div><div>
+<h4><code>statement.get([namedParameters][, ...anonymousParameters])</code><span><a class="mark" href="#statementgetnamedparameters-anonymousparameters" id="statementgetnamedparameters-anonymousparameters">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_get_namedparameters_anonymousparameters"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.7.0, v22.14.0</td>
+<td><p>Add support for <code>DataView</code> and typed array objects for <code>anonymousParameters</code>.</p></td></tr>
+<tr><td>v22.5.0</td>
+<td><p><span>Added in: v22.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>namedParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于绑定命名参数的可选对象。此对象的键用于配置映射。</li>
+<li><code>...anonymousParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> 零个或多个要绑定到匿名参数的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 对应于执行预编译语句返回的第一行的对象。对象的键和值对应于行的列名和值。如果数据库未返回任何行，则此方法返回 <code>undefined</code>。</li>
+</ul>
+<p>此方法执行预编译语句并将第一个结果作为对象返回。如果预编译语句未返回任何结果，则此方法返回 <code>undefined</code>。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>
+</div><div>
+<h4><code>statement.iterate([namedParameters][, ...anonymousParameters])</code><span><a class="mark" href="#statementiteratenamedparameters-anonymousparameters" id="statementiteratenamedparameters-anonymousparameters">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_iterate_namedparameters_anonymousparameters"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.7.0, v22.14.0</td>
+<td><p>Add support for <code>DataView</code> and typed array objects for <code>anonymousParameters</code>.</p></td></tr>
+<tr><td>v23.4.0, v22.13.0</td>
+<td><p><span>Added in: v23.4.0, v22.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>namedParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于绑定命名参数的可选对象。此对象的键用于配置映射。</li>
+<li><code>...anonymousParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> 零个或多个要绑定到匿名参数的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" class="type">&#x3C;Iterator></a> 对象可迭代迭代器。每个对象对应于执行预编译语句返回的一行。每个对象的键和值对应于行的列名和值。</li>
+</ul>
+<p>此方法执行预编译语句并返回对象的迭代器。如果预编译语句未返回任何结果，则此方法返回空迭代器。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>
+</div><div>
+<h4><code>statement.run([namedParameters][, ...anonymousParameters])</code><span><a class="mark" href="#statementrunnamedparameters-anonymousparameters" id="statementrunnamedparameters-anonymousparameters">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_run_namedparameters_anonymousparameters"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.7.0, v22.14.0</td>
+<td><p>Add support for <code>DataView</code> and typed array objects for <code>anonymousParameters</code>.</p></td></tr>
+<tr><td>v22.5.0</td>
+<td><p><span>Added in: v22.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>namedParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于绑定命名参数的可选对象。此对象的键用于配置映射。</li>
+<li><code>...anonymousParameters</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> 零个或多个要绑定到匿名参数的值。</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>changes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> 最近完成的 <code>INSERT</code>、<code>UPDATE</code> 或 <code>DELETE</code> 语句修改、插入或删除的行数。此字段是数字或 <code>BigInt</code>，具体取决于预编译语句的配置。此属性是 <a href="https://www.sqlite.org/c3ref/changes.html"><code>sqlite3_changes64()</code></a> 的结果。</li>
+<li><code>lastInsertRowid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> 最近插入的 rowid。此字段是数字或 <code>BigInt</code>，具体取决于预编译语句的配置。此属性是 <a href="https://www.sqlite.org/c3ref/last_insert_rowid.html"><code>sqlite3_last_insert_rowid()</code></a> 的结果。</li>
+</ul>
+</li>
+</ul>
+<p>此方法执行预编译语句并返回一个总结结果更改的对象。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>
+</div><div>
+<h4><code>statement.setAllowBareNamedParameters(enabled)</code><span><a class="mark" href="#statementsetallowbarenamedparametersenabled" id="statementsetallowbarenamedparametersenabled">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_setallowbarenamedparameters_enabled"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li><code>enabled</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 启用或禁用支持绑定不带前缀字符的命名参数。</li>
+</ul>
+<p>SQLite 参数的名称以前缀字符开头。默认情况下，<code>node:sqlite</code> 要求在绑定参数时存在此前缀字符。但是，除了美元符号字符外，这些前缀字符在用作对象键时还需要额外的引号。</p>
+<p>为了提高人体工程学，可以使用此方法来允许裸命名参数，这些参数在 JavaScript 代码中不需要前缀字符。启用裸命名参数时需要注意几个注意事项：</p>
+<ul>
+<li>SQL 中仍然需要前缀字符。</li>
+<li>JavaScript 中仍然允许前缀字符。实际上，带前缀的名称在绑定性能上会稍好一些。</li>
+<li>在同一个预编译语句中使用模糊的命名参数，例如 <code>$k</code> 和 <code>@k</code>，将导致异常，因为无法确定如何绑定裸名称。</li>
+</ul>
+</div><div>
+<h4><code>statement.setAllowUnknownNamedParameters(enabled)</code><span><a class="mark" href="#statementsetallowunknownnamedparametersenabled" id="statementsetallowunknownnamedparametersenabled">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_setallowunknownnamedparameters_enabled"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.11.0, v22.15.0</span>
+</div>
+<ul>
+<li><code>enabled</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 启用或禁用支持未知命名参数。</li>
+</ul>
+<p>默认情况下，如果在绑定参数时遇到未知名称，则会抛出异常。此方法允许忽略未知命名参数。</p>
+</div><div>
+<h4><code>statement.setReturnArrays(enabled)</code><span><a class="mark" href="#statementsetreturnarraysenabled" id="statementsetreturnarraysenabled">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_setreturnarrays_enabled"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.0.0</span>
+</div>
+<ul>
+<li><code>enabled</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 启用或禁用将查询结果作为数组返回。</li>
+</ul>
+<p>启用后，<code>all()</code>、<code>get()</code> 和 <code>iterate()</code> 方法返回的查询结果将作为数组而不是对象返回。</p>
+</div><div>
+<h4><code>statement.setReadBigInts(enabled)</code><span><a class="mark" href="#statementsetreadbigintsenabled" id="statementsetreadbigintsenabled">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_setreadbigints_enabled"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li><code>enabled</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 启用或禁用从数据库读取 <code>INTEGER</code> 字段时使用 <code>BigInt</code>。</li>
+</ul>
+<p>从数据库读取时，SQLite <code>INTEGER</code> 默认映射到 JavaScript 数字。但是，SQLite <code>INTEGER</code> 可以存储比 JavaScript 数字能够表示的值更大的值。在这种情况下，可以使用此方法使用 JavaScript <code>BigInt</code> 读取 <code>INTEGER</code> 数据。此方法对数据库写操作没有影响，在写操作中数字和 <code>BigInt</code> 始终都受支持。</p>
+</div><div>
+<h4><code>statement.sourceSQL</code><span><a class="mark" href="#statementsourcesql" id="statementsourcesql">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_statement_sourcesql"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 用于创建此预编译语句的源 SQL。</li>
+</ul>
+<p>预编译语句的源 SQL 文本。此属性是 <a href="https://www.sqlite.org/c3ref/expanded_sql.html"><code>sqlite3_sql()</code></a> 的封装。</p>
+</div><div>
+<h4>JavaScript 和 SQLite 之间的类型转换<span><a class="mark" href="#javascript--sqlite-" id="javascript--sqlite-">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_javascript_sqlite"></a></h4>
+<p>当 Node.js 写入或读取 SQLite 时，需要在 JavaScript 数据类型和 SQLite 的[数据类型][]之间进行转换。由于 JavaScript 支持的数据类型比 SQLite 多，因此仅支持 JavaScript 类型的子集。尝试将不受支持的数据类型写入 SQLite 将导致异常。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>SQLite</th><th>JavaScript</th></tr></thead><tbody><tr><td><code>NULL</code></td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></td></tr><tr><td><code>INTEGER</code></td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 或 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a></td></tr><tr><td><code>REAL</code></td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></td></tr><tr><td><code>TEXT</code></td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></td></tr><tr><td><code>BLOB</code></td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> 或 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a></td></tr></tbody></table>
+</div>
+</section><section><h3><code>sqlite.backup(sourceDb, path[, options])</code><span><a class="mark" href="#sqlitebackupsourcedb-path-options" id="sqlitebackupsourcedb-path-options">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqlite_backup_sourcedb_path_options"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.10.0</td>
+<td><p>The <code>path</code> argument now supports Buffer and URL objects.</p></td></tr>
+<tr><td>v23.8.0</td>
+<td><p><span>Added in: v23.8.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>sourceDb</code> <a href="sqlite.html#class-databasesync" class="type">&#x3C;DatabaseSync></a> 要备份的数据库。源数据库必须打开。</li>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 备份创建的位置。如果文件已存在，其内容将被覆盖。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 备份的可选配置。支持以下属性：
+<ul>
+<li><code>source</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 源数据库的名称。可以是 <code>'main'</code>（默认的主数据库）或任何其他使用 <a href="https://www.sqlite.org/lang_attach.html"><code>ATTACH DATABASE</code></a> 添加的数据库。<strong>默认值:</strong> <code>'main'</code>。</li>
+<li><code>target</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 目标数据库的名称。可以是 <code>'main'</code>（默认的主数据库）或任何其他使用 <a href="https://www.sqlite.org/lang_attach.html"><code>ATTACH DATABASE</code></a> 添加的数据库。<strong>默认值:</strong> <code>'main'</code>。</li>
+<li><code>rate</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 每个备份批次中要传输的页面数。<strong>默认值:</strong> <code>100</code>。</li>
+<li><code>progress</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个可选的回调函数，将在每个备份步骤后调用。传递给此回调的参数是一个 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>，具有 <code>remainingPages</code> 和 <code>totalPages</code> 属性，描述备份操作的当前进度。</li>
+</ul>
+</li>
+<li>返回值: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 一个 Promise，在完成时以备份的总页数兑现，或者在发生错误时拒绝。</li>
+</ul>
+<p>此方法进行数据库备份。此方法抽象了 <a href="https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit"><code>sqlite3_backup_init()</code></a>、<a href="https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupstep"><code>sqlite3_backup_step()</code></a> 和 <a href="https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupfinish"><code>sqlite3_backup_finish()</code></a> 函数。</p>
+<p>备份的数据库在备份过程中可以正常使用。来自同一连接（同一个 <a href="sqlite.html#class-databasesync" class="type">&#x3C;DatabaseSync></a> 对象）的变更将立即反映在备份中。但是，来自其他连接的变更将导致备份过程重新启动。</p>
+
+<pre class="with-56-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> { backup, <span class="hljs-title class_">DatabaseSync</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:sqlite'</span>);
+
+(<span class="hljs-title function_">async</span> () => {
+  <span class="hljs-keyword">const</span> sourceDb = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">'source.db'</span>);
+  <span class="hljs-keyword">const</span> totalPagesTransferred = <span class="hljs-keyword">await</span> <span class="hljs-title function_">backup</span>(sourceDb, <span class="hljs-string">'backup.db'</span>, {
+    <span class="hljs-attr">rate</span>: <span class="hljs-number">1</span>, <span class="hljs-comment">// Copy one page at a time.</span>
+    <span class="hljs-attr">progress</span>: <span class="hljs-function">(<span class="hljs-params">{ totalPages, remainingPages }</span>) =></span> {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Backup in progress'</span>, { totalPages, remainingPages });
+    },
+  });
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Backup completed'</span>, totalPagesTransferred);
+})();</code><code class="language-js mjs"><span class="hljs-keyword">import</span> { backup, <span class="hljs-title class_">DatabaseSync</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:sqlite'</span>;
+
+<span class="hljs-keyword">const</span> sourceDb = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DatabaseSync</span>(<span class="hljs-string">'source.db'</span>);
+<span class="hljs-keyword">const</span> totalPagesTransferred = <span class="hljs-keyword">await</span> <span class="hljs-title function_">backup</span>(sourceDb, <span class="hljs-string">'backup.db'</span>, {
+  <span class="hljs-attr">rate</span>: <span class="hljs-number">1</span>, <span class="hljs-comment">// Copy one page at a time.</span>
+  <span class="hljs-attr">progress</span>: <span class="hljs-function">(<span class="hljs-params">{ totalPages, remainingPages }</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Backup in progress'</span>, { totalPages, remainingPages });
+  },
+});
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Backup completed'</span>, totalPagesTransferred);</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>sqlite.constants</code><span><a class="mark" href="#sqliteconstants" id="sqliteconstants">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqlite_constants"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.5.0, v22.13.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>包含 SQLite 操作常用常量的对象。</p>
+<div>
+<h4>SQLite 常量<span><a class="mark" href="#sqlite-" id="sqlite-">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_sqlite_1"></a></h4>
+<p>以下常量由 <code>sqlite.constants</code> 对象导出。</p>
+<div>
+<h5>冲突解决常量<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="sqlite"></a></h5>
+<p>以下常量之一可作为参数传递给传递给 <a href="#databaseapplychangesetchangeset-options"><code>database.applyChangeset()</code></a> 的 <code>onConflict</code> 冲突解决处理程序。另请参阅 SQLite 文档中的[传递给冲突处理程序的常量][]。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_DATA</code></td>
+    <td>当处理 DELETE 或 UPDATE 更改时，如果数据库中存在具有所需 PRIMARY KEY 字段的行，但更新修改的一个或多个其他（非主键）字段不包含预期的“之前”值，则使用此常量调用冲突处理程序。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_NOTFOUND</code></td>
+    <td>当处理 DELETE 或 UPDATE 更改时，如果数据库中不存在具有所需 PRIMARY KEY 字段的行，则使用此常量调用冲突处理程序。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_CONFLICT</code></td>
+    <td>在处理 INSERT 更改时，如果操作会导致重复的主键值，则将此常量传递给冲突处理程序。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_CONSTRAINT</code></td>
+    <td>如果启用了外键处理，并且应用变更集使数据库处于包含外键冲突的状态，则在提交变更集之前，使用此常量调用冲突处理程序一次。如果冲突处理程序返回 <code>SQLITE_CHANGESET_OMIT</code>，则提交更改，包括导致外键约束冲突的更改。或者，如果返回 <code>SQLITE_CHANGESET_ABORT</code>，则回滚变更集。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_FOREIGN_KEY</code></td>
+    <td>如果在应用更改时发生任何其他约束冲突（即 UNIQUE、CHECK 或 NOT NULL 约束），则使用此常量调用冲突处理程序。</td>
+  </tr>
+</tbody></table>
+<p>以下常量之一必须从传递给 <a href="#databaseapplychangesetchangeset-options"><code>database.applyChangeset()</code></a> 的 <code>onConflict</code> 冲突解决处理程序返回。另请参阅 SQLite 文档中的[从冲突处理程序返回的常量][]。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_OMIT</code></td>
+    <td>忽略冲突的更改。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_REPLACE</code></td>
+    <td>冲突的更改替换现有值。请注意，仅当冲突类型为 <code>SQLITE_CHANGESET_DATA</code> 或 <code>SQLITE_CHANGESET_CONFLICT</code> 时才能返回此值。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CHANGESET_ABORT</code></td>
+    <td>当更改遇到冲突时中止并回滚数据库。</td>
+  </tr>
+</tbody></table>
+</div><div>
+<h5>授权常量<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_1"></a></h5>
+<p>以下常量与 <a href="#databasesetauthorizercallback"><code>database.setAuthorizer()</code></a> 方法一起使用。</p>
+<div>
+<h6>授权结果码<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_2"></a></h6>
+<p>以下常量之一必须从传递给 <a href="#databasesetauthorizercallback"><code>database.setAuthorizer()</code></a> 的授权器回调函数返回。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>SQLITE_OK</code></td>
+    <td>允许操作正常进行。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DENY</code></td>
+    <td>拒绝操作并导致返回错误。</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_IGNORE</code></td>
+    <td>忽略操作并继续，就像从未请求过一样。</td>
+  </tr>
+</tbody></table>
+</div><div>
+<h6>授权操作码<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="sqlite_3"></a></h6>
+<p>以下常量作为第一个参数传递给授权器回调函数，以指示正在授权的操作类型。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_INDEX</code></td>
+    <td>创建索引</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_TABLE</code></td>
+    <td>创建表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_TEMP_INDEX</code></td>
+    <td>创建临时索引</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_TEMP_TABLE</code></td>
+    <td>创建临时表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_TEMP_TRIGGER</code></td>
+    <td>创建临时触发器</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_TEMP_VIEW</code></td>
+    <td>创建临时视图</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_TRIGGER</code></td>
+    <td>创建触发器</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_VIEW</code></td>
+    <td>创建视图</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DELETE</code></td>
+    <td>从表中删除</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_INDEX</code></td>
+    <td>删除索引</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_TABLE</code></td>
+    <td>删除表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_TEMP_INDEX</code></td>
+    <td>删除临时索引</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_TEMP_TABLE</code></td>
+    <td>删除临时表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_TEMP_TRIGGER</code></td>
+    <td>删除临时触发器</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_TEMP_VIEW</code></td>
+    <td>删除临时视图</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_TRIGGER</code></td>
+    <td>删除触发器</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_VIEW</code></td>
+    <td>删除视图</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_INSERT</code></td>
+    <td>插入到表中</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_PRAGMA</code></td>
+    <td>执行 PRAGMA 语句</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_READ</code></td>
+    <td>从表中读取</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_SELECT</code></td>
+    <td>执行 SELECT 语句</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_TRANSACTION</code></td>
+    <td>开始、提交或回滚事务</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_UPDATE</code></td>
+    <td>更新表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_ATTACH</code></td>
+    <td>附加数据库</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DETACH</code></td>
+    <td>分离数据库</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_ALTER_TABLE</code></td>
+    <td>更改表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_REINDEX</code></td>
+    <td>重新索引</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_ANALYZE</code></td>
+    <td>分析数据库</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_CREATE_VTABLE</code></td>
+    <td>创建虚拟表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_DROP_VTABLE</code></td>
+    <td>删除虚拟表</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_FUNCTION</code></td>
+    <td>使用函数</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_SAVEPOINT</code></td>
+    <td>创建、释放或回滚保存点</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_COPY</code></td>
+    <td>复制数据（旧版）</td>
+  </tr>
+  <tr>
+    <td><code>SQLITE_RECURSIVE</code></td>
+    <td>递归查询</td>
+  </tr>
+</tbody></table></div></div></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1532 @@
+{
+  "type": "module",
+  "source": "doc/api/v8.md",
+  "modules": [
+    {
+      "textRaw": "V8",
+      "name": "v8",
+      "introduced_in": "v4.0.0",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/v8.js\">lib/v8.js</a></p>\n<p><code>node:v8</code> 模块暴露了特定于构建到 Node.js 二进制文件中的 <a href=\"https://developers.google.com/v8/\">V8</a> 版本的 API。可以通过以下方式访问：</p>\n<pre><code class=\"language-js\">const v8 = require('node:v8');\n</code></pre>",
+      "methods": [
+        {
+          "textRaw": "`v8.cachedDataVersionTag()`",
+          "type": "method",
+          "name": "cachedDataVersionTag",
+          "meta": {
+            "added": [
+              "v8.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回：{integer}",
+                  "name": "返回：",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回一个整数，表示从 V8 版本、命令行标志和检测到的 CPU 特性派生的版本标签。这对于确定 <a href=\"vm.html#new-vmscriptcode-options\"><code>vm.Script</code></a> 的 <code>cachedData</code> 缓冲区是否与此 V8 实例兼容非常有用。</p>\n<pre><code class=\"language-js\">console.log(v8.cachedDataVersionTag()); // 3947234607\n// v8.cachedDataVersionTag() 返回的值是从 V8 版本、命令行标志和检测到的 CPU 特性派生的。测试当标志切换时该值确实会更新。\nv8.setFlagsFromString('--allow_natives_syntax');\nconsole.log(v8.cachedDataVersionTag()); // 183726201\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.getHeapCodeStatistics()`",
+          "type": "method",
+          "name": "getHeapCodeStatistics",
+          "meta": {
+            "added": [
+              "v12.8.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回：{Object}",
+                  "name": "返回：",
+                  "type": "Object"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>获取堆中代码及其元数据的统计信息，参见 V8 <a href=\"https://v8docs.nodesource.com/node-13.2/d5/dda/classv8_1_1_isolate.html#a6079122af17612ef54ef3348ce170866\"><code>GetHeapCodeAndMetadataStatistics</code></a> API。返回一个具有以下属性的对象：</p>\n<ul>\n<li><code>code_and_metadata_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>bytecode_and_metadata_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>external_script_source_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>cpu_profiler_metadata_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  code_and_metadata_size: 212208,\n  bytecode_and_metadata_size: 161368,\n  external_script_source_size: 1410794,\n  cpu_profiler_metadata_size: 0,\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.getHeapSnapshot([options])`",
+          "type": "method",
+          "name": "getHeapSnapshot",
+          "meta": {
+            "added": [
+              "v11.13.0"
+            ],
+            "changes": [
+              {
+                "version": "v19.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/44989",
+                "description": "Support options to configure the heap snapshot."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`exposeInternals` {boolean} 如果为 true，则在堆快照中暴露内部对象。**默认值:** `false`。",
+                      "name": "exposeInternals",
+                      "type": "boolean",
+                      "desc": "如果为 true，则在堆快照中暴露内部对象。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "`exposeNumericValues` {boolean} 如果为 true，则在人工字段中暴露数值。**默认值:** `false`。",
+                      "name": "exposeNumericValues",
+                      "type": "boolean",
+                      "desc": "如果为 true，则在人工字段中暴露数值。**默认值:** `false`。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回：{stream.Readable} 一个包含 V8 堆快照的可读流。",
+                  "name": "返回：",
+                  "type": "stream.Readable",
+                  "desc": "一个包含 V8 堆快照的可读流。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>生成当前 V8 堆的快照，并返回一个可读流，可用于读取 JSON 序列化的表示形式。此 JSON 流格式旨在与 Chrome DevTools 等工具一起使用。JSON 模式是未文档化的，并且特定于 V8 引擎。因此，模式可能随 V8 版本的不同而变化。</p>\n<p>创建堆快照需要大约快照创建时堆大小两倍的内存。这可能导致 OOM 杀手终止进程的风险。</p>\n<p>生成快照是一个同步操作，根据堆大小的不同，会阻塞事件循环一段时间。</p>\n<pre><code class=\"language-js\">// 打印堆快照到控制台\nconst v8 = require('node:v8');\nconst stream = v8.getHeapSnapshot();\nstream.pipe(process.stdout);\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.getHeapSpaceStatistics()`",
+          "type": "method",
+          "name": "getHeapSpaceStatistics",
+          "meta": {
+            "added": [
+              "v6.0.0"
+            ],
+            "changes": [
+              {
+                "version": "v7.5.0",
+                "pr-url": "https://github.com/nodejs/node/pull/10186",
+                "description": "Support values exceeding the 32-bit unsigned integer range."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回：{Object\\[]}",
+                  "name": "返回：",
+                  "type": "Object\\[]"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回关于 V8 堆空间的统计信息，即构成 V8 堆的段。堆空间的顺序或堆空间的可用性都不能保证，因为统计信息是通过 V8 <a href=\"https://v8docs.nodesource.com/node-13.2/d5/dda/classv8_1_1_isolate.html#ac673576f24fdc7a33378f8f57e1d13a4\"><code>GetHeapSpaceStatistics</code></a> 函数提供的，并且可能随 V8 版本的不同而变化。</p>\n<p>返回值是一个对象数组，包含以下属性：</p>\n<ul>\n<li><code>space_name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>space_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>space_used_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>space_available_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>physical_space_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<pre><code class=\"language-json\">[\n  {\n    \"space_name\": \"new_space\",\n    \"space_size\": 2063872,\n    \"space_used_size\": 951112,\n    \"space_available_size\": 80824,\n    \"physical_space_size\": 2063872\n  },\n  {\n    \"space_name\": \"old_space\",\n    \"space_size\": 3090560,\n    \"space_used_size\": 2493792,\n    \"space_available_size\": 0,\n    \"physical_space_size\": 3090560\n  },\n  {\n    \"space_name\": \"code_space\",\n    \"space_size\": 1260160,\n    \"space_used_size\": 644256,\n    \"space_available_size\": 960,\n    \"physical_space_size\": 1260160\n  },\n  {\n    \"space_name\": \"map_space\",\n    \"space_size\": 1094160,\n    \"space_used_size\": 201608,\n    \"space_available_size\": 0,\n    \"physical_space_size\": 1094160\n  },\n  {\n    \"space_name\": \"large_object_space\",\n    \"space_size\": 0,\n    \"space_used_size\": 0,\n    \"space_available_size\": 1490980608,\n    \"physical_space_size\": 0\n  }\n]\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.getHeapStatistics()`",
+          "type": "method",
+          "name": "getHeapStatistics",
+          "meta": {
+            "added": [
+              "v1.0.0"
+            ],
+            "changes": [
+              {
+                "version": "v7.5.0",
+                "pr-url": "https://github.com/nodejs/node/pull/10186",
+                "description": "Support values exceeding the 32-bit unsigned integer range."
+              },
+              {
+                "version": "v7.2.0",
+                "pr-url": "https://github.com/nodejs/node/pull/8610",
+                "description": "Added `malloced_memory`, `peak_malloced_memory`, and `does_zap_garbage`."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "返回：{Object}",
+                  "name": "返回：",
+                  "type": "Object"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回一个具有以下属性的对象：</p>\n<ul>\n<li><code>total_heap_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>total_heap_size_executable</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>total_physical_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>total_available_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>used_heap_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>heap_size_limit</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>malloced_memory</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>peak_malloced_memory</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>does_zap_garbage</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>number_of_native_contexts</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>number_of_detached_contexts</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>total_global_handles_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>used_global_handles_size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>external_memory</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<p><code>total_heap_size</code> total_heap_size 的值是 V8 为堆分配的字节数。如果 used_heap 需要更多内存，这个值可能会增长。</p>\n<p><code>total_heap_size_executable</code> total_heap_size_executable 的值是堆中可以包含可执行代码的部分，以字节为单位。这包括 JIT 编译代码使用的内存以及必须保持可执行的任何内存。</p>\n<p><code>total_physical_size</code> total_physical_size 的值是 V8 堆实际使用的物理内存，以字节为单位。这是已提交（或正在使用）的内存量，而不是保留的内存。</p>\n<p><code>total_available_size</code> total_available_size 的值是 V8 堆可用的内存字节数。这个值表示 V8 在超过堆限制之前可以使用多少更多内存。</p>\n<p><code>used_heap_size</code> used_heap_size 的值是 V8 的 JavaScript 对象当前正在使用的字节数。这是实际使用的内存，不包括已分配但尚未使用的内存。</p>\n<p><code>heap_size_limit</code> heap_size_limit 的值是 V8 堆的最大大小，以字节为单位（默认限制，由系统资源决定，或传递给 <code>--max_old_space_size</code> 选项的值）。</p>\n<p><code>malloced_memory</code> malloced_memory 的值是通过 <code>malloc</code> 由 V8 分配的字节数。</p>\n<p><code>peak_malloced_memory</code> peak_malloced_memory 的值是在进程生命周期内通过 <code>malloc</code> 由 V8 分配的峰值字节数。</p>\n<p><code>does_zap_garbage</code> 是一个 0/1 布尔值，表示 <code>--zap_code_space</code> 选项是否启用。这会使 V8 用位模式覆盖堆垃圾。RSS 占用空间（驻留集大小）会变大，因为它持续接触所有堆页面，这使得操作系统更不可能将它们换出。</p>\n<p><code>number_of_native_contexts</code> native_context 的值是当前活动的顶级上下文的数量。这个数字随时间增加表示存在内存泄漏。</p>\n<p><code>number_of_detached_contexts</code> detached_context 的值是已分离但尚未垃圾回收的上下文数量。这个数字非零表示潜在的内存泄漏。</p>\n<p><code>total_global_handles_size</code> total_global_handles_size 的值是 V8 全局句柄的总内存大小。</p>\n<p><code>used_global_handles_size</code> used_global_handles_size 的值是 V8 全局句柄的已使用内存大小。</p>\n<p><code>external_memory</code> external_memory 的值是数组缓冲区和外部字符串的内存大小。</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">{\n  total_heap_size: 7326976,\n  total_heap_size_executable: 4194304,\n  total_physical_size: 7326976,\n  total_available_size: 1152656,\n  used_heap_size: 3476208,\n  heap_size_limit: 1535115264,\n  malloced_memory: 16384,\n  peak_malloced_memory: 1127496,\n  does_zap_garbage: 0,\n  number_of_native_contexts: 1,\n  number_of_detached_contexts: 0,\n  total_global_handles_size: 8192,\n  used_global_handles_size: 3296,\n  external_memory: 318824\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.getCppHeapStatistics([detailLevel])`",
+          "type": "method",
+          "name": "getCppHeapStatistics",
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p>使用 V8 <a href=\"https://v8docs.nodesource.com/node-22.4/d9/dc4/classv8_1_1_cpp_heap.html#a3a5d09567758e608fffde50eeabc2feb\"><code>CollectStatistics()</code></a> 函数检索有关内存消耗和利用率的 <a href=\"https://v8docs.nodesource.com/node-22.4/d9/dc4/classv8_1_1_cpp_heap.html\">CppHeap</a> 统计信息，该函数可能随 V8 版本的不同而变化。</p>\n<ul>\n<li><code>detailLevel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a>:  <strong>默认值:</strong> <code>'detailed'</code>。\n指定返回统计信息的详细级别。\n接受的值为：\n<ul>\n<li><code>'brief'</code>:  简要统计信息仅包含整个堆的顶级分配和使用的内存统计信息。</li>\n<li><code>'detailed'</code>: 详细统计信息还包含每个空间和页面的细分，以及空闲列表统计信息和对象类型直方图。</li>\n</ul>\n</li>\n</ul>\n<p>它返回一个结构类似于 <a href=\"https://v8docs.nodesource.com/node-22.4/d7/d51/heap-statistics_8h_source.html\"><code>cppgc::HeapStatistics</code></a> 对象的对象。有关对象属性的更多信息，请参阅 <a href=\"https://v8docs.nodesource.com/node-22.4/df/d2f/structcppgc_1_1_heap_statistics.html\">V8 文档</a>。</p>\n<pre><code class=\"language-js\">// Detailed\n({\n  committed_size_bytes: 131072,\n  resident_size_bytes: 131072,\n  used_size_bytes: 152,\n  space_statistics: [\n    {\n      name: 'NormalPageSpace0',\n      committed_size_bytes: 0,\n      resident_size_bytes: 0,\n      used_size_bytes: 0,\n      page_stats: [{}],\n      free_list_stats: {},\n    },\n    {\n      name: 'NormalPageSpace1',\n      committed_size_bytes: 131072,\n      resident_size_bytes: 131072,\n      used_size_bytes: 152,\n      page_stats: [{}],\n      free_list_stats: {},\n    },\n    {\n      name: 'NormalPageSpace2',\n      committed_size_bytes: 0,\n      resident_size_bytes: 0,\n      used_size_bytes: 0,\n      page_stats: [{}],\n      free_list_stats: {},\n    },\n    {\n      name: 'NormalPageSpace3',\n      committed_size_bytes: 0,\n      resident_size_bytes: 0,\n      used_size_bytes: 0,\n      page_stats: [{}],\n      free_list_stats: {},\n    },\n    {\n      name: 'LargePageSpace',\n      committed_size_bytes: 0,\n      resident_size_bytes: 0,\n      used_size_bytes: 0,\n      page_stats: [{}],\n      free_list_stats: {},\n    },\n  ],\n  type_names: [],\n  detail_level: 'detailed',\n});\n</code></pre>\n<pre><code class=\"language-js\">// Brief\n({\n  committed_size_bytes: 131072,\n  resident_size_bytes: 131072,\n  used_size_bytes: 128864,\n  space_statistics: [],\n  type_names: [],\n  detail_level: 'brief',\n});\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.queryObjects(ctor[, options])`",
+          "type": "method",
+          "name": "queryObjects",
+          "meta": {
+            "added": [
+              "v22.0.0",
+              "v20.13.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".1 - Active development",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`ctor` {Function} 可用于在原型链上搜索以过滤堆中目标对象的构造函数。",
+                  "name": "ctor",
+                  "type": "Function",
+                  "desc": "可用于在原型链上搜索以过滤堆中目标对象的构造函数。"
+                },
+                {
+                  "textRaw": "`options` {undefined|Object}",
+                  "name": "options",
+                  "type": "undefined|Object",
+                  "options": [
+                    {
+                      "textRaw": "`format` {string} 如果是 `'count'`，则返回匹配对象的计数。如果是 `'summary'`，则返回包含匹配对象摘要字符串的数组。",
+                      "name": "format",
+                      "type": "string",
+                      "desc": "如果是 `'count'`，则返回匹配对象的计数。如果是 `'summary'`，则返回包含匹配对象摘要字符串的数组。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回：{number|Array<string>}",
+                  "name": "返回：",
+                  "type": "number|Array<string>"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>这类似于 Chromium DevTools 控制台提供的 <a href=\"https://developer.chrome.com/docs/devtools/console/utilities#queryObjects-function\"><code>queryObjects()</code> console API</a>。它可用于在完全垃圾回收后搜索堆中在其原型链上具有匹配构造函数的对象，这对于内存泄漏回归测试非常有用。为了避免意外结果，用户应避免在其实现不控制的构造函数上使用此 API，或者在应用程序中可能被其他方调用的构造函数上使用。</p>\n<p>为了避免意外泄漏，此 API 不返回找到的对象的原始引用。默认情况下，它返回找到对象的计数。如果 <code>options.format</code> 是 <code>'summary'</code>，则返回一个包含每个对象的简要字符串表示的数组。此 API 提供的可见性类似于堆快照提供的可见性，同时用户可以节省序列化和解析的成本，并在搜索期间直接过滤目标对象。</p>\n<p>只有当前执行上下文中创建的对象包含在结果中。</p>\n<pre><code class=\"language-cjs\">const { queryObjects } = require('node:v8');\nclass A { foo = 'bar'; }\nconsole.log(queryObjects(A)); // 0\nconst a = new A();\nconsole.log(queryObjects(A)); // 1\n// [ \"A { foo: 'bar' }\" ]\nconsole.log(queryObjects(A, { format: 'summary' }));\n\nclass B extends A { bar = 'qux'; }\nconst b = new B();\nconsole.log(queryObjects(B)); // 1\n// [ \"B { foo: 'bar', bar: 'qux' }\" ]\nconsole.log(queryObjects(B, { format: 'summary' }));\n\n// 注意，当有子类继承自构造函数时，该构造函数也会出现在子类原型的原型链中，因此子类的原型也会包含在结果中。\nconsole.log(queryObjects(A));  // 3\n// [ \"B { foo: 'bar', bar: 'qux' }\", 'A {}', \"A { foo: 'bar' }\" ]\nconsole.log(queryObjects(A, { format: 'summary' }));\n</code></pre>\n<pre><code class=\"language-mjs\">import { queryObjects } from 'node:v8';\nclass A { foo = 'bar'; }\nconsole.log(queryObjects(A)); // 0\nconst a = new A();\nconsole.log(queryObjects(A)); // 1\n// [ \"A { foo: 'bar' }\" ]\nconsole.log(queryObjects(A, { format: 'summary' }));\n\nclass B extends A { bar = 'qux'; }\nconst b = new B();\nconsole.log(queryObjects(B)); // 1\n// [ \"B { foo: 'bar', bar: 'qux' }\" ]\nconsole.log(queryObjects(B, { format: 'summary' }));\n\n// 注意，当有子类继承自构造函数时，该构造函数也会出现在子类原型的原型链中，因此子类的原型也会包含在结果中。\nconsole.log(queryObjects(A));  // 3\n// [ \"B { foo: 'bar', bar: 'qux' }\", 'A {}', \"A { foo: 'bar' }\" ]\nconsole.log(queryObjects(A, { format: 'summary' }));\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.setFlagsFromString(flags)`",
+          "type": "method",
+          "name": "setFlagsFromString",
+          "meta": {
+            "added": [
+              "v1.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`flags` {string}",
+                  "name": "flags",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>v8.setFlagsFromString()</code> 方法可用于以编程方式设置 V8 命令行标志。使用此方法时应小心。在 VM 启动后更改设置可能导致不可预测的行为，包括崩溃和数据丢失；或者它可能根本不起作用。</p>\n<p>特定 Node.js 版本的 V8 选项可通过运行 <code>node --v8-options</code> 来确定。</p>\n<p>用法：</p>\n<pre><code class=\"language-js\">// 在一分钟内将 GC 事件打印到 stdout。\nconst v8 = require('node:v8');\nv8.setFlagsFromString('--trace_gc');\nsetTimeout(() => { v8.setFlagsFromString('--notrace_gc'); }, 60e3);\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.stopCoverage()`",
+          "type": "method",
+          "name": "stopCoverage",
+          "meta": {
+            "added": [
+              "v15.1.0",
+              "v14.18.0",
+              "v12.22.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>v8.stopCoverage()</code> 方法允许用户停止由 <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> 开始的覆盖率收集，以便 V8 可以释放执行计数记录并优化代码。这可以与 [<code>v8.takeCoverage()</code>][] 结合使用，如果用户希望按需收集覆盖率。</p>"
+        },
+        {
+          "textRaw": "`v8.takeCoverage()`",
+          "type": "method",
+          "name": "takeCoverage",
+          "meta": {
+            "added": [
+              "v15.1.0",
+              "v14.18.0",
+              "v12.22.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>v8.takeCoverage()</code> 方法允许用户将由 <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> 开始的覆盖率按需写入磁盘。此方法可以在进程的生命周期内多次调用。每次调用时，执行计数器将被重置，并且新的覆盖率报告将被写入由 <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE</code></a> 指定的目录。</p>\n<p>当进程即将退出时，除非在进程退出之前调用 [<code>v8.stopCoverage()</code>][]，否则最后一次覆盖率仍将被写入磁盘。</p>"
+        },
+        {
+          "textRaw": "`v8.writeHeapSnapshot([filename[,options]])`",
+          "type": "method",
+          "name": "writeHeapSnapshot",
+          "meta": {
+            "added": [
+              "v11.13.0"
+            ],
+            "changes": [
+              {
+                "version": "v19.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/44989",
+                "description": "Support options to configure the heap snapshot."
+              },
+              {
+                "version": "v18.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/41373",
+                "description": "An exception will now be thrown if the file could not be written."
+              },
+              {
+                "version": "v18.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/42577",
+                "description": "Make the returned error codes consistent across all platforms."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`filename` {string} 要保存 V8 堆快照的文件路径。如果未指定，将生成一个文件名模式为 `'Heap-${yyyymmdd}-${hhmmss}-${pid}-${thread_id}.heapsnapshot'` 的文件，其中 `{pid}` 是 Node.js 进程的 PID，`{thread_id}` 在从主 Node.js 线程调用 `writeHeapSnapshot()` 时为 `0`，或者是工作线程的 id。",
+                  "name": "filename",
+                  "type": "string",
+                  "desc": "要保存 V8 堆快照的文件路径。如果未指定，将生成一个文件名模式为 `'Heap-${yyyymmdd}-${hhmmss}-${pid}-${thread_id}.heapsnapshot'` 的文件，其中 `{pid}` 是 Node.js 进程的 PID，`{thread_id}` 在从主 Node.js 线程调用 `writeHeapSnapshot()` 时为 `0`，或者是工作线程的 id。"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`exposeInternals` {boolean} 如果为 true，则在堆快照中暴露内部对象。**默认值:** `false`。",
+                      "name": "exposeInternals",
+                      "type": "boolean",
+                      "desc": "如果为 true，则在堆快照中暴露内部对象。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "`exposeNumericValues` {boolean} 如果为 true，则在人工字段中暴露数值。**默认值:** `false`。",
+                      "name": "exposeNumericValues",
+                      "type": "boolean",
+                      "desc": "如果为 true，则在人工字段中暴露数值。**默认值:** `false`。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回：{string} 保存快照的文件名。",
+                  "name": "返回：",
+                  "type": "string",
+                  "desc": "保存快照的文件名。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>生成当前 V8 堆的快照，并将其写入 JSON 文件。此文件旨在与 Chrome DevTools 等工具一起使用。JSON 模式是未文档化的，并且特定于 V8 引擎，可能随 V8 版本的不同而变化。</p>\n<p>堆快照是针对单个 V8 隔离的。当使用 <a href=\"worker_threads.html\">工作线程</a> 时，从主线程生成的堆快照不会包含任何关于工作线程的信息，反之亦然。</p>\n<p>创建堆快照需要大约快照创建时堆大小两倍的内存。这可能导致 OOM 杀手终止进程的风险。</p>\n<p>生成快照是一个同步操作，根据堆大小的不同，会阻塞事件循环一段时间。</p>\n<pre><code class=\"language-js\">const { writeHeapSnapshot } = require('node:v8');\nconst {\n  Worker,\n  isMainThread,\n  parentPort,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename);\n\n  worker.once('message', (filename) => {\n    console.log(`worker heapdump: ${filename}`);\n    // 现在获取主线程的堆转储。\n    console.log(`main thread heapdump: ${writeHeapSnapshot()}`);\n  });\n\n  // 告诉工作线程创建堆转储。\n  worker.postMessage('heapdump');\n} else {\n  parentPort.once('message', (message) => {\n    if (message === 'heapdump') {\n      // 为工作线程生成堆转储\n      // 并将文件名返回给父线程。\n      parentPort.postMessage(writeHeapSnapshot());\n    }\n  });\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`v8.setHeapSnapshotNearHeapLimit(limit)`",
+          "type": "method",
+          "name": "setHeapSnapshotNearHeapLimit",
+          "meta": {
+            "added": [
+              "v18.10.0",
+              "v16.18.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57513",
+                "description": "Marking the API stable."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`limit` {integer}",
+                  "name": "limit",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果 <code>--heapsnapshot-near-heap-limit</code> 已从命令行设置或 API 被多次调用，则该 API 是无操作的。<code>limit</code> 必须是一个正整数。有关更多信息，请参阅 <a href=\"cli.html#--heapsnapshot-near-heap-limitmax_count\"><code>--heapsnapshot-near-heap-limit</code></a>。</p>"
+        },
+        {
+          "textRaw": "`v8.isStringOneByteRepresentation(content)`",
+          "type": "method",
+          "name": "isStringOneByteRepresentation",
+          "meta": {
+            "added": [
+              "v23.10.0",
+              "v22.15.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`content` {string}",
+                  "name": "content",
+                  "type": "string"
+                },
+                {
+                  "textRaw": "返回：{boolean}",
+                  "name": "返回：",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>V8 仅支持 <code>Latin-1/ISO-8859-1</code> 和 <code>UTF16</code> 作为字符串的底层表示。\n如果 <code>content</code> 使用 <code>Latin-1/ISO-8859-1</code> 作为底层表示，此函数将返回 true；\n否则，返回 false。</p>\n<p>如果此方法返回 false，并不意味着字符串包含一些不在 <code>Latin-1/ISO-8859-1</code> 中的字符。\n有时 <code>Latin-1</code> 字符串也可能表示为 <code>UTF16</code>。</p>\n<pre><code class=\"language-js\">const { isStringOneByteRepresentation } = require('node:v8');\n\nconst Encoding = {\n  latin1: 1,\n  utf16le: 2,\n};\nconst buffer = Buffer.alloc(100);\nfunction writeString(input) {\n  if (isStringOneByteRepresentation(input)) {\n    buffer.writeUint8(Encoding.latin1);\n    buffer.writeUint32LE(input.length, 1);\n    buffer.write(input, 5, 'latin1');\n  } else {\n    buffer.writeUint8(Encoding.utf16le);\n    buffer.writeUint32LE(input.length * 2, 1);\n    buffer.write(input, 5, 'utf16le');\n  }\n}\nwriteString('hello');\nwriteString('你好');\n</code></pre>"
+        }
+      ],
+      "modules": [
+        {
+          "textRaw": "序列化 API",
+          "name": "序列化_api",
+          "desc": "<p>序列化 API 提供了以与 [HTML 结构化克隆算法][] 兼容的方式序列化 JavaScript 值的方法。</p>\n<p>该格式是向后兼容的（即可以安全地存储到磁盘）。相等的 JavaScript 值可能导致不同的序列化输出。</p>",
+          "methods": [
+            {
+              "textRaw": "`v8.serialize(value)`",
+              "type": "method",
+              "name": "serialize",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`value` {any}",
+                      "name": "value",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "返回：{Buffer}",
+                      "name": "返回：",
+                      "type": "Buffer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>使用 <a href=\"#class-v8defaultserializer\"><code>DefaultSerializer</code></a> 将 <code>value</code> 序列化为缓冲区。</p>\n<p>当尝试序列化需要大于 <a href=\"buffer.html#bufferconstantsmax_length\"><code>buffer.constants.MAX_LENGTH</code></a> 的缓冲区的巨大对象时，将抛出 <a href=\"errors.html#err_buffer_too_large\"><code>ERR_BUFFER_TOO_LARGE</code></a>。</p>"
+            },
+            {
+              "textRaw": "`v8.deserialize(buffer)`",
+              "type": "method",
+              "name": "deserialize",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {Buffer|TypedArray|DataView} 由 [`serialize()`][] 返回的缓冲区。",
+                      "name": "buffer",
+                      "type": "Buffer|TypedArray|DataView",
+                      "desc": "由 [`serialize()`][] 返回的缓冲区。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>使用具有默认选项的 <a href=\"#class-v8defaultdeserializer\"><code>DefaultDeserializer</code></a> 从缓冲区读取 JS 值。</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "类：`v8.Serializer`",
+              "name": "类：`v8.serializer`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new Serializer()`",
+                  "type": "ctor",
+                  "name": "Serializer",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>Serializer</code> 对象。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`serializer.writeHeader()`",
+                  "type": "method",
+                  "name": "writeHeader",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>写出一个头部，包括序列化格式版本。</p>"
+                },
+                {
+                  "textRaw": "`serializer.writeValue(value)`",
+                  "type": "method",
+                  "name": "writeValue",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`value` {any}",
+                          "name": "value",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>序列化一个 JavaScript 值，并将序列化的表示形式添加到内部缓冲区。</p>\n<p>如果 <code>value</code> 无法序列化，则会抛出错误。</p>"
+                },
+                {
+                  "textRaw": "`serializer.releaseBuffer()`",
+                  "type": "method",
+                  "name": "releaseBuffer",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{Buffer}",
+                          "name": "返回：",
+                          "type": "Buffer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回存储的内部缓冲区。一旦缓冲区被释放，就不应再使用此序列化器。如果先前的写入失败，调用此方法会导致未定义的行为。</p>"
+                },
+                {
+                  "textRaw": "`serializer.transferArrayBuffer(id, arrayBuffer)`",
+                  "type": "method",
+                  "name": "transferArrayBuffer",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`id` {integer} 一个 32 位无符号整数。",
+                          "name": "id",
+                          "type": "integer",
+                          "desc": "一个 32 位无符号整数。"
+                        },
+                        {
+                          "textRaw": "`arrayBuffer` {ArrayBuffer} 一个 `ArrayBuffer` 实例。",
+                          "name": "arrayBuffer",
+                          "type": "ArrayBuffer",
+                          "desc": "一个 `ArrayBuffer` 实例。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>标记一个 <code>ArrayBuffer</code> 为将其内容通过带外传输。在反序列化上下文中将相应的 <code>ArrayBuffer</code> 传递给 <a href=\"#deserializertransferarraybufferid-arraybuffer\"><code>deserializer.transferArrayBuffer()</code></a>。</p>"
+                },
+                {
+                  "textRaw": "`serializer.writeUint32(value)`",
+                  "type": "method",
+                  "name": "writeUint32",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`value` {integer}",
+                          "name": "value",
+                          "type": "integer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>写入一个原始的 32 位无符号整数。\n用于自定义 <a href=\"#serializer_writehostobjectobject\"><code>serializer._writeHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`serializer.writeUint64(hi, lo)`",
+                  "type": "method",
+                  "name": "writeUint64",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`hi` {integer}",
+                          "name": "hi",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "`lo` {integer}",
+                          "name": "lo",
+                          "type": "integer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>写入一个原始的 64 位无符号整数，拆分为高 32 位和低 32 位部分。\n用于自定义 <a href=\"#serializer_writehostobjectobject\"><code>serializer._writeHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`serializer.writeDouble(value)`",
+                  "type": "method",
+                  "name": "writeDouble",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`value` {number}",
+                          "name": "value",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>写入一个 JS <code>number</code> 值。\n用于自定义 <a href=\"#serializer_writehostobjectobject\"><code>serializer._writeHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`serializer.writeRawBytes(buffer)`",
+                  "type": "method",
+                  "name": "writeRawBytes",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`buffer` {Buffer|TypedArray|DataView}",
+                          "name": "buffer",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将原始字节写入序列化器的内部缓冲区。反序列化器将需要一种计算缓冲区长度的方法。\n用于自定义 <a href=\"#serializer_writehostobjectobject\"><code>serializer._writeHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`serializer._writeHostObject(object)`",
+                  "type": "method",
+                  "name": "_writeHostObject",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`object` {Object}",
+                          "name": "object",
+                          "type": "Object"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>调用此方法来写入某种主机对象，即由本地 C++ 绑定创建的对象。如果无法序列化 <code>object</code>，应抛出适当的异常。</p>\n<p>此方法不在 <code>Serializer</code> 类本身出现，但可以由子类提供。</p>"
+                },
+                {
+                  "textRaw": "`serializer._getDataCloneError(message)`",
+                  "type": "method",
+                  "name": "_getDataCloneError",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`message` {string}",
+                          "name": "message",
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>调用此方法来生成在对象无法克隆时将抛出的错误对象。</p>\n<p>此方法默认为 <a href=\"errors.html#class-error\"><code>Error</code></a> 构造函数，可以在子类上覆盖。</p>"
+                },
+                {
+                  "textRaw": "`serializer._getSharedArrayBufferId(sharedArrayBuffer)`",
+                  "type": "method",
+                  "name": "_getSharedArrayBufferId",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`sharedArrayBuffer` {SharedArrayBuffer}",
+                          "name": "sharedArrayBuffer",
+                          "type": "SharedArrayBuffer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>当序列化器将要序列化一个 <code>SharedArrayBuffer</code> 对象时调用此方法。它必须返回对象的无符号 32 位整数 ID，如果此 <code>SharedArrayBuffer</code> 已经被序列化过，则使用相同的 ID。在反序列化时，此 ID 将传递给 <a href=\"#deserializertransferarraybufferid-arraybuffer\"><code>deserializer.transferArrayBuffer()</code></a>。</p>\n<p>如果对象无法序列化，应抛出异常。</p>\n<p>此方法不在 <code>Serializer</code> 类本身出现，但可以由子类提供。</p>"
+                },
+                {
+                  "textRaw": "`serializer._setTreatArrayBufferViewsAsHostObjects(flag)`",
+                  "type": "method",
+                  "name": "_setTreatArrayBufferViewsAsHostObjects",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`flag` {boolean} **默认值:** `false`",
+                          "name": "flag",
+                          "type": "boolean",
+                          "desc": "**默认值:** `false`"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>指示是否将 <code>TypedArray</code> 和 <code>DataView</code> 对象视为主机对象，即传递给 <a href=\"#serializer_writehostobjectobject\"><code>serializer._writeHostObject()</code></a>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`v8.Serializer`"
+            },
+            {
+              "textRaw": "类：`v8.Deserializer`",
+              "name": "类：`v8.deserializer`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new Deserializer(buffer)`",
+                  "type": "ctor",
+                  "name": "Deserializer",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`buffer` {Buffer|TypedArray|DataView} 由 [`serializer.releaseBuffer()`][] 返回的缓冲区。",
+                          "name": "buffer",
+                          "type": "Buffer|TypedArray|DataView",
+                          "desc": "由 [`serializer.releaseBuffer()`][] 返回的缓冲区。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>Deserializer</code> 对象。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`deserializer.readHeader()`",
+                  "type": "method",
+                  "name": "readHeader",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>读取并验证头部（包括格式版本）。例如，可能拒绝无效或不支持的线格式。在这种情况下，会抛出 <code>Error</code>。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.readValue()`",
+                  "type": "method",
+                  "name": "readValue",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>从缓冲区反序列化一个 JavaScript 值并返回它。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.transferArrayBuffer(id, arrayBuffer)`",
+                  "type": "method",
+                  "name": "transferArrayBuffer",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`id` {integer} 一个 32 位无符号整数。",
+                          "name": "id",
+                          "type": "integer",
+                          "desc": "一个 32 位无符号整数。"
+                        },
+                        {
+                          "textRaw": "`arrayBuffer` {ArrayBuffer|SharedArrayBuffer} 一个 `ArrayBuffer` 实例。",
+                          "name": "arrayBuffer",
+                          "type": "ArrayBuffer|SharedArrayBuffer",
+                          "desc": "一个 `ArrayBuffer` 实例。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>标记一个 <code>ArrayBuffer</code> 为将其内容通过带外传输。在序列化上下文中将相应的 <code>ArrayBuffer</code> 传递给 <a href=\"#serializertransferarraybufferid-arraybuffer\"><code>serializer.transferArrayBuffer()</code></a>（或者在 <code>SharedArrayBuffer</code> 的情况下从 <a href=\"#serializer_getsharedarraybufferidsharedarraybuffer\"><code>serializer._getSharedArrayBufferId()</code></a> 返回 <code>id</code>）。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.getWireFormatVersion()`",
+                  "type": "method",
+                  "name": "getWireFormatVersion",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{integer}",
+                          "name": "返回：",
+                          "type": "integer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>读取底层线格式版本。可能主要用于读取旧线格式版本的遗留代码。在 <code>.readHeader()</code> 之前不能调用。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.readUint32()`",
+                  "type": "method",
+                  "name": "readUint32",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{integer}",
+                          "name": "返回：",
+                          "type": "integer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>读取一个原始的 32 位无符号整数并返回它。\n用于自定义 <a href=\"#deserializer_readhostobject\"><code>deserializer._readHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.readUint64()`",
+                  "type": "method",
+                  "name": "readUint64",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{integer\\[]}",
+                          "name": "返回：",
+                          "type": "integer\\[]"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>读取一个原始的 64 位无符号整数，并将其作为数组 <code>[hi, lo]</code> 返回，其中包含两个 32 位无符号整数条目。\n用于自定义 <a href=\"#deserializer_readhostobject\"><code>deserializer._readHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.readDouble()`",
+                  "type": "method",
+                  "name": "readDouble",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{number}",
+                          "name": "返回：",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>读取一个 JS <code>number</code> 值。\n用于自定义 <a href=\"#deserializer_readhostobject\"><code>deserializer._readHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`deserializer.readRawBytes(length)`",
+                  "type": "method",
+                  "name": "readRawBytes",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`length` {integer}",
+                          "name": "length",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "返回：{Buffer}",
+                          "name": "返回：",
+                          "type": "Buffer"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>从反序列化器的内部缓冲区读取原始字节。<code>length</code> 参数必须对应于传递给 <a href=\"#serializerwriterawbytesbuffer\"><code>serializer.writeRawBytes()</code></a> 的缓冲区的长度。\n用于自定义 <a href=\"#deserializer_readhostobject\"><code>deserializer._readHostObject()</code></a> 内部。</p>"
+                },
+                {
+                  "textRaw": "`deserializer._readHostObject()`",
+                  "type": "method",
+                  "name": "_readHostObject",
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>调用此方法来读取某种主机对象，即由本地 C++ 绑定创建的对象。如果无法反序列化数据，应抛出适当的异常。</p>\n<p>此方法不在 <code>Deserializer</code> 类本身出现，但可以由子类提供。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`v8.Deserializer`"
+            },
+            {
+              "textRaw": "类：`v8.DefaultSerializer`",
+              "name": "类：`v8.defaultserializer`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><a href=\"#class-v8serializer\"><code>Serializer</code></a> 的一个子类，将 <code>TypedArray</code>（特别是 <a href=\"buffer.html\"><code>Buffer</code></a>）和 <code>DataView</code> 对象作为主机对象序列化，并且只存储它们所引用的底层 <code>ArrayBuffer</code> 的部分。</p>",
+              "type": "module",
+              "displayName": "类：`v8.DefaultSerializer`"
+            },
+            {
+              "textRaw": "类：`v8.DefaultDeserializer`",
+              "name": "类：`v8.defaultdeserializer`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><a href=\"#class-v8deserializer\"><code>Deserializer</code></a> 的一个子类，对应于由 <a href=\"#class-v8defaultserializer\"><code>DefaultSerializer</code></a> 写入的格式。</p>",
+              "type": "module",
+              "displayName": "类：`v8.DefaultDeserializer`"
+            }
+          ],
+          "type": "module",
+          "displayName": "序列化 API"
+        },
+        {
+          "textRaw": "Promise 钩子",
+          "name": "promise_钩子",
+          "desc": "<p><code>promiseHooks</code> 接口可用于跟踪 promise 生命周期事件。要跟踪 <em>所有</em> 异步活动，请参见 <a href=\"async_hooks.html\"><code>async_hooks</code></a>，它在内部使用此模块来产生 promise 生命周期事件以及其他异步资源的事件。对于请求上下文管理，请参见 <a href=\"async_context.html#class-asynclocalstorage\"><code>AsyncLocalStorage</code></a>。</p>\n<pre><code class=\"language-mjs\">import { promiseHooks } from 'node:v8';\n\n// 有四个由 promise 产生的生命周期事件：\n\n// `init` 事件表示 promise 的创建。这可能是直接创建，例如使用 `new Promise(...)`，或者是延续，例如 `then()` 或 `catch()`。每当调用异步函数或执行 `await` 时也会发生。如果创建了延续 promise，`parent` 将是它所延续的 promise。\nfunction init(promise, parent) {\n  console.log('a promise was created', { promise, parent });\n}\n\n// `settled` 事件发生在 promise 接收到决议或拒绝值时。这可能同步发生，例如在非 promise 输入上使用 `Promise.resolve()`。\nfunction settled(promise) {\n  console.log('a promise resolved or rejected', { promise });\n}\n\n// `before` 事件在 `then()` 或 `catch()` 处理程序运行或 `await` 恢复执行之前立即运行。\nfunction before(promise) {\n  console.log('a promise is about to call a then handler', { promise });\n}\n\n// `after` 事件在 `then()` 处理程序运行之后立即运行，或者在另一个 `await` 恢复之后开始 `await` 时运行。\nfunction after(promise) {\n  console.log('a promise is done calling a then handler', { promise });\n}\n\n// 生命周期钩子可以单独启动和停止\nconst stopWatchingInits = promiseHooks.onInit(init);\nconst stopWatchingSettleds = promiseHooks.onSettled(settled);\nconst stopWatchingBefores = promiseHooks.onBefore(before);\nconst stopWatchingAfters = promiseHooks.onAfter(after);\n\n// 或者它们可以成组启动和停止\nconst stopHookSet = promiseHooks.createHook({\n  init,\n  settled,\n  before,\n  after,\n});\n\n// 要停止钩子，调用其创建时返回的函数。\nstopWatchingInits();\nstopWatchingSettleds();\nstopWatchingBefores();\nstopWatchingAfters();\nstopHookSet();\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`promiseHooks.onInit(init)`",
+              "type": "method",
+              "name": "onInit",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`init` {Function} 当 promise 创建时要调用的 [`init` 回调][]。",
+                      "name": "init",
+                      "type": "Function",
+                      "desc": "当 promise 创建时要调用的 [`init` 回调][]。"
+                    },
+                    {
+                      "textRaw": "返回：{Function} 调用以停止钩子。",
+                      "name": "返回：",
+                      "type": "Function",
+                      "desc": "调用以停止钩子。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><strong><code>init</code> 钩子必须是一个普通函数。提供异步函数将抛出，因为它会产生无限的微任务循环。</strong></p>\n<pre><code class=\"language-mjs\">import { promiseHooks } from 'node:v8';\n\nconst stop = promiseHooks.onInit((promise, parent) => {});\n</code></pre>\n<pre><code class=\"language-cjs\">const { promiseHooks } = require('node:v8');\n\nconst stop = promiseHooks.onInit((promise, parent) => {});\n</code></pre>"
+            },
+            {
+              "textRaw": "`promiseHooks.onSettled(settled)`",
+              "type": "method",
+              "name": "onSettled",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`settled` {Function} 当 promise 被决议或拒绝时要调用的 [`settled` 回调][]。",
+                      "name": "settled",
+                      "type": "Function",
+                      "desc": "当 promise 被决议或拒绝时要调用的 [`settled` 回调][]。"
+                    },
+                    {
+                      "textRaw": "返回：{Function} 调用以停止钩子。",
+                      "name": "返回：",
+                      "type": "Function",
+                      "desc": "调用以停止钩子。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><strong><code>settled</code> 钩子必须是一个普通函数。提供异步函数将抛出，因为它会产生无限的微任务循环。</strong></p>\n<pre><code class=\"language-mjs\">import { promiseHooks } from 'node:v8';\n\nconst stop = promiseHooks.onSettled((promise) => {});\n</code></pre>\n<pre><code class=\"language-cjs\">const { promiseHooks } = require('node:v8');\n\nconst stop = promiseHooks.onSettled((promise) => {});\n</code></pre>"
+            },
+            {
+              "textRaw": "`promiseHooks.onBefore(before)`",
+              "type": "method",
+              "name": "onBefore",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`before` {Function} 在 promise 延续执行之前调用的 [`before` 回调][]。",
+                      "name": "before",
+                      "type": "Function",
+                      "desc": "在 promise 延续执行之前调用的 [`before` 回调][]。"
+                    },
+                    {
+                      "textRaw": "返回：{Function} 调用以停止钩子。",
+                      "name": "返回：",
+                      "type": "Function",
+                      "desc": "调用以停止钩子。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><strong><code>before</code> 钩子必须是一个普通函数。提供异步函数将抛出，因为它会产生无限的微任务循环。</strong></p>\n<pre><code class=\"language-mjs\">import { promiseHooks } from 'node:v8';\n\nconst stop = promiseHooks.onBefore((promise) => {});\n</code></pre>\n<pre><code class=\"language-cjs\">const { promiseHooks } = require('node:v8');\n\nconst stop = promiseHooks.onBefore((promise) => {});\n</code></pre>"
+            },
+            {
+              "textRaw": "`promiseHooks.onAfter(after)`",
+              "type": "method",
+              "name": "onAfter",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`after` {Function} 在 promise 延续执行之后调用的 [`after` 回调][]。",
+                      "name": "after",
+                      "type": "Function",
+                      "desc": "在 promise 延续执行之后调用的 [`after` 回调][]。"
+                    },
+                    {
+                      "textRaw": "返回：{Function} 调用以停止钩子。",
+                      "name": "返回：",
+                      "type": "Function",
+                      "desc": "调用以停止钩子。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><strong><code>after</code> 钩子必须是一个普通函数。提供异步函数将抛出，因为它会产生无限的微任务循环。</strong></p>\n<pre><code class=\"language-mjs\">import { promiseHooks } from 'node:v8';\n\nconst stop = promiseHooks.onAfter((promise) => {});\n</code></pre>\n<pre><code class=\"language-cjs\">const { promiseHooks } = require('node:v8');\n\nconst stop = promiseHooks.onAfter((promise) => {});\n</code></pre>"
+            },
+            {
+              "textRaw": "`promiseHooks.createHook(callbacks)`",
+              "type": "method",
+              "name": "createHook",
+              "meta": {
+                "added": [
+                  "v17.1.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callbacks` {Object} 要注册的 [钩子回调][Hook Callbacks]",
+                      "name": "callbacks",
+                      "type": "Object",
+                      "desc": "要注册的 [钩子回调][Hook Callbacks]",
+                      "options": [
+                        {
+                          "textRaw": "`init` {Function} [`init` 回调][]。",
+                          "name": "init",
+                          "type": "Function",
+                          "desc": "[`init` 回调][]。"
+                        },
+                        {
+                          "textRaw": "`before` {Function} [`before` 回调][]。",
+                          "name": "before",
+                          "type": "Function",
+                          "desc": "[`before` 回调][]。"
+                        },
+                        {
+                          "textRaw": "`after` {Function} [`after` 回调][]。",
+                          "name": "after",
+                          "type": "Function",
+                          "desc": "[`after` 回调][]。"
+                        },
+                        {
+                          "textRaw": "`settled` {Function} [`settled` 回调][]。",
+                          "name": "settled",
+                          "type": "Function",
+                          "desc": "[`settled` 回调][]。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回：{Function} 用于禁用钩子",
+                      "name": "返回：",
+                      "type": "Function",
+                      "desc": "用于禁用钩子"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><strong>钩子回调必须是普通函数。提供异步函数将抛出，因为它会产生无限的微任务循环。</strong></p>\n<p>注册函数以在每个 promise 的不同生命周期事件中调用。</p>\n<p>回调 <code>init()</code>/<code>before()</code>/<code>after()</code>/<code>settled()</code> 在 promise 的生命周期中的相应事件中被调用。</p>\n<p>所有回调都是可选的。例如，如果只需要跟踪 promise 的创建，那么只需要传递 <code>init</code> 回调。可以传递给 <code>callbacks</code> 的所有函数的具体细节在 <a href=\"#hook-callbacks\">钩子回调</a> 部分。</p>\n<pre><code class=\"language-mjs\">import { promiseHooks } from 'node:v8';\n\nconst stopAll = promiseHooks.createHook({\n  init(promise, parent) {},\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { promiseHooks } = require('node:v8');\n\nconst stopAll = promiseHooks.createHook({\n  init(promise, parent) {},\n});\n</code></pre>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "钩子回调",
+              "name": "钩子回调",
+              "desc": "<p>Promise 生命周期中的关键事件已分为四个领域：promise 的创建、在延续处理程序调用之前/之后或围绕 await、以及当 promise 决议或拒绝时。</p>\n<p>虽然这些钩子类似于 <a href=\"async_hooks.html\"><code>async_hooks</code></a> 的钩子，但它们缺少 <code>destroy</code> 钩子。其他类型的异步资源通常表示套接字或文件描述符，它们具有独特的“关闭”状态来表达 <code>destroy</code> 生命周期事件，而 promise 只要代码仍然可以到达它们就保持可用。垃圾收集跟踪用于使 promise 适应 <code>async_hooks</code> 事件模型，然而这种跟踪非常昂贵，并且它们可能不一定被垃圾收集。</p>\n<p>因为 promise 是通过 promise 钩子机制跟踪其生命周期的异步资源，所以 <code>init()</code>、<code>before()</code>、<code>after()</code> 和 <code>settled()</code> 回调 <em>不得</em> 是异步函数，因为它们会创建更多 promise，从而产生无限循环。</p>\n<p>虽然此 API 用于将 promise 事件输入到 <a href=\"async_hooks.html\"><code>async_hooks</code></a> 中，但两者之间的顺序是未定义的。两个 API 都是多租户的，因此可能相对于彼此以任何顺序产生事件。</p>",
+              "methods": [
+                {
+                  "textRaw": "`init(promise, parent)`",
+                  "type": "method",
+                  "name": "init",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`promise` {Promise} 正在创建的 promise。",
+                          "name": "promise",
+                          "type": "Promise",
+                          "desc": "正在创建的 promise。"
+                        },
+                        {
+                          "textRaw": "`parent` {Promise} 所延续的 promise（如果适用）。",
+                          "name": "parent",
+                          "type": "Promise",
+                          "desc": "所延续的 promise（如果适用）。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在 promise 被构造时调用。这 <em>不</em> 意味着相应的 <code>before</code>/<code>after</code> 事件会发生，仅表示可能性存在。如果 promise 创建后从未获得延续，就会发生这种情况。</p>"
+                },
+                {
+                  "textRaw": "`before(promise)`",
+                  "type": "method",
+                  "name": "before",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`promise` {Promise}",
+                          "name": "promise",
+                          "type": "Promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在 promise 延续执行之前调用。这可以是 <code>then()</code>、<code>catch()</code> 或 <code>finally()</code> 处理程序的形式，或者是 <code>await</code> 恢复。</p>\n<p><code>before</code> 回调将被调用 0 到 N 次。如果从未为 promise 进行延续，<code>before</code> 回调通常会被调用 0 次。如果从同一个 promise 进行了许多延续，<code>before</code> 回调可能会被调用多次。</p>"
+                },
+                {
+                  "textRaw": "`after(promise)`",
+                  "type": "method",
+                  "name": "after",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`promise` {Promise}",
+                          "name": "promise",
+                          "type": "Promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在 promise 延续执行之后立即调用。这可能是在 <code>then()</code>、<code>catch()</code> 或 <code>finally()</code> 处理程序之后，或者在另一个 <code>await</code> 之后的 <code>await</code> 之前。</p>"
+                },
+                {
+                  "textRaw": "`settled(promise)`",
+                  "type": "method",
+                  "name": "settled",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`promise` {Promise}",
+                          "name": "promise",
+                          "type": "Promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>当 promise 接收到决议或拒绝值时调用。这可能同步发生，例如在 <code>Promise.resolve()</code> 或 <code>Promise.reject()</code> 的情况下。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "钩子回调"
+            }
+          ],
+          "type": "module",
+          "displayName": "Promise 钩子"
+        },
+        {
+          "textRaw": "启动快照 API",
+          "name": "启动快照_api",
+          "meta": {
+            "added": [
+              "v18.6.0",
+              "v16.17.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57513",
+                "description": "Marking the API stable."
+              }
+            ]
+          },
+          "desc": "<p><code>v8.startupSnapshot</code> 接口可用于为自定义启动快照添加序列化和反序列化钩子。</p>\n<pre><code class=\"language-console\">$ node --snapshot-blob snapshot.blob --build-snapshot entry.js\n# 这会启动一个带有快照的进程\n$ node --snapshot-blob snapshot.blob\n</code></pre>\n<p>在上面的例子中，<code>entry.js</code> 可以使用 <code>v8.startupSnapshot</code> 接口中的方法来指定如何在序列化期间保存快照中自定义对象的信息，以及如何在快照反序列化期间使用这些信息来同步这些对象。例如，如果 <code>entry.js</code> 包含以下脚本：</p>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst fs = require('node:fs');\nconst zlib = require('node:zlib');\nconst path = require('node:path');\nconst assert = require('node:assert');\n\nconst v8 = require('node:v8');\n\nclass BookShelf {\n  storage = new Map();\n\n  // 从目录读取一系列文件并将它们存储到 storage 中。\n  constructor(directory, books) {\n    for (const book of books) {\n      this.storage.set(book, fs.readFileSync(path.join(directory, book)));\n    }\n  }\n\n  static compressAll(shelf) {\n    for (const [ book, content ] of shelf.storage) {\n      shelf.storage.set(book, zlib.gzipSync(content));\n    }\n  }\n\n  static decompressAll(shelf) {\n    for (const [ book, content ] of shelf.storage) {\n      shelf.storage.set(book, zlib.gunzipSync(content));\n    }\n  }\n}\n\n// 这里的 __dirname 是快照构建期间放置快照脚本的位置。\nconst shelf = new BookShelf(__dirname, [\n  'book1.en_US.txt',\n  'book1.es_ES.txt',\n  'book2.zh_CN.txt',\n]);\n\nassert(v8.startupSnapshot.isBuildingSnapshot());\n// 在快照序列化时，压缩书籍以减少大小。\nv8.startupSnapshot.addSerializeCallback(BookShelf.compressAll, shelf);\n// 在快照反序列化时，解压缩书籍。\nv8.startupSnapshot.addDeserializeCallback(BookShelf.decompressAll, shelf);\nv8.startupSnapshot.setDeserializeMainFunction((shelf) => {\n  // process.env 和 process.argv 在快照反序列化期间会被刷新。\n  const lang = process.env.BOOK_LANG || 'en_US';\n  const book = process.argv[1];\n  const name = `${book}.${lang}.txt`;\n  console.log(shelf.storage.get(name));\n}, shelf);\n</code></pre>\n<p>生成的二进制文件将在启动期间使用启动进程刷新的 <code>process.env</code> 和 <code>process.argv</code> 打印从快照反序列化的数据：</p>\n<pre><code class=\"language-console\">$ BOOK_LANG=es_ES node --snapshot-blob snapshot.blob book1\n# 打印从快照反序列化的 book1.es_ES.txt 的内容。\n</code></pre>\n<p>当前从用户态快照反序列化的应用程序无法再次快照，因此这些 API 仅对未从用户态快照反序列化的应用程序可用。</p>",
+          "methods": [
+            {
+              "textRaw": "`v8.startupSnapshot.addSerializeCallback(callback[, data])`",
+              "type": "method",
+              "name": "addSerializeCallback",
+              "meta": {
+                "added": [
+                  "v18.6.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 在序列化之前要调用的回调。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "在序列化之前要调用的回调。"
+                    },
+                    {
+                      "textRaw": "`data` {any} 可选数据，在 `callback` 被调用时将传递给该回调。",
+                      "name": "data",
+                      "type": "any",
+                      "desc": "可选数据，在 `callback` 被调用时将传递给该回调。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>添加一个回调，当 Node.js 实例即将被序列化为快照并退出时调用。这可用于释放不应或无法序列化的资源，或将用户数据转换为更适合序列化的形式。</p>\n<p>回调按照添加的顺序运行。</p>"
+            },
+            {
+              "textRaw": "`v8.startupSnapshot.addDeserializeCallback(callback[, data])`",
+              "type": "method",
+              "name": "addDeserializeCallback",
+              "meta": {
+                "added": [
+                  "v18.6.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 在快照反序列化后要调用的回调。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "在快照反序列化后要调用的回调。"
+                    },
+                    {
+                      "textRaw": "`data` {any} 可选数据，在 `callback` 被调用时将传递给该回调。",
+                      "name": "data",
+                      "type": "any",
+                      "desc": "可选数据，在 `callback` 被调用时将传递给该回调。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>添加一个回调，当 Node.js 实例从快照反序列化时调用。<code>callback</code> 和 <code>data</code>（如果提供）将被序列化到快照中，它们可用于重新初始化应用程序的状态或重新获取应用程序从快照重启时所需的资源。</p>\n<p>回调按照添加的顺序运行。</p>"
+            },
+            {
+              "textRaw": "`v8.startupSnapshot.setDeserializeMainFunction(callback[, data])`",
+              "type": "method",
+              "name": "setDeserializeMainFunction",
+              "meta": {
+                "added": [
+                  "v18.6.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 作为快照反序列化后的入口点调用的回调。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "作为快照反序列化后的入口点调用的回调。"
+                    },
+                    {
+                      "textRaw": "`data` {any} 可选数据，在 `callback` 被调用时将传递给该回调。",
+                      "name": "data",
+                      "type": "any",
+                      "desc": "可选数据，在 `callback` 被调用时将传递给该回调。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>这设置了 Node.js 应用程序从快照反序列化时的入口点。在快照构建脚本中只能调用一次。如果调用，反序列化的应用程序不再需要额外的入口点脚本来启动，并且将简单地调用回调以及反序列化的数据（如果提供），否则反序列化的应用程序仍然需要提供入口点脚本。</p>"
+            },
+            {
+              "textRaw": "`v8.startupSnapshot.isBuildingSnapshot()`",
+              "type": "method",
+              "name": "isBuildingSnapshot",
+              "meta": {
+                "added": [
+                  "v18.6.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{boolean}",
+                      "name": "返回：",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果 Node.js 实例正在运行以构建快照，则返回 true。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "启动快照 API"
+        },
+        {
+          "textRaw": "类：`v8.GCProfiler`",
+          "name": "类：`v8.gcprofiler`",
+          "meta": {
+            "added": [
+              "v19.6.0",
+              "v18.15.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>此 API 在当前线程中收集 GC 数据。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new v8.GCProfiler()`",
+              "type": "ctor",
+              "name": "v8.GCProfiler",
+              "meta": {
+                "added": [
+                  "v19.6.0",
+                  "v18.15.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>创建 <code>v8.GCProfiler</code> 类的新实例。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`profiler.start()`",
+              "type": "method",
+              "name": "start",
+              "meta": {
+                "added": [
+                  "v19.6.0",
+                  "v18.15.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>开始收集 GC 数据。</p>"
+            },
+            {
+              "textRaw": "`profiler.stop()`",
+              "type": "method",
+              "name": "stop",
+              "meta": {
+                "added": [
+                  "v19.6.0",
+                  "v18.15.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>停止收集 GC 数据并返回一个对象。对象的内容如下。</p>\n<pre><code class=\"language-json\">{\n  \"version\": 1,\n  \"startTime\": 1674059033862,\n  \"statistics\": [\n    {\n      \"gcType\": \"Scavenge\",\n      \"beforeGC\": {\n        \"heapStatistics\": {\n          \"totalHeapSize\": 5005312,\n          \"totalHeapSizeExecutable\": 524288,\n          \"totalPhysicalSize\": 5226496,\n          \"totalAvailableSize\": 4341325216,\n          \"totalGlobalHandlesSize\": 8192,\n          \"usedGlobalHandlesSize\": 2112,\n          \"usedHeapSize\": 4883840,\n          \"heapSizeLimit\": 4345298944,\n          \"mallocedMemory\": 254128,\n          \"externalMemory\": 225138,\n          \"peakMallocedMemory\": 181760\n        },\n        \"heapSpaceStatistics\": [\n          {\n            \"spaceName\": \"read_only_space\",\n            \"spaceSize\": 0,\n            \"spaceUsedSize\": 0,\n            \"spaceAvailableSize\": 0,\n            \"physicalSpaceSize\": 0\n          }\n        ]\n      },\n      \"cost\": 1574.14,\n      \"afterGC\": {\n        \"heapStatistics\": {\n          \"totalHeapSize\": 6053888,\n          \"totalHeapSizeExecutable\": 524288,\n          \"totalPhysicalSize\": 5500928,\n          \"totalAvailableSize\": 4341101384,\n          \"totalGlobalHandlesSize\": 8192,\n          \"usedGlobalHandlesSize\": 2112,\n          \"usedHeapSize\": 4059096,\n          \"heapSizeLimit\": 4345298944,\n          \"mallocedMemory\": 254128,\n          \"externalMemory\": 225138,\n          \"peakMallocedMemory\": 181760\n        },\n        \"heapSpaceStatistics\": [\n          {\n            \"spaceName\": \"read_only_space\",\n            \"spaceSize\": 0,\n            \"spaceUsedSize\": 0,\n            \"spaceAvailableSize\": 0,\n            \"physicalSpaceSize\": 0\n          }\n        ]\n      }\n    }\n  ],\n  \"endTime\": 1674059036865\n}\n</code></pre>\n<p>这是一个例子。</p>\n<pre><code class=\"language-js\">const { GCProfiler } = require('node:v8');\nconst profiler = new GCProfiler();\nprofiler.start();\nsetTimeout(() => {\n  console.log(profiler.stop());\n}, 1000);\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`v8.GCProfiler`"
+        },
+        {
+          "textRaw": "类：`CPUProfileHandle`",
+          "name": "类：`cpuprofilehandle`",
+          "meta": {
+            "added": [
+              "v24.8.0"
+            ],
+            "changes": []
+          },
+          "methods": [
+            {
+              "textRaw": "`cpuProfileHandle.stop()`",
+              "type": "method",
+              "name": "stop",
+              "meta": {
+                "added": [
+                  "v24.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Promise}",
+                      "name": "返回：",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>停止收集配置文件，然后返回一个 Promise，该 Promise 要么以错误完成，要么以配置文件数据完成。</p>"
+            },
+            {
+              "textRaw": "`cpuProfileHandle[Symbol.asyncDispose]()`",
+              "type": "method",
+              "name": "[Symbol.asyncDispose]",
+              "meta": {
+                "added": [
+                  "v24.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Promise}",
+                      "name": "返回：",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>停止收集配置文件，并且配置文件将被丢弃。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`CPUProfileHandle`"
+        },
+        {
+          "textRaw": "类：`HeapProfileHandle`",
+          "name": "类：`heapprofilehandle`",
+          "meta": {
+            "added": [
+              "v24.9.0"
+            ],
+            "changes": []
+          },
+          "methods": [
+            {
+              "textRaw": "`heapProfileHandle.stop()`",
+              "type": "method",
+              "name": "stop",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Promise}",
+                      "name": "返回：",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>停止收集配置文件，然后返回一个 Promise，该 Promise 要么以错误完成，要么以配置文件数据完成。</p>"
+            },
+            {
+              "textRaw": "`heapProfileHandle[Symbol.asyncDispose]()`",
+              "type": "method",
+              "name": "[Symbol.asyncDispose]",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Promise}",
+                      "name": "返回：",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>停止收集配置文件，并且配置文件将被丢弃。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`HeapProfileHandle`"
+        }
+      ],
+      "type": "module",
+      "displayName": "V8"
+    }
+  ]
+}

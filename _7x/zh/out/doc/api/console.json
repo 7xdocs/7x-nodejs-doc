@@ -1,0 +1,735 @@
+{
+  "type": "module",
+  "source": "doc/api/console.md",
+  "modules": [
+    {
+      "textRaw": "控制台",
+      "name": "控制台",
+      "introduced_in": "v0.10.13",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/console.js\">lib/console.js</a></p>\n<p><code>node:console</code>模块提供了一个简单的调试控制台，类似于网页浏览器提供的 JavaScript 控制台机制。</p>\n<p>该模块导出两个特定的组件：</p>\n<ul>\n<li>一个<code>Console</code>类，包含<code>console.log()</code>、<code>console.error()</code>和<code>console.warn()</code>等方法，可用于写入任何 Node.js 流。</li>\n<li>一个全局<code>console</code>实例，配置为写入<a href=\"process.html#processstdout\"><code>process.stdout</code></a>和<a href=\"process.html#processstderr\"><code>process.stderr</code></a>。全局<code>console</code>无需调用<code>require('node:console')</code>即可使用。</li>\n</ul>\n<p><em><strong>警告</strong></em>：全局 console 对象的方法既不像它们所类似的浏览器 API 那样始终同步，也不像所有其他 Node.js 流那样始终异步。希望依赖 console 函数的同步/异步行为的程序，首先应该弄清楚 console 的底层流的性质。这是因为该流取决于当前进程的底层平台和标准流配置。有关更多信息，请参见[进程 I/O 说明][]。</p>\n<p>使用全局<code>console</code>的示例：</p>\n<pre><code class=\"language-js\">console.log('hello world');\n// Prints: hello world, to stdout\nconsole.log('hello %s', 'world');\n// Prints: hello world, to stdout\nconsole.error(new Error('Whoops, something bad happened'));\n// Prints error message and stack trace to stderr:\n//   Error: Whoops, something bad happened\n//     at [eval]:5:15\n//     at Script.runInThisContext (node:vm:132:18)\n//     at Object.runInThisContext (node:vm:309:38)\n//     at node:internal/process/execution:77:19\n//     at [eval]-wrapper:6:22\n//     at evalScript (node:internal/process/execution:76:60)\n//     at node:internal/main/eval_string:23:3\n\nconst name = 'Will Robinson';\nconsole.warn(`Danger ${name}! Danger!`);\n// Prints: Danger Will Robinson! Danger!, to stderr\n</code></pre>\n<p>使用<code>Console</code>类的示例：</p>\n<pre><code class=\"language-js\">const out = getStreamSomehow();\nconst err = getStreamSomehow();\nconst myConsole = new console.Console(out, err);\n\nmyConsole.log('hello world');\n// Prints: hello world, to out\nmyConsole.log('hello %s', 'world');\n// Prints: hello world, to out\nmyConsole.error(new Error('Whoops, something bad happened'));\n// Prints: [Error: Whoops, something bad happened], to err\n\nconst name = 'Will Robinson';\nmyConsole.warn(`Danger ${name}! Danger!`);\n// Prints: Danger Will Robinson! Danger!, to err\n</code></pre>",
+      "classes": [
+        {
+          "textRaw": "类：`Console`",
+          "name": "类：`Console`",
+          "meta": {
+            "changes": [
+              {
+                "version": "v8.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/9744",
+                "description": "Errors that occur while writing to the underlying streams will now be ignored by default."
+              }
+            ]
+          },
+          "type": "class",
+          "desc": "<p><code>Console</code>类可用于创建具有可配置输出流的简单日志记录器，可通过<code>require('node:console').Console</code>或<code>console.Console</code>（或其解构形式）访问：</p>\n<pre><code class=\"language-mjs\">import { Console } from 'node:console';\n</code></pre>\n<pre><code class=\"language-cjs\">const { Console } = require('node:console');\n</code></pre>\n<pre><code class=\"language-js\">const { Console } = console;\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`console.assert(value[, ...message])`",
+              "type": "method",
+              "name": "assert",
+              "meta": {
+                "added": [
+                  "v0.1.101"
+                ],
+                "changes": [
+                  {
+                    "version": "v10.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/17706",
+                    "description": "The implementation is now spec compliant and does not throw anymore."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`value` {any} 被测试是否为真值的值。",
+                      "name": "value",
+                      "type": "any",
+                      "desc": "被测试是否为真值的值。"
+                    },
+                    {
+                      "textRaw": "`...message` {any} 除`value`之外的所有参数都用作错误消息。",
+                      "name": "...message",
+                      "type": "any",
+                      "desc": "除`value`之外的所有参数都用作错误消息。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果<code>value</code>是<a href=\"https://developer.mozilla.org/en-US/docs/Glossary/Falsy\">假值</a>或被省略，<code>console.assert()</code>会写入一条消息。它只写入消息，不会以其他方式影响执行。输出始终以<code>\"Assertion failed\"</code>开头。如果提供了<code>message</code>，则使用<a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>进行格式化。</p>\n<p>如果<code>value</code>是<a href=\"https://developer.mozilla.org/en-US/docs/Glossary/Truthy\">真值</a>，则不执行任何操作。</p>\n<pre><code class=\"language-js\">console.assert(true, '无操作');\n\nconsole.assert(false, '哎呀，%s 不起作用', '没');\n// Assertion failed: 哎呀，没不起作用\n\nconsole.assert();\n// Assertion failed\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.clear()`",
+              "type": "method",
+              "name": "clear",
+              "meta": {
+                "added": [
+                  "v8.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>当<code>stdout</code>是 TTY 时，调用<code>console.clear()</code>将尝试清除 TTY。当<code>stdout</code>不是 TTY 时，此方法不执行任何操作。</p>\n<p><code>console.clear()</code>的具体操作可能因操作系统和终端类型而异。对于大多数 Linux 操作系统，<code>console.clear()</code>的操作类似于<code>clear</code> shell 命令。在 Windows 上，<code>console.clear()</code>只会清除 Node.js 二进制文件当前终端视口中的输出。</p>"
+            },
+            {
+              "textRaw": "`console.count([label])`",
+              "type": "method",
+              "name": "count",
+              "meta": {
+                "added": [
+                  "v8.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string} 计数器的显示标签。**默认值：** `'default'`。",
+                      "name": "label",
+                      "type": "string",
+                      "desc": "计数器的显示标签。**默认值：** `'default'`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>维护特定于<code>label</code>的内部计数器，并向<code>stdout</code>输出使用给定<code>label</code>调用<code>console.count()</code>的次数。</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">> console.count()\ndefault: 1\nundefined\n> console.count('default')\ndefault: 2\nundefined\n> console.count('abc')\nabc: 1\nundefined\n> console.count('xyz')\nxyz: 1\nundefined\n> console.count('abc')\nabc: 2\nundefined\n> console.count()\ndefault: 3\nundefined\n>\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.countReset([label])`",
+              "type": "method",
+              "name": "countReset",
+              "meta": {
+                "added": [
+                  "v8.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string} 计数器的显示标签。**默认值：** `'default'`。",
+                      "name": "label",
+                      "type": "string",
+                      "desc": "计数器的显示标签。**默认值：** `'default'`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>重置特定于<code>label</code>的内部计数器。</p>\n<!-- eslint-skip -->\n<pre><code class=\"language-js\">> console.count('abc');\nabc: 1\nundefined\n> console.countReset('abc');\nundefined\n> console.count('abc');\nabc: 1\nundefined\n>\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.debug(data[, ...args])`",
+              "type": "method",
+              "name": "debug",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v8.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/17033",
+                    "description": "`console.debug` is now an alias for `console.log`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`data` {any}",
+                      "name": "data",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>console.debug()</code>函数是<a href=\"#consolelogdata-args\"><code>console.log()</code></a>的别名。</p>"
+            },
+            {
+              "textRaw": "`console.dir(obj[, options])`",
+              "type": "method",
+              "name": "dir",
+              "meta": {
+                "added": [
+                  "v0.1.101"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`obj` {any}",
+                      "name": "obj",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`showHidden` {boolean} 如果为`true`，则还会显示对象的不可枚举属性和符号属性。**默认值：** `false`。",
+                          "name": "showHidden",
+                          "type": "boolean",
+                          "desc": "如果为`true`，则还会显示对象的不可枚举属性和符号属性。**默认值：** `false`。"
+                        },
+                        {
+                          "textRaw": "`depth` {number} 告诉[`util.inspect()`][]在格式化对象时递归多少次。这对于检查大型复杂对象很有用。要使其无限递归，请传递`null`。**默认值：** `2`。",
+                          "name": "depth",
+                          "type": "number",
+                          "desc": "告诉[`util.inspect()`][]在格式化对象时递归多少次。这对于检查大型复杂对象很有用。要使其无限递归，请传递`null`。**默认值：** `2`。"
+                        },
+                        {
+                          "textRaw": "`colors` {boolean} 如果为`true`，则输出将使用 ANSI 颜色代码进行样式设置。颜色是可自定义的；请参见[自定义`util.inspect()`颜色][]。**默认值：** `false`。",
+                          "name": "colors",
+                          "type": "boolean",
+                          "desc": "如果为`true`，则输出将使用 ANSI 颜色代码进行样式设置。颜色是可自定义的；请参见[自定义`util.inspect()`颜色][]。**默认值：** `false`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>对<code>obj</code>使用<a href=\"util.html#utilinspectobject-options\"><code>util.inspect()</code></a>并将结果字符串打印到<code>stdout</code>。此函数绕过<code>obj</code>上定义的任何自定义<code>inspect()</code>函数。</p>"
+            },
+            {
+              "textRaw": "`console.dirxml(...data)`",
+              "type": "method",
+              "name": "dirxml",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v9.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/17152",
+                    "description": "`console.dirxml` now calls `console.log` for its arguments."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`...data` {any}",
+                      "name": "...data",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法调用<code>console.log()</code>并传递它接收到的参数。此方法不产生任何 XML 格式。</p>"
+            },
+            {
+              "textRaw": "`console.error([data][, ...args])`",
+              "type": "method",
+              "name": "error",
+              "meta": {
+                "added": [
+                  "v0.1.100"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`data` {any}",
+                      "name": "data",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>打印到<code>stderr</code>并换行。可以传递多个参数，第一个用作主要消息，所有其他参数用作类似于 <a href=\"http://man7.org/linux/man-pages/man3/printf.3.html\"><code>printf(3)</code></a>的替换值（所有参数都传递给<a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>）。</p>\n<pre><code class=\"language-js\">const code = 5;\nconsole.error('错误 #%d', code);\n// 打印：error #5，到stderr\nconsole.error('error', code);\n// 打印：error 5，到stderr\n</code></pre>\n<p>如果在第一个字符串中没有找到格式化元素（例如<code>%d</code>），则对每个参数调用<a href=\"util.html#utilinspectobject-options\"><code>util.inspect()</code></a>，并将结果字符串值连接起来。有关更多信息，请参见<a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>。</p>"
+            },
+            {
+              "textRaw": "`console.group([...label])`",
+              "type": "method",
+              "name": "group",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`...label` {any}",
+                      "name": "...label",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将后续行的缩进增加<code>groupIndentation</code>长度的空格数。</p>\n<p>如果提供了一个或多个<code>label</code>，则首先打印这些标签，不添加额外的缩进。</p>"
+            },
+            {
+              "textRaw": "`console.groupCollapsed()`",
+              "type": "method",
+              "name": "groupCollapsed",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><a href=\"#consolegrouplabel\"><code>console.group()</code></a>的别名。</p>"
+            },
+            {
+              "textRaw": "`console.groupEnd()`",
+              "type": "method",
+              "name": "groupEnd",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>将后续行的缩进减少<code>groupIndentation</code>长度的空格数。</p>"
+            },
+            {
+              "textRaw": "`console.info([data][, ...args])`",
+              "type": "method",
+              "name": "info",
+              "meta": {
+                "added": [
+                  "v0.1.100"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`data` {any}",
+                      "name": "data",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>console.info()</code>函数是<a href=\"#consolelogdata-args\"><code>console.log()</code></a>的别名。</p>"
+            },
+            {
+              "textRaw": "`console.log([data][, ...args])`",
+              "type": "method",
+              "name": "log",
+              "meta": {
+                "added": [
+                  "v0.1.100"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`data` {any}",
+                      "name": "data",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>打印到<code>stdout</code>并换行。可以传递多个参数，第一个用作主要消息，所有其他参数用作类似于 <a href=\"http://man7.org/linux/man-pages/man3/printf.3.html\"><code>printf(3)</code></a>的替换值（所有参数都传递给<a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>）。</p>\n<pre><code class=\"language-js\">const count = 5;\nconsole.log('count: %d', count);\n// 打印：count: 5，到stdout\nconsole.log('count:', count);\n// 打印：count: 5，到stdout\n</code></pre>\n<p>有关更多信息，请参见<a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>。</p>"
+            },
+            {
+              "textRaw": "`console.table(tabularData[, properties])`",
+              "type": "method",
+              "name": "table",
+              "meta": {
+                "added": [
+                  "v10.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`tabularData` {any}",
+                      "name": "tabularData",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`properties` {string\\[]} 用于构造表格的替代属性。",
+                      "name": "properties",
+                      "type": "string\\[]",
+                      "desc": "用于构造表格的替代属性。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>尝试使用<code>tabularData</code>的属性列（或使用<code>properties</code>）和<code>tabularData</code>的行构造一个表格并记录它。如果无法解析为表格形式，则退回到仅记录参数。</p>\n<pre><code class=\"language-js\">// 这些无法解析为表格数据\nconsole.table(Symbol());\n// Symbol()\n\nconsole.table(undefined);\n// undefined\n\nconsole.table([\n  { a: 1, b: 'Y' },\n  { a: 'Z', b: 2 },\n]);\n// ┌─────────┬─────┬─────┐\n// │ (index) │ a   │ b   │\n// ├─────────┼─────┼─────┤\n// │ 0       │ 1   │ 'Y' │\n// │ 1       │ 'Z' │ 2   │\n// └─────────┴─────┴─────┘\n\nconsole.table(\n  [\n    { a: 1, b: 'Y' },\n    { a: 'Z', b: 2 },\n  ],\n  ['a']\n);\n// ┌─────────┬─────┐\n// │ (index) │ a   │\n// ├─────────┼─────┤\n// │ 0       │ 1   │\n// │ 1       │ 'Z' │\n// └─────────┴─────┘\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.time([label])`",
+              "type": "method",
+              "name": "time",
+              "meta": {
+                "added": [
+                  "v0.1.104"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string} **默认值：** `'default'`",
+                      "name": "label",
+                      "type": "string",
+                      "desc": "**默认值：** `'default'`"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>启动一个计时器，可用于计算操作的持续时间。计时器由唯一的<code>label</code>标识。调用<a href=\"#consoletimeendlabel\"><code>console.timeEnd()</code></a>时使用相同的<code>label</code>来停止计时器，并将经过的时间以合适的时间单位输出到<code>stdout</code>。例如，如果经过的时间是 3869ms，<code>console.timeEnd()</code>将显示“3.869s”。</p>"
+            },
+            {
+              "textRaw": "`console.timeEnd([label])`",
+              "type": "method",
+              "name": "timeEnd",
+              "meta": {
+                "added": [
+                  "v0.1.104"
+                ],
+                "changes": [
+                  {
+                    "version": "v13.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/29251",
+                    "description": "The elapsed time is displayed with a suitable time unit."
+                  },
+                  {
+                    "version": "v6.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/5901",
+                    "description": "This method no longer supports multiple calls that don't map to individual `console.time()` calls; see below for details."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string} **默认值：** `'default'`",
+                      "name": "label",
+                      "type": "string",
+                      "desc": "**默认值：** `'default'`"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>停止之前通过调用<a href=\"#consoletimelabel\"><code>console.time()</code></a>启动的计时器，并将结果打印到<code>stdout</code>：</p>\n<pre><code class=\"language-js\">console.time('一堆操作');\n// 执行一堆操作。\nconsole.timeEnd('一堆操作');\n// 打印：一堆操作: 225.438ms\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.timeLog([label][, ...data])`",
+              "type": "method",
+              "name": "timeLog",
+              "meta": {
+                "added": [
+                  "v10.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string} **默认值：** `'default'`",
+                      "name": "label",
+                      "type": "string",
+                      "desc": "**默认值：** `'default'`"
+                    },
+                    {
+                      "textRaw": "`...data` {any}",
+                      "name": "...data",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>对于之前通过调用<a href=\"#consoletimelabel\"><code>console.time()</code></a>启动的计时器，将经过的时间和其他<code>data</code>参数打印到<code>stdout</code>：</p>\n<pre><code class=\"language-js\">console.time('process');\nconst value = expensiveProcess1(); // 返回42\nconsole.timeLog('process', value);\n// 打印 \"process: 365.227ms 42\"。\ndoExpensiveProcess2(value);\nconsole.timeEnd('process');\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.trace([message][, ...args])`",
+              "type": "method",
+              "name": "trace",
+              "meta": {
+                "added": [
+                  "v0.1.104"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`message` {any}",
+                      "name": "message",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>向<code>stderr</code>打印字符串<code>'Trace: '</code>， followed by the <a href=\"util.html#utilformatformat-args\"><code>util.format()</code></a>格式化的消息和到代码中当前位置的堆栈跟踪。</p>\n<pre><code class=\"language-js\">console.trace('显示我');\n// 打印：（堆栈跟踪将根据调用trace的位置而变化）\n//  Trace: 显示我\n//    at repl:2:9\n//    at REPLServer.defaultEval (repl.js:248:27)\n//    at bound (domain.js:287:14)\n//    at REPLServer.runBound [as eval] (domain.js:300:12)\n//    at REPLServer.&#x3C;anonymous> (repl.js:412:12)\n//    at emitOne (events.js:82:20)\n//    at REPLServer.emit (events.js:169:7)\n//    at REPLServer.Interface._onLine (readline.js:210:10)\n//    at REPLServer.Interface._line (readline.js:549:8)\n//    at REPLServer.Interface._ttyWrite (readline.js:826:14)\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.warn([data][, ...args])`",
+              "type": "method",
+              "name": "warn",
+              "meta": {
+                "added": [
+                  "v0.1.100"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`data` {any}",
+                      "name": "data",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>console.warn()</code>函数是<a href=\"#consoleerrordata-args\"><code>console.error()</code></a>的别名。</p>"
+            }
+          ],
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`stdout` {stream.Writable}",
+                      "name": "stdout",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`stderr` {stream.Writable}",
+                      "name": "stderr",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`ignoreErrors` {boolean} 写入底层流时忽略错误。**默认值：** `true`。",
+                      "name": "ignoreErrors",
+                      "type": "boolean",
+                      "desc": "写入底层流时忽略错误。**默认值：** `true`。"
+                    },
+                    {
+                      "textRaw": "`colorMode` {boolean|string} 设置此`Console`实例的颜色支持。设置为`true`会在检查值时启用着色。设置为`false`会在检查值时禁用着色。设置为`'auto'`会使颜色支持取决于相应流的`isTTY`属性和`getColorDepth()`返回的值。如果已设置`inspectOptions.colors`，则不能使用此选项。**默认值：** `'auto'`。",
+                      "name": "colorMode",
+                      "type": "boolean|string",
+                      "desc": "设置此`Console`实例的颜色支持。设置为`true`会在检查值时启用着色。设置为`false`会在检查值时禁用着色。设置为`'auto'`会使颜色支持取决于相应流的`isTTY`属性和`getColorDepth()`返回的值。如果已设置`inspectOptions.colors`，则不能使用此选项。**默认值：** `'auto'`。"
+                    },
+                    {
+                      "textRaw": "`inspectOptions` {Object|Map} 指定传递给[`util.inspect()`][]的选项。可以是一个选项对象，或者如果需要为 stdout 和 stderr 设置不同的选项，则可以是一个从流对象到选项的`Map`。",
+                      "name": "inspectOptions",
+                      "type": "Object|Map",
+                      "desc": "指定传递给[`util.inspect()`][]的选项。可以是一个选项对象，或者如果需要为 stdout 和 stderr 设置不同的选项，则可以是一个从流对象到选项的`Map`。"
+                    },
+                    {
+                      "textRaw": "`groupIndentation` {number} 设置组缩进。**默认值：** `2`。",
+                      "name": "groupIndentation",
+                      "type": "number",
+                      "desc": "设置组缩进。**默认值：** `2`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个具有一个或两个可写流实例的新<code>Console</code>。<code>stdout</code>是用于打印日志或信息输出的可写流。<code>stderr</code>用于警告或错误输出。如果未提供<code>stderr</code>，则<code>stdout</code>将用于<code>stderr</code>。</p>\n<pre><code class=\"language-mjs\">import { createWriteStream } from 'node:fs';\nimport { Console } from 'node:console';\n// 或者\n// const { Console } = console;\n\nconst output = createWriteStream('./stdout.log');\nconst errorOutput = createWriteStream('./stderr.log');\n// 自定义简单日志记录器\nconst logger = new Console({ stdout: output, stderr: errorOutput });\n// 像使用console一样使用它\nconst count = 5;\nlogger.log('count: %d', count);\n// 在stdout.log中：count 5\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\nconst { Console } = require('node:console');\n// 或者\n// const { Console } = console;\n\nconst output = fs.createWriteStream('./stdout.log');\nconst errorOutput = fs.createWriteStream('./stderr.log');\n// 自定义简单日志记录器\nconst logger = new Console({ stdout: output, stderr: errorOutput });\n// 像使用console一样使用它\nconst count = 5;\nlogger.log('count: %d', count);\n// 在stdout.log中：count 5\n</code></pre>\n<p>全局<code>console</code>是一个特殊的<code>Console</code>，其输出发送到<a href=\"process.html#processstdout\"><code>process.stdout</code></a>和<a href=\"process.html#processstderr\"><code>process.stderr</code></a>。它相当于调用：</p>\n<pre><code class=\"language-js\">new Console({ stdout: process.stdout, stderr: process.stderr });\n</code></pre>"
+            },
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`stdout` {stream.Writable}",
+                      "name": "stdout",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`stderr` {stream.Writable}",
+                      "name": "stderr",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`ignoreErrors` {boolean} 写入底层流时忽略错误。**默认值：** `true`。",
+                      "name": "ignoreErrors",
+                      "type": "boolean",
+                      "desc": "写入底层流时忽略错误。**默认值：** `true`。"
+                    },
+                    {
+                      "textRaw": "`colorMode` {boolean|string} 设置此`Console`实例的颜色支持。设置为`true`会在检查值时启用着色。设置为`false`会在检查值时禁用着色。设置为`'auto'`会使颜色支持取决于相应流的`isTTY`属性和`getColorDepth()`返回的值。如果已设置`inspectOptions.colors`，则不能使用此选项。**默认值：** `'auto'`。",
+                      "name": "colorMode",
+                      "type": "boolean|string",
+                      "desc": "设置此`Console`实例的颜色支持。设置为`true`会在检查值时启用着色。设置为`false`会在检查值时禁用着色。设置为`'auto'`会使颜色支持取决于相应流的`isTTY`属性和`getColorDepth()`返回的值。如果已设置`inspectOptions.colors`，则不能使用此选项。**默认值：** `'auto'`。"
+                    },
+                    {
+                      "textRaw": "`inspectOptions` {Object|Map} 指定传递给[`util.inspect()`][]的选项。可以是一个选项对象，或者如果需要为 stdout 和 stderr 设置不同的选项，则可以是一个从流对象到选项的`Map`。",
+                      "name": "inspectOptions",
+                      "type": "Object|Map",
+                      "desc": "指定传递给[`util.inspect()`][]的选项。可以是一个选项对象，或者如果需要为 stdout 和 stderr 设置不同的选项，则可以是一个从流对象到选项的`Map`。"
+                    },
+                    {
+                      "textRaw": "`groupIndentation` {number} 设置组缩进。**默认值：** `2`。",
+                      "name": "groupIndentation",
+                      "type": "number",
+                      "desc": "设置组缩进。**默认值：** `2`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个具有一个或两个可写流实例的新<code>Console</code>。<code>stdout</code>是用于打印日志或信息输出的可写流。<code>stderr</code>用于警告或错误输出。如果未提供<code>stderr</code>，则<code>stdout</code>将用于<code>stderr</code>。</p>\n<pre><code class=\"language-mjs\">import { createWriteStream } from 'node:fs';\nimport { Console } from 'node:console';\n// 或者\n// const { Console } = console;\n\nconst output = createWriteStream('./stdout.log');\nconst errorOutput = createWriteStream('./stderr.log');\n// 自定义简单日志记录器\nconst logger = new Console({ stdout: output, stderr: errorOutput });\n// 像使用console一样使用它\nconst count = 5;\nlogger.log('count: %d', count);\n// 在stdout.log中：count 5\n</code></pre>\n<pre><code class=\"language-cjs\">const fs = require('node:fs');\nconst { Console } = require('node:console');\n// 或者\n// const { Console } = console;\n\nconst output = fs.createWriteStream('./stdout.log');\nconst errorOutput = fs.createWriteStream('./stderr.log');\n// 自定义简单日志记录器\nconst logger = new Console({ stdout: output, stderr: errorOutput });\n// 像使用console一样使用它\nconst count = 5;\nlogger.log('count: %d', count);\n// 在stdout.log中：count 5\n</code></pre>\n<p>全局<code>console</code>是一个特殊的<code>Console</code>，其输出发送到<a href=\"process.html#processstdout\"><code>process.stdout</code></a>和<a href=\"process.html#processstderr\"><code>process.stderr</code></a>。它相当于调用：</p>\n<pre><code class=\"language-js\">new Console({ stdout: process.stdout, stderr: process.stderr });\n</code></pre>"
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "textRaw": "仅检查器方法",
+          "name": "仅检查器方法",
+          "desc": "<p>以下方法由 V8 引擎在通用 API 中公开，但除非与<a href=\"debugger.html\">检查器</a>（<code>--inspect</code>标志）结合使用，否则不会显示任何内容。</p>",
+          "methods": [
+            {
+              "textRaw": "`console.profile([label])`",
+              "type": "method",
+              "name": "profile",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string}",
+                      "name": "label",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法在检查器中使用时才会显示内容。<code>console.profile()</code>方法启动一个带有可选标签的 JavaScript CPU 分析，直到调用<a href=\"#consoleprofileendlabel\"><code>console.profileEnd()</code></a>。然后，该分析将添加到检查器的<strong>Profile</strong>面板。</p>\n<pre><code class=\"language-js\">console.profile('MyLabel');\n// 一些代码\nconsole.profileEnd('MyLabel');\n// 将分析'MyLabel'添加到检查器的Profiles面板。\n</code></pre>"
+            },
+            {
+              "textRaw": "`console.profileEnd([label])`",
+              "type": "method",
+              "name": "profileEnd",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string}",
+                      "name": "label",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法在检查器中使用时才会显示内容。停止当前的 JavaScript CPU 分析会话（如果已启动），并将报告打印到检查器的<strong>Profiles</strong>面板。有关示例，请参见<a href=\"#consoleprofilelabel\"><code>console.profile()</code></a>。</p>\n<p>如果此方法调用时没有标签，则停止最近启动的分析。</p>"
+            },
+            {
+              "textRaw": "`console.timeStamp([label])`",
+              "type": "method",
+              "name": "timeStamp",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`label` {string}",
+                      "name": "label",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法在检查器中使用时才会显示内容。<code>console.timeStamp()</code>方法将带有标签<code>'label'</code>的事件添加到检查器的<strong>Timeline</strong>面板。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "仅检查器方法"
+        }
+      ],
+      "type": "module",
+      "displayName": "控制台"
+    }
+  ]
+}

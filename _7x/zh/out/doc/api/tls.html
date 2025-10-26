@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>TLS (SSL) | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/tls.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:478px){.with-32-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:654px){.with-54-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:542px){.with-40-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:582px){.with-45-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:718px){.with-62-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-tls">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls active">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="tls" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#tls-ssl">TLS (SSL)</a></span>
+<ul>
+<li><a href="#-crypto">判断是否不支持 crypto</a></li>
+<li><a href="#tlsssl-">TLS/SSL 概念</a>
+<ul>
+<li><a href="#">完美前向保密</a></li>
+<li><a href="#alpn--sni">ALPN 和 SNI</a></li>
+<li><a href="#_1">预共享密钥</a></li>
+<li><a href="#_2">客户端发起的重协商攻击缓解</a></li>
+<li><a href="#_3">会话恢复</a>
+<ul>
+<li><a href="#_4">会话标识符</a></li>
+<li><a href="#_5">会话票证</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#-tls-">修改默认 TLS 密码套件</a></li>
+<li><a href="#openssl-">OpenSSL 安全级别</a>
+<ul>
+<li><a href="#_6">设置安全级别</a></li>
+<li><a href="#---tls-cipher-list">使用 [<code>--tls-cipher-list</code>][]</a></li>
+</ul>
+</li>
+<li><a href="#x509-">X509 证书错误代码</a></li>
+<li><a href="#tlsserver">类：<code>tls.Server</code></a>
+<ul>
+<li><a href="#connection">事件：<code>'connection'</code></a></li>
+<li><a href="#keylog">事件：<code>'keylog'</code></a></li>
+<li><a href="#newsession">事件：<code>'newSession'</code></a></li>
+<li><a href="#ocsprequest">事件：<code>'OCSPRequest'</code></a></li>
+<li><a href="#resumesession">事件：<code>'resumeSession'</code></a></li>
+<li><a href="#secureconnection">事件：<code>'secureConnection'</code></a></li>
+<li><a href="#tlsclienterror">事件：<code>'tlsClientError'</code></a></li>
+<li><a href="#serveraddcontexthostname-context"><code>server.addContext(hostname, context)</code></a></li>
+<li><a href="#serveraddress"><code>server.address()</code></a></li>
+<li><a href="#serverclosecallback"><code>server.close([callback])</code></a></li>
+<li><a href="#servergetticketkeys"><code>server.getTicketKeys()</code></a></li>
+<li><a href="#serverlisten"><code>server.listen()</code></a></li>
+<li><a href="#serversetsecurecontextoptions"><code>server.setSecureContext(options)</code></a></li>
+<li><a href="#serversetticketkeyskeys"><code>server.setTicketKeys(keys)</code></a></li>
+</ul>
+</li>
+<li><a href="#tlstlssocket">类：<code>tls.TLSSocket</code></a>
+<ul>
+<li><a href="#new-tlstlssocketsocket-options"><code>new tls.TLSSocket(socket[, options])</code></a></li>
+<li><a href="#keylog_1">事件：<code>'keylog'</code></a></li>
+<li><a href="#ocspresponse">事件：<code>'OCSPResponse'</code></a></li>
+<li><a href="#secureconnect">事件：<code>'secureConnect'</code></a></li>
+<li><a href="#session">事件：<code>'session'</code></a></li>
+<li><a href="#tlssocketaddress"><code>tlsSocket.address()</code></a></li>
+<li><a href="#tlssocketauthorizationerror"><code>tlsSocket.authorizationError</code></a></li>
+<li><a href="#tlssocketauthorized"><code>tlsSocket.authorized</code></a></li>
+<li><a href="#tlssocketdisablerenegotiation"><code>tlsSocket.disableRenegotiation()</code></a></li>
+<li><a href="#tlssocketenabletrace"><code>tlsSocket.enableTrace()</code></a></li>
+<li><a href="#tlssocketencrypted"><code>tlsSocket.encrypted</code></a></li>
+<li><a href="#tlssocketexportkeyingmateriallength-label-context"><code>tlsSocket.exportKeyingMaterial(length, label[, context])</code></a></li>
+<li><a href="#tlssocketgetcertificate"><code>tlsSocket.getCertificate()</code></a></li>
+<li><a href="#tlssocketgetcipher"><code>tlsSocket.getCipher()</code></a></li>
+<li><a href="#tlssocketgetephemeralkeyinfo"><code>tlsSocket.getEphemeralKeyInfo()</code></a></li>
+<li><a href="#tlssocketgetfinished"><code>tlsSocket.getFinished()</code></a></li>
+<li><a href="#tlssocketgetpeercertificatedetailed"><code>tlsSocket.getPeerCertificate([detailed])</code></a>
+<ul>
+<li><a href="#_7">证书对象</a></li>
+</ul>
+</li>
+<li><a href="#tlssocketgetpeerfinished"><code>tlsSocket.getPeerFinished()</code></a></li>
+<li><a href="#tlssocketgetpeerx509certificate"><code>tlsSocket.getPeerX509Certificate()</code></a></li>
+<li><a href="#tlssocketgetprotocol"><code>tlsSocket.getProtocol()</code></a></li>
+<li><a href="#tlssocketgetsession"><code>tlsSocket.getSession()</code></a></li>
+<li><a href="#tlssocketgetsharedsigalgs"><code>tlsSocket.getSharedSigalgs()</code></a></li>
+<li><a href="#tlssocketgettlsticket"><code>tlsSocket.getTLSTicket()</code></a></li>
+<li><a href="#tlssocketgetx509certificate"><code>tlsSocket.getX509Certificate()</code></a></li>
+<li><a href="#tlssocketissessionreused"><code>tlsSocket.isSessionReused()</code></a></li>
+<li><a href="#tlssocketlocaladdress"><code>tlsSocket.localAddress</code></a></li>
+<li><a href="#tlssocketlocalport"><code>tlsSocket.localPort</code></a></li>
+<li><a href="#tlssocketremoteaddress"><code>tlsSocket.remoteAddress</code></a></li>
+<li><a href="#tlssocketremotefamily"><code>tlsSocket.remoteFamily</code></a></li>
+<li><a href="#tlssocketremoteport"><code>tlsSocket.remotePort</code></a></li>
+<li><a href="#tlssocketrenegotiateoptions-callback"><code>tlsSocket.renegotiate(options, callback)</code></a></li>
+<li><a href="#tlssocketsetkeycertcontext"><code>tlsSocket.setKeyCert(context)</code></a></li>
+<li><a href="#tlssocketsetmaxsendfragmentsize"><code>tlsSocket.setMaxSendFragment(size)</code></a></li>
+</ul>
+</li>
+<li><a href="#tlscheckserveridentityhostname-cert"><code>tls.checkServerIdentity(hostname, cert)</code></a></li>
+<li><a href="#tlsconnectoptions-callback"><code>tls.connect(options[, callback])</code></a></li>
+<li><a href="#tlsconnectpath-options-callback"><code>tls.connect(path[, options][, callback])</code></a></li>
+<li><a href="#tlsconnectport-host-options-callback"><code>tls.connect(port[, host][, options][, callback])</code></a></li>
+<li><a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext([options])</code></a></li>
+<li><a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer([options][, secureConnectionListener])</code></a></li>
+<li><a href="#tlssetdefaultcacertificatescerts"><code>tls.setDefaultCACertificates(certs)</code></a></li>
+<li><a href="#tlsgetcacertificatestype"><code>tls.getCACertificates([type])</code></a></li>
+<li><a href="#tlsgetciphers"><code>tls.getCiphers()</code></a></li>
+<li><a href="#tlsrootcertificates"><code>tls.rootCertificates</code></a></li>
+<li><a href="#tlsdefault_ecdh_curve"><code>tls.DEFAULT_ECDH_CURVE</code></a></li>
+<li><a href="#tlsdefault_max_version"><code>tls.DEFAULT_MAX_VERSION</code></a></li>
+<li><a href="#tlsdefault_min_version"><code>tls.DEFAULT_MIN_VERSION</code></a></li>
+<li><a href="#tlsdefault_ciphers"><code>tls.DEFAULT_CIPHERS</code></a></li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls active">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/tls.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/tls.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/tls.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/tls.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/tls.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/tls.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/tls.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/tls.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/tls.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/tls.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/tls.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/tls.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/tls.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/tls.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/tls.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/tls.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/tls.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/tls.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/tls.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/tls.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/tls.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/tls.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/tls.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/tls.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="tls.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/tls.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#tls-ssl">TLS (SSL)</a></span>
+<ul>
+<li><a href="#-crypto">判断是否不支持 crypto</a></li>
+<li><a href="#tlsssl-">TLS/SSL 概念</a>
+<ul>
+<li><a href="#">完美前向保密</a></li>
+<li><a href="#alpn--sni">ALPN 和 SNI</a></li>
+<li><a href="#_1">预共享密钥</a></li>
+<li><a href="#_2">客户端发起的重协商攻击缓解</a></li>
+<li><a href="#_3">会话恢复</a>
+<ul>
+<li><a href="#_4">会话标识符</a></li>
+<li><a href="#_5">会话票证</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#-tls-">修改默认 TLS 密码套件</a></li>
+<li><a href="#openssl-">OpenSSL 安全级别</a>
+<ul>
+<li><a href="#_6">设置安全级别</a></li>
+<li><a href="#---tls-cipher-list">使用 [<code>--tls-cipher-list</code>][]</a></li>
+</ul>
+</li>
+<li><a href="#x509-">X509 证书错误代码</a></li>
+<li><a href="#tlsserver">类：<code>tls.Server</code></a>
+<ul>
+<li><a href="#connection">事件：<code>'connection'</code></a></li>
+<li><a href="#keylog">事件：<code>'keylog'</code></a></li>
+<li><a href="#newsession">事件：<code>'newSession'</code></a></li>
+<li><a href="#ocsprequest">事件：<code>'OCSPRequest'</code></a></li>
+<li><a href="#resumesession">事件：<code>'resumeSession'</code></a></li>
+<li><a href="#secureconnection">事件：<code>'secureConnection'</code></a></li>
+<li><a href="#tlsclienterror">事件：<code>'tlsClientError'</code></a></li>
+<li><a href="#serveraddcontexthostname-context"><code>server.addContext(hostname, context)</code></a></li>
+<li><a href="#serveraddress"><code>server.address()</code></a></li>
+<li><a href="#serverclosecallback"><code>server.close([callback])</code></a></li>
+<li><a href="#servergetticketkeys"><code>server.getTicketKeys()</code></a></li>
+<li><a href="#serverlisten"><code>server.listen()</code></a></li>
+<li><a href="#serversetsecurecontextoptions"><code>server.setSecureContext(options)</code></a></li>
+<li><a href="#serversetticketkeyskeys"><code>server.setTicketKeys(keys)</code></a></li>
+</ul>
+</li>
+<li><a href="#tlstlssocket">类：<code>tls.TLSSocket</code></a>
+<ul>
+<li><a href="#new-tlstlssocketsocket-options"><code>new tls.TLSSocket(socket[, options])</code></a></li>
+<li><a href="#keylog_1">事件：<code>'keylog'</code></a></li>
+<li><a href="#ocspresponse">事件：<code>'OCSPResponse'</code></a></li>
+<li><a href="#secureconnect">事件：<code>'secureConnect'</code></a></li>
+<li><a href="#session">事件：<code>'session'</code></a></li>
+<li><a href="#tlssocketaddress"><code>tlsSocket.address()</code></a></li>
+<li><a href="#tlssocketauthorizationerror"><code>tlsSocket.authorizationError</code></a></li>
+<li><a href="#tlssocketauthorized"><code>tlsSocket.authorized</code></a></li>
+<li><a href="#tlssocketdisablerenegotiation"><code>tlsSocket.disableRenegotiation()</code></a></li>
+<li><a href="#tlssocketenabletrace"><code>tlsSocket.enableTrace()</code></a></li>
+<li><a href="#tlssocketencrypted"><code>tlsSocket.encrypted</code></a></li>
+<li><a href="#tlssocketexportkeyingmateriallength-label-context"><code>tlsSocket.exportKeyingMaterial(length, label[, context])</code></a></li>
+<li><a href="#tlssocketgetcertificate"><code>tlsSocket.getCertificate()</code></a></li>
+<li><a href="#tlssocketgetcipher"><code>tlsSocket.getCipher()</code></a></li>
+<li><a href="#tlssocketgetephemeralkeyinfo"><code>tlsSocket.getEphemeralKeyInfo()</code></a></li>
+<li><a href="#tlssocketgetfinished"><code>tlsSocket.getFinished()</code></a></li>
+<li><a href="#tlssocketgetpeercertificatedetailed"><code>tlsSocket.getPeerCertificate([detailed])</code></a>
+<ul>
+<li><a href="#_7">证书对象</a></li>
+</ul>
+</li>
+<li><a href="#tlssocketgetpeerfinished"><code>tlsSocket.getPeerFinished()</code></a></li>
+<li><a href="#tlssocketgetpeerx509certificate"><code>tlsSocket.getPeerX509Certificate()</code></a></li>
+<li><a href="#tlssocketgetprotocol"><code>tlsSocket.getProtocol()</code></a></li>
+<li><a href="#tlssocketgetsession"><code>tlsSocket.getSession()</code></a></li>
+<li><a href="#tlssocketgetsharedsigalgs"><code>tlsSocket.getSharedSigalgs()</code></a></li>
+<li><a href="#tlssocketgettlsticket"><code>tlsSocket.getTLSTicket()</code></a></li>
+<li><a href="#tlssocketgetx509certificate"><code>tlsSocket.getX509Certificate()</code></a></li>
+<li><a href="#tlssocketissessionreused"><code>tlsSocket.isSessionReused()</code></a></li>
+<li><a href="#tlssocketlocaladdress"><code>tlsSocket.localAddress</code></a></li>
+<li><a href="#tlssocketlocalport"><code>tlsSocket.localPort</code></a></li>
+<li><a href="#tlssocketremoteaddress"><code>tlsSocket.remoteAddress</code></a></li>
+<li><a href="#tlssocketremotefamily"><code>tlsSocket.remoteFamily</code></a></li>
+<li><a href="#tlssocketremoteport"><code>tlsSocket.remotePort</code></a></li>
+<li><a href="#tlssocketrenegotiateoptions-callback"><code>tlsSocket.renegotiate(options, callback)</code></a></li>
+<li><a href="#tlssocketsetkeycertcontext"><code>tlsSocket.setKeyCert(context)</code></a></li>
+<li><a href="#tlssocketsetmaxsendfragmentsize"><code>tlsSocket.setMaxSendFragment(size)</code></a></li>
+</ul>
+</li>
+<li><a href="#tlscheckserveridentityhostname-cert"><code>tls.checkServerIdentity(hostname, cert)</code></a></li>
+<li><a href="#tlsconnectoptions-callback"><code>tls.connect(options[, callback])</code></a></li>
+<li><a href="#tlsconnectpath-options-callback"><code>tls.connect(path[, options][, callback])</code></a></li>
+<li><a href="#tlsconnectport-host-options-callback"><code>tls.connect(port[, host][, options][, callback])</code></a></li>
+<li><a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext([options])</code></a></li>
+<li><a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer([options][, secureConnectionListener])</code></a></li>
+<li><a href="#tlssetdefaultcacertificatescerts"><code>tls.setDefaultCACertificates(certs)</code></a></li>
+<li><a href="#tlsgetcacertificatestype"><code>tls.getCACertificates([type])</code></a></li>
+<li><a href="#tlsgetciphers"><code>tls.getCiphers()</code></a></li>
+<li><a href="#tlsrootcertificates"><code>tls.rootCertificates</code></a></li>
+<li><a href="#tlsdefault_ecdh_curve"><code>tls.DEFAULT_ECDH_CURVE</code></a></li>
+<li><a href="#tlsdefault_max_version"><code>tls.DEFAULT_MAX_VERSION</code></a></li>
+<li><a href="#tlsdefault_min_version"><code>tls.DEFAULT_MIN_VERSION</code></a></li>
+<li><a href="#tlsdefault_ciphers"><code>tls.DEFAULT_CIPHERS</code></a></li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>TLS (SSL)<span><a class="mark" href="#tls-ssl" id="tls-ssl">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_ssl"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/tls.js">lib/tls.js</a></p>
+<p><code>node:tls</code> 模块提供了在 OpenSSL 之上构建的传输层安全性（TLS）和安全套接字层（SSL）协议的实现。
+可以通过以下方式访问该模块：</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> tls <span class="hljs-keyword">from</span> <span class="hljs-string">'node:tls'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> tls = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);</code><button class="copy-button">copy</button></pre>
+<section><h3>判断是否不支持 crypto<span><a class="mark" href="#-crypto" id="-crypto">#</a></span><a aria-hidden="true" class="legacy" id="tls_crypto"></a></h3>
+<p>Node.js 有可能在构建时未包含对 <code>node:crypto</code> 模块的支持。在这种情况下，尝试从 <code>tls</code> <code>import</code> 或调用 <code>require('node:tls')</code> 将会抛出错误。</p>
+<p>使用 CommonJS 时，可以使用 try/catch 捕获抛出的错误：</p>
+<pre><code class="language-js cjs"><span class="hljs-keyword">let</span> tls;
+<span class="hljs-keyword">try</span> {
+  tls = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+} <span class="hljs-keyword">catch</span> (err) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'tls support is disabled!'</span>);
+}</code> <button class="copy-button">copy</button></pre>
+<p>使用词法 ESM <code>import</code> 关键字时，只有在<strong>任何</strong>加载模块的尝试<strong>之前</strong>（例如，使用预加载模块）注册了 <code>process.on('uncaughtException')</code> 的处理程序时，才能捕获错误。</p>
+<p>使用 ESM 时，如果代码可能在未启用 crypto 支持的 Node.js 构建版本上运行，请考虑使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import"><code>import()</code></a> 函数而不是词法 <code>import</code> 关键字：</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">let</span> tls;
+<span class="hljs-keyword">try</span> {
+  tls = <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'node:tls'</span>);
+} <span class="hljs-keyword">catch</span> (err) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'tls support is disabled!'</span>);
+}</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>TLS/SSL 概念<span><a class="mark" href="#tlsssl-" id="tlsssl-">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_ssl_1"></a></h3>
+<p>TLS/SSL 是一组依赖于公钥基础设施（PKI）以在客户端和服务器之间实现安全通信的协议。对于大多数常见情况，每个服务器必须有一个私钥。</p>
+<p>私钥可以通过多种方式生成。下面的示例演示了使用 OpenSSL 命令行界面生成 2048 位 RSA 私钥：</p>
+<pre><code class="language-bash">openssl genrsa -out ryans-key.pem 2048</code> <button class="copy-button">copy</button></pre>
+<p>使用 TLS/SSL 时，所有服务器（以及某些客户端）必须有一个_证书_。证书是与私钥对应的_公钥_，并且由证书颁发机构或私钥所有者进行数字签名（此类证书称为"自签名"）。获取证书的第一步是创建一个_证书签名请求_（CSR）文件。</p>
+<p>可以使用 OpenSSL 命令行界面为私钥生成 CSR：</p>
+<pre><code class="language-bash">openssl req -new -sha256 -key ryans-key.pem -out ryans-csr.pem</code> <button class="copy-button">copy</button></pre>
+<p>生成 CSR 文件后，可以将其发送给证书颁发机构进行签名，或用于生成自签名证书。</p>
+<p>下面的示例演示了使用 OpenSSL 命令行界面创建自签名证书：</p>
+<pre><code class="language-bash">openssl x509 -req -<span class="hljs-keyword">in</span> ryans-csr.pem -signkey ryans-key.pem -out ryans-cert.pem</code> <button class="copy-button">copy</button></pre>
+<p>证书生成后，可以用它来生成 <code>.pfx</code> 或 <code>.p12</code> 文件：</p>
+<pre><code class="language-bash">openssl pkcs12 -<span class="hljs-built_in">export</span> -<span class="hljs-keyword">in</span> ryans-cert.pem -inkey ryans-key.pem \
+      -certfile ca-cert.pem -out ryans.pfx</code> <button class="copy-button">copy</button></pre>
+<p>其中：</p>
+<ul>
+<li><code>in</code>: 是已签名的证书</li>
+<li><code>inkey</code>: 是关联的私钥</li>
+<li><code>certfile</code>: 是将所有证书颁发机构（CA）证书连接成一个单一文件，例如 <code>cat ca1-cert.pem ca2-cert.pem > ca-cert.pem</code></li>
+</ul>
+<div>
+<h4>完美前向保密<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="tls"></a></h4>
+
+<p>术语_[前向保密][]_或_完美前向保密_描述了密钥协商（即密钥交换）方法的一个特性。也就是说，服务器和客户端密钥用于协商新的临时密钥，这些密钥专门且仅用于当前的通信会话。实际上，这意味着即使服务器的私钥被泄露，只有当攻击者设法获取专门为该会话生成的密钥对时，窃听者才能解密通信。</p>
+<p>完美前向保密是通过为每次 TLS/SSL 握手随机生成一个密钥对进行密钥协商来实现的（与对所有会话使用相同密钥相反）。实现这种技术的方法称为"临时"。</p>
+<p>目前通常使用两种方法来实现完美前向保密（注意传统缩写后附加的字符"E"）：</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman">ECDHE</a>：椭圆曲线迪菲-赫尔曼密钥协商协议的临时版本。</li>
+<li><a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">DHE</a>：迪菲-赫尔曼密钥协商协议的临时版本。</li>
+</ul>
+<p>默认启用使用 ECDHE 的完美前向保密。创建 TLS 服务器时，可以使用 <code>ecdhCurve</code> 选项来自定义支持的 ECDH 曲线列表。有关更多信息，请参阅 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a>。</p>
+<p>DHE 默认禁用，但可以通过将 <code>dhparam</code> 选项设置为 <code>'auto'</code> 来与 ECDHE 一起启用。也支持自定义 DHE 参数，但建议使用自动选择的、众所周知的参数。</p>
+<p>在 TLSv1.2 之前，完美前向保密是可选的。从 TLSv1.3 开始，（EC）DHE 总是被使用（除了仅使用 PSK 的连接）。</p>
+</div><div>
+<h4>ALPN 和 SNI<span><a class="mark" href="#alpn--sni" id="alpn--sni">#</a></span><a aria-hidden="true" class="legacy" id="tls_alpn_sni"></a></h4>
+
+<p>ALPN（应用层协议协商扩展）和 SNI（服务器名称指示）是 TLS 握手扩展：</p>
+<ul>
+<li>ALPN：允许一个 TLS 服务器用于多种协议（HTTP、HTTP/2）</li>
+<li>SNI：允许一个 TLS 服务器用于具有不同证书的多个主机名。</li>
+</ul>
+</div><div>
+<h4>预共享密钥<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="tls_1"></a></h4>
+
+<p>TLS-PSK 支持可作为基于证书认证的替代方案。它使用预共享密钥而不是证书来验证 TLS 连接，提供相互认证。TLS-PSK 和公钥基础设施并不相互排斥。客户端和服务器可以同时容纳两者，在正常的密码协商步骤中选择其中之一。</p>
+<p>TLS-PSK 仅在与每台连接机器安全共享密钥的手段存在时才是好的选择，因此对于大多数 TLS 用途，它并不能取代公钥基础设施（PKI）。近年来，OpenSSL 中的 TLS-PSK 实现出现了许多安全缺陷，主要是因为它只被少数应用程序使用。在切换到 PSK 密码套件之前，请考虑所有替代方案。生成 PSK 时，使用 <a href="https://tools.ietf.org/html/rfc4086">RFC 4086</a> 中讨论的足够熵至关重要。从密码或其他低熵源派生共享密钥是不安全的。</p>
+<p>PSK 密码套件默认禁用，因此使用 TLS-PSK 需要使用 <code>ciphers</code> 选项显式指定密码套件。可用密码套件列表可以通过 <code>openssl ciphers -v 'PSK'</code> 检索。所有 TLS 1.3 密码套件都适用于 PSK，可以通过 <code>openssl ciphers -v -s -tls1_3 -psk</code> 检索。
+在客户端连接上，应传递自定义的 <code>checkServerIdentity</code>，因为在缺少证书的情况下默认的检查会失败。</p>
+<p>根据 <a href="https://tools.ietf.org/html/rfc4279">RFC 4279</a>，必须支持最长 128 字节的 PSK 身份和最长 64 字节的 PSK。从 OpenSSL 1.1.0 开始，最大身份大小为 128 字节，最大 PSK 长度为 256 字节。</p>
+<p>由于底层 OpenSSL API 的限制，当前实现不支持异步 PSK 回调。</p>
+<p>要使用 TLS-PSK，客户端和服务器必须指定 <code>pskCallback</code> 选项，这是一个返回要使用的 PSK 的函数（必须与所选密码套件的摘要兼容）。</p>
+<p>它将首先在客户端调用：</p>
+<ul>
+<li><code>hint</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 服务器发送的可选消息，帮助客户端决定在协商期间使用哪个身份。如果使用 TLS 1.3，则始终为 <code>null</code>。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 格式为 <code>{ psk: &#x3C;Buffer|TypedArray|DataView>, identity: &#x3C;string> }</code> 或 <code>null</code>。</li>
+</ul>
+<p>然后在服务器上调用：</p>
+<ul>
+<li><code>socket</code> <a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a> 服务器套接字实例，等同于 <code>this</code>。</li>
+<li><code>identity</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 客户端发送的身份参数。</li>
+<li>返回：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> PSK（或 <code>null</code>）。</li>
+</ul>
+<p>返回 <code>null</code> 会停止协商过程并向另一方发送 <code>unknown_psk_identity</code> 警报消息。如果服务器希望隐藏 PSK 身份未知的事实，则回调必须提供一些随机数据作为 <code>psk</code>，以便在协商完成前使连接因 <code>decrypt_error</code> 而失败。</p>
+</div><div>
+<h4>客户端发起的重协商攻击缓解<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="tls_2"></a></h4>
+
+<p>TLS 协议允许客户端重新协商 TLS 会话的某些方面。不幸的是，会话重协商需要服务器端不成比例的资源，使其成为拒绝服务攻击的潜在载体。</p>
+<p>为了降低风险，重协商被限制为每十分钟三次。当超过此阈值时，会在 <a href="#class-tlstlssocket"><code>tls.TLSSocket</code></a> 实例上发出 <code>'error'</code> 事件。这些限制是可配置的：</p>
+<ul>
+<li><code>tls.CLIENT_RENEG_LIMIT</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 指定重协商请求的次数。<strong>默认值：</strong> <code>3</code>。</li>
+<li><code>tls.CLIENT_RENEG_WINDOW</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 指定重协商窗口的时间（秒）。<strong>默认值：</strong> <code>600</code>（10 分钟）。</li>
+</ul>
+<p>在没有完全理解影响和风险的情况下，不应修改默认的重协商限制。</p>
+<p>TLSv1.3 不支持重协商。</p>
+</div><div>
+<h4>会话恢复<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="tls_3"></a></h4>
+<p>建立 TLS 会话可能相对较慢。可以通过保存并稍后重用会话状态来加速此过程。有几种机制可以做到这一点，这里从最旧到最新（也是首选）进行讨论。</p>
+<div>
+<h5>会话标识符<span><a class="mark" href="#_4" id="_4">#</a></span><a aria-hidden="true" class="legacy" id="tls_4"></a></h5>
+<p>服务器为新连接生成唯一 ID 并将其发送给客户端。客户端和服务器保存会话状态。当重新连接时，客户端发送其保存的会话状态的 ID，如果服务器也具有该 ID 的状态，则可以同意使用它。否则，服务器将创建新会话。有关更多信息，请参阅 <a href="https://www.ietf.org/rfc/rfc2246.txt">RFC 2246</a>，第 23 和 30 页。</p>
+<p>在大多数 Web 浏览器进行 HTTPS 请求时，支持使用会话标识符恢复。</p>
+<p>对于 Node.js，客户端等待 <a href="#event-session"><code>'session'</code></a> 事件获取会话数据，并将数据提供给后续 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 的 <code>session</code> 选项以重用会话。服务器必须为 <a href="#event-newsession"><code>'newSession'</code></a> 和 <a href="#event-resumesession"><code>'resumeSession'</code></a> 事件实现处理程序，以使用会话 ID 作为查找键来保存和恢复会话数据。为了在负载均衡器或集群工作进程之间重用会话，服务器必须在其会话处理程序中使用共享会话缓存（例如 Redis）。</p>
+</div><div>
+<h5>会话票证<span><a class="mark" href="#_5" id="_5">#</a></span><a aria-hidden="true" class="legacy" id="tls_5"></a></h5>
+<p>服务器加密整个会话状态并将其作为"票证"发送给客户端。当重新连接时，状态在初始连接中发送给服务器。这种机制避免了服务器端会话缓存的需要。如果服务器因任何原因（解密失败、票证过旧等）不使用票证，它将创建新会话并发送新票证。有关更多信息，请参阅 <a href="https://tools.ietf.org/html/rfc5077">RFC 5077</a>。</p>
+<p>在大多数 Web 浏览器进行 HTTPS 请求时，支持使用会话票证恢复。</p>
+<p>对于 Node.js，客户端使用与会话标识符恢复相同的 API 进行会话票证恢复。对于调试，如果 <a href="#tlssocketgettlsticket"><code>tls.TLSSocket.getTLSTicket()</code></a> 返回值，则会话数据包含票证，否则包含客户端会话状态。</p>
+<p>对于 TLSv1.3，请注意服务器可能会发送多个票证，导致多个 <code>'session'</code> 事件，有关更多信息，请参阅 <a href="#event-session"><code>'session'</code></a>。</p>
+<p>单进程服务器不需要特定的实现即可使用会话票证。为了在服务器重启或负载均衡器之间使用会话票证，所有服务器必须具有相同的票证密钥。内部有三个 16 字节的密钥，但为了方便起见，tls API 将它们公开为单个 48 字节的缓冲区。</p>
+<p>可以通过在一个服务器实例上调用 <a href="#servergetticketkeys"><code>server.getTicketKeys()</code></a> 来获取票证密钥，然后分发它们，但更合理的是安全地生成 48 字节的安全随机数据，并使用 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 的 <code>ticketKeys</code> 选项设置它们。应定期重新生成密钥，并且可以使用 <a href="#serversetticketkeyskeys"><code>server.setTicketKeys()</code></a> 重置服务器的密钥。</p>
+<p>会话票证密钥是加密密钥，它们_<strong>必须安全存储</strong>_。对于 TLS 1.2 及以下版本，如果它们被泄露，所有使用它们加密的票证的会话都可以被解密。它们不应存储在磁盘上，并且应定期重新生成。</p>
+<p>如果客户端通告支持票证，服务器将发送它们。服务器可以通过在 <code>secureOptions</code> 中提供 <code>require('node:constants').SSL_OP_NO_TICKET</code> 来禁用票证。</p>
+<p>会话标识符和会话票证都会超时，导致服务器创建新会话。可以使用 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 的 <code>sessionTimeout</code> 选项配置超时。</p>
+<p>对于所有机制，当恢复失败时，服务器将创建新会话。由于恢复会话失败不会导致 TLS/HTTPS 连接失败，因此很容易不注意不必要的糟糕 TLS 性能。可以使用 OpenSSL CLI 来验证服务器是否正在恢复会话。使用 <code>openssl s_client</code> 的 <code>-reconnect</code> 选项，例如：</p>
+<pre><code class="language-bash">openssl s_client -connect localhost:443 -reconnect</code> <button class="copy-button">copy</button></pre>
+<p>通读调试输出。第一次连接应显示"New"，例如：</p>
+<pre><code class="language-text">New, TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256</code> <button class="copy-button">copy</button></pre>
+<p>后续连接应显示"Reused"，例如：</p>
+<pre><code class="language-text">Reused, TLSv1.2, Cipher is ECDHE-RSA-AES128-GCM-SHA256</code> <button class="copy-button">copy</button></pre>
+</div></div>
+</section><section><h3>修改默认 TLS 密码套件<span><a class="mark" href="#-tls-" id="-tls-">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls"></a></h3>
+<p>Node.js 构建时带有一组已启用和已禁用的默认 TLS 密码套件。构建 Node.js 时可以配置此默认密码列表，以允许发行版提供自己的默认列表。</p>
+<p>以下命令可用于显示默认密码套件：</p>
+<pre><code class="language-console">node -p crypto.constants.defaultCoreCipherList | tr ':' '\n'
+TLS_AES_256_GCM_SHA384
+TLS_CHACHA20_POLY1305_SHA256
+TLS_AES_128_GCM_SHA256
+ECDHE-RSA-AES128-GCM-SHA256
+ECDHE-ECDSA-AES128-GCM-SHA256
+ECDHE-RSA-AES256-GCM-SHA384
+ECDHE-ECDSA-AES256-GCM-SHA384
+DHE-RSA-AES128-GCM-SHA256
+ECDHE-RSA-AES128-SHA256
+DHE-RSA-AES128-SHA256
+ECDHE-RSA-AES256-SHA384
+DHE-RSA-AES256-SHA384
+ECDHE-RSA-AES256-SHA256
+DHE-RSA-AES256-SHA256
+HIGH
+!aNULL
+!eNULL
+!EXPORT
+!DES
+!RC4
+!MD5
+!PSK
+!SRP
+!CAMELLIA</code> <button class="copy-button">copy</button></pre>
+<p>可以使用 <a href="cli.html#--tls-cipher-listlist"><code>--tls-cipher-list</code></a> 命令行开关（直接或通过 <a href="cli.html#node_optionsoptions"><code>NODE_OPTIONS</code></a> 环境变量）完全替换此默认值。例如，以下命令使 <code>ECDHE-RSA-AES128-GCM-SHA256:!RC4</code> 成为默认 TLS 密码套件：</p>
+<pre><code class="language-bash">node --tls-cipher-list=<span class="hljs-string">'ECDHE-RSA-AES128-GCM-SHA256:!RC4'</span> server.js
+
+<span class="hljs-built_in">export</span> NODE_OPTIONS=--tls-cipher-list=<span class="hljs-string">'ECDHE-RSA-AES128-GCM-SHA256:!RC4'</span>
+node server.js</code> <button class="copy-button">copy</button></pre>
+<p>要验证，使用以下命令显示设置的密码列表，注意 <code>defaultCoreCipherList</code> 和 <code>defaultCipherList</code> 之间的区别：</p>
+<pre><code class="language-bash">node --tls-cipher-list=<span class="hljs-string">'ECDHE-RSA-AES128-GCM-SHA256:!RC4'</span> -p crypto.constants.defaultCipherList | <span class="hljs-built_in">tr</span> <span class="hljs-string">':'</span> <span class="hljs-string">'\n'</span>
+ECDHE-RSA-AES128-GCM-SHA256
+!RC4</code> <button class="copy-button">copy</button></pre>
+<p>即，<code>defaultCoreCipherList</code> 列表在编译时设置，而 <code>defaultCipherList</code> 在运行时设置。</p>
+<p>要从运行时修改默认密码套件，请修改 <code>tls.DEFAULT_CIPHERS</code> 变量，这必须在侦听任何套接字之前执行，它不会影响已打开的套接字。例如：</p>
+<pre><code class="language-js"><span class="hljs-comment">// 移除过时的 CBC 密码套件和基于 RSA 密钥交换的密码套件，因为它们不提供前向保密</span>
+tls.<span class="hljs-property">DEFAULT_CIPHERS</span> +=
+  <span class="hljs-string">':!ECDHE-RSA-AES128-SHA:!ECDHE-RSA-AES128-SHA256:!ECDHE-RSA-AES256-SHA:!ECDHE-RSA-AES256-SHA384'</span> +
+  <span class="hljs-string">':!ECDHE-ECDSA-AES128-SHA:!ECDHE-ECDSA-AES128-SHA256:!ECDHE-ECDSA-AES256-SHA:!ECDHE-ECDSA-AES256-SHA384'</span> +
+  <span class="hljs-string">':!kRSA'</span>;</code> <button class="copy-button">copy</button></pre>
+<p>也可以基于每个客户端或服务器使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 的 <code>ciphers</code> 选项替换默认值，该选项在 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a>、<a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 以及创建新的 <a href="#class-tlstlssocket"><code>tls.TLSSocket</code></a> 时也可用。</p>
+<p>密码列表可以包含 TLSv1.3 密码套件名称（以 <code>'TLS_'</code> 开头的名称）和 TLSv1.2 及以下版本的密码套件规范。TLSv1.2 密码套件支持旧规范格式，有关详细信息，请参阅 OpenSSL [密码列表格式][] 文档，但这些规范_不_适用于 TLSv1.3 密码套件。TLSv1.3 套件只能通过在其密码列表中包含其全名来启用。例如，不能使用传统的 TLSv1.2 <code>'EECDH'</code> 或 <code>'!EECDH'</code> 规范来启用或禁用它们。</p>
+<p>尽管 TLSv1.3 和 TLSv1.2 密码套件的相对顺序不同，但 TLSv1.3 协议比 TLSv1.2 安全得多，如果握手指示支持 TLSv1.3，并且启用了任何 TLSv1.3 密码套件，则总是会选择 TLSv1.3。</p>
+<p>Node.js 中包含的默认密码套件经过精心选择，以反映当前的安全最佳实践和风险缓解。更改默认密码套件可能会对应用程序的安全性产生重大影响。仅当绝对必要时才应使用 <code>--tls-cipher-list</code> 开关和 <code>ciphers</code> 选项。</p>
+<p>默认密码套件优先选择 GCM 密码套件以符合 [Chrome 的"现代加密"设置][]，并且为了完美前向保密而优先选择 ECDHE 和 DHE 密码套件，同时提供_一些_向后兼容性。</p>
+<p>依赖不安全且已弃用的 RC4 或基于 DES 的密码套件（如 Internet Explorer 6）的旧客户端无法使用默认配置完成握手过程。如果_必须_支持这些客户端，[TLS 建议][]可能提供兼容的密码套件。有关格式的更多详细信息，请参阅 OpenSSL [密码列表格式][] 文档。</p>
+<p>只有五种 TLSv1.3 密码套件：</p>
+<ul>
+<li><code>'TLS_AES_256_GCM_SHA384'</code></li>
+<li><code>'TLS_CHACHA20_POLY1305_SHA256'</code></li>
+<li><code>'TLS_AES_128_GCM_SHA256'</code></li>
+<li><code>'TLS_AES_128_CCM_SHA256'</code></li>
+<li><code>'TLS_AES_128_CCM_8_SHA256'</code></li>
+</ul>
+<p>默认启用前三种。基于 <code>CCM</code> 的两种套件受 TLSv1.3 支持，因为它们可能在受限系统上性能更好，但由于它们提供的安全性较低，默认情况下未启用。</p>
+</section><section><h3>OpenSSL 安全级别<span><a class="mark" href="#openssl-" id="openssl-">#</a></span><a aria-hidden="true" class="legacy" id="tls_openssl"></a></h3>
+<p>OpenSSL 库强制执行安全级别以控制加密操作的最低可接受安全级别。OpenSSL 的安全级别范围从 0 到 5，每个级别都施加更严格的安全要求。默认安全级别为 2，通常适用于大多数现代应用程序。但是，某些传统功能和协议（例如 TLSv1）需要较低的安全级别（<code>SECLEVEL=0</code>）才能正常工作。有关更多详细信息，请参阅 [关于安全级别的 OpenSSL 文档][]。</p>
+<div>
+<h4>设置安全级别<span><a class="mark" href="#_6" id="_6">#</a></span><a aria-hidden="true" class="legacy" id="tls_6"></a></h4>
+<p>要在 Node.js 应用程序中调整安全级别，可以在密码字符串中包含 <code>@SECLEVEL=X</code>，其中 <code>X</code> 是所需的安全级别。例如，要在使用默认 OpenSSL 密码列表时将安全级别设置为 0，可以使用：</p>
+
+<pre class="with-54-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createServer, connect } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:tls'</span>;
+<span class="hljs-keyword">const</span> port = <span class="hljs-number">443</span>;
+
+<span class="hljs-title function_">createServer</span>({ <span class="hljs-attr">ciphers</span>: <span class="hljs-string">'DEFAULT@SECLEVEL=0'</span>, <span class="hljs-attr">minVersion</span>: <span class="hljs-string">'TLSv1'</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params">socket</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Client connected with protocol:'</span>, socket.<span class="hljs-title function_">getProtocol</span>());
+  socket.<span class="hljs-title function_">end</span>();
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">close</span>();
+})
+.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =></span> {
+  <span class="hljs-title function_">connect</span>(port, { <span class="hljs-attr">ciphers</span>: <span class="hljs-string">'DEFAULT@SECLEVEL=0'</span>, <span class="hljs-attr">maxVersion</span>: <span class="hljs-string">'TLSv1'</span> });
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createServer, connect } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+<span class="hljs-keyword">const</span> port = <span class="hljs-number">443</span>;
+
+<span class="hljs-title function_">createServer</span>({ <span class="hljs-attr">ciphers</span>: <span class="hljs-string">'DEFAULT@SECLEVEL=0'</span>, <span class="hljs-attr">minVersion</span>: <span class="hljs-string">'TLSv1'</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params">socket</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Client connected with protocol:'</span>, socket.<span class="hljs-title function_">getProtocol</span>());
+  socket.<span class="hljs-title function_">end</span>();
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">close</span>();
+})
+.<span class="hljs-title function_">listen</span>(port, <span class="hljs-function">() =></span> {
+  <span class="hljs-title function_">connect</span>(port, { <span class="hljs-attr">ciphers</span>: <span class="hljs-string">'DEFAULT@SECLEVEL=0'</span>, <span class="hljs-attr">maxVersion</span>: <span class="hljs-string">'TLSv1'</span> });
+});</code><button class="copy-button">copy</button></pre>
+<p>这种方法将安全级别设置为 0，允许使用传统功能，同时仍然利用默认的 OpenSSL 密码。</p>
+</div><div>
+<h4>使用 <a href="cli.html#--tls-cipher-listlist"><code>--tls-cipher-list</code></a><span><a class="mark" href="#---tls-cipher-list" id="---tls-cipher-list">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_cipher_list"></a></h4>
+<p>您也可以使用 <code>--tls-cipher-list=DEFAULT@SECLEVEL=X</code> 从命令行设置安全级别和密码，如 [修改默认 TLS 密码套件][] 中所述。但是，通常不鼓励使用命令行选项设置密码，最好在应用程序代码中为各个上下文配置密码，因为这种方法提供更精细的控制，并降低全局降低安全级别的风险。</p>
+</div>
+</section><section><h3>X509 证书错误代码<span><a class="mark" href="#x509-" id="x509-">#</a></span><a aria-hidden="true" class="legacy" id="tls_x509"></a></h3>
+<p>多个函数可能由于 OpenSSL 报告的证书错误而失败。在这种情况下，该函数通过其回调提供一个 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a>，该错误具有 <code>code</code> 属性，该属性可以取以下值之一：</p>
+<!--
+values are taken from src/crypto/crypto_common.cc
+description are taken from deps/openssl/openssl/crypto/x509/x509_txt.c
+-->
+<ul>
+<li><code>'UNABLE_TO_GET_ISSUER_CERT'</code>: 无法获取颁发者证书。</li>
+<li><code>'UNABLE_TO_GET_CRL'</code>: 无法获取证书 CRL。</li>
+<li><code>'UNABLE_TO_DECRYPT_CERT_SIGNATURE'</code>: 无法解密证书的签名。</li>
+<li><code>'UNABLE_TO_DECRYPT_CRL_SIGNATURE'</code>: 无法解密 CRL 的签名。</li>
+<li><code>'UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY'</code>: 无法解码颁发者公钥。</li>
+<li><code>'CERT_SIGNATURE_FAILURE'</code>: 证书签名失败。</li>
+<li><code>'CRL_SIGNATURE_FAILURE'</code>: CRL 签名失败。</li>
+<li><code>'CERT_NOT_YET_VALID'</code>: 证书尚未生效。</li>
+<li><code>'CERT_HAS_EXPIRED'</code>: 证书已过期。</li>
+<li><code>'CRL_NOT_YET_VALID'</code>: CRL 尚未生效。</li>
+<li><code>'CRL_HAS_EXPIRED'</code>: CRL 已过期。</li>
+<li><code>'ERROR_IN_CERT_NOT_BEFORE_FIELD'</code>: 证书 notBefore 字段中的格式错误。</li>
+<li><code>'ERROR_IN_CERT_NOT_AFTER_FIELD'</code>: 证书 notAfter 字段中的格式错误。</li>
+<li><code>'ERROR_IN_CRL_LAST_UPDATE_FIELD'</code>: CRL lastUpdate 字段中的格式错误。</li>
+<li><code>'ERROR_IN_CRL_NEXT_UPDATE_FIELD'</code>: CRL nextUpdate 字段中的格式错误。</li>
+<li><code>'OUT_OF_MEM'</code>: 内存不足。</li>
+<li><code>'DEPTH_ZERO_SELF_SIGNED_CERT'</code>: 自签名证书。</li>
+<li><code>'SELF_SIGNED_CERT_IN_CHAIN'</code>: 证书链中的自签名证书。</li>
+<li><code>'UNABLE_TO_GET_ISSUER_CERT_LOCALLY'</code>: 无法在本地获取颁发者证书。</li>
+<li><code>'UNABLE_TO_VERIFY_LEAF_SIGNATURE'</code>: 无法验证第一个证书。</li>
+<li><code>'CERT_CHAIN_TOO_LONG'</code>: 证书链太长。</li>
+<li><code>'CERT_REVOKED'</code>: 证书已被吊销。</li>
+<li><code>'INVALID_CA'</code>: 无效的 CA 证书。</li>
+<li><code>'PATH_LENGTH_EXCEEDED'</code>: 超出路径长度约束。</li>
+<li><code>'INVALID_PURPOSE'</code>: 不支持的证书用途。</li>
+<li><code>'CERT_UNTRUSTED'</code>: 证书不受信任。</li>
+<li><code>'CERT_REJECTED'</code>: 证书被拒绝。</li>
+<li><code>'HOSTNAME_MISMATCH'</code>: 主机名不匹配。</li>
+</ul>
+<p>当发生诸如 <code>UNABLE_TO_VERIFY_LEAF_SIGNATURE</code>、<code>DEPTH_ZERO_SELF_SIGNED_CERT</code> 或 <code>UNABLE_TO_GET_ISSUER_CERT</code> 等证书错误时，Node.js 会附加一个提示，建议如果根 CA 已本地安装，请尝试使用 <code>--use-system-ca</code> 标志运行，以引导开发人员找到安全的解决方案，从而防止不安全的变通方法。</p>
+</section><section><h3>类：<code>tls.Server</code><span><a class="mark" href="#tlsserver" id="tlsserver">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_server"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.2</span>
+</div>
+<ul>
+<li>扩展：<a href="net.html#class-netserver" class="type">&#x3C;net.Server></a></li>
+</ul>
+<p>接受使用 TLS 或 SSL 的加密连接。</p>
+<div>
+<h4>事件：<code>'connection'</code><span><a class="mark" href="#connection" id="connection">#</a></span><a aria-hidden="true" class="legacy" id="tls_connection"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.3.2</span>
+</div>
+<ul>
+<li><code>socket</code> <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a></li>
+</ul>
+<p>在建立新的 TCP 流时，在 TLS 握手开始之前发出此事件。<code>socket</code> 通常是 <a href="net.html#class-netsocket"><code>net.Socket</code></a> 类型的对象，但不会像从 <a href="net.html#class-netserver"><code>net.Server</code></a> <code>'connection'</code> 事件创建的套接字那样接收事件。通常用户不希望访问此事件。</p>
+<p>用户也可以显式发出此事件以将连接注入到 TLS 服务器中。在这种情况下，可以传递任何 <a href="stream.html#class-streamduplex"><code>Duplex</code></a> 流。</p>
+</div><div>
+<h4>事件：<code>'keylog'</code><span><a class="mark" href="#keylog" id="keylog">#</a></span><a aria-hidden="true" class="legacy" id="tls_keylog"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.3.0, v10.20.0</span>
+</div>
+<ul>
+<li><code>line</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> ASCII 文本行，采用 NSS <code>SSLKEYLOGFILE</code> 格式。</li>
+<li><code>tlsSocket</code> <a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a> 生成它的 <code>tls.TLSSocket</code> 实例。</li>
+</ul>
+<p>当与此服务器的连接生成或接收密钥材料时，会发出 <code>keylog</code> 事件（通常在握手完成之前，但不一定）。此密钥材料可以存储用于调试，因为它允许解密捕获的 TLS 流量。对于每个套接字可能会多次发出。</p>
+<p>一个典型的用例是将接收到的行附加到公共文本文件，该文件随后被软件（如 Wireshark）用于解密流量：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> logFile = fs.<span class="hljs-title function_">createWriteStream</span>(<span class="hljs-string">'/tmp/ssl-keys.log'</span>, { <span class="hljs-attr">flags</span>: <span class="hljs-string">'a'</span> });
+<span class="hljs-comment">// ...</span>
+server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'keylog'</span>, <span class="hljs-function">(<span class="hljs-params">line, tlsSocket</span>) =></span> {
+  <span class="hljs-keyword">if</span> (tlsSocket.<span class="hljs-property">remoteAddress</span> !== <span class="hljs-string">'...'</span>)
+    <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 仅记录特定 IP 的密钥</span>
+  logFile.<span class="hljs-title function_">write</span>(line);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'newSession'</code><span><a class="mark" href="#newsession" id="newsession">#</a></span><a aria-hidden="true" class="legacy" id="tls_newsession"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v0.11.12</td>
+<td><p>The <code>callback</code> argument is now supported.</p></td></tr>
+<tr><td>v0.9.2</td>
+<td><p><span>Added in: v0.9.2</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>创建新的 TLS 会话时会发出 <code>'newSession'</code> 事件。这可以用于在外部存储中存储会话。数据应提供给 <a href="#event-resumesession"><code>'resumeSession'</code></a> 回调。</p>
+<p>调用监听器回调时会传递三个参数：</p>
+<ul>
+<li><code>sessionId</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> TLS 会话标识符</li>
+<li><code>sessionData</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> TLS 会话数据</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个不带参数的回调函数，必须调用该函数才能通过安全连接发送或接收数据。</li>
+</ul>
+<p>监听此事件仅对添加事件监听器后建立的连接产生影响。</p>
+</div><div>
+<h4>事件：<code>'OCSPRequest'</code><span><a class="mark" href="#ocsprequest" id="ocsprequest">#</a></span><a aria-hidden="true" class="legacy" id="tls_ocsprequest"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.13</span>
+</div>
+<p>当客户端发送证书状态请求时，会发出 <code>'OCSPRequest'</code> 事件。调用监听器回调时会传递三个参数：</p>
+<ul>
+<li><code>certificate</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 服务器证书</li>
+<li><code>issuer</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 颁发者的证书</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个必须调用以提供 OCSP 请求结果的回调函数。</li>
+</ul>
+<p>可以解析服务器的当前证书以获取 OCSP URL 和证书 ID；获取 OCSP 响应后，调用 <code>callback(null, resp)</code>，其中 <code>resp</code> 是包含 OCSP 响应的 <code>Buffer</code> 实例。<code>certificate</code> 和 <code>issuer</code> 都是主要证书和颁发者证书的 <code>Buffer</code> DER 表示。这些可用于获取 OCSP 证书 ID 和 OCSP 端点 URL。</p>
+<p>或者，可以调用 <code>callback(null, null)</code>，表示没有 OCSP 响应。</p>
+<p>调用 <code>callback(err)</code> 将导致调用 <code>socket.destroy(err)</code>。</p>
+<p>OCSP 请求的典型流程如下：</p>
+<ol>
+<li>客户端连接到服务器并发送 <code>'OCSPRequest'</code>（通过 ClientHello 中的状态信息扩展）。</li>
+<li>服务器接收请求并发出 <code>'OCSPRequest'</code> 事件，如果注册了监听器则调用它。</li>
+<li>服务器从 <code>certificate</code> 或 <code>issuer</code> 中提取 OCSP URL，并向 CA 执行 [OCSP 请求][]。</li>
+<li>服务器从 CA 接收 <code>'OCSPResponse'</code> 并通过 <code>callback</code> 参数将其发送回客户端</li>
+<li>客户端验证响应，要么销毁套接字，要么执行握手。</li>
+</ol>
+<p>如果证书是自签名的或颁发者不在根证书列表中，则 <code>issuer</code> 可能为 <code>null</code>。（在建立 TLS 连接时，可以通过 <code>ca</code> 选项提供颁发者。）</p>
+<p>监听此事件仅对添加事件监听器后建立的连接产生影响。</p>
+<p>可以使用像 <a href="https://www.npmjs.com/package/asn1.js">asn1.js</a> 这样的 npm 模块来解析证书。</p>
+</div><div>
+<h4>事件：<code>'resumeSession'</code><span><a class="mark" href="#resumesession" id="resumesession">#</a></span><a aria-hidden="true" class="legacy" id="tls_resumesession"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.9.2</span>
+</div>
+<p>当客户端请求恢复之前的 TLS 会话时，会发出 <code>'resumeSession'</code> 事件。调用监听器回调时会传递两个参数：</p>
+<ul>
+<li><code>sessionId</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> TLS 会话标识符</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 恢复先前会话时要调用的回调函数：<code>callback([err[, sessionData]])</code>
+<ul>
+<li><code>err</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+<li><code>sessionData</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+</ul>
+</li>
+</ul>
+<p>事件监听器应使用给定的 <code>sessionId</code> 在外部存储中查找由 <a href="#event-newsession"><code>'newSession'</code></a> 事件处理程序保存的 <code>sessionData</code>。如果找到，则调用 <code>callback(null, sessionData)</code> 以恢复会话。如果未找到，则无法恢复会话。必须调用 <code>callback()</code> 而不带 <code>sessionData</code>，以便握手可以继续并创建新会话。可以调用 <code>callback(err)</code> 来终止传入连接并销毁套接字。</p>
+<p>监听此事件仅对添加事件监听器后建立的连接产生影响。</p>
+<p>以下说明了恢复 TLS 会话：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> tlsSessionStore = {};
+server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'newSession'</span>, <span class="hljs-function">(<span class="hljs-params">id, data, cb</span>) =></span> {
+  tlsSessionStore[id.<span class="hljs-title function_">toString</span>(<span class="hljs-string">'hex'</span>)] = data;
+  <span class="hljs-title function_">cb</span>();
+});
+server.<span class="hljs-title function_">on</span>(<span class="hljs-string">'resumeSession'</span>, <span class="hljs-function">(<span class="hljs-params">id, cb</span>) =></span> {
+  <span class="hljs-title function_">cb</span>(<span class="hljs-literal">null</span>, tlsSessionStore[id.<span class="hljs-title function_">toString</span>(<span class="hljs-string">'hex'</span>)] || <span class="hljs-literal">null</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'secureConnection'</code><span><a class="mark" href="#secureconnection" id="secureconnection">#</a></span><a aria-hidden="true" class="legacy" id="tls_secureconnection"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.3.2</span>
+</div>
+<p>新连接的握手过程成功完成后，会发出 <code>'secureConnection'</code> 事件。调用监听器回调时会传递一个参数：</p>
+<ul>
+<li><code>tlsSocket</code> <a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a> 已建立的 TLS 套接字。</li>
+</ul>
+<p><code>tlsSocket.authorized</code> 属性是一个 <code>boolean</code>，指示客户端是否已由服务器提供的证书颁发机构之一进行验证。如果 <code>tlsSocket.authorized</code> 为 <code>false</code>，则 <code>socket.authorizationError</code> 被设置为描述授权失败的原因。根据 TLS 服务器的设置，仍可能接受未经授权的连接。</p>
+<p><code>tlsSocket.alpnProtocol</code> 属性是一个字符串，包含选择的 ALPN 协议。当 ALPN 没有选择协议，因为客户端或服务器未发送 ALPN 扩展时，<code>tlsSocket.alpnProtocol</code> 等于 <code>false</code>。</p>
+<p><code>tlsSocket.servername</code> 属性是一个字符串，包含通过 SNI 请求的服务器名称。</p>
+</div><div>
+<h4>事件：<code>'tlsClientError'</code><span><a class="mark" href="#tlsclienterror" id="tlsclienterror">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlsclienterror"></a></h4>
+<div class="api_metadata">
+<span>Added in: v6.0.0</span>
+</div>
+<p>在建立安全连接之前发生错误时，会发出 <code>'tlsClientError'</code> 事件。调用监听器回调时会传递两个参数：</p>
+<ul>
+<li><code>exception</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> 描述错误的 <code>Error</code> 对象</li>
+<li><code>tlsSocket</code> <a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a> 错误源自的 <code>tls.TLSSocket</code> 实例。</li>
+</ul>
+</div><div>
+<h4><code>server.addContext(hostname, context)</code><span><a class="mark" href="#serveraddcontexthostname-context" id="serveraddcontexthostname-context">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_addcontext_hostname_context"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.5.3</span>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 一个 SNI 主机名或通配符（例如 <code>'*'</code>）</li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="tls.html#tlscreatesecurecontextoptions" class="type">&#x3C;tls.SecureContext></a> 一个包含来自 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> <code>options</code> 参数的任何可能属性（例如 <code>key</code>、<code>cert</code>、<code>ca</code> 等）的对象，或者是使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 本身创建的 TLS 上下文对象。</li>
+</ul>
+<p><code>server.addContext()</code> 方法添加一个安全上下文，如果客户端请求的 SNI 名称与提供的 <code>hostname</code>（或通配符）匹配，则将使用该上下文。</p>
+<p>当有多个匹配的上下文时，将使用最近添加的那个。</p>
+</div><div>
+<h4><code>server.address()</code><span><a class="mark" href="#serveraddress" id="serveraddress">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_address"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.6.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>返回由操作系统报告的服务器的绑定地址、地址族名称和端口。有关更多信息，请参阅 <a href="net.html#serveraddress"><code>net.Server.address()</code></a>。</p>
+</div><div>
+<h4><code>server.close([callback])</code><span><a class="mark" href="#serverclosecallback" id="serverclosecallback">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_close_callback"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.3.2</span>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个监听器回调，将注册以监听服务器实例的 <code>'close'</code> 事件。</li>
+<li>返回：<a href="tls.html#class-tlsserver" class="type">&#x3C;tls.Server></a></li>
+</ul>
+<p><code>server.close()</code> 方法停止服务器接受新连接。</p>
+<p>此函数异步操作。当服务器没有更多打开连接时，将发出 <code>'close'</code> 事件。</p>
+</div><div>
+<h4><code>server.getTicketKeys()</code><span><a class="mark" href="#servergetticketkeys" id="servergetticketkeys">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_getticketkeys"></a></h4>
+<div class="api_metadata">
+<span>Added in: v3.0.0</span>
+</div>
+<ul>
+<li>返回：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 一个包含会话票证密钥的 48 字节缓冲区。</li>
+</ul>
+<p>返回会话票证密钥。</p>
+<p>有关更多信息，请参阅 [会话恢复][]。</p>
+</div><div>
+<h4><code>server.listen()</code><span><a class="mark" href="#serverlisten" id="serverlisten">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_listen"></a></h4>
+<p>启动服务器监听加密连接。
+此方法与 <a href="net.html#class-netserver"><code>net.Server</code></a> 的 <a href="net.html#serverlisten"><code>server.listen()</code></a> 相同。</p>
+</div><div>
+<h4><code>server.setSecureContext(options)</code><span><a class="mark" href="#serversetsecurecontextoptions" id="serversetsecurecontextoptions">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_setsecurecontext_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.0.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个包含来自 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> <code>options</code> 参数的任何可能属性（例如 <code>key</code>、<code>cert</code>、<code>ca</code> 等）的对象。</li>
+</ul>
+<p><code>server.setSecureContext()</code> 方法替换现有服务器的安全上下文。到服务器的现有连接不会被中断。</p>
+</div><div>
+<h4><code>server.setTicketKeys(keys)</code><span><a class="mark" href="#serversetticketkeyskeys" id="serversetticketkeyskeys">#</a></span><a aria-hidden="true" class="legacy" id="tls_server_setticketkeys_keys"></a></h4>
+<div class="api_metadata">
+<span>Added in: v3.0.0</span>
+</div>
+<ul>
+<li><code>keys</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a> 一个包含会话票证密钥的 48 字节缓冲区。</li>
+</ul>
+<p>设置会话票证密钥。</p>
+<p>对票证密钥的更改仅对未来的服务器连接有效。现有或当前挂起的服务器连接将使用先前的密钥。</p>
+<p>有关更多信息，请参阅 [会话恢复][]。</p>
+</div>
+</section><section><h3>类：<code>tls.TLSSocket</code><span><a class="mark" href="#tlstlssocket" id="tlstlssocket">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_tlssocket"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>扩展：<a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a></li>
+</ul>
+<p>执行写入数据的透明加密和所有必需的 TLS 协商。</p>
+<p><code>tls.TLSSocket</code> 的实例实现了双工 <a href="stream.html#stream">Stream</a> 接口。</p>
+<p>返回 TLS 连接元数据的方法（例如 <a href="#tlssocketgetpeercertificatedetailed"><code>tls.TLSSocket.getPeerCertificate()</code></a>）仅在连接打开时返回数据。</p>
+<div>
+<h4><code>new tls.TLSSocket(socket[, options])</code><span><a class="mark" href="#new-tlstlssocketsocket-options" id="new-tlstlssocketsocket-options">#</a></span><a aria-hidden="true" class="legacy" id="tls_new_tls_tlssocket_socket_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v12.2.0</td>
+<td><p>The <code>enableTrace</code> option is now supported.</p></td></tr>
+<tr><td>v5.0.0</td>
+<td><p>ALPN options are supported now.</p></td></tr>
+<tr><td>v0.11.4</td>
+<td><p><span>Added in: v0.11.4</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>socket</code> <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a> | <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a>
+在服务器端，任何 <code>Duplex</code> 流。在客户端，任何 <a href="net.html#class-netsocket"><code>net.Socket</code></a> 的实例（对于客户端通用的 <code>Duplex</code> 流支持，必须使用 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a>）。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>enableTrace</code>: 参见 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a></li>
+<li><code>isServer</code>: SSL/TLS 协议是不对称的，TLSSocket 必须知道它们是作为服务器还是客户端行为。如果为 <code>true</code>，TLS 套接字将被实例化为服务器。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>server</code> <a href="net.html#class-netserver" class="type">&#x3C;net.Server></a> 一个 <a href="net.html#class-netserver"><code>net.Server</code></a> 实例。</li>
+<li><code>requestCert</code>: 是否通过请求证书来验证远程对等方。客户端总是请求服务器证书。服务器（<code>isServer</code> 为 true）可以将 <code>requestCert</code> 设置为 true 以请求客户端证书。</li>
+<li><code>rejectUnauthorized</code>: 参见 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a></li>
+<li><code>ALPNProtocols</code>: 参见 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a></li>
+<li><code>SNICallback</code>: 参见 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a></li>
+<li><code>session</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 一个包含 TLS 会话的 <code>Buffer</code> 实例。</li>
+<li><code>requestOCSP</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，指定 OCSP 状态请求扩展将被添加到客户端 hello，并且在建立安全通信之前，将在套接字上发出 <code>'OCSPResponse'</code> 事件。</li>
+<li><code>secureContext</code>: 使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 创建的 TLS 上下文对象。如果未提供 <code>secureContext</code>，则将整个 <code>options</code> 对象传递给 <code>tls.createSecureContext()</code> 来创建一个。</li>
+<li>...: 如果缺少 <code>secureContext</code> 选项，则使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 选项。否则，它们将被忽略。</li>
+</ul>
+</li>
+</ul>
+<p>从现有的 TCP 套接字构造一个新的 <code>tls.TLSSocket</code> 对象。</p>
+</div><div>
+<h4>事件：<code>'keylog'</code><span><a class="mark" href="#keylog_1" id="keylog_1">#</a></span><a aria-hidden="true" class="legacy" id="tls_keylog_1"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.3.0, v10.20.0</span>
+</div>
+<ul>
+<li><code>line</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> ASCII 文本行，采用 NSS <code>SSLKEYLOGFILE</code> 格式。</li>
+</ul>
+<p>当套接字生成或接收密钥材料时，会在 <code>tls.TLSSocket</code> 上发出 <code>keylog</code> 事件。此密钥材料可以存储用于调试，因为它允许解密捕获的 TLS 流量。它可能在握手完成之前或之后多次发出。</p>
+<p>一个典型的用例是将接收到的行附加到公共文本文件，该文件随后被软件（如 Wireshark）用于解密流量：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> logFile = fs.<span class="hljs-title function_">createWriteStream</span>(<span class="hljs-string">'/tmp/ssl-keys.log'</span>, { <span class="hljs-attr">flags</span>: <span class="hljs-string">'a'</span> });
+<span class="hljs-comment">// ...</span>
+tlsSocket.<span class="hljs-title function_">on</span>(<span class="hljs-string">'keylog'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> logFile.<span class="hljs-title function_">write</span>(line));</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'OCSPResponse'</code><span><a class="mark" href="#ocspresponse" id="ocspresponse">#</a></span><a aria-hidden="true" class="legacy" id="tls_ocspresponse"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.13</span>
+</div>
+<p>如果在创建 <code>tls.TLSSocket</code> 时设置了 <code>requestOCSP</code> 选项并且已收到 OCSP 响应，则会发出 <code>'OCSPResponse'</code> 事件。调用监听器回调时会传递一个参数：</p>
+<ul>
+<li><code>response</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 服务器的 OCSP 响应</li>
+</ul>
+<p>通常，<code>response</code> 是来自服务器 CA 的数字签名对象，包含有关服务器证书吊销状态的信息。</p>
+</div><div>
+<h4>事件：<code>'secureConnect'</code><span><a class="mark" href="#secureconnect" id="secureconnect">#</a></span><a aria-hidden="true" class="legacy" id="tls_secureconnect"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<p>新连接的握手过程成功完成后，会发出 <code>'secureConnect'</code> 事件。无论服务器的证书是否已授权，都会调用监听器回调。客户端有责任检查 <code>tlsSocket.authorized</code> 属性以确定服务器证书是否由指定的 CA 之一签名。如果 <code>tlsSocket.authorized === false</code>，则可以通过检查 <code>tlsSocket.authorizationError</code> 属性来找到错误。如果使用了 ALPN，可以检查 <code>tlsSocket.alpnProtocol</code> 属性以确定协商的协议。</p>
+<p>当使用 <code>new tls.TLSSocket()</code> 构造函数创建 <a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a> 时，不会发出 <code>'secureConnect'</code> 事件。</p>
+</div><div>
+<h4>事件：<code>'session'</code><span><a class="mark" href="#session" id="session">#</a></span><a aria-hidden="true" class="legacy" id="tls_session"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li><code>session</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+</ul>
+<p>当新的会话或 TLS 票证可用时，在客户端 <code>tls.TLSSocket</code> 上发出 <code>'session'</code> 事件。这可能在握手完成之前或之后，具体取决于协商的 TLS 协议版本。在服务器上不会发出此事件，或者如果未创建新会话（例如，当连接恢复时）。对于某些 TLS 协议版本，该事件可能会多次发出，在这种情况下，所有会话都可用于恢复。</p>
+<p>在客户端，可以将 <code>session</code> 提供给 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 的 <code>session</code> 选项以恢复连接。</p>
+<p>有关更多信息，请参阅 [会话恢复][]。</p>
+<p>对于 TLSv1.2 及以下版本，可以在握手完成后调用 <a href="#tlssocketgetsession"><code>tls.TLSSocket.getSession()</code></a>。对于 TLSv1.3，协议仅允许基于票证的恢复，会发送多个票证，并且票证直到握手完成后才发送。因此有必要等待 <code>'session'</code> 事件以获取可恢复的会话。应用程序应使用 <code>'session'</code> 事件而不是 <code>getSession()</code> 以确保它们适用于所有 TLS 版本。只期望获取或使用一个会话的应用程序应仅监听此事件一次：</p>
+<pre><code class="language-js">tlsSocket.<span class="hljs-title function_">once</span>(<span class="hljs-string">'session'</span>, <span class="hljs-function">(<span class="hljs-params">session</span>) =></span> {
+  <span class="hljs-comment">// 会话可以立即或稍后使用。</span>
+  tls.<span class="hljs-title function_">connect</span>({
+    <span class="hljs-attr">session</span>: session,
+    <span class="hljs-comment">// 其他连接选项...</span>
+  });
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>tlsSocket.address()</code><span><a class="mark" href="#tlssocketaddress" id="tlssocketaddress">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_address"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.4.0</td>
+<td><p>The <code>family</code> property now returns a string instead of a number.</p></td></tr>
+<tr><td>v18.0.0</td>
+<td><p>The <code>family</code> property now returns a number instead of a string.</p></td></tr>
+<tr><td>v0.11.4</td>
+<td><p><span>Added in: v0.11.4</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>返回底层套接字由操作系统报告的绑定 <code>address</code>、地址 <code>family</code> 名称和 <code>port</code>：
+<code>{ port: 12346, family: 'IPv4', address: '127.0.0.1' }</code>。</p>
+</div><div>
+<h4><code>tlsSocket.authorizationError</code><span><a class="mark" href="#tlssocketauthorizationerror" id="tlssocketauthorizationerror">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_authorizationerror"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<p>返回对等方证书未被验证的原因。仅当 <code>tlsSocket.authorized === false</code> 时才设置此属性。</p>
+</div><div>
+<h4><code>tlsSocket.authorized</code><span><a class="mark" href="#tlssocketauthorized" id="tlssocketauthorized">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_authorized"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果对等方证书是由创建 <code>tls.TLSSocket</code> 实例时指定的 CA 之一签名的，则此属性为 <code>true</code>，否则为 <code>false</code>。</p>
+</div><div>
+<h4><code>tlsSocket.disableRenegotiation()</code><span><a class="mark" href="#tlssocketdisablerenegotiation" id="tlssocketdisablerenegotiation">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_disablerenegotiation"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.4.0</span>
+</div>
+<p>禁用此 <code>TLSSocket</code> 实例的 TLS 重协商。一旦调用，尝试重新协商将在 <code>TLSSocket</code> 上触发 <code>'error'</code> 事件。</p>
+</div><div>
+<h4><code>tlsSocket.enableTrace()</code><span><a class="mark" href="#tlssocketenabletrace" id="tlssocketenabletrace">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_enabletrace"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.2.0</span>
+</div>
+<p>启用后，TLS 数据包跟踪信息将写入 <code>stderr</code>。这可用于调试 TLS 连接问题。</p>
+<p>输出的格式与 <code>openssl s_client -trace</code> 或 <code>openssl s_server -trace</code> 的输出相同。虽然它是由 OpenSSL 的 <code>SSL_trace()</code> 函数生成的，但格式是未文档化的，可能会在没有通知的情况下更改，不应依赖。</p>
+</div><div>
+<h4><code>tlsSocket.encrypted</code><span><a class="mark" href="#tlssocketencrypted" id="tlssocketencrypted">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_encrypted"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<p>始终返回 <code>true</code>。这可用于区分 TLS 套接字和常规 <code>net.Socket</code> 实例。</p>
+</div><div>
+<h4><code>tlsSocket.exportKeyingMaterial(length, label[, context])</code><span><a class="mark" href="#tlssocketexportkeyingmateriallength-label-context" id="tlssocketexportkeyingmateriallength-label-context">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_exportkeyingmaterial_length_label_context"></a></h4>
+<div class="api_metadata">
+<span>Added in: v13.10.0, v12.17.0</span>
+</div>
+<ul>
+<li>
+<p><code>length</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 要从密钥材料中检索的字节数</p>
+</li>
+<li>
+<p><code>label</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 一个应用程序特定标签，通常这将是来自 <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#exporter-labels">IANA 导出器标签注册表</a> 的值。</p>
+</li>
+<li>
+<p><code>context</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 可选地提供一个上下文。</p>
+</li>
+<li>
+<p>返回：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 请求的密钥材料字节</p>
+</li>
+</ul>
+<p>密钥材料用于验证以防止网络协议中的不同攻击，例如 IEEE 802.1X 规范中。</p>
+<p>示例</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> keyingMaterial = tlsSocket.<span class="hljs-title function_">exportKeyingMaterial</span>(
+  <span class="hljs-number">128</span>,
+  <span class="hljs-string">'client finished'</span>);
+
+<span class="hljs-comment">/*
+ 密钥材料的示例返回值：
+ &#x3C;Buffer 76 26 af 99 c5 56 8e 42 09 91 ef 9f 93 cb ad 6c 7b 65 f8 53 f1 d8 d9
+    12 5a 33 b8 b5 25 df 7b 37 9f e0 e2 4f b8 67 83 a3 2f cd 5d 41 42 4c 91
+    74 ef 2c ... 78 more bytes>
+*/</span></code> <button class="copy-button">copy</button></pre>
+<p>有关更多信息，请参阅 OpenSSL <a href="https://www.openssl.org/docs/man1.1.1/man3/SSL_export_keying_material.html"><code>SSL_export_keying_material</code></a> 文档。</p>
+</div><div>
+<h4><code>tlsSocket.getCertificate()</code><span><a class="mark" href="#tlssocketgetcertificate" id="tlssocketgetcertificate">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getcertificate"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.2.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>返回一个表示本地证书的对象。返回的对象具有一些与证书字段对应的属性。</p>
+<p>有关证书结构的示例，请参阅 <a href="#tlssocketgetpeercertificatedetailed"><code>tls.TLSSocket.getPeerCertificate()</code></a>。</p>
+<p>如果没有本地证书，则返回一个空对象。如果套接字已被销毁，则返回 <code>null</code>。</p>
+</div><div>
+<h4><code>tlsSocket.getCipher()</code><span><a class="mark" href="#tlssocketgetcipher" id="tlssocketgetcipher">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getcipher"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.4.0, v12.16.0</td>
+<td><p>Return the IETF cipher name as <code>standardName</code>.</p></td></tr>
+<tr><td>v12.0.0</td>
+<td><p>Return the minimum cipher version, instead of a fixed string (<code>'TLSv1/SSLv3'</code>).</p></td></tr>
+<tr><td>v0.11.4</td>
+<td><p><span>Added in: v0.11.4</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 密码套件的 OpenSSL 名称。</li>
+<li><code>standardName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 密码套件的 IETF 名称。</li>
+<li><code>version</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 此密码套件支持的最低 TLS 协议版本。有关实际协商的协议，请参阅 <a href="#tlssocketgetprotocol"><code>tls.TLSSocket.getProtocol()</code></a>。</li>
+</ul>
+</li>
+</ul>
+<p>返回一个包含有关协商的密码套件信息的对象。</p>
+<p>例如，一个使用 AES256-SHA 密码的 TLSv1.2 协议：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"AES256-SHA"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"standardName"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"TLS_RSA_WITH_AES_256_CBC_SHA"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"version"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"SSLv3"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>有关更多信息，请参阅
+<a href="https://www.openssl.org/docs/man1.1.1/man3/SSL_CIPHER_get_name.html">SSL_CIPHER_get_name</a>。</p>
+</div><div>
+<h4><code>tlsSocket.getEphemeralKeyInfo()</code><span><a class="mark" href="#tlssocketgetephemeralkeyinfo" id="tlssocketgetephemeralkeyinfo">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getephemeralkeyinfo"></a></h4>
+<div class="api_metadata">
+<span>Added in: v5.0.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>返回一个表示客户端连接上 [完美前向保密][] 中临时密钥交换的类型、名称和参数大小的对象。当密钥交换不是临时时，它返回一个空对象。由于这仅在客户端套接字上受支持；如果在服务器套接字上调用，则返回 <code>null</code>。支持的类型有 <code>'DH'</code> 和 <code>'ECDH'</code>。仅当类型为 <code>'ECDH'</code> 时，<code>name</code> 属性可用。</p>
+<p>例如：<code>{ type: 'ECDH', name: 'prime256v1', size: 256 }</code>。</p>
+</div><div>
+<h4><code>tlsSocket.getFinished()</code><span><a class="mark" href="#tlssocketgetfinished" id="tlssocketgetfinished">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getfinished"></a></h4>
+<div class="api_metadata">
+<span>Added in: v9.9.0</span>
+</div>
+<ul>
+<li>返回：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 作为 SSL/TLS 握手的一部分发送到套接字的最新 <code>Finished</code> 消息，如果尚未发送 <code>Finished</code> 消息，则为 <code>undefined</code>。</li>
+</ul>
+<p>由于 <code>Finished</code> 消息是完整握手的消息摘要（TLS 1.0 总共 192 位，SSL 3.0 更多），当不需要 SSL/TLS 提供的认证或不够时，它们可用于外部认证过程。</p>
+<p>对应于 OpenSSL 中的 <code>SSL_get_finished</code> 例程，可用于实现 <a href="https://tools.ietf.org/html/rfc5929">RFC 5929</a> 中的 <code>tls-unique</code> 通道绑定。</p>
+</div><div>
+<h4><code>tlsSocket.getPeerCertificate([detailed])</code><span><a class="mark" href="#tlssocketgetpeercertificatedetailed" id="tlssocketgetpeercertificatedetailed">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getpeercertificate_detailed"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li><code>detailed</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则包含完整的证书链，否则仅包含对等方的证书。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个证书对象。</li>
+</ul>
+<p>返回一个表示对等方证书的对象。如果对等方未提供证书，则返回一个空对象。如果套接字已被销毁，则返回 <code>null</code>。</p>
+<p>如果请求了完整的证书链，则每个证书将包含一个 <code>issuerCertificate</code> 属性，其中包含一个表示其颁发者证书的对象。</p>
+<div>
+<h5>证书对象<span><a class="mark" href="#_7" id="_7">#</a></span><a aria-hidden="true" class="legacy" id="tls_7"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.1.0, v18.13.0</td>
+<td><p>Add "ca" property.</p></td></tr>
+<tr><td>v17.2.0, v16.14.0</td>
+<td><p>Add fingerprint512.</p></td></tr>
+<tr><td>v11.4.0</td>
+<td><p>Support Elliptic Curve public key info.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>证书对象具有与证书字段对应的属性。</p>
+<ul>
+<li><code>ca</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果是证书颁发机构（CA）则为 <code>true</code>，否则为 <code>false</code>。</li>
+<li><code>raw</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> DER 编码的 X.509 证书数据。</li>
+<li><code>subject</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 证书主题，按国家（<code>C</code>）、州或省（<code>ST</code>）、地区（<code>L</code>）、组织（<code>O</code>）、组织单位（<code>OU</code>）和通用名称（<code>CN</code>）描述。通用名称通常是 TLS 证书的 DNS 名称。示例：
+<code>{C: 'UK', ST: 'BC', L: 'Metro', O: 'Node Fans', OU: 'Docs', CN: 'example.com'}</code>。</li>
+<li><code>issuer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 证书颁发者，使用与 <code>subject</code> 相同的术语描述。</li>
+<li><code>valid_from</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 证书生效的日期时间。</li>
+<li><code>valid_to</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 证书失效的日期时间。</li>
+<li><code>serialNumber</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 证书序列号，作为十六进制字符串。示例：<code>'B9B0D332A1AA5635'</code>。</li>
+<li><code>fingerprint</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> DER 编码证书的 SHA-1 摘要。它以 <code>:</code> 分隔的十六进制字符串返回。示例：<code>'2A:7A:C2:DD:...'</code>。</li>
+<li><code>fingerprint256</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> DER 编码证书的 SHA-256 摘要。它以 <code>:</code> 分隔的十六进制字符串返回。示例：
+<code>'2A:7A:C2:DD:...'</code>。</li>
+<li><code>fingerprint512</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> DER 编码证书的 SHA-512 摘要。它以 <code>:</code> 分隔的十六进制字符串返回。示例：
+<code>'2A:7A:C2:DD:...'</code>。</li>
+<li><code>ext_key_usage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> （可选）扩展密钥用法，一组 OID。</li>
+<li><code>subjectaltname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> （可选）包含主题连接名称的字符串，作为 <code>subject</code> 名称的替代。</li>
+<li><code>infoAccess</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> （可选）描述 AuthorityInfoAccess 的数组，与 OCSP 一起使用。</li>
+<li><code>issuerCertificate</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> （可选）颁发者证书对象。对于自签名证书，这可能是循环引用。</li>
+</ul>
+<p>根据密钥类型，证书可能包含有关公钥的信息。</p>
+<p>对于 RSA 密钥，可以定义以下属性：</p>
+<ul>
+<li><code>bits</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> RSA 位大小。示例：<code>1024</code>。</li>
+<li><code>exponent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> RSA 指数，作为十六进制数字表示法中的字符串。示例：<code>'0x010001'</code>。</li>
+<li><code>modulus</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> RSA 模数，作为十六进制字符串。示例：
+<code>'B56CE45CB7...'</code>。</li>
+<li><code>pubkey</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 公钥。</li>
+</ul>
+<p>对于 EC 密钥，可以定义以下属性：</p>
+<ul>
+<li><code>pubkey</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 公钥。</li>
+<li><code>bits</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 密钥大小（位）。示例：<code>256</code>。</li>
+<li><code>asn1Curve</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> （可选）椭圆曲线 OID 的 ASN.1 名称。知名曲线由 OID 标识。虽然不常见，但曲线可能由其数学属性标识，在这种情况下，它将没有 OID。示例：<code>'prime256v1'</code>。</li>
+<li><code>nistCurve</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> （可选）椭圆曲线的 NIST 名称（如果它有的话（并非所有知名曲线都被 NIST 分配了名称））。示例：<code>'P-256'</code>。</li>
+</ul>
+<p>证书示例：</p>
+<!-- eslint-skip -->
+<pre><code class="language-js">{ <span class="hljs-attr">subject</span>:
+   { <span class="hljs-attr">OU</span>: [ <span class="hljs-string">'Domain Control Validated'</span>, <span class="hljs-string">'PositiveSSL Wildcard'</span> ],
+     <span class="hljs-attr">CN</span>: <span class="hljs-string">'*.nodejs.org'</span> },
+  <span class="hljs-attr">issuer</span>:
+   { <span class="hljs-attr">C</span>: <span class="hljs-string">'GB'</span>,
+     <span class="hljs-attr">ST</span>: <span class="hljs-string">'Greater Manchester'</span>,
+     <span class="hljs-attr">L</span>: <span class="hljs-string">'Salford'</span>,
+     <span class="hljs-attr">O</span>: <span class="hljs-string">'COMODO CA Limited'</span>,
+     <span class="hljs-attr">CN</span>: <span class="hljs-string">'COMODO RSA Domain Validation Secure Server CA'</span> },
+  <span class="hljs-attr">subjectaltname</span>: <span class="hljs-string">'DNS:*.nodejs.org, DNS:nodejs.org'</span>,
+  <span class="hljs-attr">infoAccess</span>:
+   { <span class="hljs-string">'CA Issuers - URI'</span>:
+      [ <span class="hljs-string">'http://crt.comodoca.com/COMODORSADomainValidationSecureServerCA.crt'</span> ],
+     <span class="hljs-string">'OCSP - URI'</span>: [ <span class="hljs-string">'http://ocsp.comodoca.com'</span> ] },
+  <span class="hljs-attr">modulus</span>: <span class="hljs-string">'B56CE45CB740B09A13F64AC543B712FF9EE8E4C284B542A1708A27E82A8D151CA178153E12E6DDA15BF70FFD96CB8A88618641BDFCCA03527E665B70D779C8A349A6F88FD4EF6557180BD4C98192872BCFE3AF56E863C09DDD8BC1EC58DF9D94F914F0369102B2870BECFA1348A0838C9C49BD1C20124B442477572347047506B1FCD658A80D0C44BCC16BC5C5496CFE6E4A8428EF654CD3D8972BF6E5BFAD59C93006830B5EB1056BBB38B53D1464FA6E02BFDF2FF66CD949486F0775EC43034EC2602AEFBF1703AD221DAA2A88353C3B6A688EFE8387811F645CEED7B3FE46E1F8B9F59FAD028F349B9BC14211D5830994D055EEA3D547911E07A0ADDEB8A82B9188E58720D95CD478EEC9AF1F17BE8141BE80906F1A339445A7EB5B285F68039B0F294598A7D1C0005FC22B5271B0752F58CCDEF8C8FD856FB7AE21C80B8A2CE983AE94046E53EDE4CB89F42502D31B5360771C01C80155918637490550E3F555E2EE75CC8C636DDE3633CFEDD62E91BF0F7688273694EEEBA20C2FC9F14A2A435517BC1D7373922463409AB603295CEB0BB53787A334C9CA3CA8B30005C5A62FC0715083462E00719A8FA3ED0A9828C3871360A73F8B04A4FC1E71302844E9BB9940B77E745C9D91F226D71AFCAD4B113AAF68D92B24DDB4A2136B55A1CD1ADF39605B63CB639038ED0F4C987689866743A68769CC55847E4A06D6E2E3F1'</span>,
+  <span class="hljs-attr">exponent</span>: <span class="hljs-string">'0x10001'</span>,
+  <span class="hljs-attr">pubkey</span>: &#x3C;Buffer ... >,
+  valid_from: 'Aug 14 00:00:00 2017 GMT',
+  valid_to: 'Nov 20 23:59:59 2019 GMT',
+  fingerprint: '01:02:59:D9:C3:D2:0D:08:F7:82:4E:44:A4:B4:53:C5:E2:3A:87:4D',
+  fingerprint256: '69:AE:1A:6A:D4:3D:C6:C1:1B:EA:C6:23:DE:BA:2A:14:62:62:93:5C:7A:EA:06:41:9B:0B:BC:87:CE:48:4E:02',
+  fingerprint512: '19:2B:3E:C3:B3:5B:32:E8:AE:BB:78:97:27:E4:BA:6C:39:C9:92:79:4F:31:46:39:E2:70:E5:5F:89:42:17:C9:E8:64:CA:FF:BB:72:56:73:6E:28:8A:92:7E:A3:2A:15:8B:C2:E0:45:CA:C3:BC:EA:40:52:EC:CA:A2:68:CB:32',
+  ext_key_usage: [ '1.3.6.1.5.5.7.3.1', '1.3.6.1.5.5.7.3.2' ],
+  serialNumber: '66593D57F20CBC573E433381B5FEC280',
+  raw: &#x3C;Buffer ... > }</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4><code>tlsSocket.getPeerFinished()</code><span><a class="mark" href="#tlssocketgetpeerfinished" id="tlssocketgetpeerfinished">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getpeerfinished"></a></h4>
+<div class="api_metadata">
+<span>Added in: v9.9.0</span>
+</div>
+<ul>
+<li>返回：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 预期或实际从套接字作为 SSL/TLS 握手的一部分接收的最新 <code>Finished</code> 消息，如果到目前为止没有 <code>Finished</code> 消息，则为 <code>undefined</code>。</li>
+</ul>
+<p>由于 <code>Finished</code> 消息是完整握手的消息摘要（TLS 1.0 总共 192 位，SSL 3.0 更多），当不需要 SSL/TLS 提供的认证或不够时，它们可用于外部认证过程。</p>
+<p>对应于 OpenSSL 中的 <code>SSL_get_peer_finished</code> 例程，可用于实现 <a href="https://tools.ietf.org/html/rfc5929">RFC 5929</a> 中的 <code>tls-unique</code> 通道绑定。</p>
+</div><div>
+<h4><code>tlsSocket.getPeerX509Certificate()</code><span><a class="mark" href="#tlssocketgetpeerx509certificate" id="tlssocketgetpeerx509certificate">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getpeerx509certificate"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.9.0</span>
+</div>
+<ul>
+<li>返回：<a href="crypto.html#class-x509certificate" class="type">&#x3C;X509Certificate></a></li>
+</ul>
+<p>以 <a href="crypto.html#class-x509certificate" class="type">&#x3C;X509Certificate></a> 对象的形式返回对等方证书。</p>
+<p>如果没有对等方证书，或者套接字已被销毁，则返回 <code>undefined</code>。</p>
+</div><div>
+<h4><code>tlsSocket.getProtocol()</code><span><a class="mark" href="#tlssocketgetprotocol" id="tlssocketgetprotocol">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getprotocol"></a></h4>
+<div class="api_metadata">
+<span>Added in: v5.7.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></li>
+</ul>
+<p>返回一个字符串，包含当前连接的协商 SSL/TLS 协议版本。对于尚未完成握手过程的已连接套接字，将返回值 <code>'unknown'</code>。对于服务器套接字或已断开的客户端套接字，将返回 <code>null</code>。</p>
+<p>协议版本有：</p>
+<ul>
+<li><code>'SSLv3'</code></li>
+<li><code>'TLSv1'</code></li>
+<li><code>'TLSv1.1'</code></li>
+<li><code>'TLSv1.2'</code></li>
+<li><code>'TLSv1.3'</code></li>
+</ul>
+<p>有关更多信息，请参阅 OpenSSL <a href="https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html"><code>SSL_get_version</code></a> 文档。</p>
+</div><div>
+<h4><code>tlsSocket.getSession()</code><span><a class="mark" href="#tlssocketgetsession" id="tlssocketgetsession">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getsession"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+</ul>
+<p>返回 TLS 会话数据，如果未协商会话，则返回 <code>undefined</code>。在客户端，可以将数据提供给 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 的 <code>session</code> 选项以恢复连接。在服务器上，它可能对调试有用。</p>
+<p>有关更多信息，请参阅 [会话恢复][]。</p>
+<p>注意：<code>getSession()</code> 仅适用于 TLSv1.2 及以下版本。对于 TLSv1.3，应用程序必须使用 <a href="#event-session"><code>'session'</code></a> 事件（它也适用于 TLSv1.2 及以下版本）。</p>
+</div><div>
+<h4><code>tlsSocket.getSharedSigalgs()</code><span><a class="mark" href="#tlssocketgetsharedsigalgs" id="tlssocketgetsharedsigalgs">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getsharedsigalgs"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.11.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> 服务器和客户端共享的签名算法列表，按偏好降序排列。</li>
+</ul>
+<p>有关更多信息，请参阅
+<a href="https://www.openssl.org/docs/man1.1.1/man3/SSL_get_shared_sigalgs.html">SSL_get_shared_sigalgs</a>。</p>
+</div><div>
+<h4><code>tlsSocket.getTLSTicket()</code><span><a class="mark" href="#tlssocketgettlsticket" id="tlssocketgettlsticket">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_gettlsticket"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a></li>
+</ul>
+<p>对于客户端，如果可用，返回 TLS 会话票证，否则返回 <code>undefined</code>。对于服务器，始终返回 <code>undefined</code>。</p>
+<p>它可能对调试有用。</p>
+<p>有关更多信息，请参阅 [会话恢复][]。</p>
+</div><div>
+<h4><code>tlsSocket.getX509Certificate()</code><span><a class="mark" href="#tlssocketgetx509certificate" id="tlssocketgetx509certificate">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_getx509certificate"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.9.0</span>
+</div>
+<ul>
+<li>返回：<a href="crypto.html#class-x509certificate" class="type">&#x3C;X509Certificate></a></li>
+</ul>
+<p>以 <a href="crypto.html#class-x509certificate" class="type">&#x3C;X509Certificate></a> 对象的形式返回本地证书。</p>
+<p>如果没有本地证书，或者套接字已被销毁，则返回 <code>undefined</code>。</p>
+</div><div>
+<h4><code>tlsSocket.isSessionReused()</code><span><a class="mark" href="#tlssocketissessionreused" id="tlssocketissessionreused">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_issessionreused"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.5.6</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果会话被重用，则为 <code>true</code>，否则为 <code>false</code>。</li>
+</ul>
+<p>有关更多信息，请参阅 [会话恢复][]。</p>
+</div><div>
+<h4><code>tlsSocket.localAddress</code><span><a class="mark" href="#tlssocketlocaladdress" id="tlssocketlocaladdress">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_localaddress"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回本地 IP 地址的字符串表示形式。</p>
+</div><div>
+<h4><code>tlsSocket.localPort</code><span><a class="mark" href="#tlssocketlocalport" id="tlssocketlocalport">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_localport"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>返回本地端口的数字表示形式。</p>
+</div><div>
+<h4><code>tlsSocket.remoteAddress</code><span><a class="mark" href="#tlssocketremoteaddress" id="tlssocketremoteaddress">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_remoteaddress"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回远程 IP 地址的字符串表示形式。例如，<code>'74.125.127.100'</code> 或 <code>'2001:4860:a005::68'</code>。</p>
+</div><div>
+<h4><code>tlsSocket.remoteFamily</code><span><a class="mark" href="#tlssocketremotefamily" id="tlssocketremotefamily">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_remotefamily"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回远程 IP 族的字符串表示形式。<code>'IPv4'</code> 或 <code>'IPv6'</code>。</p>
+</div><div>
+<h4><code>tlsSocket.remotePort</code><span><a class="mark" href="#tlssocketremoteport" id="tlssocketremoteport">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_remoteport"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.4</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>返回远程端口的数字表示形式。例如，<code>443</code>。</p>
+</div><div>
+<h4><code>tlsSocket.renegotiate(options, callback)</code><span><a class="mark" href="#tlssocketrenegotiateoptions-callback" id="tlssocketrenegotiateoptions-callback">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_renegotiate_options_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v0.11.8</td>
+<td><p><span>Added in: v0.11.8</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>
+<p><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></p>
+<ul>
+<li><code>rejectUnauthorized</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果不是 <code>false</code>，则根据提供的 CA 列表验证服务器证书。如果验证失败，则会发出 <code>'error'</code> 事件；<code>err.code</code> 包含 OpenSSL 错误代码。<strong>默认值：</strong> <code>true</code>。</li>
+<li><code>requestCert</code></li>
+</ul>
+</li>
+<li>
+<p><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 如果 <code>renegotiate()</code> 返回 <code>true</code>，则回调会附加一次到 <code>'secure'</code> 事件。如果 <code>renegotiate()</code> 返回 <code>false</code>，则 <code>callback</code> 将在下一个 tick 中被调用并带有一个错误，除非 <code>tlsSocket</code> 已被销毁，在这种情况下 <code>callback</code> 根本不会被调用。</p>
+</li>
+<li>
+<p>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果重新协商已启动，则为 <code>true</code>，否则为 <code>false</code>。</p>
+</li>
+</ul>
+<p><code>tlsSocket.renegotiate()</code> 方法启动 TLS 重新协商过程。完成后，<code>callback</code> 函数将被传递一个参数，该参数是 <code>Error</code>（如果请求失败）或 <code>null</code>。</p>
+<p>此方法可用于在安全连接建立后请求对等方的证书。</p>
+<p>当作为服务器运行时，套接字将在 <code>handshakeTimeout</code> 超时后因错误而被销毁。</p>
+<p>对于 TLSv1.3，无法启动重新协商，协议不支持它。</p>
+</div><div>
+<h4><code>tlsSocket.setKeyCert(context)</code><span><a class="mark" href="#tlssocketsetkeycertcontext" id="tlssocketsetkeycertcontext">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_setkeycert_context"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.5.0, v20.17.0</span>
+</div>
+<ul>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="tls.html#tlscreatesecurecontextoptions" class="type">&#x3C;tls.SecureContext></a> 一个至少包含 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> <code>options</code> 中的 <code>key</code> 和 <code>cert</code> 属性的对象，或者是使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 本身创建的 TLS 上下文对象。</li>
+</ul>
+<p><code>tlsSocket.setKeyCert()</code> 方法设置套接字使用的私钥和证书。如果您希望从 TLS 服务器的 <code>ALPNCallback</code> 中选择服务器证书，这主要很有用。</p>
+</div><div>
+<h4><code>tlsSocket.setMaxSendFragment(size)</code><span><a class="mark" href="#tlssocketsetmaxsendfragmentsize" id="tlssocketsetmaxsendfragmentsize">#</a></span><a aria-hidden="true" class="legacy" id="tls_tlssocket_setmaxsendfragment_size"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.11</span>
+</div>
+<ul>
+<li><code>size</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 最大 TLS 片段大小。最大值为 <code>16384</code>。<strong>默认值：</strong> <code>16384</code>。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p><code>tlsSocket.setMaxSendFragment()</code> 方法设置最大 TLS 片段大小。如果设置限制成功，则返回 <code>true</code>；否则返回 <code>false</code>。</p>
+<p>较小的片段大小减少了客户端的缓冲延迟：较大的片段在 TLS 层缓冲，直到接收到整个片段并验证其完整性；大的片段可能跨越多次往返，并且由于数据包丢失或重新排序，它们的处理可能会延迟。但是，较小的片段会增加额外的 TLS 帧字节和 CPU 开销，这可能会降低整体服务器吞吐量。</p>
+</div>
+</section><section><h3><code>tls.checkServerIdentity(hostname, cert)</code><span><a class="mark" href="#tlscheckserveridentityhostname-cert" id="tlscheckserveridentityhostname-cert">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_checkserveridentity_hostname_cert"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v17.3.1, v16.13.2, v14.18.3, v12.22.9</td>
+<td><p>Support for <code>uniformResourceIdentifier</code> subject alternative names has been disabled in response to CVE-2021-44531.</p></td></tr>
+<tr><td>v0.8.4</td>
+<td><p><span>Added in: v0.8.4</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 用于验证证书的主机名或 IP 地址。</li>
+<li><code>cert</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 表示对等方证书的 [证书对象][]。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>验证证书 <code>cert</code> 是否颁发给 <code>hostname</code>。</p>
+<p>返回 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a> 对象，在失败时使用 <code>reason</code>、<code>host</code> 和 <code>cert</code> 填充它。成功时返回 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a>。</p>
+<p>此函数旨在与可以传递给 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 的 <code>checkServerIdentity</code> 选项结合使用，并因此对 [证书对象][] 进行操作。对于其他目的，请考虑使用 <a href="crypto.html#x509checkhostname-options"><code>x509.checkHost()</code></a>。</p>
+<p>通过提供替代函数作为传递给 <code>tls.connect()</code> 的 <code>options.checkServerIdentity</code> 选项，可以覆盖此函数。当然，覆盖函数可以调用 <code>tls.checkServerIdentity()</code> 以增强使用额外验证完成的检查。</p>
+<p>仅当证书通过了所有其他检查（例如由受信任的 CA 颁发（<code>options.ca</code>））时，才会调用此函数。</p>
+<p>早期版本的 Node.js 错误地接受了给定 <code>hostname</code> 的证书，如果存在匹配的 <code>uniformResourceIdentifier</code> 主题备用名称（参见 <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44531">CVE-2021-44531</a>）。希望接受 <code>uniformResourceIdentifier</code> 主题备用名称的应用程序可以使用实现所需行为的自定义 <code>options.checkServerIdentity</code> 函数。</p>
+</section><section><h3><code>tls.connect(options[, callback])</code><span><a class="mark" href="#tlsconnectoptions-callback" id="tlsconnectoptions-callback">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_connect_options_callback"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.1.0, v14.18.0</td>
+<td><p>Added <code>onread</code> option.</p></td></tr>
+<tr><td>v14.1.0, v13.14.0</td>
+<td><p>The <code>highWaterMark</code> option is accepted now.</p></td></tr>
+<tr><td>v13.6.0, v12.16.0</td>
+<td><p>The <code>pskCallback</code> option is now supported.</p></td></tr>
+<tr><td>v12.9.0</td>
+<td><p>Support the <code>allowHalfOpen</code> option.</p></td></tr>
+<tr><td>v12.4.0</td>
+<td><p>The <code>hints</code> option is now supported.</p></td></tr>
+<tr><td>v12.2.0</td>
+<td><p>The <code>enableTrace</code> option is now supported.</p></td></tr>
+<tr><td>v11.8.0, v10.16.0</td>
+<td><p>The <code>timeout</code> option is supported now.</p></td></tr>
+<tr><td>v8.0.0</td>
+<td><p>The <code>lookup</code> option is supported now.</p></td></tr>
+<tr><td>v8.0.0</td>
+<td><p>The <code>ALPNProtocols</code> option can be a <code>TypedArray</code> or <code>DataView</code> now.</p></td></tr>
+<tr><td>v5.0.0</td>
+<td><p>ALPN options are supported now.</p></td></tr>
+<tr><td>v5.3.0, v4.7.0</td>
+<td><p>The <code>secureContext</code> option is supported now.</p></td></tr>
+<tr><td>v0.11.3</td>
+<td><p><span>Added in: v0.11.3</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>enableTrace</code>: 参见 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a></li>
+<li><code>host</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 客户端应连接的主机。<strong>默认值：</strong> <code>'localhost'</code>。</li>
+<li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 客户端应连接的端口。</li>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 创建到路径的 Unix 套接字连接。如果指定了此选项，则忽略 <code>host</code> 和 <code>port</code>。</li>
+<li><code>socket</code> <a href="stream.html#class-streamduplex" class="type">&#x3C;stream.Duplex></a> 在给定套接字上建立安全连接，而不是创建新套接字。通常，这是 <a href="net.html#class-netsocket"><code>net.Socket</code></a> 的实例，但允许任何 <code>Duplex</code> 流。
+如果指定了此选项，则忽略 <code>path</code>、<code>host</code> 和 <code>port</code>，但证书验证除外。通常，套接字在传递给 <code>tls.connect()</code> 时已经连接，但也可以稍后连接。连接/断开/销毁 <code>socket</code> 是用户的责任；调用 <code>tls.connect()</code> 不会导致调用 <code>net.connect()</code>。</li>
+<li><code>allowHalfOpen</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果设置为 <code>false</code>，则当可读端结束时，套接字将自动结束可写端。如果设置了 <code>socket</code> 选项，则此选项无效。有关详细信息，请参阅 <a href="net.html#class-netsocket"><code>net.Socket</code></a> 的 <code>allowHalfOpen</code> 选项。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>rejectUnauthorized</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果不是 <code>false</code>，则根据提供的 CA 列表验证服务器证书。如果验证失败，则会发出 <code>'error'</code> 事件；<code>err.code</code> 包含 OpenSSL 错误代码。<strong>默认值：</strong> <code>true</code>。</li>
+<li><code>pskCallback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 用于 TLS-PSK 协商，请参阅 [预共享密钥][]。</li>
+<li><code>ALPNProtocols</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a>
+字符串、<code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code> 的数组，或者包含支持的 ALPN 协议的单个 <code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code>。<code>Buffer</code> 的格式应为 <code>[len][name][len][name]...</code>，例如 <code>'\x08http/1.1\x08http/1.0'</code>，其中 <code>len</code> 字节是下一个协议名称的长度。传递数组通常要简单得多，例如 <code>['http/1.1', 'http/1.0']</code>。列表中较早的协议比较晚的协议具有更高的优先级。</li>
+<li><code>servername</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> SNI（服务器名称指示）TLS 扩展的服务器名称。它是正在连接的主机的名称，必须是主机名，而不是 IP 地址。多宿主服务器可以使用它来选择向客户端呈现的正确证书，请参阅 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 的 <code>SNICallback</code> 选项。</li>
+<li><code>checkServerIdentity(servername, cert)</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个回调函数，在检查服务器的主机名（或显式设置时提供的 <code>servername</code>）与证书时使用（而不是内置的 <code>tls.checkServerIdentity()</code> 函数）。如果验证失败，这应返回一个 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a>。如果 <code>servername</code> 和 <code>cert</code> 已验证，该方法应返回 <code>undefined</code>。</li>
+<li><code>session</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 一个包含 TLS 会话的 <code>Buffer</code> 实例。</li>
+<li><code>minDHSize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 接受 TLS 连接时 DH 参数的最小大小（位）。当服务器提供的 DH 参数大小小于 <code>minDHSize</code> 时，TLS 连接将被销毁并抛出错误。<strong>默认值：</strong> <code>1024</code>。</li>
+<li><code>highWaterMark</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 与可读流 <code>highWaterMark</code> 参数一致。<strong>默认值：</strong> <code>16 * 1024</code>。</li>
+<li><code>secureContext</code>: 使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 创建的 TLS 上下文对象。如果未提供 <code>secureContext</code>，则将整个 <code>options</code> 对象传递给 <code>tls.createSecureContext()</code> 来创建一个。</li>
+<li><code>onread</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 如果缺少 <code>socket</code> 选项，传入数据将存储在单个 <code>buffer</code> 中，并在数据到达套接字时传递给提供的 <code>callback</code>，否则该选项将被忽略。有关详细信息，请参阅 <a href="net.html#class-netsocket"><code>net.Socket</code></a> 的 <code>onread</code> 选项。</li>
+<li>...: 如果缺少 <code>secureContext</code> 选项，则使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 选项，否则它们将被忽略。</li>
+<li>...: 任何未列出的 <a href="net.html#socketconnectoptions-connectlistener"><code>socket.connect()</code></a> 选项。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
+<li>返回：<a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a></li>
+</ul>
+<p>如果指定了 <code>callback</code> 函数，它将被添加为 <a href="#event-secureconnect"><code>'secureConnect'</code></a> 事件的监听器。</p>
+<p><code>tls.connect()</code> 返回一个 <a href="#class-tlstlssocket"><code>tls.TLSSocket</code></a> 对象。</p>
+<p>与 <code>https</code> API 不同，<code>tls.connect()</code> 默认不启用 SNI（服务器名称指示）扩展，这可能导致某些服务器返回不正确的证书或完全拒绝连接。要启用 SNI，除了 <code>host</code> 之外，还要设置 <code>servername</code> 选项。</p>
+<p>以下说明了来自 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 的回显服务器示例的客户端：</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// 假设一个在端口 8000 上监听的回声服务器。</span>
+<span class="hljs-keyword">import</span> { connect } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:tls'</span>;
+<span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { stdin } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-comment">// 仅当服务器需要客户端证书认证时才需要。</span>
+  <span class="hljs-attr">key</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'client-key.pem'</span>),
+  <span class="hljs-attr">cert</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'client-cert.pem'</span>),
+
+  <span class="hljs-comment">// 仅当服务器使用自签名证书时才需要。</span>
+  <span class="hljs-attr">ca</span>: [ <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'server-cert.pem'</span>) ],
+
+  <span class="hljs-comment">// 仅当服务器的证书不是用于 "localhost" 时才需要。</span>
+  <span class="hljs-attr">checkServerIdentity</span>: <span class="hljs-function">() =></span> { <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; },
+};
+
+<span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">connect</span>(<span class="hljs-number">8000</span>, options, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'client connected'</span>,
+              socket.<span class="hljs-property">authorized</span> ? <span class="hljs-string">'authorized'</span> : <span class="hljs-string">'unauthorized'</span>);
+  stdin.<span class="hljs-title function_">pipe</span>(socket);
+  stdin.<span class="hljs-title function_">resume</span>();
+});
+socket.<span class="hljs-title function_">setEncoding</span>(<span class="hljs-string">'utf8'</span>);
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);
+});
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server ends connection'</span>);
+});</code><code class="language-js cjs"><span class="hljs-comment">// 假设一个在端口 8000 上监听的回声服务器。</span>
+<span class="hljs-keyword">const</span> { connect } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+<span class="hljs-keyword">const</span> { readFileSync } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-comment">// 仅当服务器需要客户端证书认证时才需要。</span>
+  <span class="hljs-attr">key</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'client-key.pem'</span>),
+  <span class="hljs-attr">cert</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'client-cert.pem'</span>),
+
+  <span class="hljs-comment">// 仅当服务器使用自签名证书时才需要。</span>
+  <span class="hljs-attr">ca</span>: [ <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'server-cert.pem'</span>) ],
+
+  <span class="hljs-comment">// 仅当服务器的证书不是用于 "localhost" 时才需要。</span>
+  <span class="hljs-attr">checkServerIdentity</span>: <span class="hljs-function">() =></span> { <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; },
+};
+
+<span class="hljs-keyword">const</span> socket = <span class="hljs-title function_">connect</span>(<span class="hljs-number">8000</span>, options, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'client connected'</span>,
+              socket.<span class="hljs-property">authorized</span> ? <span class="hljs-string">'authorized'</span> : <span class="hljs-string">'unauthorized'</span>);
+  process.<span class="hljs-property">stdin</span>.<span class="hljs-title function_">pipe</span>(socket);
+  process.<span class="hljs-property">stdin</span>.<span class="hljs-title function_">resume</span>();
+});
+socket.<span class="hljs-title function_">setEncoding</span>(<span class="hljs-string">'utf8'</span>);
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(data);
+});
+socket.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server ends connection'</span>);
+});</code><button class="copy-button">copy</button></pre>
+<p>要为此示例生成证书和密钥，请运行：</p>
+<pre><code class="language-bash">openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj <span class="hljs-string">'/CN=localhost'</span> \
+  -keyout client-key.pem -out client-cert.pem</code> <button class="copy-button">copy</button></pre>
+<p>然后，要为此示例生成 <code>server-cert.pem</code> 证书，请运行：</p>
+<pre><code class="language-bash">openssl pkcs12 -certpbe AES-256-CBC -<span class="hljs-built_in">export</span> -out server-cert.pem \
+  -inkey client-key.pem -<span class="hljs-keyword">in</span> client-cert.pem</code> <button class="copy-button">copy</button></pre>
+<p>可以使用来自 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 的示例客户端测试服务器。</p>
+</section><section><h3><code>tls.connect(path[, options][, callback])</code><span><a class="mark" href="#tlsconnectpath-options-callback" id="tlsconnectpath-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_connect_path_options_callback"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.3</span>
+</div>
+<ul>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <code>options.path</code> 的默认值。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 参见 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a>。</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 参见 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a>。</li>
+<li>返回：<a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a></li>
+</ul>
+<p>与 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 相同，只是 <code>path</code> 可以作为参数提供，而不是作为选项。</p>
+<p>如果指定了路径选项，它将优先于路径参数。</p>
+</section><section><h3><code>tls.connect(port[, host][, options][, callback])</code><span><a class="mark" href="#tlsconnectport-host-options-callback" id="tlsconnectport-host-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_connect_port_host_options_callback"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.3</span>
+</div>
+<ul>
+<li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>options.port</code> 的默认值。</li>
+<li><code>host</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <code>options.host</code> 的默认值。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 参见 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a>。</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 参见 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a>。</li>
+<li>返回：<a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a></li>
+</ul>
+<p>与 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 相同，只是 <code>port</code> 和 <code>host</code> 可以作为参数提供，而不是作为选项。</p>
+<p>如果指定了端口或主机选项，它们将优先于任何端口或主机参数。</p>
+</section><section><h3><code>tls.createSecureContext([options])</code><span><a class="mark" href="#tlscreatesecurecontextoptions" id="tlscreatesecurecontextoptions">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_createsecurecontext_options"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.9.0, v20.18.0</td>
+<td><p>The <code>allowPartialTrustChain</code> option has been added.</p></td></tr>
+<tr><td>v22.4.0, v20.16.0</td>
+<td><p>The <code>clientCertEngine</code>, <code>privateKeyEngine</code> and <code>privateKeyIdentifier</code> options depend on custom engine support in OpenSSL which is deprecated in OpenSSL 3.</p></td></tr>
+<tr><td>v19.8.0, v18.16.0</td>
+<td><p>The <code>dhparam</code> option can now be set to <code>'auto'</code> to enable DHE with appropriate well-known parameters.</p></td></tr>
+<tr><td>v12.12.0</td>
+<td><p>Added <code>privateKeyIdentifier</code> and <code>privateKeyEngine</code> options to get private key from an OpenSSL engine.</p></td></tr>
+<tr><td>v12.11.0</td>
+<td><p>Added <code>sigalgs</code> option to override supported signature algorithms.</p></td></tr>
+<tr><td>v12.0.0</td>
+<td><p>TLSv1.3 support added.</p></td></tr>
+<tr><td>v11.5.0</td>
+<td><p>The <code>ca:</code> option now supports <code>BEGIN TRUSTED CERTIFICATE</code>.</p></td></tr>
+<tr><td>v11.4.0, v10.16.0</td>
+<td><p>The <code>minVersion</code> and <code>maxVersion</code> can be used to restrict the allowed TLS protocol versions.</p></td></tr>
+<tr><td>v10.0.0</td>
+<td><p>The <code>ecdhCurve</code> cannot be set to <code>false</code> anymore due to a change in OpenSSL.</p></td></tr>
+<tr><td>v9.3.0</td>
+<td><p>The <code>options</code> parameter can now include <code>clientCertEngine</code>.</p></td></tr>
+<tr><td>v9.0.0</td>
+<td><p>The <code>ecdhCurve</code> option can now be multiple <code>':'</code> separated curve names or <code>'auto'</code>.</p></td></tr>
+<tr><td>v7.3.0</td>
+<td><p>If the <code>key</code> option is an array, individual entries do not need a <code>passphrase</code> property anymore. <code>Array</code> entries can also just be <code>string</code>s or <code>Buffer</code>s now.</p></td></tr>
+<tr><td>v5.2.0</td>
+<td><p>The <code>ca</code> option can now be a single string containing multiple CA certificates.</p></td></tr>
+<tr><td>v0.11.13</td>
+<td><p><span>Added in: v0.11.13</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>allowPartialTrustChain</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 将信任 CA 证书列表中的中间（非自签名）证书视为受信任。</li>
+<li><code>ca</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> 可选地覆盖受信任的 CA 证书。如果未指定，默认信任的 CA 证书与使用 <code>default</code> 类型通过 <a href="#tlsgetcacertificatestype"><code>tls.getCACertificates()</code></a> 返回的证书相同。如果指定，默认列表将被 <code>ca</code> 选项中的证书完全替换（而不是连接）。用户希望添加额外证书而不是完全覆盖默认值时，需要手动连接。
+该值可以是字符串或 <code>Buffer</code>，或者是字符串和/或 <code>Buffer</code> 的 <code>Array</code>。任何字符串或 <code>Buffer</code> 都可以包含多个连接在一起的 PEM CA。对等方的证书必须可以链接到服务器信任的 CA，连接才能通过身份验证。当使用无法链接到知名 CA 的证书时，必须明确指定证书的 CA 为受信任的，否则连接将无法通过身份验证。
+如果对等方使用与默认 CA 之一不匹配或无法链接的证书，请使用 <code>ca</code> 选项提供对等方证书可以匹配或链接到的 CA 证书。
+对于自签名证书，证书就是其自己的 CA，必须提供。
+对于 PEM 编码的证书，支持的类型是 "TRUSTED CERTIFICATE"、"X509 CERTIFICATE" 和 "CERTIFICATE"。</li>
+<li><code>cert</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> PEM 格式的证书链。每个私钥应提供一个证书链。每个证书链应由提供的私钥 <code>key</code> 的 PEM 格式证书组成，后跟 PEM 格式的中间证书（如果有），按顺序排列，不包括根 CA（根 CA 必须预先为对等方所知，请参阅 <code>ca</code>）。当提供多个证书链时，它们不必与其在 <code>key</code> 中的私钥顺序相同。如果未提供中间证书，对等方将无法验证证书，握手将失败。</li>
+<li><code>sigalgs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 支持的签名算法的冒号分隔列表。该列表可以包含摘要算法（<code>SHA256</code>、<code>MD5</code> 等）、公钥算法（<code>RSA-PSS</code>、<code>ECDSA</code> 等）、两者的组合（例如 'RSA+SHA384'）或 TLS v1.3 方案名称（例如 <code>rsa_pss_pss_sha512</code>）。
+有关更多信息，请参阅 <a href="https://www.openssl.org/docs/man1.1.1/man3/SSL_CTX_set1_sigalgs_list.html">OpenSSL 手册页</a>。</li>
+<li><code>ciphers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 密码套件规范，替换默认值。有关更多信息，请参阅 [修改默认 TLS 密码套件][]。允许的密码可以通过 <a href="#tlsgetciphers"><code>tls.getCiphers()</code></a> 获取。密码名称必须大写，OpenSSL 才能接受它们。</li>
+<li><code>clientCertEngine</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 可以提供客户端证书的 OpenSSL 引擎的名称。<strong>已弃用。</strong></li>
+<li><code>crl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> PEM 格式的 CRL（证书吊销列表）。</li>
+<li><code>dhparam</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> <code>'auto'</code> 或自定义 Diffie-Hellman 参数，非 ECDHE [完美前向保密][] 所需。如果省略或无效，参数将被静默丢弃，DHE 密码将不可用。
+基于 <a href="https://en.wikipedia.org/wiki/Elliptic_curve_Diffie%E2%80%93Hellman">ECDHE</a> 的 [完美前向保密][] 仍将可用。</li>
+<li><code>ecdhCurve</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 描述命名曲线的字符串或曲线 NID 或名称的冒号分隔列表，例如 <code>P-521:P-384:P-256</code>，用于 ECDH 密钥协商。设置为 <code>auto</code> 以自动选择曲线。使用 <a href="crypto.html#cryptogetcurves"><code>crypto.getCurves()</code></a> 获取可用曲线名称列表。在最近的版本中，<code>openssl ecparam -list_curves</code> 也将显示每个可用椭圆曲线的名称和描述。<strong>默认值：</strong> <a href="#tlsdefault_ecdh_curve"><code>tls.DEFAULT_ECDH_CURVE</code></a>。</li>
+<li><code>honorCipherOrder</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 尝试使用服务器的密码套件偏好而不是客户端的。当为 <code>true</code> 时，会导致在 <code>secureOptions</code> 中设置 <code>SSL_OP_CIPHER_SERVER_PREFERENCE</code>，有关更多信息，请参阅 [OpenSSL 选项][]。</li>
+<li><code>key</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> PEM 格式的私钥。PEM 允许私钥被加密。加密的密钥将使用 <code>options.passphrase</code> 解密。可以使用不同算法的多个密钥可以作为未加密密钥字符串或缓冲区的数组提供，或者作为形式为 <code>{pem: &#x3C;string|buffer>[, passphrase: &#x3C;string>]}</code> 的对象数组提供。对象形式只能出现在数组中。<code>object.passphrase</code> 是可选的。加密的密钥将使用 <code>object.passphrase</code>（如果提供）或 <code>options.passphrase</code>（如果未提供）解密。</li>
+<li><code>privateKeyEngine</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 从中获取私钥的 OpenSSL 引擎的名称。应与 <code>privateKeyIdentifier</code> 一起使用。<strong>已弃用。</strong></li>
+<li><code>privateKeyIdentifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 由 OpenSSL 引擎管理的私钥的标识符。应与 <code>privateKeyEngine</code> 一起使用。不应与 <code>key</code> 一起设置，因为这两个选项以不同方式定义私钥。<strong>已弃用。</strong></li>
+<li><code>maxVersion</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 可选地设置允许的最大 TLS 版本。其中之一为 <code>'TLSv1.3'</code>、<code>'TLSv1.2'</code>、<code>'TLSv1.1'</code> 或 <code>'TLSv1'</code>。不能与 <code>secureProtocol</code> 选项一起指定；使用其中之一。<strong>默认值：</strong> <a href="#tlsdefault_max_version"><code>tls.DEFAULT_MAX_VERSION</code></a>。</li>
+<li><code>minVersion</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 可选地设置允许的最小 TLS 版本。其中之一为 <code>'TLSv1.3'</code>、<code>'TLSv1.2'</code>、<code>'TLSv1.1'</code> 或 <code>'TLSv1'</code>。不能与 <code>secureProtocol</code> 选项一起指定；使用其中之一。避免设置为低于 TLSv1.2，但可能为了互操作性而需要。TLSv1.2 之前的版本可能需要降低 [OpenSSL 安全级别][]。<strong>默认值：</strong> <a href="#tlsdefault_min_version"><code>tls.DEFAULT_MIN_VERSION</code></a>。</li>
+<li><code>passphrase</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 用于单个私钥和/或 PFX 的共享密码。</li>
+<li><code>pfx</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> PFX 或 PKCS12 编码的私钥和证书链。<code>pfx</code> 是单独提供 <code>key</code> 和 <code>cert</code> 的替代方案。PFX 通常是加密的，如果是，将使用 <code>passphrase</code> 解密它。多个 PFX 可以作为未加密 PFX 缓冲区的数组提供，或者作为形式为 <code>{buf: &#x3C;string|buffer>[, passphrase: &#x3C;string>]}</code> 的对象数组提供。对象形式只能出现在数组中。<code>object.passphrase</code> 是可选的。加密的 PFX 将使用 <code>object.passphrase</code>（如果提供）或 <code>options.passphrase</code>（如果未提供）解密。</li>
+<li><code>secureOptions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 可选地影响 OpenSSL 协议行为，这通常不是必需的。如果确实需要，应谨慎使用！值是一个来自 [OpenSSL 选项][] 的 <code>SSL_OP_*</code> 选项的数字位掩码。</li>
+<li><code>secureProtocol</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 选择要使用的 TLS 协议版本的旧机制，它不支持最小和最大版本的独立控制，并且不支持将协议限制为 TLSv1.3。请改用 <code>minVersion</code> 和 <code>maxVersion</code>。可能的值列在 <a href="https://www.openssl.org/docs/man1.1.1/man7/ssl.html#Dealing-with-Protocol-Methods">SSL_METHODS</a> 中，使用函数名称作为字符串。例如，使用 <code>'TLSv1_1_method'</code> 强制使用 TLS 版本 1.1，或使用 <code>'TLS_method'</code> 允许任何 TLS 协议版本直到 TLSv1.3。不建议使用小于 1.2 的 TLS 版本，但可能为了互操作性而需要。<strong>默认值：</strong> 无，请参阅 <code>minVersion</code>。</li>
+<li><code>sessionIdContext</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 服务器使用的不透明标识符，以确保会话状态不在应用程序之间共享。客户端未使用。</li>
+<li><code>ticketKeys</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 48 字节的加密强伪随机数据。有关更多信息，请参阅 [会话恢复][]。</li>
+<li><code>sessionTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 服务器创建的 TLS 会话在之后不再可恢复的秒数。有关更多信息，请参阅 [会话恢复][]。<strong>默认值：</strong> <code>300</code>。</li>
+</ul>
+</li>
+</ul>
+<p><a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 将 <code>honorCipherOrder</code> 选项的默认值设置为 <code>true</code>，其他创建安全上下文的 API 则保持未设置。</p>
+<p><a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 使用从 <code>process.argv</code> 生成的 128 位截断 SHA1 哈希值作为 <code>sessionIdContext</code> 选项的默认值，其他创建安全上下文的 API 没有默认值。</p>
+<p><code>tls.createSecureContext()</code> 方法创建一个 <code>SecureContext</code> 对象。它可用作几个 <code>tls</code> API 的参数，例如 <a href="#serveraddcontexthostname-context"><code>server.addContext()</code></a>，但没有公共方法。<a href="#class-tlsserver"><code>tls.Server</code></a> 构造函数和 <a href="#tlscreateserveroptions-secureconnectionlistener"><code>tls.createServer()</code></a> 方法不支持 <code>secureContext</code> 选项。</p>
+<p>对于使用证书的密码套件，密钥是_必需的_。可以使用 <code>key</code> 或 <code>pfx</code> 来提供它。</p>
+<p>如果未给出 <code>ca</code> 选项，则 Node.js 将默认使用 [Mozilla 公开信任的 CA 列表][]。</p>
+<p>不鼓励使用自定义 DHE 参数，而推荐使用新的 <code>dhparam: 'auto'</code> 选项。当设置为 <code>'auto'</code> 时，将自动选择具有足够强度的知名 DHE 参数。否则，如有必要，可以使用 <code>openssl dhparam</code> 创建自定义参数。密钥长度必须大于或等于 1024 位，否则将抛出错误。虽然允许 1024 位，但请使用 2048 位或更大以增强安全性。</p>
+</section><section><h3><code>tls.createServer([options][, secureConnectionListener])</code><span><a class="mark" href="#tlscreateserveroptions-secureconnectionlistener" id="tlscreateserveroptions-secureconnectionlistener">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_createserver_options_secureconnectionlistener"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.4.0, v20.16.0</td>
+<td><p>The <code>clientCertEngine</code> option depends on custom engine support in OpenSSL which is deprecated in OpenSSL 3.</p></td></tr>
+<tr><td>v19.0.0</td>
+<td><p>If <code>ALPNProtocols</code> is set, incoming connections that send an ALPN extension with no supported protocols are terminated with a fatal <code>no_application_protocol</code> alert.</p></td></tr>
+<tr><td>v20.4.0, v18.19.0</td>
+<td><p>The <code>options</code> parameter can now include <code>ALPNCallback</code>.</p></td></tr>
+<tr><td>v12.3.0</td>
+<td><p>The <code>options</code> parameter now supports <code>net.createServer()</code> options.</p></td></tr>
+<tr><td>v9.3.0</td>
+<td><p>The <code>options</code> parameter can now include <code>clientCertEngine</code>.</p></td></tr>
+<tr><td>v8.0.0</td>
+<td><p>The <code>ALPNProtocols</code> option can be a <code>TypedArray</code> or <code>DataView</code> now.</p></td></tr>
+<tr><td>v5.0.0</td>
+<td><p>ALPN options are supported now.</p></td></tr>
+<tr><td>v0.3.2</td>
+<td><p><span>Added in: v0.3.2</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ALPNProtocols</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView[]></a> | <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView" class="type">&#x3C;DataView></a>
+字符串、<code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code> 的数组，或者包含支持的 ALPN 协议的单个 <code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code>。<code>Buffer</code> 的格式应为 <code>[len][name][len][name]...</code>，例如 <code>0x05hello0x05world</code>，其中第一个字节是下一个协议名称的长度。传递数组通常要简单得多，例如 <code>['hello', 'world']</code>。（协议应按其优先级排序。）</li>
+<li><code>ALPNCallback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 如果设置，当客户端使用 ALPN 扩展打开连接时，将调用此函数。一个参数将传递给回调：一个包含 <code>servername</code> 和 <code>protocols</code> 字段的对象，分别包含来自 SNI 扩展的服务器名称（如果有）和 ALPN 协议名称字符串数组。回调必须返回 <code>protocols</code> 中列出的字符串之一，该字符串将作为选择的 ALPN 协议返回给客户端，或者返回 <code>undefined</code>，以使用致命警报拒绝连接。如果返回的字符串与客户端的 ALPN 协议之一不匹配，将抛出错误。此选项不能与 <code>ALPNProtocols</code> 选项一起使用，设置这两个选项将抛出错误。</li>
+<li><code>clientCertEngine</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 可以提供客户端证书的 OpenSSL 引擎的名称。<strong>已弃用。</strong></li>
+<li><code>enableTrace</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，将在新连接上调用 <a href="#tlssocketenabletrace"><code>tls.TLSSocket.enableTrace()</code></a>。可以在安全连接建立后启用跟踪，但必须使用此选项来跟踪安全连接的设置。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>handshakeTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 如果 SSL/TLS 握手未在指定的毫秒数内完成，则中止连接。每当握手超时时，会在 <code>tls.Server</code> 对象上发出 <code>'tlsClientError'</code>。<strong>默认值：</strong> <code>120000</code>（120 秒）。</li>
+<li><code>rejectUnauthorized</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果不是 <code>false</code>，服务器将拒绝任何未经提供的 CA 列表授权的连接。此选项仅在 <code>requestCert</code> 为 <code>true</code> 时有效。<strong>默认值：</strong> <code>true</code>。</li>
+<li><code>requestCert</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，服务器将从连接的客户端请求证书并尝试验证该证书。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>sessionTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 服务器创建的 TLS 会话在之后不再可恢复的秒数。有关更多信息，请参阅 [会话恢复][]。<strong>默认值：</strong> <code>300</code>。</li>
+<li><code>SNICallback(servername, callback)</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 如果客户端支持 SNI TLS 扩展，将调用此函数。调用时将传递两个参数：<code>servername</code> 和 <code>callback</code>。<code>callback</code> 是一个错误优先的回调函数，它接受两个可选参数：<code>error</code> 和 <code>ctx</code>。如果提供，<code>ctx</code> 是一个 <code>SecureContext</code> 实例。可以使用 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 获取适当的 <code>SecureContext</code>。如果使用假的 <code>ctx</code> 参数调用 <code>callback</code>，将使用服务器的默认安全上下文。如果未提供 <code>SNICallback</code>，将使用具有高级 API 的默认回调（见下文）。</li>
+<li><code>ticketKeys</code> <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 48 字节的加密强伪随机数据。有关更多信息，请参阅 [会话恢复][]。</li>
+<li><code>pskCallback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 用于 TLS-PSK 协商，请参阅 [预共享密钥][]。</li>
+<li><code>pskIdentityHint</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 发送给客户端的可选提示，以帮助在 TLS-PSK 协商期间选择身份。在 TLS 1.3 中将被忽略。如果设置 pskIdentityHint 失败，将发出 <code>'tlsClientError'</code>，错误代码为 <code>'ERR_TLS_PSK_SET_IDENTITY_HINT_FAILED'</code>。</li>
+<li>...: 可以提供任何 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 选项。对于服务器，通常需要身份选项（<code>pfx</code>、<code>key</code>/<code>cert</code> 或 <code>pskCallback</code>）。</li>
+<li>...: 可以提供任何 <a href="net.html#netcreateserveroptions-connectionlistener"><code>net.createServer()</code></a> 选项。</li>
+</ul>
+</li>
+<li><code>secureConnectionListener</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
+<li>返回：<a href="tls.html#class-tlsserver" class="type">&#x3C;tls.Server></a></li>
+</ul>
+<p>创建一个新的 <a href="#class-tlsserver"><code>tls.Server</code></a>。如果提供了 <code>secureConnectionListener</code>，它会自动设置为 <a href="#event-secureconnection"><code>'secureConnection'</code></a> 事件的监听器。</p>
+<p><code>ticketKeys</code> 选项在 <code>node:cluster</code> 模块工作进程之间自动共享。</p>
+<p>以下说明了一个简单的回显服务器：</p>
+
+<pre class="with-45-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createServer } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:tls'</span>;
+<span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-attr">key</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'server-key.pem'</span>),
+  <span class="hljs-attr">cert</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'server-cert.pem'</span>),
+
+  <span class="hljs-comment">// 仅当使用客户端证书认证时才需要。</span>
+  <span class="hljs-attr">requestCert</span>: <span class="hljs-literal">true</span>,
+
+  <span class="hljs-comment">// 仅当客户端使用自签名证书时才需要。</span>
+  <span class="hljs-attr">ca</span>: [ <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'client-cert.pem'</span>) ],
+};
+
+<span class="hljs-keyword">const</span> server = <span class="hljs-title function_">createServer</span>(options, <span class="hljs-function">(<span class="hljs-params">socket</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server connected'</span>,
+              socket.<span class="hljs-property">authorized</span> ? <span class="hljs-string">'authorized'</span> : <span class="hljs-string">'unauthorized'</span>);
+  socket.<span class="hljs-title function_">write</span>(<span class="hljs-string">'welcome!\n'</span>);
+  socket.<span class="hljs-title function_">setEncoding</span>(<span class="hljs-string">'utf8'</span>);
+  socket.<span class="hljs-title function_">pipe</span>(socket);
+});
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server bound'</span>);
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createServer } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+<span class="hljs-keyword">const</span> { readFileSync } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+
+<span class="hljs-keyword">const</span> options = {
+  <span class="hljs-attr">key</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'server-key.pem'</span>),
+  <span class="hljs-attr">cert</span>: <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'server-cert.pem'</span>),
+
+  <span class="hljs-comment">// 仅当使用客户端证书认证时才需要。</span>
+  <span class="hljs-attr">requestCert</span>: <span class="hljs-literal">true</span>,
+
+  <span class="hljs-comment">// 仅当客户端使用自签名证书时才需要。</span>
+  <span class="hljs-attr">ca</span>: [ <span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'client-cert.pem'</span>) ],
+};
+
+<span class="hljs-keyword">const</span> server = <span class="hljs-title function_">createServer</span>(options, <span class="hljs-function">(<span class="hljs-params">socket</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server connected'</span>,
+              socket.<span class="hljs-property">authorized</span> ? <span class="hljs-string">'authorized'</span> : <span class="hljs-string">'unauthorized'</span>);
+  socket.<span class="hljs-title function_">write</span>(<span class="hljs-string">'welcome!\n'</span>);
+  socket.<span class="hljs-title function_">setEncoding</span>(<span class="hljs-string">'utf8'</span>);
+  socket.<span class="hljs-title function_">pipe</span>(socket);
+});
+server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'server bound'</span>);
+});</code><button class="copy-button">copy</button></pre>
+<p>要为此示例生成证书和密钥，请运行：</p>
+<pre><code class="language-bash">openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj <span class="hljs-string">'/CN=localhost'</span> \
+  -keyout server-key.pem -out server-cert.pem</code> <button class="copy-button">copy</button></pre>
+<p>然后，要为此示例生成 <code>client-cert.pem</code> 证书，请运行：</p>
+<pre><code class="language-bash">openssl pkcs12 -certpbe AES-256-CBC -<span class="hljs-built_in">export</span> -out client-cert.pem \
+  -inkey server-key.pem -<span class="hljs-keyword">in</span> server-cert.pem</code> <button class="copy-button">copy</button></pre>
+<p>可以使用来自 <a href="#tlsconnectoptions-callback"><code>tls.connect()</code></a> 的示例客户端测试服务器。</p>
+</section><section><h3><code>tls.setDefaultCACertificates(certs)</code><span><a class="mark" href="#tlssetdefaultcacertificatescerts" id="tlssetdefaultcacertificatescerts">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_setdefaultcacertificates_certs"></a></h3>
+<div class="api_metadata">
+<span>Added in: v24.5.0</span>
+</div>
+<ul>
+<li><code>certs</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView" class="type">&#x3C;ArrayBufferView[]></a> PEM 格式的 CA 证书数组。</li>
+</ul>
+<p>设置 Node.js TLS 客户端使用的默认 CA 证书。如果提供的证书解析成功，它们将成为由 <a href="#tlsgetcacertificatestype"><code>tls.getCACertificates()</code></a> 返回的默认 CA 证书列表，并由未指定自己的 CA 证书的后续 TLS 连接使用。证书在设置为默认值之前将被去重。</p>
+<p>此函数仅影响当前的 Node.js 线程。由 HTTPS 代理缓存的先前会话不会受此更改的影响，因此应在进行任何不需要的可缓存 TLS 连接之前调用此方法。</p>
+<p>要使用系统 CA 证书作为默认值：</p>
+
+<pre class="with-62-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> tls = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+tls.<span class="hljs-title function_">setDefaultCACertificates</span>(tls.<span class="hljs-title function_">getCACertificates</span>(<span class="hljs-string">'system'</span>));</code><code class="language-js mjs"><span class="hljs-keyword">import</span> tls <span class="hljs-keyword">from</span> <span class="hljs-string">'node:tls'</span>;
+tls.<span class="hljs-title function_">setDefaultCACertificates</span>(tls.<span class="hljs-title function_">getCACertificates</span>(<span class="hljs-string">'system'</span>));</code><button class="copy-button">copy</button></pre>
+<p>此函数完全替换默认的 CA 证书列表。要将其他证书附加到现有默认值，请获取当前证书并附加到它们：</p>
+
+<pre class="with-54-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> tls = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tls'</span>);
+<span class="hljs-keyword">const</span> currentCerts = tls.<span class="hljs-title function_">getCACertificates</span>(<span class="hljs-string">'default'</span>);
+<span class="hljs-keyword">const</span> additionalCerts = [<span class="hljs-string">'-----BEGIN CERTIFICATE-----\n...'</span>];
+tls.<span class="hljs-title function_">setDefaultCACertificates</span>([...currentCerts, ...additionalCerts]);</code><code class="language-js mjs"><span class="hljs-keyword">import</span> tls <span class="hljs-keyword">from</span> <span class="hljs-string">'node:tls'</span>;
+<span class="hljs-keyword">const</span> currentCerts = tls.<span class="hljs-title function_">getCACertificates</span>(<span class="hljs-string">'default'</span>);
+<span class="hljs-keyword">const</span> additionalCerts = [<span class="hljs-string">'-----BEGIN CERTIFICATE-----\n...'</span>];
+tls.<span class="hljs-title function_">setDefaultCACertificates</span>([...currentCerts, ...additionalCerts]);</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>tls.getCACertificates([type])</code><span><a class="mark" href="#tlsgetcacertificatestype" id="tlsgetcacertificatestype">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_getcacertificates_type"></a></h3>
+<div class="api_metadata">
+<span>Added in: v23.10.0, v22.15.0</span>
+</div>
+<ul>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 将返回的 CA 证书类型。有效值为 <code>"default"</code>、<code>"system"</code>、<code>"bundled"</code> 和 <code>"extra"</code>。
+<strong>默认值：</strong> <code>"default"</code>。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> PEM 编码证书的数组。如果同一证书在多个来源中重复存储，则数组可能包含重复项。</li>
+</ul>
+<p>根据 <code>type</code> 返回来自各种来源的 CA 证书数组：</p>
+<ul>
+<li><code>"default"</code>：返回 Node.js TLS 客户端默认使用的 CA 证书。
+<ul>
+<li>当启用 <a href="cli.html#--use-bundled-ca---use-openssl-ca"><code>--use-bundled-ca</code></a>（默认）或未启用 <a href="cli.html#--use-bundled-ca---use-openssl-ca"><code>--use-openssl-ca</code></a> 时，这将包括来自捆绑的 Mozilla CA 存储的 CA 证书。</li>
+<li>当启用 <a href="cli.html#--use-system-ca"><code>--use-system-ca</code></a> 时，这也将包括来自系统受信任存储的证书。</li>
+<li>当使用 <a href="cli.html#node_extra_ca_certsfile"><code>NODE_EXTRA_CA_CERTS</code></a> 时，这也将包括从指定文件加载的证书。</li>
+</ul>
+</li>
+<li><code>"system"</code>：返回根据 <a href="cli.html#--use-system-ca"><code>--use-system-ca</code></a> 设置的规则从系统的受信任存储加载的 CA 证书。当未启用 <a href="cli.html#--use-system-ca"><code>--use-system-ca</code></a> 时，这可用于从系统获取证书。</li>
+<li><code>"bundled"</code>：返回来自捆绑的 Mozilla CA 存储的 CA 证书。这与 <a href="#tlsrootcertificates"><code>tls.rootCertificates</code></a> 相同。</li>
+<li><code>"extra"</code>：返回从 <a href="cli.html#node_extra_ca_certsfile"><code>NODE_EXTRA_CA_CERTS</code></a> 加载的 CA 证书。如果未设置 <a href="cli.html#node_extra_ca_certsfile"><code>NODE_EXTRA_CA_CERTS</code></a>，则是一个空数组。</li>
+</ul>
+</section><section><h3><code>tls.getCiphers()</code><span><a class="mark" href="#tlsgetciphers" id="tlsgetciphers">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_getciphers"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.10.2</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>返回包含支持的 TLS 密码名称的数组。由于历史原因，名称为小写，但必须大写才能在 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 的 <code>ciphers</code> 选项中使用。</p>
+<p>并非所有支持的密码都默认启用。请参阅 [修改默认 TLS 密码套件][]。</p>
+<p>以 <code>'tls_'</code> 开头的密码名称用于 TLSv1.3，所有其他名称用于 TLSv1.2 及以下版本。</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(tls.<span class="hljs-title function_">getCiphers</span>()); <span class="hljs-comment">// ['aes128-gcm-sha256', 'aes128-sha', ...]</span></code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>tls.rootCertificates</code><span><a class="mark" href="#tlsrootcertificates" id="tlsrootcertificates">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_rootcertificates"></a></h3>
+<div class="api_metadata">
+<span>Added in: v12.3.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>一个不可变的字符串数组，表示来自当前 Node.js 版本提供的捆绑 Mozilla CA 存储的根证书（PEM 格式）。</p>
+<p>捆绑的 CA 存储（由 Node.js 提供）是在发布时固定的 Mozilla CA 存储的快照。它在所有支持的平台上都是相同的。</p>
+<p>要获取当前 Node.js 实例实际使用的 CA 证书，其中可能包括从系统存储加载的证书（如果使用了 <code>--use-system-ca</code>）或从 <code>NODE_EXTRA_CA_CERTS</code> 指示的文件加载的证书，请使用 <a href="#tlsgetcacertificatestype"><code>tls.getCACertificates()</code></a>。</p>
+</section><section><h3><code>tls.DEFAULT_ECDH_CURVE</code><span><a class="mark" href="#tlsdefault_ecdh_curve" id="tlsdefault_ecdh_curve">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_default_ecdh_curve"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v10.0.0</td>
+<td><p>Default value changed to <code>'auto'</code>.</p></td></tr>
+<tr><td>v0.11.13</td>
+<td><p><span>Added in: v0.11.13</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>tls 服务器中用于 ECDH 密钥协商的默认曲线名称。默认值为 <code>'auto'</code>。有关更多信息，请参阅 <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a>。</p>
+</section><section><h3><code>tls.DEFAULT_MAX_VERSION</code><span><a class="mark" href="#tlsdefault_max_version" id="tlsdefault_max_version">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_default_max_version"></a></h3>
+<div class="api_metadata">
+<span>Added in: v11.4.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 的 <code>maxVersion</code> 选项的默认值。它可以分配任何支持的 TLS 协议版本，<code>'TLSv1.3'</code>、<code>'TLSv1.2'</code>、<code>'TLSv1.1'</code> 或 <code>'TLSv1'</code>。<strong>默认值：</strong> <code>'TLSv1.3'</code>，除非使用 CLI 选项更改。使用 <code>--tls-max-v1.2</code> 将默认值设置为 <code>'TLSv1.2'</code>。使用 <code>--tls-max-v1.3</code> 将默认值设置为 <code>'TLSv1.3'</code>。如果提供了多个选项，则使用最高的最大值。</li>
+</ul>
+</section><section><h3><code>tls.DEFAULT_MIN_VERSION</code><span><a class="mark" href="#tlsdefault_min_version" id="tlsdefault_min_version">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_default_min_version"></a></h3>
+<div class="api_metadata">
+<span>Added in: v11.4.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 的 <code>minVersion</code> 选项的默认值。它可以分配任何支持的 TLS 协议版本，<code>'TLSv1.3'</code>、<code>'TLSv1.2'</code>、<code>'TLSv1.1'</code> 或 <code>'TLSv1'</code>。TLSv1.2 之前的版本可能需要降低 [OpenSSL 安全级别][]。<strong>默认值：</strong> <code>'TLSv1.2'</code>，除非使用 CLI 选项更改。使用 <code>--tls-min-v1.0</code> 将默认值设置为 <code>'TLSv1'</code>。使用 <code>--tls-min-v1.1</code> 将默认值设置为 <code>'TLSv1.1'</code>。使用 <code>--tls-min-v1.3</code> 将默认值设置为 <code>'TLSv1.3'</code>。如果提供了多个选项，则使用最低的最小值。</li>
+</ul>
+</section><section><h3><code>tls.DEFAULT_CIPHERS</code><span><a class="mark" href="#tlsdefault_ciphers" id="tlsdefault_ciphers">#</a></span><a aria-hidden="true" class="legacy" id="tls_tls_default_ciphers"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.3</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <a href="#tlscreatesecurecontextoptions"><code>tls.createSecureContext()</code></a> 的 <code>ciphers</code> 选项的默认值。它可以分配任何支持的 OpenSSL 密码。默认值为 <code>crypto.constants.defaultCoreCipherList</code> 的内容，除非使用 CLI 选项 <code>--tls-default-ciphers</code> 更改。</li>
+</ul></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

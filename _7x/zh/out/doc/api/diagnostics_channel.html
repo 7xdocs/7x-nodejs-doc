@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Diagnostics Channel | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/diagnostics_channel.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:734px){.with-64-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-diagnostics_channel">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel active">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="diagnostics_channel" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#diagnostics-channel">Diagnostics Channel</a></span>
+<ul>
+<li><a href="#-api">公共 API</a>
+<ul>
+<li><a href="#">概述</a>
+<ul>
+<li><a href="#diagnostics_channelhassubscribersname"><code>diagnostics_channel.hasSubscribers(name)</code></a></li>
+<li><a href="#diagnostics_channelchannelname"><code>diagnostics_channel.channel(name)</code></a></li>
+<li><a href="#diagnostics_channelsubscribename-onmessage"><code>diagnostics_channel.subscribe(name, onMessage)</code></a></li>
+<li><a href="#diagnostics_channelunsubscribename-onmessage"><code>diagnostics_channel.unsubscribe(name, onMessage)</code></a></li>
+<li><span class="stability_1"><a href="#diagnostics_channeltracingchannelnameorchannels"><code>diagnostics_channel.tracingChannel(nameOrChannels)</code></a></span></li>
+</ul>
+</li>
+<li><a href="#channel">类：<code>Channel</code></a>
+<ul>
+<li><a href="#channelhassubscribers"><code>channel.hasSubscribers</code></a></li>
+<li><a href="#channelpublishmessage"><code>channel.publish(message)</code></a></li>
+<li><a href="#channelsubscribeonmessage"><code>channel.subscribe(onMessage)</code></a></li>
+<li><a href="#channelunsubscribeonmessage"><code>channel.unsubscribe(onMessage)</code></a></li>
+<li><span class="stability_1"><a href="#channelbindstorestore-transform"><code>channel.bindStore(store[, transform])</code></a></span></li>
+<li><span class="stability_1"><a href="#channelunbindstorestore"><code>channel.unbindStore(store)</code></a></span></li>
+<li><span class="stability_1"><a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, fn[, thisArg[, ...args]])</code></a></span></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#tracingchannel">类：<code>TracingChannel</code></a></span>
+<ul>
+<li><a href="#tracingchannelsubscribesubscribers"><code>tracingChannel.subscribe(subscribers)</code></a></li>
+<li><a href="#tracingchannelunsubscribesubscribers"><code>tracingChannel.unsubscribe(subscribers)</code></a></li>
+<li><a href="#tracingchanneltracesyncfn-context-thisarg-args"><code>tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])</code></a></li>
+<li><a href="#tracingchanneltracepromisefn-context-thisarg-args"><code>tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])</code></a></li>
+<li><a href="#tracingchanneltracecallbackfn-position-context-thisarg-args"><code>tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])</code></a></li>
+<li><a href="#tracingchannelhassubscribers"><code>tracingChannel.hasSubscribers</code></a></li>
+</ul>
+</li>
+<li><a href="#tracingchannel-channels">TracingChannel Channels</a>
+<ul>
+<li><a href="#startevent"><code>start(event)</code></a></li>
+<li><a href="#endevent"><code>end(event)</code></a></li>
+<li><a href="#asyncstartevent"><code>asyncStart(event)</code></a></li>
+<li><a href="#asyncendevent"><code>asyncEnd(event)</code></a></li>
+<li><a href="#errorevent"><code>error(event)</code></a></li>
+</ul>
+</li>
+<li><a href="#_1">内置通道</a>
+<ul>
+<li><span class="stability_1"><a href="#console">Console</a></span>
+<ul>
+<li><a href="#-consolelog">事件: <code>'console.log'</code></a></li>
+<li><a href="#-consoleinfo">事件: <code>'console.info'</code></a></li>
+<li><a href="#-consoledebug">事件: <code>'console.debug'</code></a></li>
+<li><a href="#-consolewarn">事件: <code>'console.warn'</code></a></li>
+<li><a href="#-consoleerror">事件: <code>'console.error'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#http">HTTP</a></span>
+<ul>
+<li><a href="#-httpclientrequestcreated">事件: <code>'http.client.request.created'</code></a></li>
+<li><a href="#-httpclientrequeststart">事件: <code>'http.client.request.start'</code></a></li>
+<li><a href="#-httpclientrequesterror">事件: <code>'http.client.request.error'</code></a></li>
+<li><a href="#-httpclientresponsefinish">事件: <code>'http.client.response.finish'</code></a></li>
+<li><a href="#-httpserverrequeststart">事件: <code>'http.server.request.start'</code></a></li>
+<li><a href="#-httpserverresponsecreated">事件: <code>'http.server.response.created'</code></a></li>
+<li><a href="#-httpserverresponsefinish">事件: <code>'http.server.response.finish'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#http2">HTTP/2</a></span>
+<ul>
+<li><a href="#-http2clientstreamcreated">事件: <code>'http2.client.stream.created'</code></a></li>
+<li><a href="#-http2clientstreamstart">事件: <code>'http2.client.stream.start'</code></a></li>
+<li><a href="#-http2clientstreamerror">事件: <code>'http2.client.stream.error'</code></a></li>
+<li><a href="#-http2clientstreamfinish">事件: <code>'http2.client.stream.finish'</code></a></li>
+<li><a href="#-http2clientstreamclose">事件: <code>'http2.client.stream.close'</code></a></li>
+<li><a href="#-http2serverstreamcreated">事件: <code>'http2.server.stream.created'</code></a></li>
+<li><a href="#-http2serverstreamstart">事件: <code>'http2.server.stream.start'</code></a></li>
+<li><a href="#-http2serverstreamerror">事件: <code>'http2.server.stream.error'</code></a></li>
+<li><a href="#-http2serverstreamfinish">事件: <code>'http2.server.stream.finish'</code></a></li>
+<li><a href="#-http2serverstreamclose">事件: <code>'http2.server.stream.close'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#modules">Modules</a></span>
+<ul>
+<li><a href="#-modulerequirestart">事件: <code>'module.require.start'</code></a></li>
+<li><a href="#-modulerequireend">事件: <code>'module.require.end'</code></a></li>
+<li><a href="#-modulerequireerror">事件: <code>'module.require.error'</code></a></li>
+<li><a href="#-moduleimportasyncstart">事件: <code>'module.import.asyncStart'</code></a></li>
+<li><a href="#-moduleimportasyncend">事件: <code>'module.import.asyncEnd'</code></a></li>
+<li><a href="#-moduleimporterror">事件: <code>'module.import.error'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#net">NET</a></span>
+<ul>
+<li><a href="#-netclientsocket">事件: <code>'net.client.socket'</code></a></li>
+<li><a href="#-netserversocket">事件: <code>'net.server.socket'</code></a></li>
+<li><a href="#-tracingnetserverlistenasyncstart">事件: <code>'tracing:net.server.listen:asyncStart'</code></a></li>
+<li><a href="#-tracingnetserverlistenasyncend">事件: <code>'tracing:net.server.listen:asyncEnd'</code></a></li>
+<li><a href="#-tracingnetserverlistenerror">事件: <code>'tracing:net.server.listen:error'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#udp">UDP</a></span>
+<ul>
+<li><a href="#-udpsocket">事件: <code>'udp.socket'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#process">Process</a></span>
+<ul>
+<li><a href="#-child_process">事件: <code>'child_process'</code></a></li>
+<li><a href="#-execve">事件: <code>'execve'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#worker-thread">Worker Thread</a></span>
+<ul>
+<li><a href="#-worker_threads">事件: <code>'worker_threads'</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel active">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/diagnostics_channel.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/diagnostics_channel.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/diagnostics_channel.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/diagnostics_channel.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/diagnostics_channel.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/diagnostics_channel.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/diagnostics_channel.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/diagnostics_channel.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/diagnostics_channel.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/diagnostics_channel.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/diagnostics_channel.html">15.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="diagnostics_channel.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/diagnostics_channel.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#diagnostics-channel">Diagnostics Channel</a></span>
+<ul>
+<li><a href="#-api">公共 API</a>
+<ul>
+<li><a href="#">概述</a>
+<ul>
+<li><a href="#diagnostics_channelhassubscribersname"><code>diagnostics_channel.hasSubscribers(name)</code></a></li>
+<li><a href="#diagnostics_channelchannelname"><code>diagnostics_channel.channel(name)</code></a></li>
+<li><a href="#diagnostics_channelsubscribename-onmessage"><code>diagnostics_channel.subscribe(name, onMessage)</code></a></li>
+<li><a href="#diagnostics_channelunsubscribename-onmessage"><code>diagnostics_channel.unsubscribe(name, onMessage)</code></a></li>
+<li><span class="stability_1"><a href="#diagnostics_channeltracingchannelnameorchannels"><code>diagnostics_channel.tracingChannel(nameOrChannels)</code></a></span></li>
+</ul>
+</li>
+<li><a href="#channel">类：<code>Channel</code></a>
+<ul>
+<li><a href="#channelhassubscribers"><code>channel.hasSubscribers</code></a></li>
+<li><a href="#channelpublishmessage"><code>channel.publish(message)</code></a></li>
+<li><a href="#channelsubscribeonmessage"><code>channel.subscribe(onMessage)</code></a></li>
+<li><a href="#channelunsubscribeonmessage"><code>channel.unsubscribe(onMessage)</code></a></li>
+<li><span class="stability_1"><a href="#channelbindstorestore-transform"><code>channel.bindStore(store[, transform])</code></a></span></li>
+<li><span class="stability_1"><a href="#channelunbindstorestore"><code>channel.unbindStore(store)</code></a></span></li>
+<li><span class="stability_1"><a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, fn[, thisArg[, ...args]])</code></a></span></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#tracingchannel">类：<code>TracingChannel</code></a></span>
+<ul>
+<li><a href="#tracingchannelsubscribesubscribers"><code>tracingChannel.subscribe(subscribers)</code></a></li>
+<li><a href="#tracingchannelunsubscribesubscribers"><code>tracingChannel.unsubscribe(subscribers)</code></a></li>
+<li><a href="#tracingchanneltracesyncfn-context-thisarg-args"><code>tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])</code></a></li>
+<li><a href="#tracingchanneltracepromisefn-context-thisarg-args"><code>tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])</code></a></li>
+<li><a href="#tracingchanneltracecallbackfn-position-context-thisarg-args"><code>tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])</code></a></li>
+<li><a href="#tracingchannelhassubscribers"><code>tracingChannel.hasSubscribers</code></a></li>
+</ul>
+</li>
+<li><a href="#tracingchannel-channels">TracingChannel Channels</a>
+<ul>
+<li><a href="#startevent"><code>start(event)</code></a></li>
+<li><a href="#endevent"><code>end(event)</code></a></li>
+<li><a href="#asyncstartevent"><code>asyncStart(event)</code></a></li>
+<li><a href="#asyncendevent"><code>asyncEnd(event)</code></a></li>
+<li><a href="#errorevent"><code>error(event)</code></a></li>
+</ul>
+</li>
+<li><a href="#_1">内置通道</a>
+<ul>
+<li><span class="stability_1"><a href="#console">Console</a></span>
+<ul>
+<li><a href="#-consolelog">事件: <code>'console.log'</code></a></li>
+<li><a href="#-consoleinfo">事件: <code>'console.info'</code></a></li>
+<li><a href="#-consoledebug">事件: <code>'console.debug'</code></a></li>
+<li><a href="#-consolewarn">事件: <code>'console.warn'</code></a></li>
+<li><a href="#-consoleerror">事件: <code>'console.error'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#http">HTTP</a></span>
+<ul>
+<li><a href="#-httpclientrequestcreated">事件: <code>'http.client.request.created'</code></a></li>
+<li><a href="#-httpclientrequeststart">事件: <code>'http.client.request.start'</code></a></li>
+<li><a href="#-httpclientrequesterror">事件: <code>'http.client.request.error'</code></a></li>
+<li><a href="#-httpclientresponsefinish">事件: <code>'http.client.response.finish'</code></a></li>
+<li><a href="#-httpserverrequeststart">事件: <code>'http.server.request.start'</code></a></li>
+<li><a href="#-httpserverresponsecreated">事件: <code>'http.server.response.created'</code></a></li>
+<li><a href="#-httpserverresponsefinish">事件: <code>'http.server.response.finish'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#http2">HTTP/2</a></span>
+<ul>
+<li><a href="#-http2clientstreamcreated">事件: <code>'http2.client.stream.created'</code></a></li>
+<li><a href="#-http2clientstreamstart">事件: <code>'http2.client.stream.start'</code></a></li>
+<li><a href="#-http2clientstreamerror">事件: <code>'http2.client.stream.error'</code></a></li>
+<li><a href="#-http2clientstreamfinish">事件: <code>'http2.client.stream.finish'</code></a></li>
+<li><a href="#-http2clientstreamclose">事件: <code>'http2.client.stream.close'</code></a></li>
+<li><a href="#-http2serverstreamcreated">事件: <code>'http2.server.stream.created'</code></a></li>
+<li><a href="#-http2serverstreamstart">事件: <code>'http2.server.stream.start'</code></a></li>
+<li><a href="#-http2serverstreamerror">事件: <code>'http2.server.stream.error'</code></a></li>
+<li><a href="#-http2serverstreamfinish">事件: <code>'http2.server.stream.finish'</code></a></li>
+<li><a href="#-http2serverstreamclose">事件: <code>'http2.server.stream.close'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#modules">Modules</a></span>
+<ul>
+<li><a href="#-modulerequirestart">事件: <code>'module.require.start'</code></a></li>
+<li><a href="#-modulerequireend">事件: <code>'module.require.end'</code></a></li>
+<li><a href="#-modulerequireerror">事件: <code>'module.require.error'</code></a></li>
+<li><a href="#-moduleimportasyncstart">事件: <code>'module.import.asyncStart'</code></a></li>
+<li><a href="#-moduleimportasyncend">事件: <code>'module.import.asyncEnd'</code></a></li>
+<li><a href="#-moduleimporterror">事件: <code>'module.import.error'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#net">NET</a></span>
+<ul>
+<li><a href="#-netclientsocket">事件: <code>'net.client.socket'</code></a></li>
+<li><a href="#-netserversocket">事件: <code>'net.server.socket'</code></a></li>
+<li><a href="#-tracingnetserverlistenasyncstart">事件: <code>'tracing:net.server.listen:asyncStart'</code></a></li>
+<li><a href="#-tracingnetserverlistenasyncend">事件: <code>'tracing:net.server.listen:asyncEnd'</code></a></li>
+<li><a href="#-tracingnetserverlistenerror">事件: <code>'tracing:net.server.listen:error'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#udp">UDP</a></span>
+<ul>
+<li><a href="#-udpsocket">事件: <code>'udp.socket'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#process">Process</a></span>
+<ul>
+<li><a href="#-child_process">事件: <code>'child_process'</code></a></li>
+<li><a href="#-execve">事件: <code>'execve'</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#worker-thread">Worker Thread</a></span>
+<ul>
+<li><a href="#-worker_threads">事件: <code>'worker_threads'</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Diagnostics Channel<span><a class="mark" href="#diagnostics-channel" id="diagnostics-channel">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel"></a></h2>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.2.0, v18.13.0</td>
+<td><p>diagnostics_channel is now Stable.</p></td></tr>
+<tr><td>v15.1.0, v14.17.0</td>
+<td><p><span>Added in: v15.1.0, v14.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/diagnostics_channel.js">lib/diagnostics_channel.js</a></p>
+<p><code>node:diagnostics_channel</code> 模块提供了一个 API 来创建命名通道，用于诊断目的报告任意消息数据。</p>
+<p>可以通过以下方式访问：</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);</code><button class="copy-button">copy</button></pre>
+<p>模块开发者若想报告诊断消息，可以创建一个或多个顶层通道来报告消息。也可以在运行时获取通道，但由于这样做会产生额外开销，因此不鼓励。为了方便，通道可以被导出，但只要知道通道名称，就可以在任何地方获取。</p>
+<p>如果你打算让你的模块产生供他人使用的诊断数据，建议你包含使用了哪些命名通道以及消息数据结构的文档。通道名称通常应包含模块名称，以避免与其他模块的数据发生冲突。</p>
+<section><h3>公共 API<span><a class="mark" href="#-api" id="-api">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_api"></a></h3>
+<div>
+<h4>概述<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel"></a></h4>
+<p>以下是公共 API 的简单概述。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-comment">// 获取一个可重用的通道对象</span>
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onMessage</span>(<span class="hljs-params">message, name</span>) {
+  <span class="hljs-comment">// 接收数据</span>
+}
+
+<span class="hljs-comment">// 订阅通道</span>
+diagnostics_channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);
+
+<span class="hljs-comment">// 检查通道是否有活跃订阅者</span>
+<span class="hljs-keyword">if</span> (channel.<span class="hljs-property">hasSubscribers</span>) {
+  <span class="hljs-comment">// 发布数据到通道</span>
+  channel.<span class="hljs-title function_">publish</span>({
+    <span class="hljs-attr">some</span>: <span class="hljs-string">'data'</span>,
+  });
+}
+
+<span class="hljs-comment">// 取消订阅通道</span>
+diagnostics_channel.<span class="hljs-title function_">unsubscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-comment">// 获取一个可重用的通道对象</span>
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onMessage</span>(<span class="hljs-params">message, name</span>) {
+  <span class="hljs-comment">// 接收数据</span>
+}
+
+<span class="hljs-comment">// 订阅通道</span>
+diagnostics_channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);
+
+<span class="hljs-comment">// 检查通道是否有活跃订阅者</span>
+<span class="hljs-keyword">if</span> (channel.<span class="hljs-property">hasSubscribers</span>) {
+  <span class="hljs-comment">// 发布数据到通道</span>
+  channel.<span class="hljs-title function_">publish</span>({
+    <span class="hljs-attr">some</span>: <span class="hljs-string">'data'</span>,
+  });
+}
+
+<span class="hljs-comment">// 取消订阅通道</span>
+diagnostics_channel.<span class="hljs-title function_">unsubscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);</code><button class="copy-button">copy</button></pre>
+<div>
+<h5><code>diagnostics_channel.hasSubscribers(name)</code><span><a class="mark" href="#diagnostics_channelhassubscribersname" id="diagnostics_channelhassubscribersname">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel_hassubscribers_name"></a></h5>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> 通道名称</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否有活跃订阅者</li>
+</ul>
+<p>检查指定名称的通道是否有活跃订阅者。如果你要发送的消息准备成本很高，这个 API 会很有帮助。</p>
+<p>此 API 是可选的，但在尝试从性能非常敏感的代码发布消息时很有用。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">if</span> (diagnostics_channel.<span class="hljs-title function_">hasSubscribers</span>(<span class="hljs-string">'my-channel'</span>)) {
+  <span class="hljs-comment">// 有订阅者，准备并发布消息</span>
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">if</span> (diagnostics_channel.<span class="hljs-title function_">hasSubscribers</span>(<span class="hljs-string">'my-channel'</span>)) {
+  <span class="hljs-comment">// 有订阅者，准备并发布消息</span>
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>diagnostics_channel.channel(name)</code><span><a class="mark" href="#diagnostics_channelchannelname" id="diagnostics_channelchannelname">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel_channel_name"></a></h5>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> 通道名称</li>
+<li>返回: <a href="diagnostics_channel.html#class-channel" class="type">&#x3C;Channel></a> 命名通道对象</li>
+</ul>
+<p>这是想要发布到命名通道的主要入口点。它产生一个通道对象，该对象经过优化以尽可能减少发布时的开销。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>diagnostics_channel.subscribe(name, onMessage)</code><span><a class="mark" href="#diagnostics_channelsubscribename-onmessage" id="diagnostics_channelsubscribename-onmessage">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel_subscribe_name_onmessage"></a></h5>
+<div class="api_metadata">
+<span>Added in: v18.7.0, v16.17.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> 通道名称</li>
+<li><code>onMessage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 接收通道消息的处理程序
+<ul>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 消息数据</li>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> 通道名称</li>
+</ul>
+</li>
+</ul>
+<p>注册一个消息处理程序来订阅此通道。每当有消息发布到通道时，此消息处理程序将同步运行。消息处理程序中抛出的任何错误都将触发 <a href="process.html#event-uncaughtexception"><code>'uncaughtException'</code></a>。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+diagnostics_channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">'my-channel'</span>, <span class="hljs-function">(<span class="hljs-params">message, name</span>) =></span> {
+  <span class="hljs-comment">// 接收数据</span>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+diagnostics_channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">'my-channel'</span>, <span class="hljs-function">(<span class="hljs-params">message, name</span>) =></span> {
+  <span class="hljs-comment">// 接收数据</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>diagnostics_channel.unsubscribe(name, onMessage)</code><span><a class="mark" href="#diagnostics_channelunsubscribename-onmessage" id="diagnostics_channelunsubscribename-onmessage">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel_unsubscribe_name_onmessage"></a></h5>
+<div class="api_metadata">
+<span>Added in: v18.7.0, v16.17.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> 通道名称</li>
+<li><code>onMessage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 要移除的先前订阅的处理程序</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果找到处理程序则为 <code>true</code>，否则为 <code>false</code>。</li>
+</ul>
+<p>移除先前使用 <a href="#diagnostics_channelsubscribename-onmessage"><code>diagnostics_channel.subscribe(name, onMessage)</code></a> 注册到此通道的消息处理程序。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onMessage</span>(<span class="hljs-params">message, name</span>) {
+  <span class="hljs-comment">// 接收数据</span>
+}
+
+diagnostics_channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);
+
+diagnostics_channel.<span class="hljs-title function_">unsubscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onMessage</span>(<span class="hljs-params">message, name</span>) {
+  <span class="hljs-comment">// 接收数据</span>
+}
+
+diagnostics_channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);
+
+diagnostics_channel.<span class="hljs-title function_">unsubscribe</span>(<span class="hljs-string">'my-channel'</span>, onMessage);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>diagnostics_channel.tracingChannel(nameOrChannels)</code><span><a class="mark" href="#diagnostics_channeltracingchannelnameorchannels" id="diagnostics_channeltracingchannelnameorchannels">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_diagnostics_channel_tracingchannel_nameorchannels"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>nameOrChannels</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="diagnostics_channel.html#class-tracingchannel" class="type">&#x3C;TracingChannel></a> 通道名称或包含所有 <a href="#tracingchannel-channels">TracingChannel Channels</a> 的对象</li>
+<li>返回: <a href="diagnostics_channel.html#class-tracingchannel" class="type">&#x3C;TracingChannel></a> 用于跟踪的通道集合</li>
+</ul>
+<p>为给定的 <a href="#tracingchannel-channels">TracingChannel Channels</a> 创建一个 <a href="#class-tracingchannel"><code>TracingChannel</code></a> 包装器。如果给定名称，则相应的跟踪通道将以 <code>tracing:${name}:${eventType}</code> 的形式创建，其中 <code>eventType</code> 对应于 <a href="#tracingchannel-channels">TracingChannel Channels</a> 的类型。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channelsByName = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-comment">// 或者...</span>
+
+<span class="hljs-keyword">const</span> channelsByCollection = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>({
+  <span class="hljs-attr">start</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:start'</span>),
+  <span class="hljs-attr">end</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:end'</span>),
+  <span class="hljs-attr">asyncStart</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:asyncStart'</span>),
+  <span class="hljs-attr">asyncEnd</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:asyncEnd'</span>),
+  <span class="hljs-attr">error</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:error'</span>),
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channelsByName = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-comment">// 或者...</span>
+
+<span class="hljs-keyword">const</span> channelsByCollection = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>({
+  <span class="hljs-attr">start</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:start'</span>),
+  <span class="hljs-attr">end</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:end'</span>),
+  <span class="hljs-attr">asyncStart</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:asyncStart'</span>),
+  <span class="hljs-attr">asyncEnd</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:asyncEnd'</span>),
+  <span class="hljs-attr">error</span>: diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'tracing:my-channel:error'</span>),
+});</code><button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4>类：<code>Channel</code><span><a class="mark" href="#channel" id="channel">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0</span>
+</div>
+<p><code>Channel</code> 类表示数据管道中的单个命名通道。它用于跟踪订阅者，并在有订阅者存在时发布消息。它作为一个独立的对象存在，以避免在发布时查找通道，从而实现非常快的发布速度，并允许大量使用而产生非常小的成本。通道是使用 <a href="#diagnostics_channelchannelname"><code>diagnostics_channel.channel(name)</code></a> 创建的，不支持直接使用 <code>new Channel(name)</code> 构造通道。</p>
+<div>
+<h5><code>channel.hasSubscribers</code><span><a class="mark" href="#channelhassubscribers" id="channelhassubscribers">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_hassubscribers"></a></h5>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否有活跃订阅者</li>
+</ul>
+<p>检查此通道是否有活跃订阅者。如果你要发送的消息准备成本很高，这个 API 会很有帮助。</p>
+<p>此 API 是可选的，但在尝试从性能非常敏感的代码发布消息时很有用。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">if</span> (channel.<span class="hljs-property">hasSubscribers</span>) {
+  <span class="hljs-comment">// 有订阅者，准备并发布消息</span>
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">if</span> (channel.<span class="hljs-property">hasSubscribers</span>) {
+  <span class="hljs-comment">// 有订阅者，准备并发布消息</span>
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>channel.publish(message)</code><span><a class="mark" href="#channelpublishmessage" id="channelpublishmessage">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_publish_message"></a></h5>
+<div class="api_metadata">
+<span>Added in: v15.1.0, v14.17.0</span>
+</div>
+<ul>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 发送给通道订阅者的消息</li>
+</ul>
+<p>向通道的任何订阅者发布消息。这将同步触发消息处理程序，因此它们将在同一上下文中执行。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">publish</span>({
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'message'</span>,
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">publish</span>({
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'message'</span>,
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>channel.subscribe(onMessage)</code><span><a class="mark" href="#channelsubscribeonmessage" id="channelsubscribeonmessage">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_subscribe_onmessage"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.8.0</td>
+<td><p>Deprecation revoked.</p></td></tr>
+<tr><td>v18.7.0, v16.17.0</td>
+<td><p>Documentation-only deprecation.</p></td></tr>
+<tr><td>v15.1.0, v14.17.0</td>
+<td><p><span>Added in: v15.1.0, v14.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>onMessage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 接收通道消息的处理程序
+<ul>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 消息数据</li>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type" class="type">&#x3C;symbol></a> 通道名称</li>
+</ul>
+</li>
+</ul>
+<p>注册一个消息处理程序来订阅此通道。每当有消息发布到通道时，此消息处理程序将同步运行。消息处理程序中抛出的任何错误都将触发 <a href="process.html#event-uncaughtexception"><code>'uncaughtException'</code></a>。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-function">(<span class="hljs-params">message, name</span>) =></span> {
+  <span class="hljs-comment">// 接收数据</span>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">subscribe</span>(<span class="hljs-function">(<span class="hljs-params">message, name</span>) =></span> {
+  <span class="hljs-comment">// 接收数据</span>
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>channel.unsubscribe(onMessage)</code><span><a class="mark" href="#channelunsubscribeonmessage" id="channelunsubscribeonmessage">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_unsubscribe_onmessage"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.8.0</td>
+<td><p>Deprecation revoked.</p></td></tr>
+<tr><td>v18.7.0, v16.17.0</td>
+<td><p>Documentation-only deprecation.</p></td></tr>
+<tr><td>v17.1.0, v16.14.0, v14.19.0</td>
+<td><p>Added return value. Added to channels without subscribers.</p></td></tr>
+<tr><td>v15.1.0, v14.17.0</td>
+<td><p><span>Added in: v15.1.0, v14.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>onMessage</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 要移除的先前订阅的处理程序</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果找到处理程序则为 <code>true</code>，否则为 <code>false</code>。</li>
+</ul>
+<p>移除先前使用 <a href="#channelsubscribeonmessage"><code>channel.subscribe(onMessage)</code></a> 注册到此通道的消息处理程序。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onMessage</span>(<span class="hljs-params">message, name</span>) {
+  <span class="hljs-comment">// 接收数据</span>
+}
+
+channel.<span class="hljs-title function_">subscribe</span>(onMessage);
+
+channel.<span class="hljs-title function_">unsubscribe</span>(onMessage);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">onMessage</span>(<span class="hljs-params">message, name</span>) {
+  <span class="hljs-comment">// 接收数据</span>
+}
+
+channel.<span class="hljs-title function_">subscribe</span>(onMessage);
+
+channel.<span class="hljs-title function_">unsubscribe</span>(onMessage);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>channel.bindStore(store[, transform])</code><span><a class="mark" href="#channelbindstorestore-transform" id="channelbindstorestore-transform">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_bindstore_store_transform"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>store</code> <a href="async_context.html#class-asynclocalstorage" class="type">&#x3C;AsyncLocalStorage></a> 要绑定上下文数据的存储</li>
+<li><code>transform</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 在设置存储上下文之前转换上下文数据</li>
+</ul>
+<p>当调用 <a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, ...)</code></a> 时，给定的上下文数据将应用于绑定到通道的任何存储。如果存储已经被绑定，先前的 <code>transform</code> 函数将被新的替换。可以省略 <code>transform</code> 函数，将给定的上下文数据直接设置为上下文。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:async_hooks'</span>;
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">bindStore</span>(store, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-keyword">return</span> { data };
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:async_hooks'</span>);
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">bindStore</span>(store, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-keyword">return</span> { data };
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>channel.unbindStore(store)</code><span><a class="mark" href="#channelunbindstorestore" id="channelunbindstorestore">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_unbindstore_store"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>store</code> <a href="async_context.html#class-asynclocalstorage" class="type">&#x3C;AsyncLocalStorage></a> 要从通道解绑的存储。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果找到存储则为 <code>true</code>，否则为 <code>false</code>。</li>
+</ul>
+<p>移除先前使用 <a href="#channelbindstorestore-transform"><code>channel.bindStore(store)</code></a> 注册到此通道的消息处理程序。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:async_hooks'</span>;
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">bindStore</span>(store);
+channel.<span class="hljs-title function_">unbindStore</span>(store);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:async_hooks'</span>);
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">bindStore</span>(store);
+channel.<span class="hljs-title function_">unbindStore</span>(store);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>channel.runStores(context, fn[, thisArg[, ...args]])</code><span><a class="mark" href="#channelrunstorescontext-fn-thisarg-args" id="channelrunstorescontext-fn-thisarg-args">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_channel_runstores_context_fn_thisarg_args"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<ul>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 发送给订阅者并绑定到存储的消息</li>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 在进入的存储上下文中运行的处理程序</li>
+<li><code>thisArg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 函数调用的接收器。</li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传递给函数的可选参数。</li>
+</ul>
+<p>在给定函数的持续时间内，将给定的数据应用于绑定到通道的任何 AsyncLocalStorage 实例，然后在该数据应用于存储的范围内发布到通道。</p>
+<p>如果给定了 <a href="#channelbindstorestore-transform"><code>channel.bindStore(store)</code></a> 一个转换函数，它将在消息数据成为存储的上下文值之前应用于转换消息数据。在需要上下文链接的情况下，可以从转换函数内部访问先前的存储上下文。</p>
+<p>应用于存储的上下文应该可以在从给定函数期间开始的任何异步代码中访问，但是在某些情况下可能会发生 [上下文丢失][]。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:async_hooks'</span>;
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">bindStore</span>(store, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> {
+  <span class="hljs-keyword">const</span> parent = store.<span class="hljs-title function_">getStore</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Span</span>(message, parent);
+});
+channel.<span class="hljs-title function_">runStores</span>({ <span class="hljs-attr">some</span>: <span class="hljs-string">'message'</span> }, <span class="hljs-function">() =></span> {
+  store.<span class="hljs-title function_">getStore</span>(); <span class="hljs-comment">// Span({ some: 'message' })</span>
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:async_hooks'</span>);
+
+<span class="hljs-keyword">const</span> store = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-keyword">const</span> channel = diagnostics_channel.<span class="hljs-title function_">channel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channel.<span class="hljs-title function_">bindStore</span>(store, <span class="hljs-function">(<span class="hljs-params">message</span>) =></span> {
+  <span class="hljs-keyword">const</span> parent = store.<span class="hljs-title function_">getStore</span>();
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Span</span>(message, parent);
+});
+channel.<span class="hljs-title function_">runStores</span>({ <span class="hljs-attr">some</span>: <span class="hljs-string">'message'</span> }, <span class="hljs-function">() =></span> {
+  store.<span class="hljs-title function_">getStore</span>(); <span class="hljs-comment">// Span({ some: 'message' })</span>
+});</code><button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4>类：<code>TracingChannel</code><span><a class="mark" href="#tracingchannel" id="tracingchannel">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel"></a></h4>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p><code>TracingChannel</code> 类是一个 <a href="#tracingchannel-channels">TracingChannel Channels</a> 的集合，它们共同表达一个可跟踪的操作。它用于形式化和简化生成跟踪应用程序流事件的过程。<a href="#diagnostics_channeltracingchannelnameorchannels"><code>diagnostics_channel.tracingChannel()</code></a> 用于构造 <code>TracingChannel</code>。与 <code>Channel</code> 一样，建议在文件的顶层创建并重用单个 <code>TracingChannel</code>，而不是动态创建它们。</p>
+<div>
+<h5><code>tracingChannel.subscribe(subscribers)</code><span><a class="mark" href="#tracingchannelsubscribesubscribers" id="tracingchannelsubscribesubscribers">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_subscribe_subscribers"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<ul>
+<li><code>subscribers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> <a href="#tracingchannel-channels">TracingChannel Channels</a> 订阅者集合
+<ul>
+<li><code>start</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#startevent"><code>start</code> event</a> 订阅者</li>
+<li><code>end</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#endevent"><code>end</code> event</a> 订阅者</li>
+<li><code>asyncStart</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#asyncstartevent"><code>asyncStart</code> event</a> 订阅者</li>
+<li><code>asyncEnd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#asyncendevent"><code>asyncEnd</code> event</a> 订阅者</li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#errorevent"><code>error</code> event</a> 订阅者</li>
+</ul>
+</li>
+</ul>
+<p>辅助函数，将一组函数订阅到相应的通道。这与在每个通道上单独调用 <a href="#channelsubscribeonmessage"><code>channel.subscribe(onMessage)</code></a> 相同。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">subscribe</span>({
+  <span class="hljs-title function_">start</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 start 消息</span>
+  },
+  <span class="hljs-title function_">end</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 end 消息</span>
+  },
+  <span class="hljs-title function_">asyncStart</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncStart 消息</span>
+  },
+  <span class="hljs-title function_">asyncEnd</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncEnd 消息</span>
+  },
+  <span class="hljs-title function_">error</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 error 消息</span>
+  },
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">subscribe</span>({
+  <span class="hljs-title function_">start</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 start 消息</span>
+  },
+  <span class="hljs-title function_">end</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 end 消息</span>
+  },
+  <span class="hljs-title function_">asyncStart</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncStart 消息</span>
+  },
+  <span class="hljs-title function_">asyncEnd</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncEnd 消息</span>
+  },
+  <span class="hljs-title function_">error</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 error 消息</span>
+  },
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>tracingChannel.unsubscribe(subscribers)</code><span><a class="mark" href="#tracingchannelunsubscribesubscribers" id="tracingchannelunsubscribesubscribers">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_unsubscribe_subscribers"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<ul>
+<li><code>subscribers</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> <a href="#tracingchannel-channels">TracingChannel Channels</a> 订阅者集合
+<ul>
+<li><code>start</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#startevent"><code>start</code> event</a> 订阅者</li>
+<li><code>end</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#endevent"><code>end</code> event</a> 订阅者</li>
+<li><code>asyncStart</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#asyncstartevent"><code>asyncStart</code> event</a> 订阅者</li>
+<li><code>asyncEnd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#asyncendevent"><code>asyncEnd</code> event</a> 订阅者</li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> <a href="#errorevent"><code>error</code> event</a> 订阅者</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果所有处理程序都成功取消订阅则为 <code>true</code>，否则为 <code>false</code>。</li>
+</ul>
+<p>辅助函数，从相应的通道取消订阅一组函数。这与在每个通道上单独调用 <a href="#channelunsubscribeonmessage"><code>channel.unsubscribe(onMessage)</code></a> 相同。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">unsubscribe</span>({
+  <span class="hljs-title function_">start</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 start 消息</span>
+  },
+  <span class="hljs-title function_">end</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 end 消息</span>
+  },
+  <span class="hljs-title function_">asyncStart</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncStart 消息</span>
+  },
+  <span class="hljs-title function_">asyncEnd</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncEnd 消息</span>
+  },
+  <span class="hljs-title function_">error</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 error 消息</span>
+  },
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">unsubscribe</span>({
+  <span class="hljs-title function_">start</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 start 消息</span>
+  },
+  <span class="hljs-title function_">end</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 end 消息</span>
+  },
+  <span class="hljs-title function_">asyncStart</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncStart 消息</span>
+  },
+  <span class="hljs-title function_">asyncEnd</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 asyncEnd 消息</span>
+  },
+  <span class="hljs-title function_">error</span>(<span class="hljs-params">message</span>) {
+    <span class="hljs-comment">// 处理 error 消息</span>
+  },
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>tracingChannel.traceSync(fn[, context[, thisArg[, ...args]]])</code><span><a class="mark" href="#tracingchanneltracesyncfn-context-thisarg-args" id="tracingchanneltracesyncfn-context-thisarg-args">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_tracesync_fn_context_thisarg_args"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<ul>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 要围绕其进行跟踪的函数</li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于关联事件的共享对象</li>
+<li><code>thisArg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 函数调用的接收器</li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传递给函数的可选参数</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 给定函数的返回值</li>
+</ul>
+<p>跟踪同步函数调用。这总是在执行前后产生 <a href="#startevent"><code>start</code> event</a> 和 <a href="#endevent"><code>end</code> event</a>，如果给定函数抛出错误，可能会产生 <a href="#errorevent"><code>error</code> event</a>。这将在 <code>start</code> 通道上使用 <a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, ...)</code></a> 运行给定函数，确保所有事件都应具有任何绑定的存储以匹配此跟踪上下文。</p>
+<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者将不会收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">traceSync</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// 做一些事情</span>
+}, {
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">traceSync</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// 做一些事情</span>
+}, {
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>tracingChannel.tracePromise(fn[, context[, thisArg[, ...args]]])</code><span><a class="mark" href="#tracingchanneltracepromisefn-context-thisarg-args" id="tracingchanneltracepromisefn-context-thisarg-args">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_tracepromise_fn_context_thisarg_args"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<ul>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 要围绕其进行跟踪的返回 Promise 的函数</li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于关联跟踪事件的共享对象</li>
+<li><code>thisArg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 函数调用的接收器</li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传递给函数的可选参数</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 链接自给定函数返回的 promise</li>
+</ul>
+<p>跟踪返回 promise 的函数调用。这总是在函数执行的同步部分前后产生 <a href="#startevent"><code>start</code> event</a> 和 <a href="#endevent"><code>end</code> event</a>，并在达到 promise 延续时产生 <a href="#asyncstartevent"><code>asyncStart</code> event</a> 和 <a href="#asyncendevent"><code>asyncEnd</code> event</a>。如果给定函数抛出错误或返回的 promise 被拒绝，它也可能产生 <a href="#errorevent"><code>error</code> event</a>。这将在 <code>start</code> 通道上使用 <a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, ...)</code></a> 运行给定函数，确保所有事件都应具有任何绑定的存储以匹配此跟踪上下文。</p>
+<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者将不会收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">tracePromise</span>(<span class="hljs-title function_">async</span> () => {
+  <span class="hljs-comment">// 做一些事情</span>
+}, {
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">tracePromise</span>(<span class="hljs-title function_">async</span> () => {
+  <span class="hljs-comment">// 做一些事情</span>
+}, {
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>tracingChannel.traceCallback(fn[, position[, context[, thisArg[, ...args]]]])</code><span><a class="mark" href="#tracingchanneltracecallbackfn-position-context-thisarg-args" id="tracingchanneltracecallbackfn-position-context-thisarg-args">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_tracecallback_fn_position_context_thisarg_args"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.19.0</span>
+</div>
+<ul>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 要围绕其进行跟踪的使用回调的函数</li>
+<li><code>position</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 预期回调的从零开始的参数位置（如果传递 <code>undefined</code> 则默认为最后一个参数）</li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 用于关联跟踪事件的共享对象（如果传递 <code>undefined</code> 则默认为 <code>{}</code>）</li>
+<li><code>thisArg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 函数调用的接收器</li>
+<li><code>...args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传递给函数的参数（必须包括回调）</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 给定函数的返回值</li>
+</ul>
+<p>跟踪接收回调的函数调用。回调应遵循通常使用的 error-first 约定。这总是在函数执行的同步部分前后产生 <a href="#startevent"><code>start</code> event</a> 和 <a href="#endevent"><code>end</code> event</a>，并在回调执行前后产生 <a href="#asyncstartevent"><code>asyncStart</code> event</a> 和 <a href="#asyncendevent"><code>asyncEnd</code> event</a>。如果给定函数抛出或传递给回调的第一个参数被设置，它也可能产生 <a href="#errorevent"><code>error</code> event</a>。这将在 <code>start</code> 通道上使用 <a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, ...)</code></a> 运行给定函数，确保所有事件都应具有任何绑定的存储以匹配此跟踪上下文。</p>
+<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者将不会收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">traceCallback</span>(<span class="hljs-function">(<span class="hljs-params">arg1, callback</span>) =></span> {
+  <span class="hljs-comment">// 做一些事情</span>
+  <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">'result'</span>);
+}, <span class="hljs-number">1</span>, {
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
+}, thisArg, arg1, callback);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+channels.<span class="hljs-title function_">traceCallback</span>(<span class="hljs-function">(<span class="hljs-params">arg1, callback</span>) =></span> {
+  <span class="hljs-comment">// 做一些事情</span>
+  <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, <span class="hljs-string">'result'</span>);
+}, <span class="hljs-number">1</span>, {
+  <span class="hljs-attr">some</span>: <span class="hljs-string">'thing'</span>,
+}, thisArg, arg1, callback);</code><button class="copy-button">copy</button></pre>
+<p>回调也将使用 <a href="#channelrunstorescontext-fn-thisarg-args"><code>channel.runStores(context, ...)</code></a> 运行，这在某些情况下可以实现上下文丢失恢复。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:async_hooks'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+<span class="hljs-keyword">const</span> myStore = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-comment">// start 通道将初始存储数据设置为某个值</span>
+<span class="hljs-comment">// 并将该存储数据值存储在跟踪上下文对象上</span>
+channels.<span class="hljs-property">start</span>.<span class="hljs-title function_">bindStore</span>(myStore, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-keyword">const</span> span = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Span</span>(data);
+  data.<span class="hljs-property">span</span> = span;
+  <span class="hljs-keyword">return</span> span;
+});
+
+<span class="hljs-comment">// 然后 asyncStart 可以从之前存储的数据中恢复</span>
+channels.<span class="hljs-property">asyncStart</span>.<span class="hljs-title function_">bindStore</span>(myStore, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-keyword">return</span> data.<span class="hljs-property">span</span>;
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">AsyncLocalStorage</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:async_hooks'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+<span class="hljs-keyword">const</span> myStore = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AsyncLocalStorage</span>();
+
+<span class="hljs-comment">// start 通道将初始存储数据设置为某个值</span>
+<span class="hljs-comment">// 并将该存储数据值存储在跟踪上下文对象上</span>
+channels.<span class="hljs-property">start</span>.<span class="hljs-title function_">bindStore</span>(myStore, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-keyword">const</span> span = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Span</span>(data);
+  data.<span class="hljs-property">span</span> = span;
+  <span class="hljs-keyword">return</span> span;
+});
+
+<span class="hljs-comment">// 然后 asyncStart 可以从之前存储的数据中恢复</span>
+channels.<span class="hljs-property">asyncStart</span>.<span class="hljs-title function_">bindStore</span>(myStore, <span class="hljs-function">(<span class="hljs-params">data</span>) =></span> {
+  <span class="hljs-keyword">return</span> data.<span class="hljs-property">span</span>;
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>tracingChannel.hasSubscribers</code><span><a class="mark" href="#tracingchannelhassubscribers" id="tracingchannelhassubscribers">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_hassubscribers"></a></h5>
+<div class="api_metadata">
+<span>Added in: v22.0.0, v20.13.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果任何单个通道有订阅者则为 <code>true</code>，否则为 <code>false</code>。</li>
+</ul>
+<p>这是 <a href="#class-tracingchannel"><code>TracingChannel</code></a> 实例上可用的辅助方法，用于检查任何 <a href="#tracingchannel-channels">TracingChannel Channels</a> 是否有订阅者。如果其中任何一个至少有一个订阅者，则返回 <code>true</code>，否则返回 <code>false</code>。</p>
+
+<pre class="with-64-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> diagnostics_channel <span class="hljs-keyword">from</span> <span class="hljs-string">'node:diagnostics_channel'</span>;
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">if</span> (channels.<span class="hljs-property">hasSubscribers</span>) {
+  <span class="hljs-comment">// 做一些事情</span>
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> diagnostics_channel = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:diagnostics_channel'</span>);
+
+<span class="hljs-keyword">const</span> channels = diagnostics_channel.<span class="hljs-title function_">tracingChannel</span>(<span class="hljs-string">'my-channel'</span>);
+
+<span class="hljs-keyword">if</span> (channels.<span class="hljs-property">hasSubscribers</span>) {
+  <span class="hljs-comment">// 做一些事情</span>
+}</code><button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4>TracingChannel Channels<span><a class="mark" href="#tracingchannel-channels" id="tracingchannel-channels">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracingchannel_channels"></a></h4>
+<p>TracingChannel 是几个 diagnostics_channel 的集合，代表单个可跟踪操作的执行生命周期中的特定点。行为分为五个 diagnostics_channel，包括 <code>start</code>、<code>end</code>、<code>asyncStart</code>、<code>asyncEnd</code> 和 <code>error</code>。单个可跟踪操作将在所有事件之间共享相同的事件对象，这有助于通过 weakmap 管理关联。</p>
+<p>这些事件对象将在任务"完成"时使用 <code>result</code> 或 <code>error</code> 值进行扩展。对于同步任务，<code>result</code> 将是返回值，<code>error</code> 将是函数抛出的任何东西。对于基于回调的异步函数，<code>result</code> 将是回调的第二个参数，而 <code>error</code> 要么是 <code>end</code> 事件中可见的抛出错误，要么是 <code>asyncStart</code> 或 <code>asyncEnd</code> 事件中的第一个回调参数。</p>
+<p>为确保仅形成正确的跟踪图，只有在跟踪开始之前存在订阅者时才会发布事件。在跟踪开始后添加的订阅者不应收到该跟踪的未来事件，只有未来的跟踪才会被看到。</p>
+<p>跟踪通道应遵循以下命名模式：</p>
+<ul>
+<li><code>tracing:module.class.method:start</code> 或 <code>tracing:module.function:start</code></li>
+<li><code>tracing:module.class.method:end</code> 或 <code>tracing:module.function:end</code></li>
+<li><code>tracing:module.class.method:asyncStart</code> 或 <code>tracing:module.function:asyncStart</code></li>
+<li><code>tracing:module.class.method:asyncEnd</code> 或 <code>tracing:module.function:asyncEnd</code></li>
+<li><code>tracing:module.class.method:error</code> 或 <code>tracing:module.function:error</code></li>
+</ul>
+<div>
+<h5><code>start(event)</code><span><a class="mark" href="#startevent" id="startevent">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_start_event"></a></h5>
+<ul>
+<li>名称: <code>tracing:${name}:start</code></li>
+</ul>
+<p><code>start</code> 事件表示函数被调用的点。此时，事件数据可能包含函数参数或在函数执行开始时可用的任何内容。</p>
+</div><div>
+<h5><code>end(event)</code><span><a class="mark" href="#endevent" id="endevent">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_end_event"></a></h5>
+<ul>
+<li>名称: <code>tracing:${name}:end</code></li>
+</ul>
+<p><code>end</code> 事件表示函数调用返回值的点。对于异步函数，这是返回 promise 的时候，而不是函数内部进行返回语句的时候。此时，如果被跟踪的函数是同步的，<code>result</code> 字段将设置为函数的返回值。或者，<code>error</code> 字段可能存在以表示任何抛出的错误。</p>
+<p>建议专门监听 <code>error</code> 事件来跟踪错误，因为一个可跟踪操作可能产生多个错误。例如，一个内部启动的异步任务可能失败，然后任务的同步部分抛出错误。</p>
+</div><div>
+<h5><code>asyncStart(event)</code><span><a class="mark" href="#asyncstartevent" id="asyncstartevent">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_asyncstart_event"></a></h5>
+<ul>
+<li>名称: <code>tracing:${name}:asyncStart</code></li>
+</ul>
+<p><code>asyncStart</code> 事件表示到达可跟踪函数的回调或延续。此时，回调参数之类的东西可能可用，或者表达操作"结果"的任何其他内容。</p>
+<p>对于基于回调的函数，回调的第一个参数将被分配给 <code>error</code> 字段（如果不是 <code>undefined</code> 或 <code>null</code>），第二个参数将被分配给 <code>result</code> 字段。</p>
+<p>对于 promise，<code>resolve</code> 路径的参数将被分配给 <code>result</code>，<code>reject</code> 路径的参数将被分配给 <code>error</code>。</p>
+<p>建议专门监听 <code>error</code> 事件来跟踪错误，因为一个可跟踪操作可能产生多个错误。例如，一个内部启动的异步任务可能失败，然后任务的同步部分抛出错误。</p>
+</div><div>
+<h5><code>asyncEnd(event)</code><span><a class="mark" href="#asyncendevent" id="asyncendevent">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_asyncend_event"></a></h5>
+<ul>
+<li>名称: <code>tracing:${name}:asyncEnd</code></li>
+</ul>
+<p><code>asyncEnd</code> 事件表示异步函数的回调返回。在 <code>asyncStart</code> 事件之后，事件数据不太可能改变，但查看回调完成的点可能很有用。</p>
+</div><div>
+<h5><code>error(event)</code><span><a class="mark" href="#errorevent" id="errorevent">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_error_event"></a></h5>
+<ul>
+<li>名称: <code>tracing:${name}:error</code></li>
+</ul>
+<p><code>error</code> 事件表示可跟踪函数同步或异步产生的任何错误。如果在被跟踪函数的同步部分抛出错误，错误将被分配给事件的 <code>error</code> 字段并触发 <code>error</code> 事件。如果通过回调或 promise 拒绝异步接收错误，它也将被分配给事件的 <code>error</code> 字段并触发 <code>error</code> 事件。</p>
+<p>单个可跟踪函数调用可能多次产生错误，因此在消费此事件时应考虑这一点。例如，如果内部触发了另一个失败的异步任务，然后函数的同步部分抛出错误，则将发出两个 <code>error</code> 事件，一个用于同步错误，一个用于异步错误。</p>
+</div></div><div>
+<h4>内置通道<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_1"></a></h4>
+<div>
+<h5>Console<span><a class="mark" href="#console" id="console">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_console"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div>
+<h6>事件: <code>'console.log'</code><span><a class="mark" href="#-consolelog" id="-consolelog">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_console_log"></a></h6>
+<ul>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any[]></a></li>
+</ul>
+<p>当 <code>console.log()</code> 被调用时触发。接收传递给 <code>console.log()</code> 的参数数组。</p>
+</div><div>
+<h6>事件: <code>'console.info'</code><span><a class="mark" href="#-consoleinfo" id="-consoleinfo">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_console_info"></a></h6>
+<ul>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any[]></a></li>
+</ul>
+<p>当 <code>console.info()</code> 被调用时触发。接收传递给 <code>console.info()</code> 的参数数组。</p>
+</div><div>
+<h6>事件: <code>'console.debug'</code><span><a class="mark" href="#-consoledebug" id="-consoledebug">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_console_debug"></a></h6>
+<ul>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any[]></a></li>
+</ul>
+<p>当 <code>console.debug()</code> 被调用时触发。接收传递给 <code>console.debug()</code> 的参数数组。</p>
+</div><div>
+<h6>事件: <code>'console.warn'</code><span><a class="mark" href="#-consolewarn" id="-consolewarn">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_console_warn"></a></h6>
+<ul>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any[]></a></li>
+</ul>
+<p>当 <code>console.warn()</code> 被调用时触发。接收传递给 <code>console.warn()</code> 的参数数组。</p>
+</div><div>
+<h6>事件: <code>'console.error'</code><span><a class="mark" href="#-consoleerror" id="-consoleerror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_console_error"></a></h6>
+<ul>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any[]></a></li>
+</ul>
+<p>当 <code>console.error()</code> 被调用时触发。接收传递给 <code>console.error()</code> 的参数数组。</p>
+</div></div><div>
+<h5>HTTP<span><a class="mark" href="#http" id="http">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div>
+<h6>事件: <code>'http.client.request.created'</code><span><a class="mark" href="#-httpclientrequestcreated" id="-httpclientrequestcreated">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_client_request_created"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpclientrequest" class="type">&#x3C;http.ClientRequest></a></li>
+</ul>
+<p>当客户端创建请求对象时触发。
+与 <code>http.client.request.start</code> 不同，此事件在请求发送之前触发。</p>
+</div><div>
+<h6>事件: <code>'http.client.request.start'</code><span><a class="mark" href="#-httpclientrequeststart" id="-httpclientrequeststart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_client_request_start"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpclientrequest" class="type">&#x3C;http.ClientRequest></a></li>
+</ul>
+<p>当客户端开始请求时触发。</p>
+</div><div>
+<h6>事件: <code>'http.client.request.error'</code><span><a class="mark" href="#-httpclientrequesterror" id="-httpclientrequesterror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_client_request_error"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpclientrequest" class="type">&#x3C;http.ClientRequest></a></li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>当客户端请求期间发生错误时触发。</p>
+</div><div>
+<h6>事件: <code>'http.client.response.finish'</code><span><a class="mark" href="#-httpclientresponsefinish" id="-httpclientresponsefinish">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_client_response_finish"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpclientrequest" class="type">&#x3C;http.ClientRequest></a></li>
+<li><code>response</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a></li>
+</ul>
+<p>当客户端收到响应时触发。</p>
+</div><div>
+<h6>事件: <code>'http.server.request.start'</code><span><a class="mark" href="#-httpserverrequeststart" id="-httpserverrequeststart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_server_request_start"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a></li>
+<li><code>response</code> <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a></li>
+<li><code>socket</code> <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a></li>
+<li><code>server</code> <a href="http.html#class-httpserver" class="type">&#x3C;http.Server></a></li>
+</ul>
+<p>当服务器收到请求时触发。</p>
+</div><div>
+<h6>事件: <code>'http.server.response.created'</code><span><a class="mark" href="#-httpserverresponsecreated" id="-httpserverresponsecreated">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_server_response_created"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a></li>
+<li><code>response</code> <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a></li>
+</ul>
+<p>当服务器创建响应时触发。
+此事件在响应发送之前触发。</p>
+</div><div>
+<h6>事件: <code>'http.server.response.finish'</code><span><a class="mark" href="#-httpserverresponsefinish" id="-httpserverresponsefinish">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_server_response_finish"></a></h6>
+<ul>
+<li><code>request</code> <a href="http.html#class-httpincomingmessage" class="type">&#x3C;http.IncomingMessage></a></li>
+<li><code>response</code> <a href="http.html#class-httpserverresponse" class="type">&#x3C;http.ServerResponse></a></li>
+<li><code>socket</code> <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a></li>
+<li><code>server</code> <a href="http.html#class-httpserver" class="type">&#x3C;http.Server></a></li>
+</ul>
+<p>当服务器发送响应时触发。</p>
+</div></div><div>
+<h5>HTTP/2<span><a class="mark" href="#http2" id="http2">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http_2"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div>
+<h6>事件: <code>'http2.client.stream.created'</code><span><a class="mark" href="#-http2clientstreamcreated" id="-http2clientstreamcreated">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_client_stream_created"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-clienthttp2stream" class="type">&#x3C;ClientHttp2Stream></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+</ul>
+<p>当在客户端创建流时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.client.stream.start'</code><span><a class="mark" href="#-http2clientstreamstart" id="-http2clientstreamstart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_client_stream_start"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-clienthttp2stream" class="type">&#x3C;ClientHttp2Stream></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+</ul>
+<p>当在客户端启动流时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.client.stream.error'</code><span><a class="mark" href="#-http2clientstreamerror" id="-http2clientstreamerror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_client_stream_error"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-clienthttp2stream" class="type">&#x3C;ClientHttp2Stream></a></li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>当在客户端处理流期间发生错误时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.client.stream.finish'</code><span><a class="mark" href="#-http2clientstreamfinish" id="-http2clientstreamfinish">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_client_stream_finish"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-clienthttp2stream" class="type">&#x3C;ClientHttp2Stream></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+<li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>当在客户端收到流时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.client.stream.close'</code><span><a class="mark" href="#-http2clientstreamclose" id="-http2clientstreamclose">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_client_stream_close"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-clienthttp2stream" class="type">&#x3C;ClientHttp2Stream></a></li>
+</ul>
+<p>当在客户端关闭流时触发。关闭流时使用的 HTTP/2 错误代码可以使用 <code>stream.rstCode</code> 属性检索。</p>
+</div><div>
+<h6>事件: <code>'http2.server.stream.created'</code><span><a class="mark" href="#-http2serverstreamcreated" id="-http2serverstreamcreated">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_server_stream_created"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-serverhttp2stream" class="type">&#x3C;ServerHttp2Stream></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+</ul>
+<p>当在服务器创建流时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.server.stream.start'</code><span><a class="mark" href="#-http2serverstreamstart" id="-http2serverstreamstart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_server_stream_start"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-serverhttp2stream" class="type">&#x3C;ServerHttp2Stream></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+</ul>
+<p>当在服务器启动流时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.server.stream.error'</code><span><a class="mark" href="#-http2serverstreamerror" id="-http2serverstreamerror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_server_stream_error"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-serverhttp2stream" class="type">&#x3C;ServerHttp2Stream></a></li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>当在服务器处理流期间发生错误时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.server.stream.finish'</code><span><a class="mark" href="#-http2serverstreamfinish" id="-http2serverstreamfinish">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_server_stream_finish"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-serverhttp2stream" class="type">&#x3C;ServerHttp2Stream></a></li>
+<li><code>headers</code> <a href="http2.html#headers-object" class="type">&#x3C;HTTP/2 Headers Object></a></li>
+<li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>当在服务器发送流时触发。</p>
+</div><div>
+<h6>事件: <code>'http2.server.stream.close'</code><span><a class="mark" href="#-http2serverstreamclose" id="-http2serverstreamclose">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_http2_server_stream_close"></a></h6>
+<ul>
+<li><code>stream</code> <a href="http2.html#class-serverhttp2stream" class="type">&#x3C;ServerHttp2Stream></a></li>
+</ul>
+<p>当在服务器关闭流时触发。关闭流时使用的 HTTP/2 错误代码可以使用 <code>stream.rstCode</code> 属性检索。</p>
+</div></div><div>
+<h5>Modules<span><a class="mark" href="#modules" id="modules">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_modules"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div>
+<h6>事件: <code>'module.require.start'</code><span><a class="mark" href="#-modulerequirestart" id="-modulerequirestart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_module_require_start"></a></h6>
+<ul>
+<li><code>event</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含以下属性
+<ul>
+<li><code>id</code> 传递给 <code>require()</code> 的参数。模块名称。</li>
+<li><code>parentFilename</code> 尝试 require(id) 的模块名称。</li>
+</ul>
+</li>
+</ul>
+<p>当 <code>require()</code> 执行时触发。参见 <a href="#startevent"><code>start</code> event</a>。</p>
+</div><div>
+<h6>事件: <code>'module.require.end'</code><span><a class="mark" href="#-modulerequireend" id="-modulerequireend">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_module_require_end"></a></h6>
+<ul>
+<li><code>event</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含以下属性
+<ul>
+<li><code>id</code> 传递给 <code>require()</code> 的参数。模块名称。</li>
+<li><code>parentFilename</code> 尝试 require(id) 的模块名称。</li>
+</ul>
+</li>
+</ul>
+<p>当 <code>require()</code> 调用返回时触发。参见 <a href="#endevent"><code>end</code> event</a>。</p>
+</div><div>
+<h6>事件: <code>'module.require.error'</code><span><a class="mark" href="#-modulerequireerror" id="-modulerequireerror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_module_require_error"></a></h6>
+<ul>
+<li><code>event</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含以下属性
+<ul>
+<li><code>id</code> 传递给 <code>require()</code> 的参数。模块名称。</li>
+<li><code>parentFilename</code> 尝试 require(id) 的模块名称。</li>
+</ul>
+</li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>当 <code>require()</code> 抛出错误时触发。参见 <a href="#errorevent"><code>error</code> event</a>。</p>
+</div><div>
+<h6>事件: <code>'module.import.asyncStart'</code><span><a class="mark" href="#-moduleimportasyncstart" id="-moduleimportasyncstart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_module_import_asyncstart"></a></h6>
+<ul>
+<li><code>event</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含以下属性
+<ul>
+<li><code>id</code> 传递给 <code>import()</code> 的参数。模块名称。</li>
+<li><code>parentURL</code> 尝试 import(id) 的模块的 URL 对象。</li>
+</ul>
+</li>
+</ul>
+<p>当 <code>import()</code> 被调用时触发。参见 <a href="#asyncstartevent"><code>asyncStart</code> event</a>。</p>
+</div><div>
+<h6>事件: <code>'module.import.asyncEnd'</code><span><a class="mark" href="#-moduleimportasyncend" id="-moduleimportasyncend">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_module_import_asyncend"></a></h6>
+<ul>
+<li><code>event</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含以下属性
+<ul>
+<li><code>id</code> 传递给 <code>import()</code> 的参数。模块名称。</li>
+<li><code>parentURL</code> 尝试 import(id) 的模块的 URL 对象。</li>
+</ul>
+</li>
+</ul>
+<p>当 <code>import()</code> 完成时触发。参见 <a href="#asyncendevent"><code>asyncEnd</code> event</a>。</p>
+</div><div>
+<h6>事件: <code>'module.import.error'</code><span><a class="mark" href="#-moduleimporterror" id="-moduleimporterror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_module_import_error"></a></h6>
+<ul>
+<li><code>event</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含以下属性
+<ul>
+<li><code>id</code> 传递给 <code>import()</code> 的参数。模块名称。</li>
+<li><code>parentURL</code> 尝试 import(id) 的模块的 URL 对象。</li>
+</ul>
+</li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>当 <code>import()</code> 抛出错误时触发。参见 <a href="#errorevent"><code>error</code> event</a>。</p>
+</div></div><div>
+<h5>NET<span><a class="mark" href="#net" id="net">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_net"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div>
+<h6>事件: <code>'net.client.socket'</code><span><a class="mark" href="#-netclientsocket" id="-netclientsocket">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_net_client_socket"></a></h6>
+<ul>
+<li><code>socket</code> <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a> | <a href="tls.html#class-tlstlssocket" class="type">&#x3C;tls.TLSSocket></a></li>
+</ul>
+<p>当创建新的 TCP 或管道客户端套接字连接时触发。</p>
+</div><div>
+<h6>事件: <code>'net.server.socket'</code><span><a class="mark" href="#-netserversocket" id="-netserversocket">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_net_server_socket"></a></h6>
+<ul>
+<li><code>socket</code> <a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a></li>
+</ul>
+<p>当收到新的 TCP 或管道连接时触发。</p>
+</div><div>
+<h6>事件: <code>'tracing:net.server.listen:asyncStart'</code><span><a class="mark" href="#-tracingnetserverlistenasyncstart" id="-tracingnetserverlistenasyncstart">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracing_net_server_listen_asyncstart"></a></h6>
+<ul>
+<li><code>server</code> <a href="net.html#class-netserver" class="type">&#x3C;net.Server></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>当调用 <a href="net.html#serverlisten"><code>net.Server.listen()</code></a> 时触发，在实际设置端口或管道之前。</p>
+</div><div>
+<h6>事件: <code>'tracing:net.server.listen:asyncEnd'</code><span><a class="mark" href="#-tracingnetserverlistenasyncend" id="-tracingnetserverlistenasyncend">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracing_net_server_listen_asyncend"></a></h6>
+<ul>
+<li><code>server</code> <a href="net.html#class-netserver" class="type">&#x3C;net.Server></a></li>
+</ul>
+<p>当 <a href="net.html#serverlisten"><code>net.Server.listen()</code></a> 完成并且服务器准备好接受连接时触发。</p>
+</div><div>
+<h6>事件: <code>'tracing:net.server.listen:error'</code><span><a class="mark" href="#-tracingnetserverlistenerror" id="-tracingnetserverlistenerror">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_tracing_net_server_listen_error"></a></h6>
+<ul>
+<li><code>server</code> <a href="net.html#class-netserver" class="type">&#x3C;net.Server></a></li>
+<li><code>error</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error" class="type">&#x3C;Error></a></li>
+</ul>
+<p>当 <a href="net.html#serverlisten"><code>net.Server.listen()</code></a> 返回错误时触发。</p>
+</div></div><div>
+<h5>UDP<span><a class="mark" href="#udp" id="udp">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_udp"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div>
+<h6>事件: <code>'udp.socket'</code><span><a class="mark" href="#-udpsocket" id="-udpsocket">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_udp_socket"></a></h6>
+<ul>
+<li><code>socket</code> <a href="dgram.html#class-dgramsocket" class="type">&#x3C;dgram.Socket></a></li>
+</ul>
+<p>当创建新的 UDP 套接字时触发。</p>
+</div></div><div>
+<h5>Process<span><a class="mark" href="#process" id="process">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_process"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div class="api_metadata">
+<span>Added in: v16.18.0</span>
+</div>
+<div>
+<h6>事件: <code>'child_process'</code><span><a class="mark" href="#-child_process" id="-child_process">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_child_process"></a></h6>
+<ul>
+<li><code>process</code> <a href="child_process.html#class-childprocess" class="type">&#x3C;ChildProcess></a></li>
+</ul>
+<p>当创建新进程时触发。</p>
+</div><div>
+<h6>事件: <code>'execve'</code><span><a class="mark" href="#-execve" id="-execve">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_execve"></a></h6>
+<ul>
+<li><code>execPath</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>当调用 <a href="process.html#processexecvefile-args-env"><code>process.execve()</code></a> 时触发。</p>
+</div></div><div>
+<h5>Worker Thread<span><a class="mark" href="#worker-thread" id="worker-thread">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_worker_thread"></a></h5>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<div class="api_metadata">
+<span>Added in: v16.18.0</span>
+</div>
+<div>
+<h6>事件: <code>'worker_threads'</code><span><a class="mark" href="#-worker_threads" id="-worker_threads">#</a></span><a aria-hidden="true" class="legacy" id="diagnostics_channel_worker_threads"></a></h6>
+<ul>
+<li><code>worker</code> <a href="worker_threads.html#class-worker" class="type">&#x3C;Worker></a></li>
+</ul>
+<p>当创建新线程时触发。</p></div></div></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

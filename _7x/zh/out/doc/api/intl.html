@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>国际化支持 | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/intl.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  
+</head>
+<body class="alt apidoc" id="api-section-intl">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl active">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="intl" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><a href="#">国际化支持</a>
+<ul>
+<li><a href="#-nodejs-">构建 Node.js 的选项</a>
+<ul>
+<li><a href="#none">禁用所有国际化功能（<code>none</code>）</a></li>
+<li><a href="#-icu-system-icu">使用预安装的 ICU 构建（<code>system-icu</code>）</a></li>
+<li><a href="#-icu-small-icu">嵌入有限的 ICU 数据集（<code>small-icu</code>）</a>
+<ul>
+<li><a href="#-icu-">在运行时提供 ICU 数据</a></li>
+</ul>
+</li>
+<li><a href="#-icufull-icu">嵌入完整的 ICU（<code>full-icu</code>）</a></li>
+</ul>
+</li>
+<li><a href="#_1">检测国际化支持</a></li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl active">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/intl.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/intl.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/intl.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/intl.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/intl.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/intl.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/intl.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/intl.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/intl.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/intl.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/intl.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/intl.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/intl.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/intl.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/intl.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/intl.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/intl.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/intl.html">8.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="intl.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/intl.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><a href="#">国际化支持</a>
+<ul>
+<li><a href="#-nodejs-">构建 Node.js 的选项</a>
+<ul>
+<li><a href="#none">禁用所有国际化功能（<code>none</code>）</a></li>
+<li><a href="#-icu-system-icu">使用预安装的 ICU 构建（<code>system-icu</code>）</a></li>
+<li><a href="#-icu-small-icu">嵌入有限的 ICU 数据集（<code>small-icu</code>）</a>
+<ul>
+<li><a href="#-icu-">在运行时提供 ICU 数据</a></li>
+</ul>
+</li>
+<li><a href="#-icufull-icu">嵌入完整的 ICU（<code>full-icu</code>）</a></li>
+</ul>
+</li>
+<li><a href="#_1">检测国际化支持</a></li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>国际化支持<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="intl"></a></h2>
+
+
+<p>Node.js 拥有许多特性，使得编写国际化程序更加容易。其中一些包括：</p>
+<ul>
+<li><a href="https://tc39.github.io/ecma262/">ECMAScript 语言规范</a>中的区域敏感或 Unicode 感知函数：
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize"><code>String.prototype.normalize()</code></a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase"><code>String.prototype.toLowerCase()</code></a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase"><code>String.prototype.toUpperCase()</code></a></li>
+</ul>
+</li>
+<li><a href="https://tc39.github.io/ecma402/">ECMAScript 国际化 API 规范</a>（又称 ECMA-402）中描述的所有功能：
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl"><code>Intl</code></a> 对象</li>
+<li>区域敏感的方法，如 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare"><code>String.prototype.localeCompare()</code></a> 和 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString"><code>Date.prototype.toLocaleString()</code></a></li>
+</ul>
+</li>
+<li>[WHATWG URL 解析器][]的<a href="https://en.wikipedia.org/wiki/Internationalized_domain_name">国际化域名</a>（IDNs）支持</li>
+<li><a href="buffer.html#buffertranscodesource-fromenc-toenc"><code>require('node:buffer').transcode()</code></a></li>
+<li>更准确的 <a href="repl.html#repl">REPL</a> 行编辑</li>
+<li><a href="util.html#class-utiltextdecoder"><code>require('node:util').TextDecoder</code></a></li>
+<li><a href="https://github.com/tc39/proposal-regexp-unicode-property-escapes"><code>RegExp</code> Unicode 属性转义</a></li>
+</ul>
+<p>Node.js 和底层的 V8 引擎使用 <a href="http://site.icu-project.org/">Unicode 国际化组件（ICU）</a> 在原生 C/C++ 代码中实现这些功能。Node.js 默认提供了完整的 ICU 数据集。但是，由于 ICU 数据文件的大小，提供了几个选项用于在构建或运行 Node.js 时自定义 ICU 数据集。</p>
+<section><h3>构建 Node.js 的选项<span><a class="mark" href="#-nodejs-" id="-nodejs-">#</a></span><a aria-hidden="true" class="legacy" id="intl_node_js"></a></h3>
+<p>为了控制 ICU 在 Node.js 中的使用，编译期间提供了四个 <code>configure</code> 选项。关于如何编译 Node.js 的更多细节记录在 <a href="https://github.com/nodejs/node/blob/HEAD/BUILDING.md">BUILDING.md</a> 中。</p>
+<ul>
+<li><code>--with-intl=none</code> / <code>--without-intl</code></li>
+<li><code>--with-intl=system-icu</code></li>
+<li><code>--with-intl=small-icu</code></li>
+<li><code>--with-intl=full-icu</code>（默认）</li>
+</ul>
+<p>每个 <code>configure</code> 选项可用的 Node.js 和 JavaScript 功能概述：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>功能</th><th><code>none</code></th><th><code>system-icu</code></th><th><code>small-icu</code></th><th><code>full-icu</code></th></tr></thead><tbody><tr><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize"><code>String.prototype.normalize()</code></a></td><td>无（函数为空操作）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><code>String.prototype.to*Case()</code></td><td>完整</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl"><code>Intl</code></a></td><td>无（对象不存在）</td><td>部分/完整（取决于操作系统）</td><td>部分（仅英文）</td><td>完整</td></tr><tr><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare"><code>String.prototype.localeCompare()</code></a></td><td>部分（非区域敏感）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><code>String.prototype.toLocale*Case()</code></td><td>部分（非区域敏感）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString"><code>Number.prototype.toLocaleString()</code></a></td><td>部分（非区域敏感）</td><td>部分/完整（取决于操作系统）</td><td>部分（仅英文）</td><td>完整</td></tr><tr><td><code>Date.prototype.toLocale*String()</code></td><td>部分（非区域敏感）</td><td>部分/完整（取决于操作系统）</td><td>部分（仅英文）</td><td>完整</td></tr><tr><td><a href="url.html#legacy-url-api">旧版 URL 解析器</a></td><td>部分（无 IDN 支持）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td>[WHATWG URL 解析器][]</td><td>部分（无 IDN 支持）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><a href="buffer.html#buffertranscodesource-fromenc-toenc"><code>require('node:buffer').transcode()</code></a></td><td>无（函数不存在）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><a href="repl.html#repl">REPL</a></td><td>部分（行编辑不准确）</td><td>完整</td><td>完整</td><td>完整</td></tr><tr><td><a href="util.html#class-utiltextdecoder"><code>require('node:util').TextDecoder</code></a></td><td>部分（基本编码支持）</td><td>部分/完整（取决于操作系统）</td><td>部分（仅 Unicode）</td><td>完整</td></tr><tr><td>[<code>RegExp</code> Unicode 属性转义][]</td><td>无（无效的 <code>RegExp</code> 错误）</td><td>完整</td><td>完整</td><td>完整</td></tr></tbody></table>
+<p>"（非区域敏感）" 标识表示该函数的操作方式与非 <code>Locale</code> 版本的函数相同（如果存在）。例如，在 <code>none</code> 模式下，<code>Date.prototype.toLocaleString()</code> 的操作与 <code>Date.prototype.toString()</code> 相同。</p>
+<div>
+<h4>禁用所有国际化功能（<code>none</code>）<span><a class="mark" href="#none" id="none">#</a></span><a aria-hidden="true" class="legacy" id="intl_none"></a></h4>
+<p>如果选择此选项，ICU 将被禁用，并且上述大多数国际化功能在生成的 <code>node</code> 二进制文件中将<strong>不可用</strong>。</p>
+</div><div>
+<h4>使用预安装的 ICU 构建（<code>system-icu</code>）<span><a class="mark" href="#-icu-system-icu" id="-icu-system-icu">#</a></span><a aria-hidden="true" class="legacy" id="intl_icu_system_icu"></a></h4>
+<p>Node.js 可以链接到系统上已安装的 ICU 构建。事实上，大多数 Linux 发行版已经附带了 ICU，此选项使得可以重复使用操作系统中其他组件使用的同一组数据。</p>
+<p>仅需要 ICU 库本身的功能，例如 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize"><code>String.prototype.normalize()</code></a> 和 [WHATWG URL 解析器][]，在 <code>system-icu</code> 下完全支持。需要 ICU 区域数据的特性，例如 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat"><code>Intl.DateTimeFormat</code></a>，<em>可能</em>完全或部分支持，具体取决于系统上安装的 ICU 数据的完整性。</p>
+</div><div>
+<h4>嵌入有限的 ICU 数据集（<code>small-icu</code>）<span><a class="mark" href="#-icu-small-icu" id="-icu-small-icu">#</a></span><a aria-hidden="true" class="legacy" id="intl_icu_small_icu"></a></h4>
+<p>此选项使得生成的二进制文件静态链接到 ICU 库，并在 <code>node</code> 可执行文件中包含一个 ICU 数据子集（通常仅包含英文区域设置）。</p>
+<p>仅需要 ICU 库本身的功能，例如 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize"><code>String.prototype.normalize()</code></a> 和 [WHATWG URL 解析器][]，在 <code>small-icu</code> 下完全支持。需要额外 ICU 区域数据的特性，例如 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat"><code>Intl.DateTimeFormat</code></a>，通常仅适用于英文区域设置：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> january = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(<span class="hljs-number">9e8</span>);
+<span class="hljs-keyword">const</span> english = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Intl</span>.<span class="hljs-title class_">DateTimeFormat</span>(<span class="hljs-string">'en'</span>, { <span class="hljs-attr">month</span>: <span class="hljs-string">'long'</span> });
+<span class="hljs-keyword">const</span> spanish = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Intl</span>.<span class="hljs-title class_">DateTimeFormat</span>(<span class="hljs-string">'es'</span>, { <span class="hljs-attr">month</span>: <span class="hljs-string">'long'</span> });
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(english.<span class="hljs-title function_">format</span>(january));
+<span class="hljs-comment">// 打印 "January"</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(spanish.<span class="hljs-title function_">format</span>(january));
+<span class="hljs-comment">// 在 small-icu 上，根据用户的默认区域设置，打印 "M01" 或 "January"</span>
+<span class="hljs-comment">// 应该打印 "enero"</span></code> <button class="copy-button">copy</button></pre>
+<p>此模式在功能和二进制大小之间提供了平衡。</p>
+<div>
+<h5>在运行时提供 ICU 数据<span><a class="mark" href="#-icu-" id="-icu-">#</a></span><a aria-hidden="true" class="legacy" id="intl_icu"></a></h5>
+<p>如果使用了 <code>small-icu</code> 选项，仍然可以在运行时提供额外的区域数据，以便 JS 方法适用于所有 ICU 区域设置。假设数据文件存储在 <code>/runtime/directory/with/dat/file</code>，可以通过以下任一方式使其对 ICU 可用：</p>
+<ul>
+<li>
+<p><code>--with-icu-default-data-dir</code> 配置选项：</p>
+<pre><code class="language-bash">./configure --with-icu-default-data-dir=/runtime/directory/with/dat/file --with-intl=small-icu</code> <button class="copy-button">copy</button></pre>
+<p>这仅将默认数据目录路径嵌入到二进制文件中。实际的数据文件将在运行时从这个目录路径加载。</p>
+</li>
+<li>
+<p><a href="cli.html#node_icu_datafile"><code>NODE_ICU_DATA</code></a> 环境变量：</p>
+<pre><code class="language-bash"><span class="hljs-built_in">env</span> NODE_ICU_DATA=/runtime/directory/with/dat/file node</code> <button class="copy-button">copy</button></pre>
+</li>
+<li>
+<p><a href="cli.html#--icu-data-dirfile"><code>--icu-data-dir</code></a> 命令行参数：</p>
+<pre><code class="language-bash">node --icu-data-dir=/runtime/directory/with/dat/file</code> <button class="copy-button">copy</button></pre>
+</li>
+</ul>
+<p>当指定了多个选项时，<code>--icu-data-dir</code> 命令行参数的优先级最高，其次是 <code>NODE_ICU_DATA</code> 环境变量，然后是 <code>--with-icu-default-data-dir</code> 配置选项。</p>
+<p>ICU 能够自动查找和加载多种数据格式，但数据必须适用于 ICU 版本，并且文件名必须正确。数据文件最常见的名称是 <code>icudtX[bl].dat</code>，其中 <code>X</code> 表示目标 ICU 版本，<code>b</code> 或 <code>l</code> 表示系统的字节序。如果无法从指定目录读取预期的数据文件，Node.js 将加载失败。与当前 Node.js 版本对应的数据文件名可以通过以下方式计算：</p>
+<pre><code class="language-js"><span class="hljs-string">`icudt<span class="hljs-subst">${process.versions.icu.split(<span class="hljs-string">'.'</span>)[<span class="hljs-number">0</span>]}</span><span class="hljs-subst">${os.endianness()[<span class="hljs-number">0</span>].toLowerCase()}</span>.dat`</span>;</code> <button class="copy-button">copy</button></pre>
+<p>有关其他支持的格式以及 ICU 数据的一般更多详细信息，请查看 ICU 用户指南中的 <a href="http://userguide.icu-project.org/icudata">"ICU Data"</a> 文章。</p>
+<p><a href="https://www.npmjs.com/package/full-icu">full-icu</a> npm 模块可以极大地简化 ICU 数据安装，通过检测正在运行的 <code>node</code> 可执行文件的 ICU 版本并下载相应的数据文件。通过 <code>npm i full-icu</code> 安装模块后，数据文件将位于 <code>./node_modules/full-icu</code>。然后，可以将此路径传递给 <code>NODE_ICU_DATA</code> 或 <code>--icu-data-dir</code>，如上所示，以启用完整的 <code>Intl</code> 支持。</p>
+</div></div><div>
+<h4>嵌入完整的 ICU（<code>full-icu</code>）<span><a class="mark" href="#-icufull-icu" id="-icufull-icu">#</a></span><a aria-hidden="true" class="legacy" id="intl_icu_full_icu"></a></h4>
+<p>此选项使得生成的二进制文件静态链接到 ICU 并包含完整的 ICU 数据集。以这种方式创建的二进制文件没有进一步的外部依赖，并支持所有区域设置，但可能相当大。如果未传递 <code>--with-intl</code> 标志，这是默认行为。官方二进制文件也是以此模式构建的。</p>
+</div>
+</section><section><h3>检测国际化支持<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="intl_1"></a></h3>
+<p>要验证 ICU 是否已启用（<code>system-icu</code>、<code>small-icu</code> 或 <code>full-icu</code>），只需检查 <code>Intl</code> 的存在就足够了：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> hasICU = <span class="hljs-keyword">typeof</span> <span class="hljs-title class_">Intl</span> === <span class="hljs-string">'object'</span>;</code> <button class="copy-button">copy</button></pre>
+<p>或者，检查 <code>process.versions.icu</code>（仅在启用 ICU 时定义的属性）也可以：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> hasICU = <span class="hljs-keyword">typeof</span> process.<span class="hljs-property">versions</span>.<span class="hljs-property">icu</span> === <span class="hljs-string">'string'</span>;</code> <button class="copy-button">copy</button></pre>
+<p>要检查对非英语区域设置的支持（即 <code>full-icu</code> 或 <code>system-icu</code>），<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat"><code>Intl.DateTimeFormat</code></a> 可以是一个很好的区分因素：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> hasFullICU = (<span class="hljs-function">() =></span> {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> january = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>(<span class="hljs-number">9e8</span>);
+    <span class="hljs-keyword">const</span> spanish = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Intl</span>.<span class="hljs-title class_">DateTimeFormat</span>(<span class="hljs-string">'es'</span>, { <span class="hljs-attr">month</span>: <span class="hljs-string">'long'</span> });
+    <span class="hljs-keyword">return</span> spanish.<span class="hljs-title function_">format</span>(january) === <span class="hljs-string">'enero'</span>;
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+  }
+})();</code> <button class="copy-button">copy</button></pre>
+<p>对于更详细的 <code>Intl</code> 支持测试，以下资源可能会有所帮助：</p>
+<ul>
+<li><a href="https://github.com/srl295/btest402">btest402</a>：通常用于检查是否正确构建了支持 <code>Intl</code> 的 Node.js。</li>
+<li><a href="https://github.com/tc39/test262/tree/HEAD/test/intl402">Test262</a>：ECMAScript 的官方一致性测试套件包含一个专门针对 ECMA-402 的部分。</li>
+</ul></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

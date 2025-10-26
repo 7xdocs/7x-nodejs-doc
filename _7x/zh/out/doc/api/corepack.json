@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "source": "doc/api/corepack.md",
+  "introduced_in": "v14.19.0",
+  "meta": {
+    "added": [
+      "v16.9.0",
+      "v14.19.0"
+    ],
+    "changes": []
+  },
+  "stability": 1,
+  "stabilityText": "实验性",
+  "miscs": [
+    {
+      "textRaw": "Corepack",
+      "name": "Corepack",
+      "introduced_in": "v14.19.0",
+      "type": "misc",
+      "meta": {
+        "added": [
+          "v16.9.0",
+          "v14.19.0"
+        ],
+        "changes": []
+      },
+      "stability": 1,
+      "stabilityText": "实验性",
+      "desc": "<p><strong>从Node.js v25开始，Corepack将不再随附分发。</strong></p>\n<p>目前依赖Node.js中捆绑的<code>corepack</code>可执行文件的用户，可以切换到使用用户区提供的<a href=\"https://github.com/nodejs/corepack\">corepack</a>模块。</p>"
+    }
+  ]
+}

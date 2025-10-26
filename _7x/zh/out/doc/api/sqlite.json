@@ -1,0 +1,1475 @@
+{
+  "type": "module",
+  "source": "doc/api/sqlite.md",
+  "modules": [
+    {
+      "textRaw": "SQLite",
+      "name": "sqlite",
+      "introduced_in": "v22.5.0",
+      "meta": {
+        "added": [
+          "v22.5.0"
+        ],
+        "changes": []
+      },
+      "stability": 1,
+      "stabilityText": ".1 - Active development.",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/sqlite.js\">lib/sqlite.js</a></p>\n<p><code>node:sqlite</code> 模块用于操作 SQLite 数据库。\n可以通过以下方式访问它：</p>\n<pre><code class=\"language-mjs\">import sqlite from 'node:sqlite';\n</code></pre>\n<pre><code class=\"language-cjs\">const sqlite = require('node:sqlite');\n</code></pre>\n<p>此模块仅在 <code>node:</code> 方案下可用。</p>\n<p>以下示例展示了使用 <code>node:sqlite</code> 模块打开一个内存数据库、向数据库写入数据，然后读取数据的基本用法。</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { DatabaseSync } = require('node:sqlite');\nconst database = new DatabaseSync(':memory:');\n\n// Execute SQL statements from strings.\ndatabase.exec(`\n  CREATE TABLE data(\n    key INTEGER PRIMARY KEY,\n    value TEXT\n  ) STRICT\n`);\n// Create a prepared statement to insert data into the database.\nconst insert = database.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\n// Execute the prepared statement with bound values.\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n// Create a prepared statement to read data from the database.\nconst query = database.prepare('SELECT * FROM data ORDER BY key');\n// Execute the prepared statement and log the result set.\nconsole.log(query.all());\n// Prints: [ { key: 1, value: 'hello' }, { key: 2, value: 'world' } ]\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "类：`DatabaseSync`",
+          "name": "类：`databasesync`",
+          "meta": {
+            "added": [
+              "v22.5.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57752",
+                "description": "Add `timeout` option."
+              },
+              {
+                "version": [
+                  "v23.10.0",
+                  "v22.15.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/56991",
+                "description": "The `path` argument now supports Buffer and URL objects."
+              }
+            ]
+          },
+          "desc": "<p>此类表示与 SQLite 数据库的单个[连接][]。此类暴露的所有 API 都是同步执行的。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new DatabaseSync(path[, options])`",
+              "type": "ctor",
+              "name": "DatabaseSync",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58697",
+                    "description": "Add new SQLite database options."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`path` {string | Buffer | URL} 数据库的路径。SQLite 数据库可以存储在文件中或完全[内存中][]。要使用文件支持的数据库，路径应为文件路径。要使用内存数据库，路径应为特殊名称 `':memory:'`。",
+                      "name": "path",
+                      "type": "string | Buffer | URL",
+                      "desc": "数据库的路径。SQLite 数据库可以存储在文件中或完全[内存中][]。要使用文件支持的数据库，路径应为文件路径。要使用内存数据库，路径应为特殊名称 `':memory:'`。"
+                    },
+                    {
+                      "textRaw": "`options` {Object} 数据库连接的配置选项。支持以下选项：",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "数据库连接的配置选项。支持以下选项：",
+                      "options": [
+                        {
+                          "textRaw": "`open` {boolean} 如果为 `true`，数据库由构造函数打开。当此值为 `false` 时，必须通过 `open()` 方法打开数据库。**默认值:** `true`。",
+                          "name": "open",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，数据库由构造函数打开。当此值为 `false` 时，必须通过 `open()` 方法打开数据库。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`readOnly` {boolean} 如果为 `true`，数据库以只读模式打开。如果数据库不存在，打开操作将失败。**默认值:** `false`。",
+                          "name": "readOnly",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，数据库以只读模式打开。如果数据库不存在，打开操作将失败。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`enableForeignKeyConstraints` {boolean} 如果为 `true`，则启用外键约束。推荐启用，但为了兼容旧版数据库模式可以禁用它。外键约束的强制执行可以在打开数据库后使用 [`PRAGMA foreign_keys`][] 来启用和禁用。**默认值:** `true`。",
+                          "name": "enableForeignKeyConstraints",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，则启用外键约束。推荐启用，但为了兼容旧版数据库模式可以禁用它。外键约束的强制执行可以在打开数据库后使用 [`PRAGMA foreign_keys`][] 来启用和禁用。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`enableDoubleQuotedStringLiterals` {boolean} 如果为 `true`，SQLite 将接受[双引号字符串字面量][]。不推荐启用，但为了兼容旧版数据库模式可以启用。**默认值:** `false`。",
+                          "name": "enableDoubleQuotedStringLiterals",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，SQLite 将接受[双引号字符串字面量][]。不推荐启用，但为了兼容旧版数据库模式可以启用。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`allowExtension` {boolean} 如果为 `true`，则启用 `loadExtension` SQL 函数和 `loadExtension()` 方法。之后可以调用 `enableLoadExtension(false)` 来禁用此功能。**默认值:** `false`。",
+                          "name": "allowExtension",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，则启用 `loadExtension` SQL 函数和 `loadExtension()` 方法。之后可以调用 `enableLoadExtension(false)` 来禁用此功能。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`timeout` {number} [繁忙超时][]时间，以毫秒为单位。这是 SQLite 在返回错误之前等待数据库锁释放的最长时间。**默认值:** `0`。",
+                          "name": "timeout",
+                          "type": "number",
+                          "desc": "[繁忙超时][]时间，以毫秒为单位。这是 SQLite 在返回错误之前等待数据库锁释放的最长时间。**默认值:** `0`。"
+                        },
+                        {
+                          "textRaw": "`readBigInts` {boolean} 如果为 `true`，整数字段将作为 JavaScript `BigInt` 值读取。如果为 `false`，整数字段将作为 JavaScript 数字读取。**默认值:** `false`。",
+                          "name": "readBigInts",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，整数字段将作为 JavaScript `BigInt` 值读取。如果为 `false`，整数字段将作为 JavaScript 数字读取。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`returnArrays` {boolean} 如果为 `true`，查询结果将以数组形式返回，而不是对象。**默认值:** `false`。",
+                          "name": "returnArrays",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，查询结果将以数组形式返回，而不是对象。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`allowBareNamedParameters` {boolean} 如果为 `true`，允许绑定不带前缀字符的命名参数（例如，使用 `foo` 而不是 `:foo`）。**默认值:** `true`。",
+                          "name": "allowBareNamedParameters",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，允许绑定不带前缀字符的命名参数（例如，使用 `foo` 而不是 `:foo`）。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`allowUnknownNamedParameters` {boolean} 如果为 `true`，绑定命名参数时忽略未知参数。如果为 `false`，对于未知命名参数会抛出异常。**默认值:** `false`。",
+                          "name": "allowUnknownNamedParameters",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，绑定命名参数时忽略未知参数。如果为 `false`，对于未知命名参数会抛出异常。**默认值:** `false`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>构造一个新的 <code>DatabaseSync</code> 实例。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`database.aggregate(name, options)`",
+              "type": "method",
+              "name": "aggregate",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>向 SQLite 数据库注册一个新的聚合函数。此方法是 <a href=\"https://www.sqlite.org/c3ref/create_function.html\"><code>sqlite3_create_window_function()</code></a> 的封装。</p>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 要创建的 SQLite 函数的名称。</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 函数配置设置。\n<ul>\n<li><code>deterministic</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 如果为 <code>true</code>，则在创建的函数上设置 <a href=\"https://www.sqlite.org/c3ref/c_deterministic.html\"><code>SQLITE_DETERMINISTIC</code></a> 标志。<strong>默认值:</strong> <code>false</code>。</li>\n<li><code>directOnly</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 如果为 <code>true</code>，则在创建的函数上设置 <a href=\"https://www.sqlite.org/c3ref/c_deterministic.html\"><code>SQLITE_DIRECTONLY</code></a> 标志。<strong>默认值:</strong> <code>false</code>。</li>\n<li><code>useBigIntArguments</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 如果为 <code>true</code>，传递给 <code>options.step</code> 和 <code>options.inverse</code> 的整数参数将转换为 <code>BigInt</code>。如果为 <code>false</code>，整数参数将作为 JavaScript 数字传递。<strong>默认值:</strong> <code>false</code>。</li>\n<li><code>varargs</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 如果为 <code>true</code>，<code>options.step</code> 和 <code>options.inverse</code> 可以用任意数量的参数调用（在零到 <a href=\"https://www.sqlite.org/limits.html#max_function_arg\"><code>SQLITE_MAX_FUNCTION_ARG</code></a> 之间）。如果为 <code>false</code>，<code>inverse</code> 和 <code>step</code> 必须用恰好 <code>length</code> 个参数调用。<strong>默认值:</strong> <code>false</code>。</li>\n<li><code>start</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\" class=\"type\">&lt;Array&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 聚合函数的初始值。聚合函数初始化时使用此值。当传递 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 时，初始值将是其返回值。</li>\n<li><code>step</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 为聚合中的每一行调用的函数。该函数接收当前状态和行值。此函数的返回值应为新状态。</li>\n<li><code>result</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 调用以获取聚合结果的函数。该函数接收最终状态并应返回聚合的结果。</li>\n<li><code>inverse</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 当提供此函数时，<code>aggregate</code> 方法将作为窗口函数工作。该函数接收当前状态和移除的行值。此函数的返回值应为新状态。</li>\n</ul>\n</li>\n</ul>\n<p>当用作窗口函数时，<code>result</code> 函数将被多次调用。</p>\n<pre><code class=\"language-cjs\">const { DatabaseSync } = require('node:sqlite');\n\nconst db = new DatabaseSync(':memory:');\ndb.exec(`\n  CREATE TABLE t3(x, y);\n  INSERT INTO t3 VALUES ('a', 4),\n                        ('b', 5),\n                        ('c', 3),\n                        ('d', 8),\n                        ('e', 1);\n`);\n\ndb.aggregate('sumint', {\n  start: 0,\n  step: (acc, value) => acc + value,\n});\n\ndb.prepare('SELECT sumint(y) as total FROM t3').get(); // { total: 21 }\n</code></pre>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\n\nconst db = new DatabaseSync(':memory:');\ndb.exec(`\n  CREATE TABLE t3(x, y);\n  INSERT INTO t3 VALUES ('a', 4),\n                        ('b', 5),\n                        ('c', 3),\n                        ('d', 8),\n                        ('e', 1);\n`);\n\ndb.aggregate('sumint', {\n  start: 0,\n  step: (acc, value) => acc + value,\n});\n\ndb.prepare('SELECT sumint(y) as total FROM t3').get(); // { total: 21 }\n</code></pre>"
+            },
+            {
+              "textRaw": "`database.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>关闭数据库连接。如果数据库未打开，则抛出异常。此方法是 <a href=\"https://www.sqlite.org/c3ref/close.html\"><code>sqlite3_close_v2()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`database.loadExtension(path)`",
+              "type": "method",
+              "name": "loadExtension",
+              "meta": {
+                "added": [
+                  "v23.5.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`path` {string} 要加载的共享库的路径。",
+                      "name": "path",
+                      "type": "string",
+                      "desc": "要加载的共享库的路径。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将共享库加载到数据库连接中。此方法是 <a href=\"https://www.sqlite.org/c3ref/load_extension.html\"><code>sqlite3_load_extension()</code></a> 的封装。需要在构造 <code>DatabaseSync</code> 实例时启用 <code>allowExtension</code> 选项。</p>"
+            },
+            {
+              "textRaw": "`database.enableLoadExtension(allow)`",
+              "type": "method",
+              "name": "enableLoadExtension",
+              "meta": {
+                "added": [
+                  "v23.5.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`allow` {boolean} 是否允许加载扩展。",
+                      "name": "allow",
+                      "type": "boolean",
+                      "desc": "是否允许加载扩展。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>启用或禁用 <code>loadExtension</code> SQL 函数和 <code>loadExtension()</code> 方法。当构造时 <code>allowExtension</code> 为 <code>false</code> 时，出于安全原因，您无法启用加载扩展。</p>"
+            },
+            {
+              "textRaw": "`database.location([dbName])`",
+              "type": "method",
+              "name": "location",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`dbName` {string} 数据库的名称。可以是 `'main'`（默认的主数据库）或任何其他使用 [`ATTACH DATABASE`][] 添加的数据库。**默认值:** `'main'`。",
+                      "name": "dbName",
+                      "type": "string",
+                      "desc": "数据库的名称。可以是 `'main'`（默认的主数据库）或任何其他使用 [`ATTACH DATABASE`][] 添加的数据库。**默认值:** `'main'`。"
+                    },
+                    {
+                      "textRaw": "返回值: {string | null} 数据库文件的位置。当使用内存数据库时，此方法返回 null。",
+                      "name": "返回值",
+                      "type": "string | null",
+                      "desc": "数据库文件的位置。当使用内存数据库时，此方法返回 null。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法是 <a href=\"https://sqlite.org/c3ref/db_filename.html\"><code>sqlite3_db_filename()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`database.exec(sql)`",
+              "type": "method",
+              "name": "exec",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sql` {string} 要执行的 SQL 字符串。",
+                      "name": "sql",
+                      "type": "string",
+                      "desc": "要执行的 SQL 字符串。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法允许执行一个或多个 SQL 语句而不返回任何结果。当执行从文件中读取的 SQL 语句时，此方法很有用。此方法是 <a href=\"https://www.sqlite.org/c3ref/exec.html\"><code>sqlite3_exec()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`database.function(name[, options], function)`",
+              "type": "method",
+              "name": "function",
+              "meta": {
+                "added": [
+                  "v23.5.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string} 要创建的 SQLite 函数的名称。",
+                      "name": "name",
+                      "type": "string",
+                      "desc": "要创建的 SQLite 函数的名称。"
+                    },
+                    {
+                      "textRaw": "`options` {Object} 函数的可选配置设置。支持以下属性：",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "函数的可选配置设置。支持以下属性：",
+                      "options": [
+                        {
+                          "textRaw": "`deterministic` {boolean} 如果为 `true`，则在创建的函数上设置 [`SQLITE_DETERMINISTIC`][] 标志。**默认值:** `false`。",
+                          "name": "deterministic",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，则在创建的函数上设置 [`SQLITE_DETERMINISTIC`][] 标志。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`directOnly` {boolean} 如果为 `true`，则在创建的函数上设置 [`SQLITE_DIRECTONLY`][] 标志。**默认值:** `false`。",
+                          "name": "directOnly",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，则在创建的函数上设置 [`SQLITE_DIRECTONLY`][] 标志。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`useBigIntArguments` {boolean} 如果为 `true`，传递给 `function` 的整数参数将转换为 `BigInt`。如果为 `false`，整数参数将作为 JavaScript 数字传递。**默认值:** `false`。",
+                          "name": "useBigIntArguments",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，传递给 `function` 的整数参数将转换为 `BigInt`。如果为 `false`，整数参数将作为 JavaScript 数字传递。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`varargs` {boolean} 如果为 `true`，`function` 可以用任意数量的参数调用（在零到 [`SQLITE_MAX_FUNCTION_ARG`][] 之间）。如果为 `false`，`function` 必须用恰好 `function.length` 个参数调用。**默认值:** `false`。",
+                          "name": "varargs",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，`function` 可以用任意数量的参数调用（在零到 [`SQLITE_MAX_FUNCTION_ARG`][] 之间）。如果为 `false`，`function` 必须用恰好 `function.length` 个参数调用。**默认值:** `false`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`function` {Function} 调用 SQLite 函数时要调用的 JavaScript 函数。此函数的返回值应为有效的 SQLite 数据类型：请参阅 [JavaScript 和 SQLite 之间的类型转换][]。如果返回值为 `undefined`，则结果默认为 `NULL`。",
+                      "name": "function",
+                      "type": "Function",
+                      "desc": "调用 SQLite 函数时要调用的 JavaScript 函数。此函数的返回值应为有效的 SQLite 数据类型：请参阅 [JavaScript 和 SQLite 之间的类型转换][]。如果返回值为 `undefined`，则结果默认为 `NULL`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法用于创建 SQLite 用户定义函数。此方法是 <a href=\"https://www.sqlite.org/c3ref/create_function.html\"><code>sqlite3_create_function_v2()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`database.setAuthorizer(callback)`",
+              "type": "method",
+              "name": "setAuthorizer",
+              "meta": {
+                "added": [
+                  "v24.10.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function|null} 要设置的授权器函数，或 `null` 以清除当前授权器。",
+                      "name": "callback",
+                      "type": "Function|null",
+                      "desc": "要设置的授权器函数，或 `null` 以清除当前授权器。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置一个授权器回调，当 SQLite 尝试通过预编译语句访问数据或修改数据库模式时，将调用此回调。这可用于实现安全策略、审计访问或限制某些操作。此方法是 <a href=\"https://sqlite.org/c3ref/set_authorizer.html\"><code>sqlite3_set_authorizer()</code></a> 的封装。</p>\n<p>调用时，回调接收五个参数：</p>\n<ul>\n<li><code>actionCode</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 正在执行的操作类型（例如，<code>SQLITE_INSERT</code>、<code>SQLITE_UPDATE</code>、<code>SQLITE_SELECT</code>）。</li>\n<li><code>arg1</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> 第一个参数（依赖于上下文，通常是表名）。</li>\n<li><code>arg2</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> 第二个参数（依赖于上下文，通常是列名）。</li>\n<li><code>dbName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> 数据库的名称。</li>\n<li><code>triggerOrView</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> 导致访问的触发器或视图的名称。</li>\n</ul>\n<p>回调必须返回以下常量之一：</p>\n<ul>\n<li><code>SQLITE_OK</code> - 允许操作。</li>\n<li><code>SQLITE_DENY</code> - 拒绝操作（导致错误）。</li>\n<li><code>SQLITE_IGNORE</code> - 忽略操作（静默跳过）。</li>\n</ul>\n<pre><code class=\"language-cjs\">const { DatabaseSync, constants } = require('node:sqlite');\nconst db = new DatabaseSync(':memory:');\n\n// Set up an authorizer that denies all table creation\ndb.setAuthorizer((actionCode) => {\n  if (actionCode === constants.SQLITE_CREATE_TABLE) {\n    return constants.SQLITE_DENY;\n  }\n  return constants.SQLITE_OK;\n});\n\n// This will work\ndb.prepare('SELECT 1').get();\n\n// This will throw an error due to authorization denial\ntry {\n  db.exec('CREATE TABLE blocked (id INTEGER)');\n} catch (err) {\n  console.log('Operation blocked:', err.message);\n}\n</code></pre>\n<pre><code class=\"language-mjs\">import { DatabaseSync, constants } from 'node:sqlite';\nconst db = new DatabaseSync(':memory:');\n\n// Set up an authorizer that denies all table creation\ndb.setAuthorizer((actionCode) => {\n  if (actionCode === constants.SQLITE_CREATE_TABLE) {\n    return constants.SQLITE_DENY;\n  }\n  return constants.SQLITE_OK;\n});\n\n// This will work\ndb.prepare('SELECT 1').get();\n\n// This will throw an error due to authorization denial\ntry {\n  db.exec('CREATE TABLE blocked (id INTEGER)');\n} catch (err) {\n  console.log('Operation blocked:', err.message);\n}\n</code></pre>"
+            },
+            {
+              "textRaw": "`database.open()`",
+              "type": "method",
+              "name": "open",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>打开 <code>DatabaseSync</code> 构造函数的 <code>path</code> 参数中指定的数据库。仅当数据库未通过构造函数打开时才应使用此方法。如果数据库已经打开，则抛出异常。</p>"
+            },
+            {
+              "textRaw": "`database.prepare(sql)`",
+              "type": "method",
+              "name": "prepare",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sql` {string} 要编译为预编译语句的 SQL 字符串。",
+                      "name": "sql",
+                      "type": "string",
+                      "desc": "要编译为预编译语句的 SQL 字符串。"
+                    },
+                    {
+                      "textRaw": "返回值: {StatementSync} 预编译语句。",
+                      "name": "返回值",
+                      "type": "StatementSync",
+                      "desc": "预编译语句。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 SQL 语句编译为[预编译语句][]。此方法是 <a href=\"https://www.sqlite.org/c3ref/prepare.html\"><code>sqlite3_prepare_v2()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`database.createSQLTagStore([maxSize])`",
+              "type": "method",
+              "name": "createSQLTagStore",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`maxSize` {integer} 要缓存的预编译语句的最大数量。**默认值:** `1000`。",
+                      "name": "maxSize",
+                      "type": "integer",
+                      "desc": "要缓存的预编译语句的最大数量。**默认值:** `1000`。"
+                    },
+                    {
+                      "textRaw": "返回值: {SQLTagStore} 一个新的 SQL 标签存储，用于缓存预编译语句。",
+                      "name": "返回值",
+                      "type": "SQLTagStore",
+                      "desc": "一个新的 SQL 标签存储，用于缓存预编译语句。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个新的 <code>SQLTagStore</code>，它是一个用于存储预编译语句的 LRU（最近最少使用）缓存。这允许通过使用唯一标识符标记预编译语句来有效地重用它们。</p>\n<p>当执行带标签的 SQL 字面量时，<code>SQLTagStore</code> 会检查该特定 SQL 字符串的预编译语句是否已存在于缓存中。如果存在，则使用缓存的语句。如果不存在，则创建一个新的预编译语句，执行它，然后将其存储在缓存中以备将来使用。此机制有助于避免重复解析和准备相同 SQL 语句的开销。</p>\n<pre><code class=\"language-mjs\">import { DatabaseSync } from 'node:sqlite';\n\nconst db = new DatabaseSync(':memory:');\nconst sql = db.createSQLTagStore();\n\ndb.exec('CREATE TABLE users (id INT, name TEXT)');\n\n// Using the 'run' method to insert data.\n// The tagged literal is used to identify the prepared statement.\nsql.run`INSERT INTO users VALUES (1, 'Alice')`;\nsql.run`INSERT INTO users VALUES (2, 'Bob')`;\n\n// Using the 'get' method to retrieve a single row.\nconst id = 1;\nconst user = sql.get`SELECT * FROM users WHERE id = ${id}`;\nconsole.log(user); // { id: 1, name: 'Alice' }\n\n// Using the 'all' method to retrieve all rows.\nconst allUsers = sql.all`SELECT * FROM users ORDER BY id`;\nconsole.log(allUsers);\n// [\n//   { id: 1, name: 'Alice' },\n//   { id: 2, name: 'Bob' }\n// ]\n</code></pre>"
+            },
+            {
+              "textRaw": "`database.createSession([options])`",
+              "type": "method",
+              "name": "createSession",
+              "meta": {
+                "added": [
+                  "v23.3.0",
+                  "v22.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object} 会话的配置选项。",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "会话的配置选项。",
+                      "options": [
+                        {
+                          "textRaw": "`table` {string} 要跟踪更改的特定表。默认情况下，跟踪所有表的更改。",
+                          "name": "table",
+                          "type": "string",
+                          "desc": "要跟踪更改的特定表。默认情况下，跟踪所有表的更改。"
+                        },
+                        {
+                          "textRaw": "`db` {string} 要跟踪的数据库的名称。当使用 [`ATTACH DATABASE`][] 添加了多个数据库时，这很有用。**默认值**: `'main'`。",
+                          "name": "db",
+                          "type": "string",
+                          "desc": "要跟踪的数据库的名称。当使用 [`ATTACH DATABASE`][] 添加了多个数据库时，这很有用。**默认值**: `'main'`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回值: {Session} 会话句柄。",
+                      "name": "返回值",
+                      "type": "Session",
+                      "desc": "会话句柄。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建会话并将其附加到数据库。此方法是 <a href=\"https://www.sqlite.org/session/sqlite3session_create.html\"><code>sqlite3session_create()</code></a> 和 <a href=\"https://www.sqlite.org/session/sqlite3session_attach.html\"><code>sqlite3session_attach()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`database.applyChangeset(changeset[, options])`",
+              "type": "method",
+              "name": "applyChangeset",
+              "meta": {
+                "added": [
+                  "v23.3.0",
+                  "v22.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`changeset` {Uint8Array} 二进制变更集或补丁集。",
+                      "name": "changeset",
+                      "type": "Uint8Array",
+                      "desc": "二进制变更集或补丁集。"
+                    },
+                    {
+                      "textRaw": "`options` {Object} 应用更改的配置选项。",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "应用更改的配置选项。",
+                      "options": [
+                        {
+                          "textRaw": "`filter` {Function} 跳过那些当目标表名提供给此函数时返回真值的更改。默认情况下，尝试所有更改。",
+                          "name": "filter",
+                          "type": "Function",
+                          "desc": "跳过那些当目标表名提供给此函数时返回真值的更改。默认情况下，尝试所有更改。"
+                        },
+                        {
+                          "textRaw": "`onConflict` {Function} 一个决定如何处理冲突的函数。该函数接收一个参数，可以是以下值之一：该函数应返回以下值之一：当冲突处理程序中抛出错误或处理程序返回任何其他值时，应用变更集会中止并且数据库会回滚。**默认值**: 返回 `SQLITE_CHANGESET_ABORT` 的函数。",
+                          "name": "onConflict",
+                          "type": "Function",
+                          "desc": "一个决定如何处理冲突的函数。该函数接收一个参数，可以是以下值之一：该函数应返回以下值之一：当冲突处理程序中抛出错误或处理程序返回任何其他值时，应用变更集会中止并且数据库会回滚。**默认值**: 返回 `SQLITE_CHANGESET_ABORT` 的函数。",
+                          "options": [
+                            {
+                              "textRaw": "`SQLITE_CHANGESET_DATA`: `DELETE` 或 `UPDATE` 更改不包含预期的“之前”值。",
+                              "name": "SQLITE_CHANGESET_DATA",
+                              "desc": "`DELETE` 或 `UPDATE` 更改不包含预期的“之前”值。"
+                            },
+                            {
+                              "textRaw": "`SQLITE_CHANGESET_NOTFOUND`: 与 `DELETE` 或 `UPDATE` 更改的主键匹配的行不存在。",
+                              "name": "SQLITE_CHANGESET_NOTFOUND",
+                              "desc": "与 `DELETE` 或 `UPDATE` 更改的主键匹配的行不存在。"
+                            },
+                            {
+                              "textRaw": "`SQLITE_CHANGESET_CONFLICT`: `INSERT` 更改导致重复的主键值。",
+                              "name": "SQLITE_CHANGESET_CONFLICT",
+                              "desc": "`INSERT` 更改导致重复的主键值。"
+                            },
+                            {
+                              "textRaw": "`SQLITE_CHANGESET_FOREIGN_KEY`: 应用更改将导致外键冲突。",
+                              "name": "SQLITE_CHANGESET_FOREIGN_KEY",
+                              "desc": "应用更改将导致外键冲突。"
+                            },
+                            {
+                              "textRaw": "`SQLITE_CHANGESET_CONSTRAINT`: 应用更改导致 `UNIQUE`、`CHECK` 或 `NOT NULL` 约束冲突。",
+                              "name": "SQLITE_CHANGESET_CONSTRAINT",
+                              "desc": "应用更改导致 `UNIQUE`、`CHECK` 或 `NOT NULL` 约束冲突。"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回值: {boolean} 变更集是否成功应用而未中止。",
+                      "name": "返回值",
+                      "type": "boolean",
+                      "desc": "变更集是否成功应用而未中止。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果数据库未打开，则抛出异常。此方法是 <a href=\"https://www.sqlite.org/session/sqlite3changeset_apply.html\"><code>sqlite3changeset_apply()</code></a> 的封装。</p>\n<pre><code class=\"language-js\">const sourceDb = new DatabaseSync(':memory:');\nconst targetDb = new DatabaseSync(':memory:');\n\nsourceDb.exec('CREATE TABLE data(key INTEGER PRIMARY KEY, value TEXT)');\ntargetDb.exec('CREATE TABLE data(key INTEGER PRIMARY KEY, value TEXT)');\n\nconst session = sourceDb.createSession();\n\nconst insert = sourceDb.prepare('INSERT INTO data (key, value) VALUES (?, ?)');\ninsert.run(1, 'hello');\ninsert.run(2, 'world');\n\nconst changeset = session.changeset();\ntargetDb.applyChangeset(changeset);\n// Now that the changeset has been applied, targetDb contains the same data as sourceDb.\n</code></pre>"
+            },
+            {
+              "textRaw": "`database[Symbol.dispose]()`",
+              "type": "method",
+              "name": "[Symbol.dispose]",
+              "meta": {
+                "added": [
+                  "v23.11.0",
+                  "v22.15.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58467",
+                    "description": "No longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>关闭数据库连接。如果数据库连接已关闭，则此操作无效。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`isOpen` 类型: {boolean} 数据库当前是否打开。",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v23.11.0",
+                  "v22.15.0"
+                ],
+                "changes": []
+              },
+              "desc": "数据库当前是否打开。"
+            },
+            {
+              "textRaw": "`isTransaction` 类型: {boolean} 数据库当前是否在事务中。此方法是 [`sqlite3_get_autocommit()`][] 的封装。",
+              "type": "boolean",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "数据库当前是否在事务中。此方法是 [`sqlite3_get_autocommit()`][] 的封装。"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`DatabaseSync`"
+        },
+        {
+          "textRaw": "类：`Session`",
+          "name": "类：`session`",
+          "meta": {
+            "added": [
+              "v23.3.0",
+              "v22.12.0"
+            ],
+            "changes": []
+          },
+          "methods": [
+            {
+              "textRaw": "`session.changeset()`",
+              "type": "method",
+              "name": "changeset",
+              "meta": {
+                "added": [
+                  "v23.3.0",
+                  "v22.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回值: {Uint8Array} 可以应用于其他数据库的二进制变更集。",
+                      "name": "返回值",
+                      "type": "Uint8Array",
+                      "desc": "可以应用于其他数据库的二进制变更集。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>检索自创建变更集以来所有更改的变更集。可以多次调用。如果数据库或会话未打开，则抛出异常。此方法是 <a href=\"https://www.sqlite.org/session/sqlite3session_changeset.html\"><code>sqlite3session_changeset()</code></a> 的封装。</p>"
+            },
+            {
+              "textRaw": "`session.patchset()`",
+              "type": "method",
+              "name": "patchset",
+              "meta": {
+                "added": [
+                  "v23.3.0",
+                  "v22.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回值: {Uint8Array} 可以应用于其他数据库的二进制补丁集。",
+                      "name": "返回值",
+                      "type": "Uint8Array",
+                      "desc": "可以应用于其他数据库的二进制补丁集。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>与上述方法类似，但生成更紧凑的补丁集。请参阅 SQLite 文档中的[变更集和补丁集][]。如果数据库或会话未打开，则抛出异常。此方法是 <a href=\"https://www.sqlite.org/session/sqlite3session_patchset.html\"><code>sqlite3session_patchset()</code></a> 的封装。</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "`session.close()`.",
+              "name": "`session.close()`.",
+              "desc": "<p>关闭会话。如果数据库或会话未打开，则抛出异常。此方法是 <a href=\"https://www.sqlite.org/session/sqlite3session_delete.html\"><code>sqlite3session_delete()</code></a> 的封装。</p>",
+              "type": "module",
+              "displayName": "`session.close()`."
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`Session`"
+        },
+        {
+          "textRaw": "类：`StatementSync`",
+          "name": "类：`statementsync`",
+          "meta": {
+            "added": [
+              "v22.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>此类表示单个[预编译语句][]。此类无法通过其构造函数实例化。相反，实例是通过 <code>database.prepare()</code> 方法创建的。此类暴露的所有 API 都是同步执行的。</p>\n<p>预编译语句是用于创建它的 SQL 的高效二进制表示。预编译语句是可参数化的，并且可以使用不同的绑定值多次调用。参数还提供针对 [SQL 注入][]攻击的保护。由于这些原因，在处理用户输入时，预编译语句优于手动构建的 SQL 字符串。</p>",
+          "type": "module",
+          "displayName": "类：`StatementSync`"
+        },
+        {
+          "textRaw": "类：`SQLTagStore`",
+          "name": "类：`sqltagstore`",
+          "meta": {
+            "added": [
+              "v24.9.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>此类表示用于存储预编译语句的单个 LRU（最近最少使用）缓存。</p>\n<p>此类的实例通过 database.createSQLTagStore() 方法创建，而不是使用构造函数。存储根据提供的 SQL 查询字符串缓存预编译语句。当再次看到相同的查询时，存储会检索缓存的语句并通过参数绑定安全地应用新值，从而防止 SQL 注入等攻击。</p>\n<p>缓存有一个 maxSize，默认为 1000 个语句，但可以提供自定义大小（例如，database.createSQLTagStore(100)）。此类暴露的所有 API 都是同步执行的。</p>",
+          "methods": [
+            {
+              "textRaw": "`sqlTagStore.all(sqlTemplate[, ...values])`",
+              "type": "method",
+              "name": "all",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sqlTemplate` {Template Literal} 包含 SQL 查询的模板字面量。",
+                      "name": "sqlTemplate",
+                      "type": "Template Literal",
+                      "desc": "包含 SQL 查询的模板字面量。"
+                    },
+                    {
+                      "textRaw": "`...values` {any} 要插入到模板字面量中的值。",
+                      "name": "...values",
+                      "type": "any",
+                      "desc": "要插入到模板字面量中的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Array} 表示查询返回的行的对象数组。",
+                      "name": "返回值",
+                      "type": "Array",
+                      "desc": "表示查询返回的行的对象数组。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>执行给定的 SQL 查询并将所有结果行作为对象数组返回。</p>"
+            },
+            {
+              "textRaw": "`sqlTagStore.get(sqlTemplate[, ...values])`",
+              "type": "method",
+              "name": "get",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sqlTemplate` {Template Literal} 包含 SQL 查询的模板字面量。",
+                      "name": "sqlTemplate",
+                      "type": "Template Literal",
+                      "desc": "包含 SQL 查询的模板字面量。"
+                    },
+                    {
+                      "textRaw": "`...values` {any} 要插入到模板字面量中的值。",
+                      "name": "...values",
+                      "type": "any",
+                      "desc": "要插入到模板字面量中的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Object | undefined} 表示查询返回的第一行的对象，如果没有返回行，则为 `undefined`。",
+                      "name": "返回值",
+                      "type": "Object | undefined",
+                      "desc": "表示查询返回的第一行的对象，如果没有返回行，则为 `undefined`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>执行给定的 SQL 查询并将第一个结果行作为对象返回。</p>"
+            },
+            {
+              "textRaw": "`sqlTagStore.iterate(sqlTemplate[, ...values])`",
+              "type": "method",
+              "name": "iterate",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sqlTemplate` {Template Literal} 包含 SQL 查询的模板字面量。",
+                      "name": "sqlTemplate",
+                      "type": "Template Literal",
+                      "desc": "包含 SQL 查询的模板字面量。"
+                    },
+                    {
+                      "textRaw": "`...values` {any} 要插入到模板字面量中的值。",
+                      "name": "...values",
+                      "type": "any",
+                      "desc": "要插入到模板字面量中的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Iterator} 一个迭代器，生成表示查询返回的行的对象。",
+                      "name": "返回值",
+                      "type": "Iterator",
+                      "desc": "一个迭代器，生成表示查询返回的行的对象。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>执行给定的 SQL 查询并返回一个遍历结果行的迭代器。</p>"
+            },
+            {
+              "textRaw": "`sqlTagStore.run(sqlTemplate[, ...values])`",
+              "type": "method",
+              "name": "run",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`sqlTemplate` {Template Literal} 包含 SQL 查询的模板字面量。",
+                      "name": "sqlTemplate",
+                      "type": "Template Literal",
+                      "desc": "包含 SQL 查询的模板字面量。"
+                    },
+                    {
+                      "textRaw": "`...values` {any} 要插入到模板字面量中的值。",
+                      "name": "...values",
+                      "type": "any",
+                      "desc": "要插入到模板字面量中的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Object} 包含有关执行信息的对象，包括 `changes` 和 `lastInsertRowid`。",
+                      "name": "返回值",
+                      "type": "Object",
+                      "desc": "包含有关执行信息的对象，包括 `changes` 和 `lastInsertRowid`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>执行给定的 SQL 查询，预期不返回任何行（例如，INSERT、UPDATE、DELETE）。</p>"
+            },
+            {
+              "textRaw": "`sqlTagStore.size()`",
+              "type": "method",
+              "name": "size",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回值: {integer} 当前缓存中的预编译语句数量。",
+                      "name": "返回值",
+                      "type": "integer",
+                      "desc": "当前缓存中的预编译语句数量。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>一个只读属性，返回当前缓存中的预编译语句数量。</p>"
+            },
+            {
+              "textRaw": "`sqlTagStore.reset()`",
+              "type": "method",
+              "name": "reset",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>重置 LRU 缓存，清除所有存储的预编译语句。</p>"
+            },
+            {
+              "textRaw": "`sqlTagStore.clear()`",
+              "type": "method",
+              "name": "clear",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><code>sqlTagStore.reset()</code> 的别名。</p>"
+            },
+            {
+              "textRaw": "`statement.all([namedParameters][, ...anonymousParameters])`",
+              "type": "method",
+              "name": "all",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56385",
+                    "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`namedParameters` {Object} 用于绑定命名参数的可选对象。此对象的键用于配置映射。",
+                      "name": "namedParameters",
+                      "type": "Object",
+                      "desc": "用于绑定命名参数的可选对象。此对象的键用于配置映射。"
+                    },
+                    {
+                      "textRaw": "`...anonymousParameters` {null|number|bigint|string|Buffer|TypedArray|DataView} 零个或多个要绑定到匿名参数的值。",
+                      "name": "...anonymousParameters",
+                      "type": "null|number|bigint|string|Buffer|TypedArray|DataView",
+                      "desc": "零个或多个要绑定到匿名参数的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Array} 对象数组。每个对象对应于执行预编译语句返回的一行。每个对象的键和值对应于行的列名和值。",
+                      "name": "返回值",
+                      "type": "Array",
+                      "desc": "对象数组。每个对象对应于执行预编译语句返回的一行。每个对象的键和值对应于行的列名和值。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法执行预编译语句并将所有结果作为对象数组返回。如果预编译语句未返回任何结果，则此方法返回空数组。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>"
+            },
+            {
+              "textRaw": "`statement.columns()`",
+              "type": "method",
+              "name": "columns",
+              "meta": {
+                "added": [
+                  "v23.11.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回值: {Array} 对象数组。每个对象对应于预编译语句中的一列，并包含以下属性：",
+                      "name": "返回值",
+                      "type": "Array",
+                      "desc": "对象数组。每个对象对应于预编译语句中的一列，并包含以下属性：",
+                      "options": [
+                        {
+                          "textRaw": "`column` {string|null} 源表中列的非别名名称，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_origin_name()`][] 的结果。",
+                          "name": "column",
+                          "type": "string|null",
+                          "desc": "源表中列的非别名名称，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_origin_name()`][] 的结果。"
+                        },
+                        {
+                          "textRaw": "`database` {string|null} 源数据库的非别名名称，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_database_name()`][] 的结果。",
+                          "name": "database",
+                          "type": "string|null",
+                          "desc": "源数据库的非别名名称，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_database_name()`][] 的结果。"
+                        },
+                        {
+                          "textRaw": "`name` {string} 在 `SELECT` 语句的结果集中分配给列的名称。此属性是 [`sqlite3_column_name()`][] 的结果。",
+                          "name": "name",
+                          "type": "string",
+                          "desc": "在 `SELECT` 语句的结果集中分配给列的名称。此属性是 [`sqlite3_column_name()`][] 的结果。"
+                        },
+                        {
+                          "textRaw": "`table` {string|null} 源表的非别名名称，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_table_name()`][] 的结果。",
+                          "name": "table",
+                          "type": "string|null",
+                          "desc": "源表的非别名名称，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_table_name()`][] 的结果。"
+                        },
+                        {
+                          "textRaw": "`type` {string|null} 列的声明数据类型，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_decltype()`][] 的结果。",
+                          "name": "type",
+                          "type": "string|null",
+                          "desc": "列的声明数据类型，如果列是表达式或子查询的结果，则为 `null`。此属性是 [`sqlite3_column_decltype()`][] 的结果。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法用于检索有关预编译语句返回的列的信息。</p>"
+            },
+            {
+              "textRaw": "`statement.get([namedParameters][, ...anonymousParameters])`",
+              "type": "method",
+              "name": "get",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56385",
+                    "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`namedParameters` {Object} 用于绑定命名参数的可选对象。此对象的键用于配置映射。",
+                      "name": "namedParameters",
+                      "type": "Object",
+                      "desc": "用于绑定命名参数的可选对象。此对象的键用于配置映射。"
+                    },
+                    {
+                      "textRaw": "`...anonymousParameters` {null|number|bigint|string|Buffer|TypedArray|DataView} 零个或多个要绑定到匿名参数的值。",
+                      "name": "...anonymousParameters",
+                      "type": "null|number|bigint|string|Buffer|TypedArray|DataView",
+                      "desc": "零个或多个要绑定到匿名参数的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Object|undefined} 对应于执行预编译语句返回的第一行的对象。对象的键和值对应于行的列名和值。如果数据库未返回任何行，则此方法返回 `undefined`。",
+                      "name": "返回值",
+                      "type": "Object|undefined",
+                      "desc": "对应于执行预编译语句返回的第一行的对象。对象的键和值对应于行的列名和值。如果数据库未返回任何行，则此方法返回 `undefined`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法执行预编译语句并将第一个结果作为对象返回。如果预编译语句未返回任何结果，则此方法返回 <code>undefined</code>。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>"
+            },
+            {
+              "textRaw": "`statement.iterate([namedParameters][, ...anonymousParameters])`",
+              "type": "method",
+              "name": "iterate",
+              "meta": {
+                "added": [
+                  "v23.4.0",
+                  "v22.13.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56385",
+                    "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`namedParameters` {Object} 用于绑定命名参数的可选对象。此对象的键用于配置映射。",
+                      "name": "namedParameters",
+                      "type": "Object",
+                      "desc": "用于绑定命名参数的可选对象。此对象的键用于配置映射。"
+                    },
+                    {
+                      "textRaw": "`...anonymousParameters` {null|number|bigint|string|Buffer|TypedArray|DataView} 零个或多个要绑定到匿名参数的值。",
+                      "name": "...anonymousParameters",
+                      "type": "null|number|bigint|string|Buffer|TypedArray|DataView",
+                      "desc": "零个或多个要绑定到匿名参数的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Iterator} 对象可迭代迭代器。每个对象对应于执行预编译语句返回的一行。每个对象的键和值对应于行的列名和值。",
+                      "name": "返回值",
+                      "type": "Iterator",
+                      "desc": "对象可迭代迭代器。每个对象对应于执行预编译语句返回的一行。每个对象的键和值对应于行的列名和值。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法执行预编译语句并返回对象的迭代器。如果预编译语句未返回任何结果，则此方法返回空迭代器。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>"
+            },
+            {
+              "textRaw": "`statement.run([namedParameters][, ...anonymousParameters])`",
+              "type": "method",
+              "name": "run",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.7.0",
+                      "v22.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56385",
+                    "description": "Add support for `DataView` and typed array objects for `anonymousParameters`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`namedParameters` {Object} 用于绑定命名参数的可选对象。此对象的键用于配置映射。",
+                      "name": "namedParameters",
+                      "type": "Object",
+                      "desc": "用于绑定命名参数的可选对象。此对象的键用于配置映射。"
+                    },
+                    {
+                      "textRaw": "`...anonymousParameters` {null|number|bigint|string|Buffer|TypedArray|DataView} 零个或多个要绑定到匿名参数的值。",
+                      "name": "...anonymousParameters",
+                      "type": "null|number|bigint|string|Buffer|TypedArray|DataView",
+                      "desc": "零个或多个要绑定到匿名参数的值。"
+                    },
+                    {
+                      "textRaw": "返回值: {Object}",
+                      "name": "返回值",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`changes` {number|bigint} 最近完成的 `INSERT`、`UPDATE` 或 `DELETE` 语句修改、插入或删除的行数。此字段是数字或 `BigInt`，具体取决于预编译语句的配置。此属性是 [`sqlite3_changes64()`][] 的结果。",
+                          "name": "changes",
+                          "type": "number|bigint",
+                          "desc": "最近完成的 `INSERT`、`UPDATE` 或 `DELETE` 语句修改、插入或删除的行数。此字段是数字或 `BigInt`，具体取决于预编译语句的配置。此属性是 [`sqlite3_changes64()`][] 的结果。"
+                        },
+                        {
+                          "textRaw": "`lastInsertRowid` {number|bigint} 最近插入的 rowid。此字段是数字或 `BigInt`，具体取决于预编译语句的配置。此属性是 [`sqlite3_last_insert_rowid()`][] 的结果。",
+                          "name": "lastInsertRowid",
+                          "type": "number|bigint",
+                          "desc": "最近插入的 rowid。此字段是数字或 `BigInt`，具体取决于预编译语句的配置。此属性是 [`sqlite3_last_insert_rowid()`][] 的结果。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法执行预编译语句并返回一个总结结果更改的对象。预编译语句的[参数使用][] <code>namedParameters</code> 和 <code>anonymousParameters</code> 中的值进行绑定。</p>"
+            },
+            {
+              "textRaw": "`statement.setAllowBareNamedParameters(enabled)`",
+              "type": "method",
+              "name": "setAllowBareNamedParameters",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`enabled` {boolean} 启用或禁用支持绑定不带前缀字符的命名参数。",
+                      "name": "enabled",
+                      "type": "boolean",
+                      "desc": "启用或禁用支持绑定不带前缀字符的命名参数。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>SQLite 参数的名称以前缀字符开头。默认情况下，<code>node:sqlite</code> 要求在绑定参数时存在此前缀字符。但是，除了美元符号字符外，这些前缀字符在用作对象键时还需要额外的引号。</p>\n<p>为了提高人体工程学，可以使用此方法来允许裸命名参数，这些参数在 JavaScript 代码中不需要前缀字符。启用裸命名参数时需要注意几个注意事项：</p>\n<ul>\n<li>SQL 中仍然需要前缀字符。</li>\n<li>JavaScript 中仍然允许前缀字符。实际上，带前缀的名称在绑定性能上会稍好一些。</li>\n<li>在同一个预编译语句中使用模糊的命名参数，例如 <code>$k</code> 和 <code>@k</code>，将导致异常，因为无法确定如何绑定裸名称。</li>\n</ul>"
+            },
+            {
+              "textRaw": "`statement.setAllowUnknownNamedParameters(enabled)`",
+              "type": "method",
+              "name": "setAllowUnknownNamedParameters",
+              "meta": {
+                "added": [
+                  "v23.11.0",
+                  "v22.15.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`enabled` {boolean} 启用或禁用支持未知命名参数。",
+                      "name": "enabled",
+                      "type": "boolean",
+                      "desc": "启用或禁用支持未知命名参数。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>默认情况下，如果在绑定参数时遇到未知名称，则会抛出异常。此方法允许忽略未知命名参数。</p>"
+            },
+            {
+              "textRaw": "`statement.setReturnArrays(enabled)`",
+              "type": "method",
+              "name": "setReturnArrays",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`enabled` {boolean} 启用或禁用将查询结果作为数组返回。",
+                      "name": "enabled",
+                      "type": "boolean",
+                      "desc": "启用或禁用将查询结果作为数组返回。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>启用后，<code>all()</code>、<code>get()</code> 和 <code>iterate()</code> 方法返回的查询结果将作为数组而不是对象返回。</p>"
+            },
+            {
+              "textRaw": "`statement.setReadBigInts(enabled)`",
+              "type": "method",
+              "name": "setReadBigInts",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`enabled` {boolean} 启用或禁用从数据库读取 `INTEGER` 字段时使用 `BigInt`。",
+                      "name": "enabled",
+                      "type": "boolean",
+                      "desc": "启用或禁用从数据库读取 `INTEGER` 字段时使用 `BigInt`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>从数据库读取时，SQLite <code>INTEGER</code> 默认映射到 JavaScript 数字。但是，SQLite <code>INTEGER</code> 可以存储比 JavaScript 数字能够表示的值更大的值。在这种情况下，可以使用此方法使用 JavaScript <code>BigInt</code> 读取 <code>INTEGER</code> 数据。此方法对数据库写操作没有影响，在写操作中数字和 <code>BigInt</code> 始终都受支持。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`capacity` 返回值: {integer} 缓存可以容纳的预编译语句的最大数量。",
+              "type": "integer",
+              "name": "返回值",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一个只读属性，返回缓存可以容纳的预编译语句的最大数量。</p>",
+              "shortDesc": "缓存可以容纳的预编译语句的最大数量。"
+            },
+            {
+              "textRaw": "`db` {DatabaseSync} 创建此 `SQLTagStore` 的 `DatabaseSync` 实例。",
+              "type": "DatabaseSync",
+              "name": "db",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一个只读属性，返回与此 <code>SQLTagStore</code> 关联的 <code>DatabaseSync</code> 对象。</p>",
+              "shortDesc": "创建此 `SQLTagStore` 的 `DatabaseSync` 实例。"
+            },
+            {
+              "textRaw": "`expandedSQL` 类型: {string} 扩展后包含参数值的源 SQL。",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>预编译语句的源 SQL 文本，其中参数占位符被替换为最近执行此预编译语句时使用的值。此属性是 <a href=\"https://www.sqlite.org/c3ref/expanded_sql.html\"><code>sqlite3_expanded_sql()</code></a> 的封装。</p>",
+              "shortDesc": "扩展后包含参数值的源 SQL。"
+            },
+            {
+              "textRaw": "`sourceSQL` 类型: {string} 用于创建此预编译语句的源 SQL。",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>预编译语句的源 SQL 文本。此属性是 <a href=\"https://www.sqlite.org/c3ref/expanded_sql.html\"><code>sqlite3_sql()</code></a> 的封装。</p>",
+              "shortDesc": "用于创建此预编译语句的源 SQL。"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "JavaScript 和 SQLite 之间的类型转换",
+              "name": "javascript_和_sqlite_之间的类型转换",
+              "desc": "<p>当 Node.js 写入或读取 SQLite 时，需要在 JavaScript 数据类型和 SQLite 的[数据类型][]之间进行转换。由于 JavaScript 支持的数据类型比 SQLite 多，因此仅支持 JavaScript 类型的子集。尝试将不受支持的数据类型写入 SQLite 将导致异常。</p>\n<table>\n<thead>\n<tr>\n<th>SQLite</th>\n<th>JavaScript</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>NULL</code></td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a></td>\n</tr>\n<tr>\n<td><code>INTEGER</code></td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 或 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt\" class=\"type\">&lt;bigint&gt;</a></td>\n</tr>\n<tr>\n<td><code>REAL</code></td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></td>\n</tr>\n<tr>\n<td><code>TEXT</code></td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></td>\n</tr>\n<tr>\n<td><code>BLOB</code></td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> 或 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a></td>\n</tr>\n</tbody>\n</table>",
+              "type": "module",
+              "displayName": "JavaScript 和 SQLite 之间的类型转换"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`SQLTagStore`"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`sqlite.backup(sourceDb, path[, options])`",
+          "type": "method",
+          "name": "backup",
+          "meta": {
+            "added": [
+              "v23.8.0"
+            ],
+            "changes": [
+              {
+                "version": "v23.10.0",
+                "pr-url": "https://github.com/nodejs/node/pull/56991",
+                "description": "The `path` argument now supports Buffer and URL objects."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`sourceDb` {DatabaseSync} 要备份的数据库。源数据库必须打开。",
+                  "name": "sourceDb",
+                  "type": "DatabaseSync",
+                  "desc": "要备份的数据库。源数据库必须打开。"
+                },
+                {
+                  "textRaw": "`path` {string | Buffer | URL} 备份创建的位置。如果文件已存在，其内容将被覆盖。",
+                  "name": "path",
+                  "type": "string | Buffer | URL",
+                  "desc": "备份创建的位置。如果文件已存在，其内容将被覆盖。"
+                },
+                {
+                  "textRaw": "`options` {Object} 备份的可选配置。支持以下属性：",
+                  "name": "options",
+                  "type": "Object",
+                  "desc": "备份的可选配置。支持以下属性：",
+                  "options": [
+                    {
+                      "textRaw": "`source` {string} 源数据库的名称。可以是 `'main'`（默认的主数据库）或任何其他使用 [`ATTACH DATABASE`][] 添加的数据库。**默认值:** `'main'`。",
+                      "name": "source",
+                      "type": "string",
+                      "desc": "源数据库的名称。可以是 `'main'`（默认的主数据库）或任何其他使用 [`ATTACH DATABASE`][] 添加的数据库。**默认值:** `'main'`。"
+                    },
+                    {
+                      "textRaw": "`target` {string} 目标数据库的名称。可以是 `'main'`（默认的主数据库）或任何其他使用 [`ATTACH DATABASE`][] 添加的数据库。**默认值:** `'main'`。",
+                      "name": "target",
+                      "type": "string",
+                      "desc": "目标数据库的名称。可以是 `'main'`（默认的主数据库）或任何其他使用 [`ATTACH DATABASE`][] 添加的数据库。**默认值:** `'main'`。"
+                    },
+                    {
+                      "textRaw": "`rate` {number} 每个备份批次中要传输的页面数。**默认值:** `100`。",
+                      "name": "rate",
+                      "type": "number",
+                      "desc": "每个备份批次中要传输的页面数。**默认值:** `100`。"
+                    },
+                    {
+                      "textRaw": "`progress` {Function} 一个可选的回调函数，将在每个备份步骤后调用。传递给此回调的参数是一个 {Object}，具有 `remainingPages` 和 `totalPages` 属性，描述备份操作的当前进度。",
+                      "name": "progress",
+                      "type": "Function",
+                      "desc": "一个可选的回调函数，将在每个备份步骤后调用。传递给此回调的参数是一个 {Object}，具有 `remainingPages` 和 `totalPages` 属性，描述备份操作的当前进度。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回值: {Promise} 一个 Promise，在完成时以备份的总页数兑现，或者在发生错误时拒绝。",
+                  "name": "返回值",
+                  "type": "Promise",
+                  "desc": "一个 Promise，在完成时以备份的总页数兑现，或者在发生错误时拒绝。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>此方法进行数据库备份。此方法抽象了 <a href=\"https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupinit\"><code>sqlite3_backup_init()</code></a>、<a href=\"https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupstep\"><code>sqlite3_backup_step()</code></a> 和 <a href=\"https://www.sqlite.org/c3ref/backup_finish.html#sqlite3backupfinish\"><code>sqlite3_backup_finish()</code></a> 函数。</p>\n<p>备份的数据库在备份过程中可以正常使用。来自同一连接（同一个 <a href=\"sqlite.html#class-databasesync\" class=\"type\">&lt;DatabaseSync&gt;</a> 对象）的变更将立即反映在备份中。但是，来自其他连接的变更将导致备份过程重新启动。</p>\n<pre><code class=\"language-cjs\">const { backup, DatabaseSync } = require('node:sqlite');\n\n(async () => {\n  const sourceDb = new DatabaseSync('source.db');\n  const totalPagesTransferred = await backup(sourceDb, 'backup.db', {\n    rate: 1, // Copy one page at a time.\n    progress: ({ totalPages, remainingPages }) => {\n      console.log('Backup in progress', { totalPages, remainingPages });\n    },\n  });\n\n  console.log('Backup completed', totalPagesTransferred);\n})();\n</code></pre>\n<pre><code class=\"language-mjs\">import { backup, DatabaseSync } from 'node:sqlite';\n\nconst sourceDb = new DatabaseSync('source.db');\nconst totalPagesTransferred = await backup(sourceDb, 'backup.db', {\n  rate: 1, // Copy one page at a time.\n  progress: ({ totalPages, remainingPages }) => {\n    console.log('Backup in progress', { totalPages, remainingPages });\n  },\n});\n\nconsole.log('Backup completed', totalPagesTransferred);\n</code></pre>"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`constants` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v23.5.0",
+              "v22.13.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>包含 SQLite 操作常用常量的对象。</p>",
+          "modules": [
+            {
+              "textRaw": "SQLite 常量",
+              "name": "sqlite_常量",
+              "desc": "<p>以下常量由 <code>sqlite.constants</code> 对象导出。</p>",
+              "modules": [
+                {
+                  "textRaw": "冲突解决常量",
+                  "name": "冲突解决常量",
+                  "desc": "<p>以下常量之一可作为参数传递给传递给 <a href=\"#databaseapplychangesetchangeset-options\"><code>database.applyChangeset()</code></a> 的 <code>onConflict</code> 冲突解决处理程序。另请参阅 SQLite 文档中的[传递给冲突处理程序的常量][]。</p>\n<table>\n  <tr>\n    <th>常量</th>\n    <th>描述</th>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_DATA</code></td>\n    <td>当处理 DELETE 或 UPDATE 更改时，如果数据库中存在具有所需 PRIMARY KEY 字段的行，但更新修改的一个或多个其他（非主键）字段不包含预期的“之前”值，则使用此常量调用冲突处理程序。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_NOTFOUND</code></td>\n    <td>当处理 DELETE 或 UPDATE 更改时，如果数据库中不存在具有所需 PRIMARY KEY 字段的行，则使用此常量调用冲突处理程序。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_CONFLICT</code></td>\n    <td>在处理 INSERT 更改时，如果操作会导致重复的主键值，则将此常量传递给冲突处理程序。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_CONSTRAINT</code></td>\n    <td>如果启用了外键处理，并且应用变更集使数据库处于包含外键冲突的状态，则在提交变更集之前，使用此常量调用冲突处理程序一次。如果冲突处理程序返回 <code>SQLITE_CHANGESET_OMIT</code>，则提交更改，包括导致外键约束冲突的更改。或者，如果返回 <code>SQLITE_CHANGESET_ABORT</code>，则回滚变更集。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_FOREIGN_KEY</code></td>\n    <td>如果在应用更改时发生任何其他约束冲突（即 UNIQUE、CHECK 或 NOT NULL 约束），则使用此常量调用冲突处理程序。</td>\n  </tr>\n</table>\n<p>以下常量之一必须从传递给 <a href=\"#databaseapplychangesetchangeset-options\"><code>database.applyChangeset()</code></a> 的 <code>onConflict</code> 冲突解决处理程序返回。另请参阅 SQLite 文档中的[从冲突处理程序返回的常量][]。</p>\n<table>\n  <tr>\n    <th>常量</th>\n    <th>描述</th>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_OMIT</code></td>\n    <td>忽略冲突的更改。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_REPLACE</code></td>\n    <td>冲突的更改替换现有值。请注意，仅当冲突类型为 <code>SQLITE_CHANGESET_DATA</code> 或 <code>SQLITE_CHANGESET_CONFLICT</code> 时才能返回此值。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CHANGESET_ABORT</code></td>\n    <td>当更改遇到冲突时中止并回滚数据库。</td>\n  </tr>\n</table>",
+                  "type": "module",
+                  "displayName": "冲突解决常量"
+                },
+                {
+                  "textRaw": "授权常量",
+                  "name": "授权常量",
+                  "desc": "<p>以下常量与 <a href=\"#databasesetauthorizercallback\"><code>database.setAuthorizer()</code></a> 方法一起使用。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "授权结果码",
+                      "name": "授权结果码",
+                      "desc": "<p>以下常量之一必须从传递给 <a href=\"#databasesetauthorizercallback\"><code>database.setAuthorizer()</code></a> 的授权器回调函数返回。</p>\n<table>\n  <tr>\n    <th>常量</th>\n    <th>描述</th>\n  </tr>\n  <tr>\n    <td><code>SQLITE_OK</code></td>\n    <td>允许操作正常进行。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DENY</code></td>\n    <td>拒绝操作并导致返回错误。</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_IGNORE</code></td>\n    <td>忽略操作并继续，就像从未请求过一样。</td>\n  </tr>\n</table>",
+                      "type": "module",
+                      "displayName": "授权结果码"
+                    },
+                    {
+                      "textRaw": "授权操作码",
+                      "name": "授权操作码",
+                      "desc": "<p>以下常量作为第一个参数传递给授权器回调函数，以指示正在授权的操作类型。</p>\n<table>\n  <tr>\n    <th>常量</th>\n    <th>描述</th>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_INDEX</code></td>\n    <td>创建索引</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_TABLE</code></td>\n    <td>创建表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_TEMP_INDEX</code></td>\n    <td>创建临时索引</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_TEMP_TABLE</code></td>\n    <td>创建临时表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_TEMP_TRIGGER</code></td>\n    <td>创建临时触发器</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_TEMP_VIEW</code></td>\n    <td>创建临时视图</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_TRIGGER</code></td>\n    <td>创建触发器</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_VIEW</code></td>\n    <td>创建视图</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DELETE</code></td>\n    <td>从表中删除</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_INDEX</code></td>\n    <td>删除索引</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_TABLE</code></td>\n    <td>删除表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_TEMP_INDEX</code></td>\n    <td>删除临时索引</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_TEMP_TABLE</code></td>\n    <td>删除临时表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_TEMP_TRIGGER</code></td>\n    <td>删除临时触发器</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_TEMP_VIEW</code></td>\n    <td>删除临时视图</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_TRIGGER</code></td>\n    <td>删除触发器</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_VIEW</code></td>\n    <td>删除视图</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_INSERT</code></td>\n    <td>插入到表中</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_PRAGMA</code></td>\n    <td>执行 PRAGMA 语句</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_READ</code></td>\n    <td>从表中读取</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_SELECT</code></td>\n    <td>执行 SELECT 语句</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_TRANSACTION</code></td>\n    <td>开始、提交或回滚事务</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_UPDATE</code></td>\n    <td>更新表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_ATTACH</code></td>\n    <td>附加数据库</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DETACH</code></td>\n    <td>分离数据库</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_ALTER_TABLE</code></td>\n    <td>更改表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_REINDEX</code></td>\n    <td>重新索引</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_ANALYZE</code></td>\n    <td>分析数据库</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_CREATE_VTABLE</code></td>\n    <td>创建虚拟表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_DROP_VTABLE</code></td>\n    <td>删除虚拟表</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_FUNCTION</code></td>\n    <td>使用函数</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_SAVEPOINT</code></td>\n    <td>创建、释放或回滚保存点</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_COPY</code></td>\n    <td>复制数据（旧版）</td>\n  </tr>\n  <tr>\n    <td><code>SQLITE_RECURSIVE</code></td>\n    <td>递归查询</td>\n  </tr>\n</table>",
+                      "type": "module",
+                      "displayName": "授权操作码"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "授权常量"
+                }
+              ],
+              "type": "module",
+              "displayName": "SQLite 常量"
+            }
+          ]
+        }
+      ],
+      "type": "module",
+      "displayName": "SQLite"
+    }
+  ]
+}

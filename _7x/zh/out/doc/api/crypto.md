@@ -1,0 +1,5732 @@
+# Crypto
+
+<!--introduced_in=v0.3.6-->
+
+> Stability: 2 - Stable
+
+<!-- source_link=lib/crypto.js -->
+
+`node:crypto` 模块提供了加密功能，其中包含对 OpenSSL 的哈希、HMAC、加密、解密、签名和验证函数的一组封装。
+
+```mjs
+const { createHmac } = await import('node:crypto');
+
+const secret = 'abcdefg';
+const hash = createHmac('sha256', secret)
+               .update('I love cupcakes')
+               .digest('hex');
+console.log(hash);
+// 打印:
+//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e
+```
+
+```cjs
+const { createHmac } = require('node:crypto');
+
+const secret = 'abcdefg';
+const hash = createHmac('sha256', secret)
+               .update('I love cupcakes')
+               .digest('hex');
+console.log(hash);
+// 打印:
+//   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e
+```
+
+## 确定是否支持 crypto
+
+Node.js 可能是在没有包含对 `node:crypto` 模块支持的情况下构建的。在这种情况下，尝试从 `crypto` 模块 `import` 或调用 `require('node:crypto')` 将导致抛出错误。
+
+当使用 CommonJS 时，可以使用 try/catch 捕获抛出的错误：
+
+<!-- eslint-disable no-global-assign -->
+
+```cjs
+let crypto;
+try {
+  crypto = require('node:crypto');
+} catch (err) {
+  console.error('crypto support is disabled!');
+}
+```
+
+<!-- eslint-enable no-global-assign -->
+
+当使用词法 ESM `import` 关键字时，只有在尝试加载模块之前（例如，使用预加载模块）注册了 `process.on('uncaughtException')` 的处理程序时，才能捕获错误。
+
+当使用 ESM 时，如果代码可能在不支持 crypto 的 Node.js 构建版本上运行，请考虑使用 [`import()`][] 函数而不是词法 `import` 关键字：
+
+```mjs
+let crypto;
+try {
+  crypto = await import('node:crypto');
+} catch (err) {
+  console.error('crypto support is disabled!');
+}
+```
+
+## 非对称密钥类型
+
+下表列出了 [`KeyObject`][] API 识别的非对称密钥类型：
+
+| 密钥类型                           | 描述               | OID                     |
+| ---------------------------------- | ------------------ | ----------------------- |
+| `'dh'`                             | Diffie-Hellman     | 1.2.840.113549.1.3.1    |
+| `'dsa'`                            | DSA                | 1.2.840.10040.4.1       |
+| `'ec'`                             | 椭圆曲线           | 1.2.840.10045.2.1       |
+| `'ed25519'`                        | Ed25519            | 1.3.101.112             |
+| `'ed448'`                          | Ed448              | 1.3.101.113             |
+| `'ml-dsa-44'`[^openssl35]          | ML-DSA-44          | 2.16.840.1.101.3.4.3.17 |
+| `'ml-dsa-65'`[^openssl35]          | ML-DSA-65          | 2.16.840.1.101.3.4.3.18 |
+| `'ml-dsa-87'`[^openssl35]          | ML-DSA-87          | 2.16.840.1.101.3.4.3.19 |
+| `'ml-kem-512'`[^openssl35]         | ML-KEM-512         | 2.16.840.1.101.3.4.4.1  |
+| `'ml-kem-768'`[^openssl35]         | ML-KEM-768         | 2.16.840.1.101.3.4.4.2  |
+| `'ml-kem-1024'`[^openssl35]        | ML-KEM-1024        | 2.16.840.1.101.3.4.4.3  |
+| `'rsa-pss'`                        | RSA PSS            | 1.2.840.113549.1.1.10   |
+| `'rsa'`                            | RSA                | 1.2.840.113549.1.1.1    |
+| `'slh-dsa-sha2-128f'`[^openssl35]  | SLH-DSA-SHA2-128f  | 2.16.840.1.101.3.4.3.21 |
+| `'slh-dsa-sha2-128s'`[^openssl35]  | SLH-DSA-SHA2-128s  | 2.16.840.1.101.3.4.3.22 |
+| `'slh-dsa-sha2-192f'`[^openssl35]  | SLH-DSA-SHA2-192f  | 2.16.840.1.101.3.4.3.23 |
+| `'slh-dsa-sha2-192s'`[^openssl35]  | SLH-DSA-SHA2-192s  | 2.16.840.1.101.3.4.3.24 |
+| `'slh-dsa-sha2-256f'`[^openssl35]  | SLH-DSA-SHA2-256f  | 2.16.840.1.101.3.4.3.25 |
+| `'slh-dsa-sha2-256s'`[^openssl35]  | SLH-DSA-SHA2-256s  | 2.16.840.1.101.3.4.3.26 |
+| `'slh-dsa-shake-128f'`[^openssl35] | SLH-DSA-SHAKE-128f | 2.16.840.1.101.3.4.3.27 |
+| `'slh-dsa-shake-128s'`[^openssl35] | SLH-DSA-SHAKE-128s | 2.16.840.1.101.3.4.3.28 |
+| `'slh-dsa-shake-192f'`[^openssl35] | SLH-DSA-SHAKE-192f | 2.16.840.1.101.3.4.3.29 |
+| `'slh-dsa-shake-192s'`[^openssl35] | SLH-DSA-SHAKE-192s | 2.16.840.1.101.3.4.3.30 |
+| `'slh-dsa-shake-256f'`[^openssl35] | SLH-DSA-SHAKE-256f | 2.16.840.1.101.3.4.3.31 |
+| `'slh-dsa-shake-256s'`[^openssl35] | SLH-DSA-SHAKE-256s | 2.16.840.1.101.3.4.3.32 |
+| `'x25519'`                         | X25519             | 1.3.101.110             |
+| `'x448'`                           | X448               | 1.3.101.111             |
+
+## 类：`Certificate`
+
+<!-- YAML
+added: v0.11.8
+-->
+
+SPKAC 是最初由 Netscape 实现的证书签名请求机制，并正式指定为 HTML5 的 `keygen` 元素的一部分。
+
+`<keygen>` 自 [HTML 5.2][] 起已被弃用，新项目不应再使用此元素。
+
+`node:crypto` 模块提供了 `Certificate` 类用于处理 SPKAC 数据。最常见的用法是处理由 HTML5 `<keygen>` 元素生成的输出。Node.js 在内部使用 [OpenSSL 的 SPKAC 实现][]。
+
+### 静态方法：`Certificate.exportChallenge(spkac[, encoding])`
+
+<!-- YAML
+added: v9.0.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The spkac argument can be an ArrayBuffer. Limited the size of
+                 the spkac argument to a maximum of 2**31 - 1 bytes.
+-->
+
+* `spkac` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `spkac` 字符串的[编码][encoding]。
+* 返回：{Buffer} `spkac` 数据结构中的挑战组件，包含公钥和挑战。
+
+```mjs
+const { Certificate } = await import('node:crypto');
+const spkac = getSpkacSomehow();
+const challenge = Certificate.exportChallenge(spkac);
+console.log(challenge.toString('utf8'));
+// 打印：挑战作为 UTF8 字符串
+```
+
+```cjs
+const { Certificate } = require('node:crypto');
+const spkac = getSpkacSomehow();
+const challenge = Certificate.exportChallenge(spkac);
+console.log(challenge.toString('utf8'));
+// 打印：挑战作为 UTF8 字符串
+```
+
+### 静态方法：`Certificate.exportPublicKey(spkac[, encoding])`
+
+<!-- YAML
+added: v9.0.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The spkac argument can be an ArrayBuffer. Limited the size of
+                 the spkac argument to a maximum of 2**31 - 1 bytes.
+-->
+
+* `spkac` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `spkac` 字符串的[编码][encoding]。
+* 返回：{Buffer} `spkac` 数据结构中的公钥组件，包含公钥和挑战。
+
+```mjs
+const { Certificate } = await import('node:crypto');
+const spkac = getSpkacSomehow();
+const publicKey = Certificate.exportPublicKey(spkac);
+console.log(publicKey);
+// 打印：公钥为 <Buffer ...>
+```
+
+```cjs
+const { Certificate } = require('node:crypto');
+const spkac = getSpkacSomehow();
+const publicKey = Certificate.exportPublicKey(spkac);
+console.log(publicKey);
+// 打印：公钥为 <Buffer ...>
+```
+
+### 静态方法：`Certificate.verifySpkac(spkac[, encoding])`
+
+<!-- YAML
+added: v9.0.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The spkac argument can be an ArrayBuffer. Added encoding.
+                 Limited the size of the spkac argument to a maximum of
+                 2**31 - 1 bytes.
+-->
+
+* `spkac` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `spkac` 字符串的[编码][encoding]。
+* 返回：{boolean} 如果给定的 `spkac` 数据结构有效，则为 `true`，否则为 `false`。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const { Certificate } = await import('node:crypto');
+
+const spkac = getSpkacSomehow();
+console.log(Certificate.verifySpkac(Buffer.from(spkac)));
+// 打印：true 或 false
+```
+
+```cjs
+const { Buffer } = require('node:buffer');
+const { Certificate } = require('node:crypto');
+
+const spkac = getSpkacSomehow();
+console.log(Certificate.verifySpkac(Buffer.from(spkac)));
+// 打印：true 或 false
+```
+
+### 旧版 API
+
+> Stability: 0 - Deprecated
+
+作为旧版接口，可以创建 `crypto.Certificate` 类的新实例，如下例所示。
+
+#### `new crypto.Certificate()`
+
+可以使用 `new` 关键字或通过调用 `crypto.Certificate()` 作为函数来创建 `Certificate` 类的实例：
+
+```mjs
+const { Certificate } = await import('node:crypto');
+
+const cert1 = new Certificate();
+const cert2 = Certificate();
+```
+
+```cjs
+const { Certificate } = require('node:crypto');
+
+const cert1 = new Certificate();
+const cert2 = Certificate();
+```
+
+#### `certificate.exportChallenge(spkac[, encoding])`
+
+<!-- YAML
+added: v0.11.8
+-->
+
+* `spkac` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `spkac` 字符串的[编码][encoding]。
+* 返回：{Buffer} `spkac` 数据结构中的挑战组件，包含公钥和挑战。
+
+```mjs
+const { Certificate } = await import('node:crypto');
+const cert = Certificate();
+const spkac = getSpkacSomehow();
+const challenge = cert.exportChallenge(spkac);
+console.log(challenge.toString('utf8'));
+// 打印：挑战作为 UTF8 字符串
+```
+
+```cjs
+const { Certificate } = require('node:crypto');
+const cert = Certificate();
+const spkac = getSpkacSomehow();
+const challenge = cert.exportChallenge(spkac);
+console.log(challenge.toString('utf8'));
+// 打印：挑战作为 UTF8 字符串
+```
+
+#### `certificate.exportPublicKey(spkac[, encoding])`
+
+<!-- YAML
+added: v0.11.8
+-->
+
+* `spkac` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `spkac` 字符串的[编码][encoding]。
+* 返回：{Buffer} `spkac` 数据结构中的公钥组件，包含公钥和挑战。
+
+```mjs
+const { Certificate } = await import('node:crypto');
+const cert = Certificate();
+const spkac = getSpkacSomehow();
+const publicKey = cert.exportPublicKey(spkac);
+console.log(publicKey);
+// 打印：公钥为 <Buffer ...>
+```
+
+```cjs
+const { Certificate } = require('node:crypto');
+const cert = Certificate();
+const spkac = getSpkacSomehow();
+const publicKey = cert.exportPublicKey(spkac);
+console.log(publicKey);
+// 打印：公钥为 <Buffer ...>
+```
+
+#### `certificate.verifySpkac(spkac[, encoding])`
+
+<!-- YAML
+added: v0.11.8
+-->
+
+* `spkac` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `spkac` 字符串的[编码][encoding]。
+* 返回：{boolean} 如果给定的 `spkac` 数据结构有效，则为 `true`，否则为 `false`。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const { Certificate } = await import('node:crypto');
+
+const cert = Certificate();
+const spkac = getSpkacSomehow();
+console.log(cert.verifySpkac(Buffer.from(spkac)));
+// 打印：true 或 false
+```
+
+```cjs
+const { Buffer } = require('node:buffer');
+const { Certificate } = require('node:crypto');
+
+const cert = Certificate();
+const spkac = getSpkacSomehow();
+console.log(cert.verifySpkac(Buffer.from(spkac)));
+// 打印：true 或 false
+```
+
+## 类：`Cipheriv`
+
+<!-- YAML
+added: v0.1.94
+-->
+
+* 继承：{stream.Transform}
+
+`Cipheriv` 类的实例用于加密数据。该类可以通过两种方式之一使用：
+
+* 作为既可读又可写的[流][stream]，其中写入未加密的明文数据以在可读端产生加密数据，或
+* 使用 [`cipher.update()`][] 和 [`cipher.final()`][] 方法产生加密数据。
+
+[`crypto.createCipheriv()`][] 方法用于创建 `Cipheriv` 实例。不应直接使用 `new` 关键字创建 `Cipheriv` 对象。
+
+示例：将 `Cipheriv` 对象用作流：
+
+```mjs
+const {
+  scrypt,
+  randomFill,
+  createCipheriv,
+} = await import('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+
+// 首先，我们将生成密钥。密钥长度取决于算法。
+// 对于 aes192，它是 24 字节（192 位）。
+scrypt(password, 'salt', 24, (err, key) => {
+  if (err) throw err;
+  // 然后，我们将生成一个随机初始化向量
+  randomFill(new Uint8Array(16), (err, iv) => {
+    if (err) throw err;
+
+    // 一旦我们有了密钥和 iv，就可以创建并使用 cipher...
+    const cipher = createCipheriv(algorithm, key, iv);
+
+    let encrypted = '';
+    cipher.setEncoding('hex');
+
+    cipher.on('data', (chunk) => encrypted += chunk);
+    cipher.on('end', () => console.log(encrypted));
+
+    cipher.write('some clear text data');
+    cipher.end();
+  });
+});
+```
+
+```cjs
+const {
+  scrypt,
+  randomFill,
+  createCipheriv,
+} = require('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+
+// 首先，我们将生成密钥。密钥长度取决于算法。
+// 对于 aes192，它是 24 字节（192 位）。
+scrypt(password, 'salt', 24, (err, key) => {
+  if (err) throw err;
+  // 然后，我们将生成一个随机初始化向量
+  randomFill(new Uint8Array(16), (err, iv) => {
+    if (err) throw err;
+
+    // 一旦我们有了密钥和 iv，就可以创建并使用 cipher...
+    const cipher = createCipheriv(algorithm, key, iv);
+
+    let encrypted = '';
+    cipher.setEncoding('hex');
+
+    cipher.on('data', (chunk) => encrypted += chunk);
+    cipher.on('end', () => console.log(encrypted));
+
+    cipher.write('some clear text data');
+    cipher.end();
+  });
+});
+```
+
+示例：使用 `Cipheriv` 和管道流：
+
+```mjs
+import {
+  createReadStream,
+  createWriteStream,
+} from 'node:fs';
+
+import {
+  pipeline,
+} from 'node:stream';
+
+const {
+  scrypt,
+  randomFill,
+  createCipheriv,
+} = await import('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+
+// 首先，我们将生成密钥。密钥长度取决于算法。
+// 对于 aes192，它是 24 字节（192 位）。
+scrypt(password, 'salt', 24, (err, key) => {
+  if (err) throw err;
+  // 然后，我们将生成一个随机初始化向量
+  randomFill(new Uint8Array(16), (err, iv) => {
+    if (err) throw err;
+
+    const cipher = createCipheriv(algorithm, key, iv);
+
+    const input = createReadStream('test.js');
+    const output = createWriteStream('test.enc');
+
+    pipeline(input, cipher, output, (err) => {
+      if (err) throw err;
+    });
+  });
+});
+```
+
+```cjs
+const {
+  createReadStream,
+  createWriteStream,
+} = require('node:fs');
+
+const {
+  pipeline,
+} = require('node:stream');
+
+const {
+  scrypt,
+  randomFill,
+  createCipheriv,
+} = require('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+
+// 首先，我们将生成密钥。密钥长度取决于算法。
+// 对于 aes192，它是 24 字节（192 位）。
+scrypt(password, 'salt', 24, (err, key) => {
+  if (err) throw err;
+  // 然后，我们将生成一个随机初始化向量
+  randomFill(new Uint8Array(16), (err, iv) => {
+    if (err) throw err;
+
+    const cipher = createCipheriv(algorithm, key, iv);
+
+    const input = createReadStream('test.js');
+    const output = createWriteStream('test.enc');
+
+    pipeline(input, cipher, output, (err) => {
+      if (err) throw err;
+    });
+  });
+});
+```
+
+示例：使用 [`cipher.update()`][] 和 [`cipher.final()`][] 方法：
+
+```mjs
+const {
+  scrypt,
+  randomFill,
+  createCipheriv,
+} = await import('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+
+// 首先，我们将生成密钥。密钥长度取决于算法。
+// 对于 aes192，它是 24 字节（192 位）。
+scrypt(password, 'salt', 24, (err, key) => {
+  if (err) throw err;
+  // 然后，我们将生成一个随机初始化向量
+  randomFill(new Uint8Array(16), (err, iv) => {
+    if (err) throw err;
+
+    const cipher = createCipheriv(algorithm, key, iv);
+
+    let encrypted = cipher.update('some clear text data', 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    console.log(encrypted);
+  });
+});
+```
+
+```cjs
+const {
+  scrypt,
+  randomFill,
+  createCipheriv,
+} = require('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+
+// 首先，我们将生成密钥。密钥长度取决于算法。
+// 对于 aes192，它是 24 字节（192 位）。
+scrypt(password, 'salt', 24, (err, key) => {
+  if (err) throw err;
+  // 然后，我们将生成一个随机初始化向量
+  randomFill(new Uint8Array(16), (err, iv) => {
+    if (err) throw err;
+
+    const cipher = createCipheriv(algorithm, key, iv);
+
+    let encrypted = cipher.update('some clear text data', 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    console.log(encrypted);
+  });
+});
+```
+
+### `cipher.final([outputEncoding])`
+
+<!-- YAML
+added: v0.1.94
+-->
+
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string} 任何剩余的加密内容。
+  如果指定了 `outputEncoding`，则返回字符串。
+  如果未提供 `outputEncoding`，则返回 [`Buffer`][]。
+
+一旦调用了 `cipher.final()` 方法，`Cipheriv` 对象就不能再用于加密数据。尝试多次调用 `cipher.final()` 将导致抛出错误。
+
+### `cipher.getAuthTag()`
+
+<!-- YAML
+added: v1.0.0
+-->
+
+* 返回：{Buffer} 当使用认证加密模式（目前支持 `GCM`、`CCM`、`OCB` 和 `chacha20-poly1305`）时，`cipher.getAuthTag()` 方法返回一个 [`Buffer`][]，其中包含从给定数据计算出的 _认证标签_。
+
+`cipher.getAuthTag()` 方法应在使用 [`cipher.final()`][] 方法完成加密后调用。
+
+如果在 `cipher` 实例创建期间设置了 `authTagLength` 选项，此函数将返回恰好 `authTagLength` 字节。
+
+### `cipher.setAAD(buffer[, options])`
+
+<!-- YAML
+added: v1.0.0
+-->
+
+* `buffer` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `options` {Object} [`stream.transform` 选项][]
+  * `plaintextLength` {number}
+  * `encoding` {string} 当 `buffer` 是字符串时要使用的字符串编码。
+* 返回：{Cipheriv} 用于方法链的相同 `Cipheriv` 实例。
+
+当使用认证加密模式（目前支持 `GCM`、`CCM`、`OCB` 和 `chacha20-poly1305`）时，`cipher.setAAD()` 方法设置用于 _附加认证数据_ (AAD) 输入参数的值。
+
+`plaintextLength` 选项对于 `GCM` 和 `OCB` 是可选的。当使用 `CCM` 时，必须指定 `plaintextLength` 选项，并且其值必须与明文的长度（以字节为单位）匹配。参见 [CCM 模式][]。
+
+`cipher.setAAD()` 方法必须在 [`cipher.update()`][] 之前调用。
+
+### `cipher.setAutoPadding([autoPadding])`
+
+<!-- YAML
+added: v0.7.1
+-->
+
+* `autoPadding` {boolean} **默认值：** `true`
+* 返回：{Cipheriv} 用于方法链的相同 `Cipheriv` 实例。
+
+当使用分组加密算法时，`Cipheriv` 类会自动向输入数据添加填充到适当的分组大小。要禁用默认填充，请调用 `cipher.setAutoPadding(false)`。
+
+当 `autoPadding` 为 `false` 时，整个输入数据的长度必须是密码分组大小的倍数，否则 [`cipher.final()`][] 将抛出错误。禁用自动填充对于非标准填充很有用，例如使用 `0x0` 而不是 PKCS 填充。
+
+`cipher.setAutoPadding()` 方法必须在 [`cipher.final()`][] 之前调用。
+
+### `cipher.update(data[, inputEncoding][, outputEncoding])`
+
+<!-- YAML
+added: v0.1.94
+changes:
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `data` {string|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} 数据的[编码][encoding]。
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+使用 `data` 更新密码。如果给出了 `inputEncoding` 参数，则 `data` 参数是使用指定编码的字符串。如果未给出 `inputEncoding` 参数，则 `data` 必须是 [`Buffer`][]、`TypedArray` 或 `DataView`。如果 `data` 是 [`Buffer`][]、`TypedArray` 或 `DataView`，则忽略 `inputEncoding`。
+
+`outputEncoding` 指定加密数据的输出格式。如果指定了 `outputEncoding`，则返回使用指定编码的字符串。如果未提供 `outputEncoding`，则返回 [`Buffer`][]。
+
+`cipher.update()` 方法可以在调用 [`cipher.final()`][] 之前多次调用新数据。在 [`cipher.final()`][] 之后调用 `cipher.update()` 将导致抛出错误。
+
+## 类：`Decipheriv`
+
+<!-- YAML
+added: v0.1.94
+-->
+
+* 继承：{stream.Transform}
+
+`Decipheriv` 类的实例用于解密数据。该类可以通过两种方式之一使用：
+
+* 作为既可读又可写的[流][stream]，其中写入加密的明文数据以在可读端产生未加密数据，或
+* 使用 [`decipher.update()`][] 和 [`decipher.final()`][] 方法产生未加密数据。
+
+[`crypto.createDecipheriv()`][] 方法用于创建 `Decipheriv` 实例。不应直接使用 `new` 关键字创建 `Decipheriv` 对象。
+
+示例：将 `Decipheriv` 对象用作流：
+
+```mjs
+import { Buffer } from 'node:buffer';
+const {
+  scryptSync,
+  createDecipheriv,
+} = await import('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+// 密钥长度取决于算法。对于 aes192，它是
+// 24 字节（192 位）。
+// 请改用异步的 `crypto.scrypt()`。
+const key = scryptSync(password, 'salt', 24);
+// IV 通常与密文一起传递。
+const iv = Buffer.alloc(16, 0); // 初始化向量。
+
+const decipher = createDecipheriv(algorithm, key, iv);
+
+let decrypted = '';
+decipher.on('readable', () => {
+  let chunk;
+  while (null !== (chunk = decipher.read())) {
+    decrypted += chunk.toString('utf8');
+  }
+});
+decipher.on('end', () => {
+  console.log(decrypted);
+  // 打印：some clear text data
+});
+
+// 使用相同的算法、密钥和 iv 加密。
+const encrypted =
+  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';
+decipher.write(encrypted, 'hex');
+decipher.end();
+```
+
+```cjs
+const {
+  scryptSync,
+  createDecipheriv,
+} = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+// 密钥长度取决于算法。对于 aes192，它是
+// 24 字节（192 位）。
+// 请改用异步的 `crypto.scrypt()`。
+const key = scryptSync(password, 'salt', 24);
+// IV 通常与密文一起传递。
+const iv = Buffer.alloc(16, 0); // 初始化向量。
+
+const decipher = createDecipheriv(algorithm, key, iv);
+
+let decrypted = '';
+decipher.on('readable', () => {
+  let chunk;
+  while (null !== (chunk = decipher.read())) {
+    decrypted += chunk.toString('utf8');
+  }
+});
+decipher.on('end', () => {
+  console.log(decrypted);
+  // 打印：some clear text data
+});
+
+// 使用相同的算法、密钥和 iv 加密。
+const encrypted =
+  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';
+decipher.write(encrypted, 'hex');
+decipher.end();
+```
+
+示例：使用 `Decipheriv` 和管道流：
+
+```mjs
+import {
+  createReadStream,
+  createWriteStream,
+} from 'node:fs';
+import { Buffer } from 'node:buffer';
+const {
+  scryptSync,
+  createDecipheriv,
+} = await import('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+// 请改用异步的 `crypto.scrypt()`。
+const key = scryptSync(password, 'salt', 24);
+// IV 通常与密文一起传递。
+const iv = Buffer.alloc(16, 0); // 初始化向量。
+
+const decipher = createDecipheriv(algorithm, key, iv);
+
+const input = createReadStream('test.enc');
+const output = createWriteStream('test.js');
+
+input.pipe(decipher).pipe(output);
+```
+
+```cjs
+const {
+  createReadStream,
+  createWriteStream,
+} = require('node:fs');
+const {
+  scryptSync,
+  createDecipheriv,
+} = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+// 请改用异步的 `crypto.scrypt()`。
+const key = scryptSync(password, 'salt', 24);
+// IV 通常与密文一起传递。
+const iv = Buffer.alloc(16, 0); // 初始化向量。
+
+const decipher = createDecipheriv(algorithm, key, iv);
+
+const input = createReadStream('test.enc');
+const output = createWriteStream('test.js');
+
+input.pipe(decipher).pipe(output);
+```
+
+示例：使用 [`decipher.update()`][] 和 [`decipher.final()`][] 方法：
+
+```mjs
+import { Buffer } from 'node:buffer';
+const {
+  scryptSync,
+  createDecipheriv,
+} = await import('node:crypto');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+// 请改用异步的 `crypto.scrypt()`。
+const key = scryptSync(password, 'salt', 24);
+// IV 通常与密文一起传递。
+const iv = Buffer.alloc(16, 0); // 初始化向量。
+
+const decipher = createDecipheriv(algorithm, key, iv);
+
+// 使用相同的算法、密钥和 iv 加密。
+const encrypted =
+  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';
+let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+decrypted += decipher.final('utf8');
+console.log(decrypted);
+// 打印：some clear text data
+```
+
+```cjs
+const {
+  scryptSync,
+  createDecipheriv,
+} = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const algorithm = 'aes-192-cbc';
+const password = 'Password used to generate key';
+// 请改用异步的 `crypto.scrypt()`。
+const key = scryptSync(password, 'salt', 24);
+// IV 通常与密文一起传递。
+const iv = Buffer.alloc(16, 0); // 初始化向量。
+
+const decipher = createDecipheriv(algorithm, key, iv);
+
+// 使用相同的算法、密钥和 iv 加密。
+const encrypted =
+  'e5f79c5915c02171eec6b212d5520d44480993d7d622a7c4c2da32f6efda0ffa';
+let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+decrypted += decipher.final('utf8');
+console.log(decrypted);
+// 打印：some clear text data
+```
+
+### `decipher.final([outputEncoding])`
+
+<!-- YAML
+added: v0.1.94
+-->
+
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string} 任何剩余的解密内容。
+  如果指定了 `outputEncoding`，则返回字符串。
+  如果未提供 `outputEncoding`，则返回 [`Buffer`][]。
+
+一旦调用了 `decipher.final()` 方法，`Decipheriv` 对象就不能再用于解密数据。尝试多次调用 `decipher.final()` 将导致抛出错误。
+
+### `decipher.setAAD(buffer[, options])`
+
+<!-- YAML
+added: v1.0.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The buffer argument can be a string or ArrayBuffer and is
+                limited to no more than 2 ** 31 - 1 bytes.
+  - version: v7.2.0
+    pr-url: https://github.com/nodejs/node/pull/9398
+    description: This method now returns a reference to `decipher`.
+-->
+
+* `buffer` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `options` {Object} [`stream.transform` 选项][]
+  * `plaintextLength` {number}
+  * `encoding` {string} 当 `buffer` 是字符串时要使用的字符串编码。
+* 返回：{Decipheriv} 用于方法链的相同 Decipher。
+
+当使用认证加密模式（目前支持 `GCM`、`CCM`、`OCB` 和 `chacha20-poly1305`）时，`decipher.setAAD()` 方法设置用于 _附加认证数据_ (AAD) 输入参数的值。
+
+`options` 参数对于 `GCM` 是可选的。当使用 `CCM` 时，必须指定 `plaintextLength` 选项，并且其值必须与密文的长度（以字节为单位）匹配。参见 [CCM 模式][]。
+
+`decipher.setAAD()` 方法必须在 [`decipher.update()`][] 之前调用。
+
+当传递字符串作为 `buffer` 时，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。
+
+### `decipher.setAuthTag(buffer[, encoding])`
+
+<!-- YAML
+added: v1.0.0
+changes:
+  - version:
+    - v22.0.0
+    - v20.13.0
+    pr-url: https://github.com/nodejs/node/pull/52345
+    description: Using GCM tag lengths other than 128 bits without specifying
+                 the `authTagLength` option when creating `decipher` is
+                 deprecated.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The buffer argument can be a string or ArrayBuffer and is
+                limited to no more than 2 ** 31 - 1 bytes.
+  - version: v11.0.0
+    pr-url: https://github.com/nodejs/node/pull/17825
+    description: This method now throws if the GCM tag length is invalid.
+  - version: v7.2.0
+    pr-url: https://github.com/nodejs/node/pull/9398
+    description: This method now returns a reference to `decipher`.
+-->
+
+* `buffer` {string|Buffer|ArrayBuffer|TypedArray|DataView}
+* `encoding` {string} 当 `buffer` 是字符串时要使用的字符串编码。
+* 返回：{Decipheriv} 用于方法链的相同 Decipher。
+
+当使用认证加密模式（目前支持 `GCM`、`CCM`、`OCB` 和 `chacha20-poly1305`）时，`decipher.setAuthTag()` 方法用于传入接收到的 _认证标签_。如果未提供标签，或者密文已被篡改，[`decipher.final()`][] 将抛出错误，指示由于认证失败应丢弃密文。如果标签长度根据 [NIST SP 800-38D][] 无效或与 `authTagLength` 选项的值不匹配，`decipher.setAuthTag()` 将抛出错误。
+
+`decipher.setAuthTag()` 方法必须在 `CCM` 模式的 [`decipher.update()`][] 之前调用，或在 `GCM` 和 `OCB` 模式以及 `chacha20-poly1305` 的 [`decipher.final()`][] 之前调用。
+`decipher.setAuthTag()` 只能调用一次。
+
+当传递字符串作为认证标签时，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。
+
+### `decipher.setAutoPadding([autoPadding])`
+
+<!-- YAML
+added: v0.7.1
+-->
+
+* `autoPadding` {boolean} **默认值：** `true`
+* 返回：{Decipheriv} 用于方法链的相同 Decipher。
+
+当数据在没有标准分组填充的情况下加密时，调用 `decipher.setAutoPadding(false)` 将禁用自动填充，以防止 [`decipher.final()`][] 检查并移除填充。
+
+关闭自动填充仅当输入数据的长度是密码分组大小的倍数时才有效。
+
+`decipher.setAutoPadding()` 方法必须在 [`decipher.final()`][] 之前调用。
+
+### `decipher.update(data[, inputEncoding][, outputEncoding])`
+
+<!-- YAML
+added: v0.1.94
+changes:
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `data` {string|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `data` 字符串的[编码][encoding]。
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+使用 `data` 更新解密器。如果给出了 `inputEncoding` 参数，则 `data` 参数是使用指定编码的字符串。如果未给出 `inputEncoding` 参数，则 `data` 必须是 [`Buffer`][]。如果 `data` 是 [`Buffer`][]，则忽略 `inputEncoding`。
+
+`outputEncoding` 指定加密数据的输出格式。如果指定了 `outputEncoding`，则返回使用指定编码的字符串。如果未提供 `outputEncoding`，则返回 [`Buffer`][]。
+
+`decipher.update()` 方法可以在调用 [`decipher.final()`][] 之前多次调用新数据。在 [`decipher.final()`][] 之后调用 `decipher.update()` 将导致抛出错误。
+
+即使底层密码实现了认证，此时从此函数返回的明文的真实性和完整性可能仍不确定。对于认证加密算法，通常在应用程序调用 [`decipher.final()`][] 时才建立真实性。
+
+## 类：`DiffieHellman`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+`DiffieHellman` 类是用于创建 Diffie-Hellman 密钥交换的实用工具。
+
+可以使用 [`crypto.createDiffieHellman()`][] 函数创建 `DiffieHellman` 类的实例。
+
+```mjs
+import assert from 'node:assert';
+
+const {
+  createDiffieHellman,
+} = await import('node:crypto');
+
+// 生成 Alice 的密钥...
+const alice = createDiffieHellman(2048);
+const aliceKey = alice.generateKeys();
+
+// 生成 Bob 的密钥...
+const bob = createDiffieHellman(alice.getPrime(), alice.getGenerator());
+const bobKey = bob.generateKeys();
+
+// 交换并生成密钥...
+const aliceSecret = alice.computeSecret(bobKey);
+const bobSecret = bob.computeSecret(aliceKey);
+
+// 正常
+assert.strictEqual(aliceSecret.toString('hex'), bobSecret.toString('hex'));
+```
+
+```cjs
+const assert = require('node:assert');
+
+const {
+  createDiffieHellman,
+} = require('node:crypto');
+
+// 生成 Alice 的密钥...
+const alice = createDiffieHellman(2048);
+const aliceKey = alice.generateKeys();
+
+// 生成 Bob 的密钥...
+const bob = createDiffieHellman(alice.getPrime(), alice.getGenerator());
+const bobKey = bob.generateKeys();
+
+// 交换并生成密钥...
+const aliceSecret = alice.computeSecret(bobKey);
+const bobSecret = bob.computeSecret(aliceKey);
+
+// 正常
+assert.strictEqual(aliceSecret.toString('hex'), bobSecret.toString('hex'));
+```
+
+### `diffieHellman.computeSecret(otherPublicKey[, inputEncoding][, outputEncoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `otherPublicKey` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `otherPublicKey` 字符串的[编码][encoding]。
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+使用 `otherPublicKey` 作为另一方的公钥计算共享密钥，并返回计算出的共享密钥。提供的密钥使用指定的 `inputEncoding` 解释，密钥使用指定的 `outputEncoding` 编码。
+如果未提供 `inputEncoding`，则 `otherPublicKey` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+如果给出了 `outputEncoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `diffieHellman.generateKeys([encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+生成私钥和公钥的 Diffie-Hellman 密钥值，除非它们已经生成或计算过，并以指定的 `encoding` 返回公钥。此密钥应传输给另一方。
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+此函数是 [`DH_generate_key()`][] 的薄包装。特别是，一旦生成了私钥或设置了私钥，调用此函数只会更新公钥，而不会生成新的私钥。
+
+### `diffieHellman.getGenerator([encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+以指定的 `encoding` 返回 Diffie-Hellman 生成器。
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `diffieHellman.getPrime([encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+以指定的 `encoding` 返回 Diffie-Hellman 质数。
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `diffieHellman.getPrivateKey([encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+以指定的 `encoding` 返回 Diffie-Hellman 私钥。
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `diffieHellman.getPublicKey([encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+以指定的 `encoding` 返回 Diffie-Hellman 公钥。
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `diffieHellman.setPrivateKey(privateKey[, encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `privateKey` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `privateKey` 字符串的[编码][encoding]。
+
+设置 Diffie-Hellman 私钥。如果提供了 `encoding` 参数，则 `privateKey` 应为字符串。如果未提供 `encoding`，则 `privateKey` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+此函数不会自动计算相关的公钥。可以使用 [`diffieHellman.setPublicKey()`][] 或 [`diffieHellman.generateKeys()`][] 手动提供公钥或自动派生它。
+
+### `diffieHellman.setPublicKey(publicKey[, encoding])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `publicKey` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `publicKey` 字符串的[编码][encoding]。
+
+设置 Diffie-Hellman 公钥。如果提供了 `encoding` 参数，则 `publicKey` 应为字符串。如果未提供 `encoding`，则 `publicKey` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+### `diffieHellman.verifyError`
+
+<!-- YAML
+added: v0.11.12
+-->
+
+一个位字段，包含在初始化 `DiffieHellman` 对象期间执行的检查产生的任何警告和/或错误。
+
+以下值对此属性有效（在 `node:constants` 模块中定义）：
+
+* `DH_CHECK_P_NOT_SAFE_PRIME`
+* `DH_CHECK_P_NOT_PRIME`
+* `DH_UNABLE_TO_CHECK_GENERATOR`
+* `DH_NOT_SUITABLE_GENERATOR`
+
+## 类：`DiffieHellmanGroup`
+
+<!-- YAML
+added: v0.7.5
+-->
+
+`DiffieHellmanGroup` 类以一个众所周知的 modp 组作为其参数。它的工作方式与 `DiffieHellman` 相同，只是它不允许在创建后更改其密钥。换句话说，它不实现 `setPublicKey()` 或 `setPrivateKey()` 方法。
+
+```mjs
+const { createDiffieHellmanGroup } = await import('node:crypto');
+const dh = createDiffieHellmanGroup('modp16');
+```
+
+```cjs
+const { createDiffieHellmanGroup } = require('node:crypto');
+const dh = createDiffieHellmanGroup('modp16');
+```
+
+支持以下组：
+
+* `'modp14'` (2048 位, [RFC 3526][] 第 3 节)
+* `'modp15'` (3072 位, [RFC 3526][] 第 4 节)
+* `'modp16'` (4096 位, [RFC 3526][] 第 5 节)
+* `'modp17'` (6144 位, [RFC 3526][] 第 6 节)
+* `'modp18'` (8192 位, [RFC 3526][] 第 7 节)
+
+以下组仍受支持但已弃用（参见[注意事项][Caveats]）：
+
+* `'modp1'` (768 位, [RFC 2409][] 第 6.1 节) <span class="deprecated-inline"></span>
+* `'modp2'` (1024 位, [RFC 2409][] 第 6.2 节) <span class="deprecated-inline"></span>
+* `'modp5'` (1536 位, [RFC 3526][] 第 2 节) <span class="deprecated-inline"></span>
+
+这些已弃用的组可能会在未来的 Node.js 版本中被移除。
+
+## 类：`ECDH`
+
+<!-- YAML
+added: v0.11.14
+-->
+
+`ECDH` 类是用于创建椭圆曲线 Diffie-Hellman (ECDH) 密钥交换的实用工具。
+
+可以使用 [`crypto.createECDH()`][] 函数创建 `ECDH` 类的实例。
+
+```mjs
+import assert from 'node:assert';
+
+const {
+  createECDH,
+} = await import('node:crypto');
+
+// 生成 Alice 的密钥...
+const alice = createECDH('secp521r1');
+const aliceKey = alice.generateKeys();
+
+// 生成 Bob 的密钥...
+const bob = createECDH('secp521r1');
+const bobKey = bob.generateKeys();
+
+// 交换并生成密钥...
+const aliceSecret = alice.computeSecret(bobKey);
+const bobSecret = bob.computeSecret(aliceKey);
+
+assert.strictEqual(aliceSecret.toString('hex'), bobSecret.toString('hex'));
+// 正常
+```
+
+```cjs
+const assert = require('node:assert');
+
+const {
+  createECDH,
+} = require('node:crypto');
+
+// 生成 Alice 的密钥...
+const alice = createECDH('secp521r1');
+const aliceKey = alice.generateKeys();
+
+// 生成 Bob 的密钥...
+const bob = createECDH('secp521r1');
+const bobKey = bob.generateKeys();
+
+// 交换并生成密钥...
+const aliceSecret = alice.computeSecret(bobKey);
+const bobSecret = bob.computeSecret(aliceKey);
+
+assert.strictEqual(aliceSecret.toString('hex'), bobSecret.toString('hex'));
+// 正常
+```
+
+### 静态方法：`ECDH.convertKey(key, curve[, inputEncoding[, outputEncoding[, format]]])`
+
+<!-- YAML
+added: v10.0.0
+-->
+
+* `key` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `curve` {string}
+* `inputEncoding` {string} `key` 字符串的[编码][encoding]。
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* `format` {string} **默认值：** `'uncompressed'`
+* 返回：{Buffer | string}
+
+将由 `key` 和 `curve` 指定的 EC Diffie-Hellman 公钥转换为 `format` 指定的格式。`format` 参数指定点编码，可以是 `'compressed'`、`'uncompressed'` 或 `'hybrid'`。提供的密钥使用指定的 `inputEncoding` 解释，返回的密钥使用指定的 `outputEncoding` 编码。
+
+使用 [`crypto.getCurves()`][] 获取可用曲线名称的列表。在最近的 OpenSSL 版本中，`openssl ecparam -list_curves` 也会显示每个可用椭圆曲线的名称和描述。
+
+如果未指定 `format`，点将以 `'uncompressed'` 格式返回。
+
+如果未提供 `inputEncoding`，则 `key` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+示例（解压缩密钥）：
+
+```mjs
+const {
+  createECDH,
+  ECDH,
+} = await import('node:crypto');
+
+const ecdh = createECDH('secp256k1');
+ecdh.generateKeys();
+
+const compressedKey = ecdh.getPublicKey('hex', 'compressed');
+
+const uncompressedKey = ECDH.convertKey(compressedKey,
+                                        'secp256k1',
+                                        'hex',
+                                        'hex',
+                                        'uncompressed');
+
+// 转换后的密钥和未压缩的公钥应该相同
+console.log(uncompressedKey === ecdh.getPublicKey('hex'));
+```
+
+```cjs
+const {
+  createECDH,
+  ECDH,
+} = require('node:crypto');
+
+const ecdh = createECDH('secp256k1');
+ecdh.generateKeys();
+
+const compressedKey = ecdh.getPublicKey('hex', 'compressed');
+
+const uncompressedKey = ECDH.convertKey(compressedKey,
+                                        'secp256k1',
+                                        'hex',
+                                        'hex',
+                                        'uncompressed');
+
+// 转换后的密钥和未压缩的公钥应该相同
+console.log(uncompressedKey === ecdh.getPublicKey('hex'));
+```
+
+### `ecdh.computeSecret(otherPublicKey[, inputEncoding][, outputEncoding])`
+
+<!-- YAML
+added: v0.11.14
+changes:
+  - version: v10.0.0
+    pr-url: https://github.com/nodejs/node/pull/16849
+    description: Changed error format to better support invalid public key
+                 error.
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `otherPublicKey` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `otherPublicKey` 字符串的[编码][encoding]。
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+使用 `otherPublicKey` 作为另一方的公钥计算共享密钥，并返回计算出的共享密钥。提供的密钥使用指定的 `inputEncoding` 解释，返回的密钥使用指定的 `outputEncoding` 编码。
+如果未提供 `inputEncoding`，则 `otherPublicKey` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+如果给出了 `outputEncoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+当 `otherPublicKey` 位于椭圆曲线之外时，`ecdh.computeSecret` 将抛出 `ERR_CRYPTO_ECDH_INVALID_PUBLIC_KEY` 错误。由于 `otherPublicKey` 通常是通过不安全的网络从远程用户提供的，因此请务必相应地处理此异常。
+
+### `ecdh.generateKeys([encoding[, format]])`
+
+<!-- YAML
+added: v0.11.14
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* `format` {string} **默认值：** `'uncompressed'`
+* 返回：{Buffer | string}
+
+生成私钥和公钥的 EC Diffie-Hellman 密钥值，并以指定的 `format` 和 `encoding` 返回公钥。此密钥应传输给另一方。
+
+`format` 参数指定点编码，可以是 `'compressed'` 或 `'uncompressed'`。如果未指定 `format`，点将以 `'uncompressed'` 格式返回。
+
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `ecdh.getPrivateKey([encoding])`
+
+<!-- YAML
+added: v0.11.14
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string} 指定 `encoding` 中的 EC Diffie-Hellman。
+
+如果指定了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `ecdh.getPublicKey([encoding][, format])`
+
+<!-- YAML
+added: v0.11.14
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* `format` {string} **默认值：** `'uncompressed'`
+* 返回：{Buffer | string} 指定 `encoding` 和 `format` 中的 EC Diffie-Hellman 公钥。
+
+`format` 参数指定点编码，可以是 `'compressed'` 或 `'uncompressed'`。如果未指定 `format`，点将以 `'uncompressed'` 格式返回。
+
+如果指定了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+### `ecdh.setPrivateKey(privateKey[, encoding])`
+
+<!-- YAML
+added: v0.11.14
+-->
+
+* `privateKey` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `privateKey` 字符串的[编码][encoding]。
+
+设置 EC Diffie-Hellman 私钥。
+如果提供了 `encoding`，则 `privateKey` 应为字符串；否则 `privateKey` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+如果 `privateKey` 对于创建 `ECDH` 对象时指定的曲线无效，将抛出错误。设置私钥时，相关的公点（密钥）也会生成并设置在 `ECDH` 对象中。
+
+### `ecdh.setPublicKey(publicKey[, encoding])`
+
+<!-- YAML
+added: v0.11.14
+deprecated: v5.2.0
+-->
+
+> Stability: 0 - Deprecated
+
+* `publicKey` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} `publicKey` 字符串的[编码][encoding]。
+
+设置 EC Diffie-Hellman 公钥。
+如果提供了 `encoding`，则 `publicKey` 应为字符串；否则应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+通常没有理由调用此方法，因为 `ECDH` 只需要私钥和另一方的公钥来计算共享密钥。通常要么调用 [`ecdh.generateKeys()`][]，要么调用 [`ecdh.setPrivateKey()`][]。[`ecdh.setPrivateKey()`][] 方法尝试生成与正在设置的私钥相关的公点/密钥。
+
+示例（获取共享密钥）：
+
+```mjs
+const {
+  createECDH,
+  createHash,
+} = await import('node:crypto');
+
+const alice = createECDH('secp256k1');
+const bob = createECDH('secp256k1');
+
+// 这是指定 Alice 之前私钥的一种快捷方式。
+// 在真实应用程序中使用如此可预测的私钥是不明智的。
+alice.setPrivateKey(
+  createHash('sha256').update('alice', 'utf8').digest(),
+);
+
+// Bob 使用新生成的加密强度高的伪随机密钥对
+bob.generateKeys();
+
+const aliceSecret = alice.computeSecret(bob.getPublicKey(), null, 'hex');
+const bobSecret = bob.computeSecret(alice.getPublicKey(), null, 'hex');
+
+// aliceSecret 和 bobSecret 应该是相同的共享密钥值
+console.log(aliceSecret === bobSecret);
+```
+
+```cjs
+const {
+  createECDH,
+  createHash,
+} = require('node:crypto');
+
+const alice = createECDH('secp256k1');
+const bob = createECDH('secp256k1');
+
+// 这是指定 Alice 之前私钥的一种快捷方式。
+// 在真实应用程序中使用如此可预测的私钥是不明智的。
+alice.setPrivateKey(
+  createHash('sha256').update('alice', 'utf8').digest(),
+);
+
+// Bob 使用新生成的加密强度高的伪随机密钥对
+bob.generateKeys();
+
+const aliceSecret = alice.computeSecret(bob.getPublicKey(), null, 'hex');
+const bobSecret = bob.computeSecret(alice.getPublicKey(), null, 'hex');
+
+// aliceSecret 和 bobSecret 应该是相同的共享密钥值
+console.log(aliceSecret === bobSecret);
+```
+
+## 类：`Hash`
+
+<!-- YAML
+added: v0.1.92
+-->
+
+* 继承：{stream.Transform}
+
+`Hash` 类是用于创建数据哈希摘要的实用工具。它可以通过两种方式之一使用：
+
+* 作为既可读又可写的[流][stream]，其中数据被写入以在可读端产生计算出的哈希摘要，或
+* 使用 [`hash.update()`][] 和 [`hash.digest()`][] 方法产生计算出的哈希。
+
+[`crypto.createHash()`][] 方法用于创建 `Hash` 实例。不应直接使用 `new` 关键字创建 `Hash` 对象。
+
+示例：将 `Hash` 对象用作流：
+
+```mjs
+const {
+  createHash,
+} = await import('node:crypto');
+
+const hash = createHash('sha256');
+
+hash.on('readable', () => {
+  // 哈希流只会产生一个元素。
+  const data = hash.read();
+  if (data) {
+    console.log(data.toString('hex'));
+    // 打印：
+    //   6a2da20943931e9834fc12cfe5bb47bbd9ae43489a30726962b576f4e3993e50
+  }
+});
+
+hash.write('some data to hash');
+hash.end();
+```
+
+```cjs
+const {
+  createHash,
+} = require('node:crypto');
+
+const hash = createHash('sha256');
+
+hash.on('readable', () => {
+  // 哈希流只会产生一个元素。
+  const data = hash.read();
+  if (data) {
+    console.log(data.toString('hex'));
+    // 打印：
+    //   6a2da20943931e9834fc12cfe5bb47bbd9ae43489a30726962b576f4e3993e50
+  }
+});
+
+hash.write('some data to hash');
+hash.end();
+```
+
+示例：使用 `Hash` 和管道流：
+
+```mjs
+import { createReadStream } from 'node:fs';
+import { stdout } from 'node:process';
+const { createHash } = await import('node:crypto');
+
+const hash = createHash('sha256');
+
+const input = createReadStream('test.js');
+input.pipe(hash).setEncoding('hex').pipe(stdout);
+```
+
+```cjs
+const { createReadStream } = require('node:fs');
+const { createHash } = require('node:crypto');
+const { stdout } = require('node:process');
+
+const hash = createHash('sha256');
+
+const input = createReadStream('test.js');
+input.pipe(hash).setEncoding('hex').pipe(stdout);
+```
+
+示例：使用 [`hash.update()`][] 和 [`hash.digest()`][] 方法：
+
+```mjs
+const {
+  createHash,
+} = await import('node:crypto');
+
+const hash = createHash('sha256');
+
+hash.update('some data to hash');
+console.log(hash.digest('hex'));
+// 打印：
+//   6a2da20943931e9834fc12cfe5bb47bbd9ae43489a30726962b576f4e3993e50
+```
+
+```cjs
+const {
+  createHash,
+} = require('node:crypto');
+
+const hash = createHash('sha256');
+
+hash.update('some data to hash');
+console.log(hash.digest('hex'));
+// 打印：
+//   6a2da20943931e9834fc12cfe5bb47bbd9ae43489a30726962b576f4e3993e50
+```
+
+### `hash.copy([options])`
+
+<!-- YAML
+added: v13.1.0
+-->
+
+* `options` {Object} [`stream.transform` 选项][]
+* 返回：{Hash}
+
+创建一个新的 `Hash` 对象，其中包含当前 `Hash` 对象内部状态的深拷贝。
+
+可选的 `options` 参数控制流行为。对于 XOF 哈希函数，例如 `'shake256'`，可以使用 `outputLength` 选项指定所需的输出长度（以字节为单位）。
+
+在调用 [`hash.digest()`][] 方法后尝试复制 `Hash` 对象时会抛出错误。
+
+```mjs
+// 计算滚动哈希。
+const {
+  createHash,
+} = await import('node:crypto');
+
+const hash = createHash('sha256');
+
+hash.update('one');
+console.log(hash.copy().digest('hex'));
+
+hash.update('two');
+console.log(hash.copy().digest('hex'));
+
+hash.update('three');
+console.log(hash.copy().digest('hex'));
+
+// 等等。
+```
+
+```cjs
+// 计算滚动哈希。
+const {
+  createHash,
+} = require('node:crypto');
+
+const hash = createHash('sha256');
+
+hash.update('one');
+console.log(hash.copy().digest('hex'));
+
+hash.update('two');
+console.log(hash.copy().digest('hex'));
+
+hash.update('three');
+console.log(hash.copy().digest('hex'));
+
+// 等等。
+```
+
+### `hash.digest([encoding])`
+
+<!-- YAML
+added: v0.1.92
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+计算所有传递给哈希的数据（使用 [`hash.update()`][] 方法）的摘要。
+如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+在调用 `hash.digest()` 方法后，`Hash` 对象不能再使用。多次调用将导致抛出错误。
+
+### `hash.update(data[, inputEncoding])`
+
+<!-- YAML
+added: v0.1.92
+changes:
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `data` {string|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `data` 字符串的[编码][encoding]。
+
+使用给定的 `data` 更新哈希内容，其编码在 `inputEncoding` 中给出。
+如果未提供 `encoding`，且 `data` 是字符串，则强制使用 `'utf8'` 编码。如果 `data` 是 [`Buffer`][]、`TypedArray` 或 `DataView`，则忽略 `inputEncoding`。
+
+在数据流式传输时，可以多次调用此方法传入新数据。
+
+## 类：`Hmac`
+
+<!-- YAML
+added: v0.1.94
+-->
+
+* 继承：{stream.Transform}
+
+`Hmac` 类是用于创建加密 HMAC 摘要的实用工具。它可以通过两种方式之一使用：
+
+* 作为既可读又可写的[流][stream]，其中数据被写入以在可读端产生计算出的 HMAC 摘要，或
+* 使用 [`hmac.update()`][] 和 [`hmac.digest()`][] 方法产生计算出的 HMAC 摘要。
+
+[`crypto.createHmac()`][] 方法用于创建 `Hmac` 实例。不应直接使用 `new` 关键字创建 `Hmac` 对象。
+
+示例：将 `Hmac` 对象用作流：
+
+```mjs
+const {
+  createHmac,
+} = await import('node:crypto');
+
+const hmac = createHmac('sha256', 'a secret');
+
+hmac.on('readable', () => {
+  // HMAC 流只会产生一个元素。
+  const data = hmac.read();
+  if (data) {
+    console.log(data.toString('hex'));
+    // 打印：
+    //   7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e
+  }
+});
+
+hmac.write('some data to hash');
+hmac.end();
+```
+
+```cjs
+const {
+  createHmac,
+} = require('node:crypto');
+
+const hmac = createHmac('sha256', 'a secret');
+
+hmac.on('readable', () => {
+  // HMAC 流只会产生一个元素。
+  const data = hmac.read();
+  if (data) {
+    console.log(data.toString('hex'));
+    // 打印：
+    //   7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e
+  }
+});
+
+hmac.write('some data to hash');
+hmac.end();
+```
+
+示例：使用 `Hmac` 和管道流：
+
+```mjs
+import { createReadStream } from 'node:fs';
+import { stdout } from 'node:process';
+const {
+  createHmac,
+} = await import('node:crypto');
+
+const hmac = createHmac('sha256', 'a secret');
+
+const input = createReadStream('test.js');
+input.pipe(hmac).pipe(stdout);
+```
+
+```cjs
+const {
+  createReadStream,
+} = require('node:fs');
+const {
+  createHmac,
+} = require('node:crypto');
+const { stdout } = require('node:process');
+
+const hmac = createHmac('sha256', 'a secret');
+
+const input = createReadStream('test.js');
+input.pipe(hmac).pipe(stdout);
+```
+
+示例：使用 [`hmac.update()`][] 和 [`hmac.digest()`][] 方法：
+
+```mjs
+const {
+  createHmac,
+} = await import('node:crypto');
+
+const hmac = createHmac('sha256', 'a secret');
+
+hmac.update('some data to hash');
+console.log(hmac.digest('hex'));
+// 打印：
+//   7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e
+```
+
+```cjs
+const {
+  createHmac,
+} = require('node:crypto');
+
+const hmac = createHmac('sha256', 'a secret');
+
+hmac.update('some data to hash');
+console.log(hmac.digest('hex'));
+// 打印：
+//   7fd04df92f636fd450bc841c9418e5825c17f33ad9c87c518115a45971f7f77e
+```
+
+### `hmac.digest([encoding])`
+
+<!-- YAML
+added: v0.1.94
+-->
+
+* `encoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+计算使用 [`hmac.update()`][] 传递的所有数据的 HMAC 摘要。如果提供了 `encoding`，则返回字符串；否则返回 [`Buffer`][]；
+
+在调用 `hmac.digest()` 后，`Hmac` 对象不能再使用。多次调用 `hmac.digest()` 将导致抛出错误。
+
+### `hmac.update(data[, inputEncoding])`
+
+<!-- YAML
+added: v0.1.94
+changes:
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `data` {string|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `data` 字符串的[编码][encoding]。
+
+使用给定的 `data` 更新 `Hmac` 内容，其编码在 `inputEncoding` 中给出。
+如果未提供 `encoding`，且 `data` 是字符串，则强制使用 `'utf8'` 编码。如果 `data` 是 [`Buffer`][]、`TypedArray` 或 `DataView`，则忽略 `inputEncoding`。
+
+在数据流式传输时，可以多次调用此方法传入新数据。
+
+## 类：`KeyObject`
+
+<!-- YAML
+added: v11.6.0
+changes:
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA keys.
+  - version:
+    - v14.5.0
+    - v12.19.0
+    pr-url: https://github.com/nodejs/node/pull/33360
+    description: Instances of this class can now be passed to worker threads
+                 using `postMessage`.
+  - version: v11.13.0
+    pr-url: https://github.com/nodejs/node/pull/26438
+    description: This class is now exported.
+-->
+
+Node.js 使用 `KeyObject` 类来表示对称或非对称密钥，每种密钥公开不同的函数。[`crypto.createSecretKey()`][]、[`crypto.createPublicKey()`][] 和 [`crypto.createPrivateKey()`][] 方法用于创建 `KeyObject` 实例。不应直接使用 `new` 关键字创建 `KeyObject` 对象。
+
+由于改进的安全功能，大多数应用程序应考虑使用新的 `KeyObject` API，而不是将密钥作为字符串或 `Buffer` 传递。
+
+`KeyObject` 实例可以通过 [`postMessage()`][] 传递给其他线程。接收方获得一个克隆的 `KeyObject`，并且 `KeyObject` 不需要在 `transferList` 参数中列出。
+
+### 静态方法：`KeyObject.from(key)`
+
+<!-- YAML
+added: v15.0.0
+-->
+
+* `key` {CryptoKey}
+* 返回：{KeyObject}
+
+示例：将 `CryptoKey` 实例转换为 `KeyObject`：
+
+```mjs
+const { KeyObject } = await import('node:crypto');
+const { subtle } = globalThis.crypto;
+
+const key = await subtle.generateKey({
+  name: 'HMAC',
+  hash: 'SHA-256',
+  length: 256,
+}, true, ['sign', 'verify']);
+
+const keyObject = KeyObject.from(key);
+console.log(keyObject.symmetricKeySize);
+// 打印：32（对称密钥大小，以字节为单位）
+```
+
+```cjs
+const { KeyObject } = require('node:crypto');
+const { subtle } = globalThis.crypto;
+
+(async function() {
+  const key = await subtle.generateKey({
+    name: 'HMAC',
+    hash: 'SHA-256',
+    length: 256,
+  }, true, ['sign', 'verify']);
+
+  const keyObject = KeyObject.from(key);
+  console.log(keyObject.symmetricKeySize);
+  // 打印：32（对称密钥大小，以字节为单位）
+})();
+```
+
+### `keyObject.asymmetricKeyDetails`
+
+<!-- YAML
+added: v15.7.0
+changes:
+  - version: v16.9.0
+    pr-url: https://github.com/nodejs/node/pull/39851
+    description: Expose `RSASSA-PSS-params` sequence parameters
+                 for RSA-PSS keys.
+-->
+
+* 类型：{Object}
+  * `modulusLength` {number} 密钥大小，以位为单位（RSA、DSA）。
+  * `publicExponent` {bigint} 公共指数（RSA）。
+  * `hashAlgorithm` {string} 消息摘要的名称（RSA-PSS）。
+  * `mgf1HashAlgorithm` {string} MGF1 使用的消息摘要的名称（RSA-PSS）。
+  * `saltLength` {number} 最小盐长度，以字节为单位（RSA-PSS）。
+  * `divisorLength` {number} `q` 的大小，以位为单位（DSA）。
+  * `namedCurve` {string} 曲线的名称（EC）。
+
+此属性仅存在于非对称密钥上。根据密钥的类型，此对象包含有关密钥的信息。通过此属性获得的任何信息都不能用于唯一标识密钥或危害密钥的安全性。
+
+对于 RSA-PSS 密钥，如果密钥材料包含 `RSASSA-PSS-params` 序列，则将设置 `hashAlgorithm`、`mgf1HashAlgorithm` 和 `saltLength` 属性。
+
+其他密钥细节可能会通过其他属性通过此 API 公开。
+
+### `keyObject.asymmetricKeyType`
+
+<!-- YAML
+added: v11.6.0
+changes:
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59537
+    description: Add support for SLH-DSA keys.
+  - version: v24.7.0
+    pr-url: https://github.com/nodejs/node/pull/59461
+    description: Add support for ML-KEM keys.
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA keys.
+  - version:
+     - v13.9.0
+     - v12.17.0
+    pr-url: https://github.com/nodejs/node/pull/31178
+    description: Added support for `'dh'`.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26960
+    description: Added support for `'rsa-pss'`.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26786
+    description: This property now returns `undefined` for KeyObject
+                 instances of unrecognized type instead of aborting.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26774
+    description: Added support for `'x25519'` and `'x448'`.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26319
+    description: Added support for `'ed25519'` and `'ed448'`.
+-->
+
+* 类型：{string}
+
+对于非对称密钥，此属性表示密钥的类型。请参阅支持的[非对称密钥类型][]。
+
+对于无法识别的 `KeyObject` 类型和对称密钥，此属性为 `undefined`。
+
+### `keyObject.equals(otherKeyObject)`
+
+<!-- YAML
+added:
+  - v17.7.0
+  - v16.15.0
+-->
+
+* `otherKeyObject` {KeyObject} 用于与 `keyObject` 比较的 `KeyObject`。
+* 返回：{boolean}
+
+根据密钥是否具有完全相同的类型、值和参数，返回 `true` 或 `false`。此方法不是[常数时间](https://en.wikipedia.org/wiki/Timing_attack)。
+
+### `keyObject.export([options])`
+
+<!-- YAML
+added: v11.6.0
+changes:
+  - version: v15.9.0
+    pr-url: https://github.com/nodejs/node/pull/37081
+    description: Added support for `'jwk'` format.
+-->
+
+* `options` {Object}
+* 返回：{string | Buffer | Object}
+
+对于对称密钥，可以使用以下编码选项：
+
+* `format` {string} 必须是 `'buffer'`（默认）或 `'jwk'`。
+
+对于公钥，可以使用以下编码选项：
+
+* `type` {string} 必须是 `'pkcs1'`（仅限 RSA）或 `'spki'` 之一。
+* `format` {string} 必须是 `'pem'`、`'der'` 或 `'jwk'`。
+
+对于私钥，可以使用以下编码选项：
+
+* `type` {string} 必须是 `'pkcs1'`（仅限 RSA）、`'pkcs8'` 或 `'sec1'`（仅限 EC）之一。
+* `format` {string} 必须是 `'pem'`、`'der'` 或 `'jwk'`。
+* `cipher` {string} 如果指定，私钥将使用给定的 `cipher` 和 `passphrase` 使用 PKCS#5 v2.0 基于密码的加密进行加密。
+* `passphrase` {string | Buffer} 用于加密的密码，请参阅 `cipher`。
+
+结果类型取决于所选的编码格式，当为 PEM 时，结果是字符串，当为 DER 时，它将是一个包含 DER 编码数据的缓冲区，当为 [JWK][] 时，它将是一个对象。
+
+当选择 [JWK][] 编码格式时，所有其他编码选项都将被忽略。
+
+PKCS#1、SEC1 和 PKCS#8 类型的密钥可以通过组合使用 `cipher` 和 `format` 选项进行加密。PKCS#8 `type` 可以与任何 `format` 一起使用，通过指定 `cipher` 来加密任何密钥算法（RSA、EC 或 DH）。PKCS#1 和 SEC1 只能在 PEM `format` 使用时通过指定 `cipher` 进行加密。为了最大兼容性，请使用 PKCS#8 进行加密的私钥。由于 PKCS#8 定义了自己的加密机制，因此在加密 PKCS#8 密钥时不支持 PEM 级别的加密。有关 PKCS#8 加密，请参阅 [RFC 5208][]，有关 PKCS#1 和 SEC1 加密，请参阅 [RFC 1421][]。
+
+### `keyObject.symmetricKeySize`
+
+<!-- YAML
+added: v11.6.0
+-->
+
+* 类型：{number}
+
+对于密钥密钥，此属性表示密钥的大小（以字节为单位）。对于非对称密钥，此属性为 `undefined`。
+
+### `keyObject.toCryptoKey(algorithm, extractable, keyUsages)`
+
+<!-- YAML
+added:
+ - v23.0.0
+ - v22.10.0
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `algorithm` {string|Algorithm|RsaHashedImportParams|EcKeyImportParams|HmacImportParams}
+
+<!--lint enable maximum-line-length remark-lint-->
+
+* `extractable` {boolean}
+* `keyUsages` {string\[]} 请参阅[密钥用途][]。
+* 返回：{CryptoKey}
+
+将 `KeyObject` 实例转换为 `CryptoKey`。
+
+### `keyObject.type`
+
+<!-- YAML
+added: v11.6.0
+-->
+
+* 类型：{string}
+
+根据此 `KeyObject` 的类型，此属性对于密钥（对称）密钥为 `'secret'`，对于公钥（非对称）密钥为 `'public'`，对于私钥（非对称）密钥为 `'private'`。
+
+## 类：`Sign`
+
+<!-- YAML
+added: v0.1.92
+-->
+
+* 继承：{stream.Writable}
+
+`Sign` 类是用于生成签名的实用工具。它可以通过两种方式之一使用：
+
+* 作为可写[流][stream]，其中要签名的数据被写入，[`sign.sign()`][] 方法用于生成并返回签名，或
+* 使用 [`sign.update()`][] 和 [`sign.sign()`][] 方法产生签名。
+
+[`crypto.createSign()`][] 方法用于创建 `Sign` 实例。参数是要使用的哈希函数的字符串名称。不应直接使用 `new` 关键字创建 `Sign` 对象。
+
+示例：将 `Sign` 和 [`Verify`][] 对象用作流：
+
+```mjs
+const {
+  generateKeyPairSync,
+  createSign,
+  createVerify,
+} = await import('node:crypto');
+
+const { privateKey, publicKey } = generateKeyPairSync('ec', {
+  namedCurve: 'sect239k1',
+});
+
+const sign = createSign('SHA256');
+sign.write('some data to sign');
+sign.end();
+const signature = sign.sign(privateKey, 'hex');
+
+const verify = createVerify('SHA256');
+verify.write('some data to sign');
+verify.end();
+console.log(verify.verify(publicKey, signature, 'hex'));
+// 打印：true
+```
+
+```cjs
+const {
+  generateKeyPairSync,
+  createSign,
+  createVerify,
+} = require('node:crypto');
+
+const { privateKey, publicKey } = generateKeyPairSync('ec', {
+  namedCurve: 'sect239k1',
+});
+
+const sign = createSign('SHA256');
+sign.write('some data to sign');
+sign.end();
+const signature = sign.sign(privateKey, 'hex');
+
+const verify = createVerify('SHA256');
+verify.write('some data to sign');
+verify.end();
+console.log(verify.verify(publicKey, signature, 'hex'));
+// 打印：true
+```
+
+示例：使用 [`sign.update()`][] 和 [`verify.update()`][] 方法：
+
+```mjs
+const {
+  generateKeyPairSync,
+  createSign,
+  createVerify,
+} = await import('node:crypto');
+
+const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+  modulusLength: 2048,
+});
+
+const sign = createSign('SHA256');
+sign.update('some data to sign');
+sign.end();
+const signature = sign.sign(privateKey);
+
+const verify = createVerify('SHA256');
+verify.update('some data to sign');
+verify.end();
+console.log(verify.verify(publicKey, signature));
+// 打印：true
+```
+
+```cjs
+const {
+  generateKeyPairSync,
+  createSign,
+  createVerify,
+} = require('node:crypto');
+
+const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+  modulusLength: 2048,
+});
+
+const sign = createSign('SHA256');
+sign.update('some data to sign');
+sign.end();
+const signature = sign.sign(privateKey);
+
+const verify = createVerify('SHA256');
+verify.update('some data to sign');
+verify.end();
+console.log(verify.verify(publicKey, signature));
+// 打印：true
+```
+
+### `sign.sign(privateKey[, outputEncoding])`
+
+<!-- YAML
+added: v0.1.92
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The privateKey can also be an ArrayBuffer and CryptoKey.
+  - version:
+     - v13.2.0
+     - v12.16.0
+    pr-url: https://github.com/nodejs/node/pull/29292
+    description: This function now supports IEEE-P1363 DSA and ECDSA signatures.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26960
+    description: This function now supports RSA-PSS keys.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: This function now supports key objects.
+  - version: v8.0.0
+    pr-url: https://github.com/nodejs/node/pull/11705
+    description: Support for RSASSA-PSS and additional options was added.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `privateKey` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+  * `dsaEncoding` {string}
+  * `padding` {integer}
+  * `saltLength` {integer}
+* `outputEncoding` {string} 返回值的[编码][encoding]。
+* 返回：{Buffer | string}
+
+<!--lint enable maximum-line-length remark-lint-->
+
+计算使用 [`sign.update()`][] 或 [`sign.write()`][stream-writable-write] 传递的所有数据的签名。
+
+如果 `privateKey` 不是 [`KeyObject`][]，则此函数的行为类似于 `privateKey` 已传递给 [`crypto.createPrivateKey()`][]。如果它是一个对象，则可以传递以下附加属性：
+
+* `dsaEncoding` {string} 对于 DSA 和 ECDSA，此选项指定生成签名的格式。可以是以下之一：
+  * `'der'`（默认）：DER 编码的 ASN.1 签名结构编码 `(r, s)`。
+  * `'ieee-p1363'`：IEEE-P1363 中提出的签名格式 `r || s`。
+* `padding` {integer} RSA 的可选填充值，可以是以下之一：
+
+  * `crypto.constants.RSA_PKCS1_PADDING`（默认）
+  * `crypto.constants.RSA_PKCS1_PSS_PADDING`
+
+  `RSA_PKCS1_PSS_PADDING` 将使用 MGF1 和用于签名消息的相同哈希函数，如 [RFC 4055][] 第 3.1 节中所指定，除非已根据 [RFC 4055][] 第 3.3 节将 MGF1 哈希函数指定为密钥的一部分。
+* `saltLength` {integer} 当填充为 `RSA_PKCS1_PSS_PADDING` 时的盐长度。特殊值 `crypto.constants.RSA_PSS_SALTLEN_DIGEST` 将盐长度设置为摘要大小，`crypto.constants.RSA_PSS_SALTLEN_MAX_SIGN`（默认）将其设置为最大允许值。
+
+如果提供了 `outputEncoding`，则返回字符串；否则返回 [`Buffer`][]。
+
+在调用 `sign.sign()` 方法后，`Sign` 对象不能再使用。多次调用 `sign.sign()` 将导致抛出错误。
+
+### `sign.update(data[, inputEncoding])`
+
+<!-- YAML
+added: v0.1.92
+changes:
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `data` {string|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `data` 字符串的[编码][encoding]。
+
+使用给定的 `data` 更新 `Sign` 内容，其编码在 `inputEncoding` 中给出。
+如果未提供 `encoding`，且 `data` 是字符串，则强制使用 `'utf8'` 编码。如果 `data` 是 [`Buffer`][]、`TypedArray` 或 `DataView`，则忽略 `inputEncoding`。
+
+在数据流式传输时，可以多次调用此方法传入新数据。
+
+## 类：`Verify`
+
+<!-- YAML
+added: v0.1.92
+-->
+
+* 继承：{stream.Writable}
+
+`Verify` 类是用于验证签名的实用工具。它可以通过两种方式之一使用：
+
+* 作为可写[流][stream]，其中写入的数据用于验证提供的签名，或
+* 使用 [`verify.update()`][] 和 [`verify.verify()`][] 方法验证签名。
+
+[`crypto.createVerify()`][] 方法用于创建 `Verify` 实例。不应直接使用 `new` 关键字创建 `Verify` 对象。
+
+请参阅 [`Sign`][] 获取示例。
+
+### `verify.update(data[, inputEncoding])`
+
+<!-- YAML
+added: v0.1.92
+changes:
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default `inputEncoding` changed from `binary` to `utf8`.
+-->
+
+* `data` {string|Buffer|TypedArray|DataView}
+* `inputEncoding` {string} `data` 字符串的[编码][encoding]。
+
+使用给定的 `data` 更新 `Verify` 内容，其编码在 `inputEncoding` 中给出。
+如果未提供 `inputEncoding`，且 `data` 是字符串，则强制使用 `'utf8'` 编码。如果 `data` 是 [`Buffer`][]、`TypedArray` 或 `DataView`，则忽略 `inputEncoding`。
+
+在数据流式传输时，可以多次调用此方法传入新数据。
+
+### `verify.verify(object, signature[, signatureEncoding])`
+
+<!-- YAML
+added: v0.1.92
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The object can also be an ArrayBuffer and CryptoKey.
+  - version:
+     - v13.2.0
+     - v12.16.0
+    pr-url: https://github.com/nodejs/node/pull/29292
+    description: This function now supports IEEE-P1363 DSA and ECDSA signatures.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26960
+    description: This function now supports RSA-PSS keys.
+  - version: v11.7.0
+    pr-url: https://github.com/nodejs/node/pull/25217
+    description: The key can now be a private key.
+  - version: v8.0.0
+    pr-url: https://github.com/nodejs/node/pull/11705
+    description: Support for RSASSA-PSS and additional options was added.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `object` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+  * `dsaEncoding` {string}
+  * `padding` {integer}
+  * `saltLength` {integer}
+* `signature` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `signatureEncoding` {string} `signature` 字符串的[编码][encoding]。
+* 返回：{boolean} 根据数据和公钥的签名有效性返回 `true` 或 `false`。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用给定的 `object` 和 `signature` 验证提供的数据。
+
+如果 `object` 不是 [`KeyObject`][]，则此函数的行为类似于 `object` 已传递给 [`crypto.createPublicKey()`][]。如果它是一个对象，则可以传递以下附加属性：
+
+* `dsaEncoding` {string} 对于 DSA 和 ECDSA，此选项指定签名的格式。可以是以下之一：
+  * `'der'`（默认）：DER 编码的 ASN.1 签名结构编码 `(r, s)`。
+  * `'ieee-p1363'`：IEEE-P1363 中提出的签名格式 `r || s`。
+* `padding` {integer} RSA 的可选填充值，可以是以下之一：
+
+  * `crypto.constants.RSA_PKCS1_PADDING`（默认）
+  * `crypto.constants.RSA_PKCS1_PSS_PADDING`
+
+  `RSA_PKCS1_PSS_PADDING` 将使用 MGF1 和用于验证消息的相同哈希函数，如 [RFC 4055][] 第 3.1 节中所指定，除非已根据 [RFC 4055][] 第 3.3 节将 MGF1 哈希函数指定为密钥的一部分。
+* `saltLength` {integer} 当填充为 `RSA_PKCS1_PSS_PADDING` 时的盐长度。特殊值 `crypto.constants.RSA_PSS_SALTLEN_DIGEST` 将盐长度设置为摘要大小，`crypto.constants.RSA_PSS_SALTLEN_AUTO`（默认）使其自动确定。
+
+`signature` 参数是先前为数据计算的签名，使用 `signatureEncoding`。
+如果指定了 `signatureEncoding`，则 `signature` 应为字符串；否则 `signature` 应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+在调用 `verify.verify()` 后，`verify` 对象不能再使用。多次调用 `verify.verify()` 将导致抛出错误。
+
+由于可以从私钥派生公钥，因此可以传递私钥而不是公钥。
+
+## 类：`X509Certificate`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+封装 X509 证书并提供对其信息的只读访问。
+
+```mjs
+const { X509Certificate } = await import('node:crypto');
+
+const x509 = new X509Certificate('{... pem encoded cert ...}');
+
+console.log(x509.subject);
+```
+
+```cjs
+const { X509Certificate } = require('node:crypto');
+
+const x509 = new X509Certificate('{... pem encoded cert ...}');
+
+console.log(x509.subject);
+```
+
+### `new X509Certificate(buffer)`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* `buffer` {string|TypedArray|Buffer|DataView} PEM 或 DER 编码的 X509 证书。
+
+### `x509.ca`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{boolean} 如果这是证书颁发机构 (CA) 证书，则为 `true`。
+
+### `x509.checkEmail(email[, options])`
+
+<!-- YAML
+added: v15.6.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41600
+    description: The subject option now defaults to `'default'`.
+  - version:
+      - v17.5.0
+      - v16.14.1
+    pr-url: https://github.com/nodejs/node/pull/41599
+    description: The `wildcards`, `partialWildcards`, `multiLabelWildcards`, and
+                 `singleLabelSubdomains` options have been removed since they
+                 had no effect.
+  - version:
+    - v17.5.0
+    - v16.15.0
+    pr-url: https://github.com/nodejs/node/pull/41569
+    description: The subject option can now be set to `'default'`.
+-->
+
+* `email` {string}
+* `options` {Object}
+  * `subject` {string} `'default'`、`'always'` 或 `'never'`。
+    **默认值：** `'default'`。
+* 返回：{string|undefined} 如果证书匹配，则返回 `email`，否则返回 `undefined`。
+
+检查证书是否与给定的电子邮件地址匹配。
+
+如果 `'subject'` 选项未定义或设置为 `'default'`，则仅在主题备用名称扩展不存在或不包含任何电子邮件地址时才考虑证书主题。
+
+如果 `'subject'` 选项设置为 `'always'`，并且如果主题备用名称扩展不存在或不包含匹配的电子邮件地址，则考虑证书主题。
+
+如果 `'subject'` 选项设置为 `'never'`，则从不考虑证书主题，即使证书不包含任何主题备用名称。
+
+### `x509.checkHost(name[, options])`
+
+<!-- YAML
+added: v15.6.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41600
+    description: The subject option now defaults to `'default'`.
+  - version:
+    - v17.5.0
+    - v16.15.0
+    pr-url: https://github.com/nodejs/node/pull/41569
+    description: The subject option can now be set to `'default'`.
+-->
+
+* `name` {string}
+* `options` {Object}
+  * `subject` {string} `'default'`、`'always'` 或 `'never'`。
+    **默认值：** `'default'`。
+  * `wildcards` {boolean} **默认值：** `true`。
+  * `partialWildcards` {boolean} **默认值：** `true`。
+  * `multiLabelWildcards` {boolean} **默认值：** `false`。
+  * `singleLabelSubdomains` {boolean} **默认值：** `false`。
+* 返回：{string|undefined} 返回与 `name` 匹配的主题名称，如果没有主题名称匹配，则返回 `undefined`。
+
+检查证书是否与给定的主机名匹配。
+
+如果证书与给定的主机名匹配，则返回匹配的主题名称。返回的名称可能是完全匹配（例如，`foo.example.com`）或可能包含通配符（例如，`*.example.com`）。由于主机名比较不区分大小写，返回的主题名称也可能与给定的 `name` 在大小写上不同。
+
+如果 `'subject'` 选项未定义或设置为 `'default'`，则仅在主题备用名称扩展不存在或不包含任何 DNS 名称时才考虑证书主题。此行为与 [RFC 2818][]（"HTTP Over TLS"）一致。
+
+如果 `'subject'` 选项设置为 `'always'`，并且如果主题备用名称扩展不存在或不包含匹配的 DNS 名称，则考虑证书主题。
+
+如果 `'subject'` 选项设置为 `'never'`，则从不考虑证书主题，即使证书不包含任何主题备用名称。
+
+### `x509.checkIP(ip)`
+
+<!-- YAML
+added: v15.6.0
+changes:
+  - version:
+      - v17.5.0
+      - v16.14.1
+    pr-url: https://github.com/nodejs/node/pull/41571
+    description: The `options` argument has been removed since it had no effect.
+-->
+
+* `ip` {string}
+* 返回：{string|undefined} 如果证书匹配，则返回 `ip`，否则返回 `undefined`。
+
+检查证书是否与给定的 IP 地址（IPv4 或 IPv6）匹配。
+
+仅考虑 [RFC 5280][] `iPAddress` 主题备用名称，并且它们必须与给定的 `ip` 地址完全匹配。忽略其他主题备用名称以及证书的主题字段。
+
+### `x509.checkIssued(otherCert)`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* `otherCert` {X509Certificate}
+* 返回：{boolean}
+
+通过比较证书元数据，检查此证书是否可能由给定的 `otherCert` 颁发。
+
+这对于修剪可能使用更基本的过滤例程（即仅基于主题和颁发者名称）选择的可能颁发者证书列表非常有用。
+
+最后，要验证此证书的签名是由与 `otherCert` 的公钥对应的私钥生成的，请使用 [`x509.verify(publicKey)`][]，其中 `otherCert` 的公钥表示为 [`KeyObject`][]，如下所示：
+
+```js
+if (!x509.verify(otherCert.publicKey)) {
+  throw new Error('otherCert did not issue x509');
+}
+```
+
+### `x509.checkPrivateKey(privateKey)`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* `privateKey` {KeyObject} 私钥。
+* 返回：{boolean}
+
+检查此证书的公钥是否与给定的私钥一致。
+
+### `x509.fingerprint`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书的 SHA-1 指纹。
+
+由于 SHA-1 在密码学上已被破坏，并且 SHA-1 的安全性显著低于通常用于签名证书的算法，请考虑改用 [`x509.fingerprint256`][]。
+
+### `x509.fingerprint256`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书的 SHA-256 指纹。
+
+### `x509.fingerprint512`
+
+<!-- YAML
+added:
+  - v17.2.0
+  - v16.14.0
+-->
+
+* 类型：{string}
+
+此证书的 SHA-512 指纹。
+
+由于计算 SHA-256 指纹通常更快，并且其大小仅为 SHA-512 指纹的一半，因此 [`x509.fingerprint256`][] 可能是更好的选择。虽然 SHA-512 通常提供更高级别的安全性，但 SHA-256 的安全性与大多数通常用于签名证书的算法相匹配。
+
+### `x509.infoAccess`
+
+<!-- YAML
+added: v15.6.0
+changes:
+  - version:
+      - v17.3.1
+      - v16.13.2
+    pr-url: https://github.com/nodejs-private/node-private/pull/300
+    description: Parts of this string may be encoded as JSON string literals
+                 in response to CVE-2021-44532.
+-->
+
+* 类型：{string}
+
+证书的授权信息访问扩展的文本表示。
+
+这是一个以换行符分隔的访问描述列表。每行以访问方法和访问位置的类型开头，后跟冒号和与访问位置关联的值。
+
+在表示访问方法和访问位置类型的前缀之后，每行的其余部分可能用引号括起来，表示该值是 JSON 字符串字面量。为了向后兼容，Node.js 仅在必要时使用此属性中的 JSON 字符串字面量以避免歧义。第三方代码应准备处理两种可能的条目格式。
+
+### `x509.issuer`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书中包含的颁发者标识。
+
+### `x509.issuerCertificate`
+
+<!-- YAML
+added: v15.9.0
+-->
+
+* 类型：{X509Certificate}
+
+颁发者证书，如果颁发者证书不可用，则为 `undefined`。
+
+### `x509.keyUsage`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string\[]}
+
+一个数组，详细说明此证书的密钥扩展用途。
+
+### `x509.publicKey`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{KeyObject}
+
+此证书的公钥 {KeyObject}。
+
+### `x509.raw`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{Buffer}
+
+包含此证书 DER 编码的 `Buffer`。
+
+### `x509.serialNumber`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书的序列号。
+
+序列号由证书颁发机构分配，不能唯一标识证书。考虑使用 [`x509.fingerprint256`][] 作为唯一标识符。
+
+### `x509.subject`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书的完整主题。
+
+### `x509.subjectAltName`
+
+<!-- YAML
+added: v15.6.0
+changes:
+  - version:
+      - v17.3.1
+      - v16.13.2
+    pr-url: https://github.com/nodejs-private/node-private/pull/300
+    description: Parts of this string may be encoded as JSON string literals
+                 in response to CVE-2021-44532.
+-->
+
+* 类型：{string}
+
+为此证书指定的主题备用名称。
+
+这是一个以逗号分隔的主题备用名称列表。每个条目以一个标识主题备用名称类型的字符串开头，后跟冒号和与该条目关联的值。
+
+早期版本的 Node.js 错误地认为可以在此属性的两个字符序列 `', '` 处拆分（参见 [CVE-2021-44532][]）。然而，恶意和合法证书在表示为字符串时都可能包含包含此序列的主题备用名称。
+
+在表示条目类型的前缀之后，每个条目的其余部分可能用引号括起来，表示该值是 JSON 字符串字面量。为了向后兼容，Node.js 仅在必要时使用此属性中的 JSON 字符串字面量以避免歧义。第三方代码应准备处理两种可能的条目格式。
+
+### `x509.toJSON()`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+X509 证书没有标准的 JSON 编码。`toJSON()` 方法返回一个包含 PEM 编码证书的字符串。
+
+### `x509.toLegacyObject()`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{Object}
+
+使用旧版[证书对象][]编码返回有关此证书的信息。
+
+### `x509.toString()`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+返回 PEM 编码的证书。
+
+### `x509.validFrom`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书有效的起始日期/时间。
+
+### `x509.validFromDate`
+
+<!-- YAML
+added:
+ - v23.0.0
+ - v22.10.0
+-->
+
+* 类型：{Date}
+
+此证书有效的起始日期/时间，封装在 `Date` 对象中。
+
+### `x509.validTo`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 类型：{string}
+
+此证书有效的截止日期/时间。
+
+### `x509.validToDate`
+
+<!-- YAML
+added:
+ - v23.0.0
+ - v22.10.0
+-->
+
+* 类型：{Date}
+
+此证书有效的截止日期/时间，封装在 `Date` 对象中。
+
+### `x509.signatureAlgorithm`
+
+<!-- YAML
+added: v24.9.0
+-->
+
+* 类型：{string|undefined}
+
+用于签署证书的算法，如果 OpenSSL 未知签名算法，则为 `undefined`。
+
+### `x509.signatureAlgorithmOid`
+
+<!-- YAML
+added: v24.9.0
+-->
+
+* 类型：{string}
+
+用于签署证书的算法的 OID。
+
+### `x509.verify(publicKey)`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* `publicKey` {KeyObject} 公钥。
+* 返回：{boolean}
+
+验证此证书是否由给定的公钥签名。不执行对证书的任何其他验证检查。
+
+## `node:crypto` 模块方法和属性
+
+### `crypto.argon2(algorithm, parameters, callback)`
+
+<!-- YAML
+added: v24.7.0
+-->
+
+> Stability: 1.2 - Release candidate
+
+* `algorithm` {string} Argon2 的变体，可以是 `"argon2d"`、`"argon2i"` 或 `"argon2id"` 之一。
+* `parameters` {Object}
+  * `message` {string|ArrayBuffer|Buffer|TypedArray|DataView} 必需，这是 Argon2 密码哈希应用程序的密码。
+  * `nonce` {string|ArrayBuffer|Buffer|TypedArray|DataView} 必需，必须至少为 8 字节长。这是 Argon2 密码哈希应用程序的盐。
+  * `parallelism` {number} 必需，并行度决定了可以运行多少计算链（通道）。必须大于 1 且小于 `2**24-1`。
+  * `tagLength` {number} 必需，要生成的密钥的长度。必须大于 4 且小于 `2**32-1`。
+  * `memory` {number} 必需，内存成本，以 1KiB 块为单位。必须大于 `8 * parallelism` 且小于 `2**32-1`。实际块数向下取整到 `4 * parallelism` 的最近倍数。
+  * `passes` {number} 必需，遍数（迭代次数）。必须大于 1 且小于 `2**32-1`。
+  * `secret` {string|ArrayBuffer|Buffer|TypedArray|DataView|undefined} 可选，随机附加输入，类似于盐，但 **不应** 与派生密钥一起存储。这在密码哈希应用程序中称为胡椒。如果使用，长度不得大于 `2**32-1` 字节。
+  * `associatedData` {string|ArrayBuffer|Buffer|TypedArray|DataView|undefined} 可选，要添加到哈希中的附加数据，在功能上类似于盐或密钥，但用于非随机数据。如果使用，长度不得大于 `2**32-1` 字节。
+* `callback` {Function}
+  * `err` {Error}
+  * `derivedKey` {Buffer}
+
+提供异步 [Argon2][] 实现。Argon2 是一种基于密码的密钥派生函数，设计为在计算和内存方面代价高昂，以使暴力攻击无利可图。
+
+`nonce` 应尽可能唯一。建议 nonce 是随机的且至少 16 字节长。有关详细信息，请参阅 [NIST SP 800-132][]。
+
+当为 `message`、`nonce`、`secret` 或 `associatedData` 传递字符串时，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。
+
+`callback` 函数使用两个参数调用：`err` 和 `derivedKey`。如果密钥派生失败，`err` 是一个异常对象，否则 `err` 为 `null`。`derivedKey` 作为 [`Buffer`][] 传递给回调。
+
+当任何输入参数指定无效值或类型时，将抛出异常。
+
+```mjs
+const { argon2, randomBytes } = await import('node:crypto');
+
+const parameters = {
+  message: 'password',
+  nonce: randomBytes(16),
+  parallelism: 4,
+  tagLength: 64,
+  memory: 65536,
+  passes: 3,
+};
+
+argon2('argon2id', parameters, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // 'af91dad...9520f15'
+});
+```
+
+```cjs
+const { argon2, randomBytes } = require('node:crypto');
+
+const parameters = {
+  message: 'password',
+  nonce: randomBytes(16),
+  parallelism: 4,
+  tagLength: 64,
+  memory: 65536,
+  passes: 3,
+};
+
+argon2('argon2id', parameters, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // 'af91dad...9520f15'
+});
+```
+
+### `crypto.argon2Sync(algorithm, parameters)`
+
+<!-- YAML
+added: v24.7.0
+-->
+
+> Stability: 1.2 - Release candidate
+
+* `algorithm` {string} Argon2 的变体，可以是 `"argon2d"`、`"argon2i"` 或 `"argon2id"` 之一。
+* `parameters` {Object}
+  * `message` {string|ArrayBuffer|Buffer|TypedArray|DataView} 必需，这是 Argon2 密码哈希应用程序的密码。
+  * `nonce` {string|ArrayBuffer|Buffer|TypedArray|DataView} 必需，必须至少为 8 字节长。这是 Argon2 密码哈希应用程序的盐。
+  * `parallelism` {number} 必需，并行度决定了可以运行多少计算链（通道）。必须大于 1 且小于 `2**24-1`。
+  * `tagLength` {number} 必需，要生成的密钥的长度。必须大于 4 且小于 `2**32-1`。
+  * `memory` {number} 必需，内存成本，以 1KiB 块为单位。必须大于 `8 * parallelism` 且小于 `2**32-1`。实际块数向下取整到 `4 * parallelism` 的最近倍数。
+  * `passes` {number} 必需，遍数（迭代次数）。必须大于 1 且小于 `2**32-1`。
+  * `secret` {string|ArrayBuffer|Buffer|TypedArray|DataView|undefined} 可选，随机附加输入，类似于盐，但 **不应** 与派生密钥一起存储。这在密码哈希应用程序中称为胡椒。如果使用，长度不得大于 `2**32-1` 字节。
+  * `associatedData` {string|ArrayBuffer|Buffer|TypedArray|DataView|undefined} 可选，要添加到哈希中的附加数据，在功能上类似于盐或密钥，但用于非随机数据。如果使用，长度不得大于 `2**32-1` 字节。
+* 返回：{Buffer}
+
+提供同步 [Argon2][] 实现。Argon2 是一种基于密码的密钥派生函数，设计为在计算和内存方面代价高昂，以使暴力攻击无利可图。
+
+`nonce` 应尽可能唯一。建议 nonce 是随机的且至少 16 字节长。有关详细信息，请参阅 [NIST SP 800-132][]。
+
+当为 `message`、`nonce`、`secret` 或 `associatedData` 传递字符串时，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。
+
+如果密钥派生失败，将抛出异常，否则派生密钥将作为 [`Buffer`][] 返回。
+
+当任何输入参数指定无效值或类型时，将抛出异常。
+
+```mjs
+const { argon2Sync, randomBytes } = await import('node:crypto');
+
+const parameters = {
+  message: 'password',
+  nonce: randomBytes(16),
+  parallelism: 4,
+  tagLength: 64,
+  memory: 65536,
+  passes: 3,
+};
+
+const derivedKey = argon2Sync('argon2id', parameters);
+console.log(derivedKey.toString('hex'));  // 'af91dad...9520f15'
+```
+
+```cjs
+const { argon2Sync, randomBytes } = require('node:crypto');
+
+const parameters = {
+  message: 'password',
+  nonce: randomBytes(16),
+  parallelism: 4,
+  tagLength: 64,
+  memory: 65536,
+  passes: 3,
+};
+
+const derivedKey = argon2Sync('argon2id', parameters);
+console.log(derivedKey.toString('hex'));  // 'af91dad...9520f15'
+```
+
+### `crypto.checkPrime(candidate[, options], callback)`
+
+<!-- YAML
+added: v15.8.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+-->
+
+* `candidate` {ArrayBuffer|SharedArrayBuffer|TypedArray|Buffer|DataView|bigint}
+  一个可能为质数的序列，编码为任意长度的字节序列（大端序）。
+* `options` {Object}
+  * `checks` {number} 要执行的 Miller-Rabin 概率性质数检查迭代次数。当值为 `0`（零）时，使用的检查次数对于随机输入产生的误报率最多为 2<sup>-64</sup>。选择检查次数时必须小心。有关更多详细信息，请参阅 OpenSSL 文档中 [`BN_is_prime_ex`][] 函数的 `nchecks` 选项。**默认值：** `0`
+* `callback` {Function}
+  * `err` {Error} 如果在检查期间发生错误，则设置为 {Error} 对象。
+  * `result` {boolean} 如果候选数是质数且错误概率小于 `0.25 ** options.checks`，则为 `true`。
+
+检查 `candidate` 的质数性。
+
+### `crypto.checkPrimeSync(candidate[, options])`
+
+<!-- YAML
+added: v15.8.0
+-->
+
+* `candidate` {ArrayBuffer|SharedArrayBuffer|TypedArray|Buffer|DataView|bigint}
+  一个可能为质数的序列，编码为任意长度的字节序列（大端序）。
+* `options` {Object}
+  * `checks` {number} 要执行的 Miller-Rabin 概率性质数检查迭代次数。当值为 `0`（零）时，使用的检查次数对于随机输入产生的误报率最多为 2<sup>-64</sup>。选择检查次数时必须小心。有关更多详细信息，请参阅 OpenSSL 文档中 [`BN_is_prime_ex`][] 函数的 `nchecks` 选项。**默认值：** `0`
+* 返回：{boolean} 如果候选数是质数且错误概率小于 `0.25 ** options.checks`，则为 `true`。
+
+检查 `candidate` 的质数性。
+
+### `crypto.constants`
+
+<!-- YAML
+added: v6.3.0
+-->
+
+* 类型：{Object}
+
+一个包含加密和安全相关操作常用常量的对象。当前定义的特定常量在[加密常量][]中描述。
+
+### `crypto.createCipheriv(algorithm, key, iv[, options])`
+
+<!-- YAML
+added: v0.1.94
+changes:
+  - version:
+    - v17.9.0
+    - v16.17.0
+    pr-url: https://github.com/nodejs/node/pull/42427
+    description: The `authTagLength` option is now optional when using the
+                 `chacha20-poly1305` cipher and defaults to 16 bytes.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The password and iv arguments can be an ArrayBuffer and are
+                 each limited to a maximum of 2 ** 31 - 1 bytes.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: The `key` argument can now be a `KeyObject`.
+  - version:
+     - v11.2.0
+     - v10.17.0
+    pr-url: https://github.com/nodejs/node/pull/24081
+    description: The cipher `chacha20-poly1305` (the IETF variant of
+                 ChaCha20-Poly1305) is now supported.
+  - version: v10.10.0
+    pr-url: https://github.com/nodejs/node/pull/21447
+    description: Ciphers in OCB mode are now supported.
+  - version: v10.2.0
+    pr-url: https://github.com/nodejs/node/pull/20235
+    description: The `authTagLength` option can now be used to produce shorter
+                 authentication tags in GCM mode and defaults to 16 bytes.
+  - version: v9.9.0
+    pr-url: https://github.com/nodejs/node/pull/18644
+    description: The `iv` parameter may now be `null` for ciphers which do not
+                 need an initialization vector.
+-->
+
+* `algorithm` {string}
+* `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+* `iv` {string|ArrayBuffer|Buffer|TypedArray|DataView|null}
+* `options` {Object} [`stream.transform` 选项][]
+* 返回：{Cipheriv}
+
+使用给定的 `algorithm`、`key` 和初始化向量 (`iv`) 创建并返回 `Cipheriv` 对象。
+
+`options` 参数控制流行为，是可选的，除非使用 CCM 或 OCB 模式的密码（例如 `'aes-128-ccm'`）。在这种情况下，需要 `authTagLength` 选项，并指定认证标签的长度（以字节为单位），请参阅 [CCM 模式][]。在 GCM 模式下，`authTagLength` 选项不是必需的，但可用于设置 `getAuthTag()` 将返回的认证标签长度，默认为 16 字节。对于 `chacha20-poly1305`，`authTagLength` 选项默认为 16 字节。
+
+`algorithm` 依赖于 OpenSSL，例如 `'aes192'` 等。在最近的 OpenSSL 版本中，`openssl list -cipher-algorithms` 将显示可用的密码算法。
+
+`key` 是 `algorithm` 使用的原始密钥，`iv` 是[初始化向量][]。两个参数都必须是 `'utf8'` 编码的字符串、[Buffers][`Buffer`]、`TypedArray` 或 `DataView`s。`key` 可以选择是类型为 `secret` 的 [`KeyObject`][]。如果密码不需要初始化向量，`iv` 可以是 `null`。
+
+当为 `key` 或 `iv` 传递字符串时，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。
+
+初始化向量应该是不可预测且唯一的；理想情况下，它们将是加密随机的。它们不必是秘密的：IV 通常只是以未加密的方式添加到密文消息中。这听起来可能矛盾，即某些东西必须不可预测且唯一，但不必是秘密的；但请记住，攻击者必须不能提前预测给定的 IV 将是什么。
+
+### `crypto.createDecipheriv(algorithm, key, iv[, options])`
+
+<!-- YAML
+added: v0.1.94
+changes:
+  - version:
+    - v17.9.0
+    - v16.17.0
+    pr-url: https://github.com/nodejs/node/pull/42427
+    description: The `authTagLength` option is now optional when using the
+                 `chacha20-poly1305` cipher and defaults to 16 bytes.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: The `key` argument can now be a `KeyObject`.
+  - version:
+     - v11.2.0
+     - v10.17.0
+    pr-url: https://github.com/nodejs/node/pull/24081
+    description: The cipher `chacha20-poly1305` (the IETF variant of
+                 ChaCha20-Poly1305) is now supported.
+  - version: v10.10.0
+    pr-url: https://github.com/nodejs/node/pull/21447
+    description: Ciphers in OCB mode are now supported.
+  - version: v10.2.0
+    pr-url: https://github.com/nodejs/node/pull/20039
+    description: The `authTagLength` option can now be used to restrict accepted
+                 GCM authentication tag lengths.
+  - version: v9.9.0
+    pr-url: https://github.com/nodejs/node/pull/18644
+    description: The `iv` parameter may now be `null` for ciphers which do not
+                 need an initialization vector.
+-->
+
+* `algorithm` {string}
+* `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+* `iv` {string|ArrayBuffer|Buffer|TypedArray|DataView|null}
+* `options` {Object} [`stream.transform` 选项][]
+* 返回：{Decipheriv}
+
+创建并返回一个 `Decipheriv` 对象，该对象使用给定的 `algorithm`、`key` 和初始化向量 (`iv`)。
+
+`options` 参数控制流行为，是可选的，除非使用 CCM 或 OCB 模式的密码（例如 `'aes-128-ccm'`）。在这种情况下，需要 `authTagLength` 选项，并指定认证标签的长度（以字节为单位），请参阅 [CCM 模式][]。
+对于 AES-GCM 和 `chacha20-poly1305`，`authTagLength` 选项默认为 16 字节，如果使用不同的长度，必须设置为不同的值。
+
+`algorithm` 依赖于 OpenSSL，例如 `'aes192'` 等。在最近的 OpenSSL 版本中，`openssl list -cipher-algorithms` 将显示可用的密码算法。
+
+`key` 是 `algorithm` 使用的原始密钥，`iv` 是[初始化向量][]。两个参数都必须是 `'utf8'` 编码的字符串、[Buffers][`Buffer`]、`TypedArray` 或 `DataView`s。`key` 可以选择是类型为 `secret` 的 [`KeyObject`][]。如果密码不需要初始化向量，`iv` 可以是 `null`。
+
+当为 `key` 或 `iv` 传递字符串时，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。
+
+初始化向量应该是不可预测且唯一的；理想情况下，它们将是加密随机的。它们不必是秘密的：IV 通常只是以未加密的方式添加到密文消息中。这听起来可能矛盾，即某些东西必须不可预测且唯一，但不必是秘密的；但请记住，攻击者必须不能提前预测给定的 IV 将是什么。
+
+### `crypto.createDiffieHellman(prime[, primeEncoding][, generator][, generatorEncoding])`
+
+<!-- YAML
+added: v0.11.12
+changes:
+  - version: v8.0.0
+    pr-url: https://github.com/nodejs/node/pull/12223
+    description: The `prime` argument can be any `TypedArray` or `DataView` now.
+  - version: v8.0.0
+    pr-url: https://github.com/nodejs/node/pull/11983
+    description: The `prime` argument can be a `Uint8Array` now.
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default for the encoding parameters changed
+                 from `binary` to `utf8`.
+-->
+
+* `prime` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `primeEncoding` {string} `prime` 字符串的[编码][encoding]。
+* `generator` {number|string|ArrayBuffer|Buffer|TypedArray|DataView}
+  **默认值：** `2`
+* `generatorEncoding` {string} `generator` 字符串的[编码][encoding]。
+* 返回：{DiffieHellman}
+
+使用提供的 `prime` 和可选的特定 `generator` 创建一个 `DiffieHellman` 密钥交换对象。
+
+`generator` 参数可以是数字、字符串或 [`Buffer`][]。如果未指定 `generator`，则使用值 `2`。
+
+如果指定了 `primeEncoding`，则 `prime` 应为字符串；否则应为 [`Buffer`][]、`TypedArray` 或 `DataView`。
+
+如果指定了 `generatorEncoding`，则 `generator` 应为字符串；否则应为数字、[`Buffer`][]、`TypedArray` 或 `DataView`。
+
+### `crypto.createDiffieHellman(primeLength[, generator])`
+
+<!-- YAML
+added: v0.5.0
+-->
+
+* `primeLength` {number}
+* `generator` {number} **默认值：** `2`
+* 返回：{DiffieHellman}
+
+创建一个 `DiffieHellman` 密钥交换对象，并使用可选的特定数字 `generator` 生成一个 `primeLength` 位的质数。如果未指定 `generator`，则使用值 `2`。
+
+### `crypto.createDiffieHellmanGroup(name)`
+
+<!-- YAML
+added: v0.9.3
+-->
+
+* `name` {string}
+* 返回：{DiffieHellmanGroup}
+
+[`crypto.getDiffieHellman()`][] 的别名
+
+### `crypto.createECDH(curveName)`
+
+<!-- YAML
+added: v0.11.14
+-->
+
+* `curveName` {string}
+* 返回：{ECDH}
+
+使用 `curveName` 字符串指定的预定义曲线创建一个椭圆曲线 Diffie-Hellman (`ECDH`) 密钥交换对象。使用 [`crypto.getCurves()`][] 获取可用曲线名称的列表。在最近的 OpenSSL 版本中，`openssl ecparam -list_curves` 也会显示每个可用椭圆曲线的名称和描述。
+
+### `crypto.createHash(algorithm[, options])`
+
+<!-- YAML
+added: v0.1.92
+changes:
+  - version: v12.8.0
+    pr-url: https://github.com/nodejs/node/pull/28805
+    description: The `outputLength` option was added for XOF hash functions.
+-->
+
+* `algorithm` {string}
+* `options` {Object} [`stream.transform` 选项][]
+* 返回：{Hash}
+
+创建并返回一个 `Hash` 对象，该对象可用于使用给定的 `algorithm` 生成哈希摘要。可选的 `options` 参数控制流行为。对于 XOF 哈希函数，例如 `'shake256'`，可以使用 `outputLength` 选项指定所需的输出长度（以字节为单位）。
+
+`algorithm` 依赖于平台上 OpenSSL 版本支持的可用算法。例如 `'sha256'`、`'sha512'` 等。在最近的 OpenSSL 版本中，`openssl list -digest-algorithms` 将显示可用的摘要算法。
+
+示例：生成文件的 sha256 和
+
+```mjs
+import {
+  createReadStream,
+} from 'node:fs';
+import { argv } from 'node:process';
+const {
+  createHash,
+} = await import('node:crypto');
+
+const filename = argv[2];
+
+const hash = createHash('sha256');
+
+const input = createReadStream(filename);
+input.on('readable', () => {
+  // 哈希流只会产生一个元素。
+  const data = input.read();
+  if (data)
+    hash.update(data);
+  else {
+    console.log(`${hash.digest('hex')} ${filename}`);
+  }
+});
+```
+
+```cjs
+const {
+  createReadStream,
+} = require('node:fs');
+const {
+  createHash,
+} = require('node:crypto');
+const { argv } = require('node:process');
+
+const filename = argv[2];
+
+const hash = createHash('sha256');
+
+const input = createReadStream(filename);
+input.on('readable', () => {
+  // 哈希流只会产生一个元素。
+  const data = input.read();
+  if (data)
+    hash.update(data);
+  else {
+    console.log(`${hash.digest('hex')} ${filename}`);
+  }
+});
+```
+
+### `crypto.createHmac(algorithm, key[, options])`
+
+<!-- YAML
+added: v0.1.94
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The key can also be an ArrayBuffer or CryptoKey. The
+                 encoding option was added. The key cannot contain
+                 more than 2 ** 32 - 1 bytes.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: The `key` argument can now be a `KeyObject`.
+-->
+
+* `algorithm` {string}
+* `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+* `options` {Object} [`stream.transform` 选项][]
+  * `encoding` {string} 当 `key` 是字符串时要使用的字符串编码。
+* 返回：{Hmac}
+
+创建并返回一个 `Hmac` 对象，该对象使用给定的 `algorithm` 和 `key`。可选的 `options` 参数控制流行为。
+
+`algorithm` 依赖于平台上 OpenSSL 版本支持的可用算法。例如 `'sha256'`、`'sha512'` 等。在最近的 OpenSSL 版本中，`openssl list -digest-algorithms` 将显示可用的摘要算法。
+
+`key` 是用于生成加密 HMAC 哈希的 HMAC 密钥。如果是 [`KeyObject`][]，其类型必须为 `secret`。如果是字符串，请考虑[将字符串作为输入传递给加密 API 时的注意事项][]。如果它是从加密安全的熵源（例如 [`crypto.randomBytes()`][] 或 [`crypto.generateKey()`][]）获取的，其长度不应超过 `algorithm` 的块大小（例如，SHA-256 为 512 位）。
+
+示例：生成文件的 sha256 HMAC
+
+```mjs
+import {
+  createReadStream,
+} from 'node:fs';
+import { argv } from 'node:process';
+const {
+  createHmac,
+} = await import('node:crypto');
+
+const filename = argv[2];
+
+const hmac = createHmac('sha256', 'a secret');
+
+const input = createReadStream(filename);
+input.on('readable', () => {
+  // 哈希流只会产生一个元素。
+  const data = input.read();
+  if (data)
+    hmac.update(data);
+  else {
+    console.log(`${hmac.digest('hex')} ${filename}`);
+  }
+});
+```
+
+```cjs
+const {
+  createReadStream,
+} = require('node:fs');
+const {
+  createHmac,
+} = require('node:crypto');
+const { argv } = require('node:process');
+
+const filename = argv[2];
+
+const hmac = createHmac('sha256', 'a secret');
+
+const input = createReadStream(filename);
+input.on('readable', () => {
+  // 哈希流只会产生一个元素。
+  const data = input.read();
+  if (data)
+    hmac.update(data);
+  else {
+    console.log(`${hmac.digest('hex')} ${filename}`);
+  }
+});
+```
+
+### `crypto.createPrivateKey(key)`
+
+<!-- YAML
+added: v11.6.0
+changes:
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA keys.
+  - version: v15.12.0
+    pr-url: https://github.com/nodejs/node/pull/37254
+    description: The key can also be a JWK object.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The key can also be an ArrayBuffer. The encoding option was
+                 added. The key cannot contain more than 2 ** 32 - 1 bytes.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView}
+  * `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|Object} 密钥材料，可以是 PEM、DER 或 JWK 格式。
+  * `format` {string} 必须是 `'pem'`、`'der'` 或 '`'jwk'`。
+    **默认值：** `'pem'`。
+  * `type` {string} 必须是 `'pkcs1'`、`'pkcs8'` 或 `'sec1'`。此选项仅在 `format` 为 `'der'` 时必需，否则忽略。
+  * `passphrase` {string | Buffer} 用于解密的密码。
+  * `encoding` {string} 当 `key` 是字符串时要使用的字符串编码。
+* 返回：{KeyObject}
+
+<!--lint enable maximum-line-length remark-lint-->
+
+创建并返回一个包含私钥的新密钥对象。如果 `key` 是字符串或 `Buffer`，则假定 `format` 为 `'pem'`；否则，`key` 必须是具有上述所述属性的对象。
+
+如果私钥已加密，则必须指定 `passphrase`。密码的长度限制为 1024 字节。
+
+### `crypto.createPublicKey(key)`
+
+<!-- YAML
+added: v11.6.0
+changes:
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA keys.
+  - version: v15.12.0
+    pr-url: https://github.com/nodejs/node/pull/37254
+    description: The key can also be a JWK object.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The key can also be an ArrayBuffer. The encoding option was
+                 added. The key cannot contain more than 2 ** 32 - 1 bytes.
+  - version: v11.13.0
+    pr-url: https://github.com/nodejs/node/pull/26278
+    description: The `key` argument can now be a `KeyObject` with type
+                 `private`.
+  - version: v11.7.0
+    pr-url: https://github.com/nodejs/node/pull/25217
+    description: The `key` argument can now be a private key.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView}
+  * `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|Object} 密钥材料，可以是 PEM、DER 或 JWK 格式。
+  * `format` {string} 必须是 `'pem'`、`'der'` 或 `'jwk'`。
+    **默认值：** `'pem'`。
+  * `type` {string} 必须是 `'pkcs1'` 或 `'spki'`。此选项仅在 `format` 为 `'der'` 时必需，否则忽略。
+  * `encoding` {string} 当 `key` 是字符串时要使用的字符串编码。
+* 返回：{KeyObject}
+
+<!--lint enable maximum-line-length remark-lint-->
+
+创建并返回一个包含公钥的新密钥对象。如果 `key` 是字符串或 `Buffer`，则假定 `format` 为 `'pem'`；如果 `key` 是类型为 `'private'` 的 `KeyObject`，则公钥从给定的私钥派生；否则，`key` 必须是具有上述所述属性的对象。
+
+如果格式为 `'pem'`，则 `'key'` 也可以是 X.509 证书。
+
+由于可以从私钥派生公钥，因此可以传递私钥而不是公钥。在这种情况下，此函数的行为类似于调用了 [`crypto.createPrivateKey()`][]，只是返回的 `KeyObject` 的类型将为 `'public'`，并且无法从返回的 `KeyObject` 中提取私钥。类似地，如果给定类型为 `'private'` 的 `KeyObject`，将返回一个类型为 `'public'` 的新 `KeyObject`，并且无法从返回的对象中提取私钥。
+
+### `crypto.createSecretKey(key[, encoding])`
+
+<!-- YAML
+added: v11.6.0
+changes:
+  - version:
+    - v18.8.0
+    - v16.18.0
+    pr-url: https://github.com/nodejs/node/pull/44201
+    description: The key can now be zero-length.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The key can also be an ArrayBuffer or string. The encoding
+                 argument was added. The key cannot contain more than
+                 2 ** 32 - 1 bytes.
+-->
+
+* `key` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `encoding` {string} 当 `key` 是字符串时要使用的字符串编码。
+* 返回：{KeyObject}
+
+创建并返回一个包含对称加密或 `Hmac` 的密钥的新密钥对象。
+
+### `crypto.createSign(algorithm[, options])`
+
+<!-- YAML
+added: v0.1.92
+-->
+
+* `algorithm` {string}
+* `options` {Object} [`stream.Writable` 选项][]
+* 返回：{Sign}
+
+创建并返回一个使用给定 `algorithm` 的 `Sign` 对象。使用 [`crypto.getHashes()`][] 获取可用摘要算法的名称。可选的 `options` 参数控制 `stream.Writable` 行为。
+
+在某些情况下，可以使用签名算法的名称（例如 `'RSA-SHA256'`）而不是摘要算法来创建 `Sign` 实例。这将使用相应的摘要算法。这并不适用于所有签名算法，例如 `'ecdsa-with-SHA256'`，因此最好始终使用摘要算法名称。
+
+### `crypto.createVerify(algorithm[, options])`
+
+<!-- YAML
+added: v0.1.92
+-->
+
+* `algorithm` {string}
+* `options` {Object} [`stream.Writable` 选项][]
+* 返回：{Verify}
+
+创建并返回一个使用给定算法的 `Verify` 对象。使用 [`crypto.getHashes()`][] 获取可用签名算法名称的数组。可选的 `options` 参数控制 `stream.Writable` 行为。
+
+在某些情况下，可以使用签名算法的名称（例如 `'RSA-SHA256'`）而不是摘要算法来创建 `Verify` 实例。这将使用相应的摘要算法。这并不适用于所有签名算法，例如 `'ecdsa-with-SHA256'`，因此最好始终使用摘要算法名称。
+
+### `crypto.decapsulate(key, ciphertext[, callback])`
+
+<!-- YAML
+added: v24.7.0
+-->
+
+> Stability: 1.2 - Release candidate
+
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject} 私钥
+* `ciphertext` {ArrayBuffer|Buffer|TypedArray|DataView}
+* `callback` {Function}
+  * `err` {Error}
+  * `sharedKey` {Buffer}
+* 返回：{Buffer} 如果未提供 `callback` 函数。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用 KEM 算法和私钥进行密钥解封装。
+
+支持的密钥类型及其 KEM 算法有：
+
+* `'rsa'`[^openssl30] RSA 密钥封装机制
+* `'ec'`[^openssl32] DHKEM(P-256, HKDF-SHA256), DHKEM(P-384, HKDF-SHA384), DHKEM(P-521, HKDF-SHA512)
+* `'x25519'`[^openssl32] DHKEM(X25519, HKDF-SHA256)
+* `'x448'`[^openssl32] DHKEM(X448, HKDF-SHA512)
+* `'ml-kem-512'`[^openssl35] ML-KEM
+* `'ml-kem-768'`[^openssl35] ML-KEM
+* `'ml-kem-1024'`[^openssl35] ML-KEM
+
+如果 `key` 不是 [`KeyObject`][]，则此函数的行为类似于 `key` 已传递给 [`crypto.createPrivateKey()`][]。
+
+如果提供了 `callback` 函数，则此函数使用 libuv 的线程池。
+
+### `crypto.diffieHellman(options[, callback])`
+
+<!-- YAML
+added:
+ - v13.9.0
+ - v12.17.0
+changes:
+  - version: v23.11.0
+    pr-url: https://github.com/nodejs/node/pull/57274
+    description: Optional callback argument added.
+-->
+
+* `options` {Object}
+  * `privateKey` {KeyObject}
+  * `publicKey` {KeyObject}
+* `callback` {Function}
+  * `err` {Error}
+  * `secret` {Buffer}
+* 返回: {Buffer} 如果未提供 `callback` 函数。
+
+基于 `privateKey` 和 `publicKey` 计算 Diffie-Hellman 共享密钥。
+两个密钥必须具有相同的 `asymmetricKeyType` 并且必须支持 DH 或 ECDH 操作。
+
+如果提供了 `callback` 函数，则此函数使用 libuv 的线程池。
+
+### `crypto.encapsulate(key[, callback])`
+
+<!-- YAML
+added: v24.7.0
+-->
+
+> Stability: 1.2 - Release candidate
+
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject} 公钥
+* `callback` {Function}
+  * `err` {Error}
+  * `result` {Object}
+    * `sharedKey` {Buffer}
+    * `ciphertext` {Buffer}
+* 返回: {Object} 如果未提供 `callback` 函数。
+  * `sharedKey` {Buffer}
+  * `ciphertext` {Buffer}
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用 KEM 算法和公钥进行密钥封装。
+
+支持的密钥类型及其 KEM 算法包括：
+
+* `'rsa'`[^openssl30] RSA 密钥封装机制
+* `'ec'`[^openssl32] DHKEM(P-256, HKDF-SHA256), DHKEM(P-384, HKDF-SHA256), DHKEM(P-521, HKDF-SHA256)
+* `'x25519'`[^openssl32] DHKEM(X25519, HKDF-SHA256)
+* `'x448'`[^openssl32] DHKEM(X448, HKDF-SHA512)
+* `'ml-kem-512'`[^openssl35] ML-KEM
+* `'ml-kem-768'`[^openssl35] ML-KEM
+* `'ml-kem-1024'`[^openssl35] ML-KEM
+
+如果 `key` 不是 [`KeyObject`][]，此函数的行为将如同将 `key` 传递给 [`crypto.createPublicKey()`][] 一样。
+
+如果提供了 `callback` 函数，则此函数使用 libuv 的线程池。
+
+### `crypto.fips`
+
+<!-- YAML
+added: v6.0.0
+deprecated: v10.0.0
+-->
+
+> Stability: 0 - Deprecated
+
+用于检查和控制是否当前正在使用符合 FIPS 标准的加密提供程序的属性。设置为 true 需要 Node.js 的 FIPS 构建版本。
+
+此属性已弃用。请改用 `crypto.setFips()` 和 `crypto.getFips()`。
+
+### `crypto.generateKey(type, options, callback)`
+
+<!-- YAML
+added: v15.0.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+-->
+
+* `type` {string} 生成密钥的预期用途。当前接受的值是 `'hmac'` 和 `'aes'`。
+* `options` {Object}
+  * `length` {number} 要生成的密钥的位长度。必须是一个大于 0 的值。
+    * 如果 `type` 是 `'hmac'`，最小值为 8，最大长度为 2<sup>31</sup>-1。如果该值不是 8 的倍数，生成的密钥将被截断为 `Math.floor(length / 8)`。
+    * 如果 `type` 是 `'aes'`，长度必须是 `128`、`192` 或 `256` 之一。
+* `callback` {Function}
+  * `err` {Error}
+  * `key` {KeyObject}
+
+异步生成指定 `length` 的新随机密钥。`type` 将决定对 `length` 执行哪些验证。
+
+```mjs
+const {
+  generateKey,
+} = await import('node:crypto');
+
+generateKey('hmac', { length: 512 }, (err, key) => {
+  if (err) throw err;
+  console.log(key.export().toString('hex'));  // 46e..........620
+});
+```
+
+```cjs
+const {
+  generateKey,
+} = require('node:crypto');
+
+generateKey('hmac', { length: 512 }, (err, key) => {
+  if (err) throw err;
+  console.log(key.export().toString('hex'));  // 46e..........620
+});
+```
+
+生成的 HMAC 密钥的大小不应超过底层哈希函数的块大小。更多信息请参见 [`crypto.createHmac()`][]。
+
+### `crypto.generateKeyPair(type, options, callback)`
+
+<!-- YAML
+added: v10.12.0
+changes:
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59537
+    description: Add support for SLH-DSA key pairs.
+  - version: v24.7.0
+    pr-url: https://github.com/nodejs/node/pull/59461
+    description: Add support for ML-KEM key pairs.
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA key pairs.
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v16.10.0
+    pr-url: https://github.com/nodejs/node/pull/39927
+    description: Add ability to define `RSASSA-PSS-params` sequence parameters
+                 for RSA-PSS keys pairs.
+  - version:
+     - v13.9.0
+     - v12.17.0
+    pr-url: https://github.com/nodejs/node/pull/31178
+    description: Add support for Diffie-Hellman.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26960
+    description: Add support for RSA-PSS key pairs.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26774
+    description: Add ability to generate X25519 and X448 key pairs.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26554
+    description: Add ability to generate Ed25519 and Ed448 key pairs.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: The `generateKeyPair` and `generateKeyPairSync` functions now
+                 produce key objects if no encoding was specified.
+-->
+
+* `type` {string} 要生成的非对称密钥类型。参见支持的[非对称密钥类型][]。
+* `options` {Object}
+  * `modulusLength` {number} 密钥大小（位），适用于 RSA、DSA。
+  * `publicExponent` {number} 公共指数（RSA）。**默认值:** `0x10001`。
+  * `hashAlgorithm` {string} 消息摘要的名称（RSA-PSS）。
+  * `mgf1HashAlgorithm` {string} MGF1 使用的消息摘要名称（RSA-PSS）。
+  * `saltLength` {number} 最小盐长度（字节）（RSA-PSS）。
+  * `divisorLength` {number} `q` 的大小（位）（DSA）。
+  * `namedCurve` {string} 要使用的曲线名称（EC）。
+  * `prime` {Buffer} 素数参数（DH）。
+  * `primeLength` {number} 素数长度（位）（DH）。
+  * `generator` {number} 自定义生成器（DH）。**默认值:** `2`。
+  * `groupName` {string} Diffie-Hellman 组名（DH）。参见 [`crypto.getDiffieHellman()`][]。
+  * `paramEncoding` {string} 必须为 `'named'` 或 `'explicit'`（EC）。**默认值:** `'named'`。
+  * `publicKeyEncoding` {Object} 参见 [`keyObject.export()`][]。
+  * `privateKeyEncoding` {Object} 参见 [`keyObject.export()`][]。
+* `callback` {Function}
+  * `err` {Error}
+  * `publicKey` {string | Buffer | KeyObject}
+  * `privateKey` {string | Buffer | KeyObject}
+
+生成指定 `type` 的新非对称密钥对。目前支持 RSA、RSA-PSS、DSA、EC、Ed25519、Ed448、X25519、X448 和 DH。
+
+如果指定了 `publicKeyEncoding` 或 `privateKeyEncoding`，此函数的行为将如同在其结果上调用了 [`keyObject.export()`][]。否则，密钥的相应部分将作为 [`KeyObject`][] 返回。
+
+建议将公钥编码为 `'spki'`，私钥编码为 `'pkcs8'` 并进行加密，以便长期存储：
+
+```mjs
+const {
+  generateKeyPair,
+} = await import('node:crypto');
+
+generateKeyPair('rsa', {
+  modulusLength: 4096,
+  publicKeyEncoding: {
+    type: 'spki',
+    format: 'pem',
+  },
+  privateKeyEncoding: {
+    type: 'pkcs8',
+    format: 'pem',
+    cipher: 'aes-256-cbc',
+    passphrase: 'top secret',
+  },
+}, (err, publicKey, privateKey) => {
+  // 处理错误并使用生成的密钥对。
+});
+```
+
+```cjs
+const {
+  generateKeyPair,
+} = require('node:crypto');
+
+generateKeyPair('rsa', {
+  modulusLength: 4096,
+  publicKeyEncoding: {
+    type: 'spki',
+    format: 'pem',
+  },
+  privateKeyEncoding: {
+    type: 'pkcs8',
+    format: 'pem',
+    cipher: 'aes-256-cbc',
+    passphrase: 'top secret',
+  },
+}, (err, publicKey, privateKey) => {
+  // 处理错误并使用生成的密钥对。
+});
+```
+
+完成时，将调用 `callback`，其中 `err` 设置为 `undefined`，`publicKey` / `privateKey` 表示生成的密钥对。
+
+如果此方法以其 [`util.promisify()`][] 化的版本调用，则返回一个具有 `publicKey` 和 `privateKey` 属性的 `Promise`。
+
+### `crypto.generateKeyPairSync(type, options)`
+
+<!-- YAML
+added: v10.12.0
+changes:
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59537
+    description: Add support for SLH-DSA key pairs.
+  - version: v24.7.0
+    pr-url: https://github.com/nodejs/node/pull/59461
+    description: Add support for ML-KEM key pairs.
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA key pairs.
+  - version: v16.10.0
+    pr-url: https://github.com/nodejs/node/pull/39927
+    description: Add ability to define `RSASSA-PSS-params` sequence parameters
+                 for RSA-PSS keys pairs.
+  - version:
+     - v13.9.0
+     - v12.17.0
+    pr-url: https://github.com/nodejs/node/pull/31178
+    description: Add support for Diffie-Hellman.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26960
+    description: Add support for RSA-PSS key pairs.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26774
+    description: Add ability to generate X25519 and X448 key pairs.
+  - version: v12.0.0
+    pr-url: https://github.com/nodejs/node/pull/26554
+    description: Add ability to generate Ed25519 and Ed448 key pairs.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: The `generateKeyPair` and `generateKeyPairSync` functions now
+                 produce key objects if no encoding was specified.
+-->
+
+* `type` {string} 要生成的非对称密钥类型。参见支持的[非对称密钥类型][]。
+* `options` {Object}
+  * `modulusLength` {number} 密钥大小（位），适用于 RSA、DSA。
+  * `publicExponent` {number} 公共指数（RSA）。**默认值:** `0x10001`。
+  * `hashAlgorithm` {string} 消息摘要的名称（RSA-PSS）。
+  * `mgf1HashAlgorithm` {string} MGF1 使用的消息摘要名称（RSA-PSS）。
+  * `saltLength` {number} 最小盐长度（字节）（RSA-PSS）。
+  * `divisorLength` {number} `q` 的大小（位）（DSA）。
+  * `namedCurve` {string} 要使用的曲线名称（EC）。
+  * `prime` {Buffer} 素数参数（DH）。
+  * `primeLength` {number} 素数长度（位）（DH）。
+  * `generator` {number} 自定义生成器（DH）。**默认值:** `2`。
+  * `groupName` {string} Diffie-Hellman 组名（DH）。参见 [`crypto.getDiffieHellman()`][]。
+  * `paramEncoding` {string} 必须为 `'named'` 或 `'explicit'`（EC）。**默认值:** `'named'`。
+  * `publicKeyEncoding` {Object} 参见 [`keyObject.export()`][]。
+  * `privateKeyEncoding` {Object} 参见 [`keyObject.export()`][]。
+* 返回: {Object}
+  * `publicKey` {string | Buffer | KeyObject}
+  * `privateKey` {string | Buffer | KeyObject}
+
+生成指定 `type` 的新非对称密钥对。目前支持 RSA、RSA-PSS、DSA、EC、Ed25519、Ed448、X25519、X448、DH 和 ML-DSA[^openssl35]。
+
+如果指定了 `publicKeyEncoding` 或 `privateKeyEncoding`，此函数的行为将如同在其结果上调用了 [`keyObject.export()`][]。否则，密钥的相应部分将作为 [`KeyObject`][] 返回。
+
+编码公钥时，建议使用 `'spki'`。编码私钥时，建议使用 `'pkcs8'` 并设置强密码，且对密码保密。
+
+```mjs
+const {
+  generateKeyPairSync,
+} = await import('node:crypto');
+
+const {
+  publicKey,
+  privateKey,
+} = generateKeyPairSync('rsa', {
+  modulusLength: 4096,
+  publicKeyEncoding: {
+    type: 'spki',
+    format: 'pem',
+  },
+  privateKeyEncoding: {
+    type: 'pkcs8',
+    format: 'pem',
+    cipher: 'aes-256-cbc',
+    passphrase: 'top secret',
+  },
+});
+```
+
+```cjs
+const {
+  generateKeyPairSync,
+} = require('node:crypto');
+
+const {
+  publicKey,
+  privateKey,
+} = generateKeyPairSync('rsa', {
+  modulusLength: 4096,
+  publicKeyEncoding: {
+    type: 'spki',
+    format: 'pem',
+  },
+  privateKeyEncoding: {
+    type: 'pkcs8',
+    format: 'pem',
+    cipher: 'aes-256-cbc',
+    passphrase: 'top secret',
+  },
+});
+```
+
+返回值 `{ publicKey, privateKey }` 表示生成的密钥对。当选择了 PEM 编码时，相应的密钥将是一个字符串，否则它将是一个包含 DER 编码数据的缓冲区。
+
+### `crypto.generateKeySync(type, options)`
+
+<!-- YAML
+added: v15.0.0
+-->
+
+* `type` {string} 生成密钥的预期用途。当前接受的值是 `'hmac'` 和 `'aes'`。
+* `options` {Object}
+  * `length` {number} 要生成的密钥的位长度。
+    * 如果 `type` 是 `'hmac'`，最小值为 8，最大长度为 2<sup>31</sup>-1。如果该值不是 8 的倍数，生成的密钥将被截断为 `Math.floor(length / 8)`。
+    * 如果 `type` 是 `'aes'`，长度必须是 `128`、`192` 或 `256` 之一。
+* 返回: {KeyObject}
+
+同步生成指定 `length` 的新随机密钥。`type` 将决定对 `length` 执行哪些验证。
+
+```mjs
+const {
+  generateKeySync,
+} = await import('node:crypto');
+
+const key = generateKeySync('hmac', { length: 512 });
+console.log(key.export().toString('hex'));  // e89..........41e
+```
+
+```cjs
+const {
+  generateKeySync,
+} = require('node:crypto');
+
+const key = generateKeySync('hmac', { length: 512 });
+console.log(key.export().toString('hex'));  // e89..........41e
+```
+
+生成的 HMAC 密钥的大小不应超过底层哈希函数的块大小。更多信息请参见 [`crypto.createHmac()`][]。
+
+### `crypto.generatePrime(size[, options], callback)`
+
+<!-- YAML
+added: v15.8.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+-->
+
+* `size` {number} 要生成的素数的位大小。
+* `options` {Object}
+  * `add` {ArrayBuffer|SharedArrayBuffer|TypedArray|Buffer|DataView|bigint}
+  * `rem` {ArrayBuffer|SharedArrayBuffer|TypedArray|Buffer|DataView|bigint}
+  * `safe` {boolean} **默认值:** `false`。
+  * `bigint` {boolean} 当为 `true` 时，生成的素数作为 `bigint` 返回。
+* `callback` {Function}
+  * `err` {Error}
+  * `prime` {ArrayBuffer|bigint}
+
+生成一个 `size` 位的伪随机素数。
+
+如果 `options.safe` 为 `true`，则素数将是一个安全素数——即 `(prime - 1) / 2` 也将是一个素数。
+
+`options.add` 和 `options.rem` 参数可用于强制执行额外要求，例如，对于 Diffie-Hellman：
+
+* 如果同时设置了 `options.add` 和 `options.rem`，则素数将满足条件 `prime % add = rem`。
+* 如果仅设置了 `options.add` 且 `options.safe` 不为 `true`，则素数将满足条件 `prime % add = 1`。
+* 如果仅设置了 `options.add` 且 `options.safe` 设置为 `true`，则素数将改为满足条件 `prime % add = 3`。这是必要的，因为对于 `options.add > 2`，`prime % add = 1` 将与 `options.safe` 强制执行的条件相矛盾。
+* 如果未给出 `options.add`，则忽略 `options.rem`。
+
+如果 `options.add` 和 `options.rem` 作为 `ArrayBuffer`、`SharedArrayBuffer`、`TypedArray`、`Buffer` 或 `DataView` 给出，则必须编码为大端序列。
+
+默认情况下，素数编码为八位字节的大端序列在 {ArrayBuffer} 中。如果 `bigint` 选项为 `true`，则提供一个 {bigint}。
+
+素数的大小将直接影响生成素数所需的时间。大小越大，所需时间越长。因为我们使用 OpenSSL 的 `BN_generate_prime_ex` 函数，该函数仅提供对我们中断生成过程能力的最小控制，不建议生成过大的素数，因为这样做可能会使进程无响应。
+
+### `crypto.generatePrimeSync(size[, options])`
+
+<!-- YAML
+added: v15.8.0
+-->
+
+* `size` {number} 要生成的素数的位大小。
+* `options` {Object}
+  * `add` {ArrayBuffer|SharedArrayBuffer|TypedArray|Buffer|DataView|bigint}
+  * `rem` {ArrayBuffer|SharedArrayBuffer|TypedArray|Buffer|DataView|bigint}
+  * `safe` {boolean} **默认值:** `false`。
+  * `bigint` {boolean} 当为 `true` 时，生成的素数作为 `bigint` 返回。
+* 返回: {ArrayBuffer|bigint}
+
+生成一个 `size` 位的伪随机素数。
+
+如果 `options.safe` 为 `true`，则素数将是一个安全素数——即 `(prime - 1) / 2` 也将是一个素数。
+
+`options.add` 和 `options.rem` 参数可用于强制执行额外要求，例如，对于 Diffie-Hellman：
+
+* 如果同时设置了 `options.add` 和 `options.rem`，则素数将满足条件 `prime % add = rem`。
+* 如果仅设置了 `options.add` 且 `options.safe` 不为 `true`，则素数将满足条件 `prime % add = 1`。
+* 如果仅设置了 `options.add` 且 `options.safe` 设置为 `true`，则素数将改为满足条件 `prime % add = 3`。这是必要的，因为对于 `options.add > 2`，`prime % add = 1` 将与 `options.safe` 强制执行的条件相矛盾。
+* 如果未给出 `options.add`，则忽略 `options.rem`。
+
+如果 `options.add` 和 `options.rem` 作为 `ArrayBuffer`、`SharedArrayBuffer`、`TypedArray`、`Buffer` 或 `DataView` 给出，则必须编码为大端序列。
+
+默认情况下，素数编码为八位字节的大端序列在 {ArrayBuffer} 中。如果 `bigint` 选项为 `true`，则提供一个 {bigint}。
+
+素数的大小将直接影响生成素数所需的时间。大小越大，所需时间越长。因为我们使用 OpenSSL 的 `BN_generate_prime_ex` 函数，该函数仅提供对我们中断生成过程能力的最小控制，不建议生成过大的素数，因为这样做可能会使进程无响应。
+
+### `crypto.getCipherInfo(nameOrNid[, options])`
+
+<!-- YAML
+added: v15.0.0
+-->
+
+* `nameOrNid` {string|number} 要查询的密码的名称或 nid。
+* `options` {Object}
+  * `keyLength` {number} 测试密钥长度。
+  * `ivLength` {number} 测试 IV 长度。
+* 返回: {Object}
+  * `name` {string} 密码的名称
+  * `nid` {number} 密码的 nid
+  * `blockSize` {number} 密码的块大小（字节）。当 `mode` 为 `'stream'` 时省略此属性。
+  * `ivLength` {number} 预期或默认的初始化向量长度（字节）。如果密码不使用初始化向量，则省略此属性。
+  * `keyLength` {number} 预期或默认的密钥长度（字节）。
+  * `mode` {string} 密码模式。其中之一为 `'cbc'`、`'ccm'`、`'cfb'`、`'ctr'`、`'ecb'`、`'gcm'`、`'ocb'`、`'ofb'`、`'stream'`、`'wrap'`、`'xts'`。
+
+返回有关给定密码的信息。
+
+一些密码接受可变长度的密钥和初始化向量。默认情况下，`crypto.getCipherInfo()` 方法将返回这些密码的默认值。要测试给定的密钥长度或 iv 长度对于给定密码是否可接受，请使用 `keyLength` 和 `ivLength` 选项。如果给定的值不可接受，将返回 `undefined`。
+
+### `crypto.getCiphers()`
+
+<!-- YAML
+added: v0.9.3
+-->
+
+* 返回: {string\[]} 包含支持的密码算法名称的数组。
+
+```mjs
+const {
+  getCiphers,
+} = await import('node:crypto');
+
+console.log(getCiphers()); // ['aes-128-cbc', 'aes-128-ccm', ...]
+```
+
+```cjs
+const {
+  getCiphers,
+} = require('node:crypto');
+
+console.log(getCiphers()); // ['aes-128-cbc', 'aes-128-ccm', ...]
+```
+
+### `crypto.getCurves()`
+
+<!-- YAML
+added: v2.3.0
+-->
+
+* 返回: {string\[]} 包含支持的椭圆曲线名称的数组。
+
+```mjs
+const {
+  getCurves,
+} = await import('node:crypto');
+
+console.log(getCurves()); // ['Oakley-EC2N-3', 'Oakley-EC2N-4', ...]
+```
+
+```cjs
+const {
+  getCurves,
+} = require('node:crypto');
+
+console.log(getCurves()); // ['Oakley-EC2N-3', 'Oakley-EC2N-4', ...]
+```
+
+### `crypto.getDiffieHellman(groupName)`
+
+<!-- YAML
+added: v0.7.5
+-->
+
+* `groupName` {string}
+* 返回: {DiffieHellmanGroup}
+
+创建一个预定义的 `DiffieHellmanGroup` 密钥交换对象。支持的组在 [`DiffieHellmanGroup`][] 的文档中列出。
+
+返回的对象模仿由 [`crypto.createDiffieHellman()`][] 创建的对象的接口，但不允许更改密钥（例如使用 [`diffieHellman.setPublicKey()`][]）。使用此方法的优点是双方不必事先生成或交换组模数，从而节省处理器和通信时间。
+
+示例（获取共享密钥）：
+
+```mjs
+const {
+  getDiffieHellman,
+} = await import('node:crypto');
+const alice = getDiffieHellman('modp14');
+const bob = getDiffieHellman('modp14');
+
+alice.generateKeys();
+bob.generateKeys();
+
+const aliceSecret = alice.computeSecret(bob.getPublicKey(), null, 'hex');
+const bobSecret = bob.computeSecret(alice.getPublicKey(), null, 'hex');
+
+/* aliceSecret 和 bobSecret 应该相同 */
+console.log(aliceSecret === bobSecret);
+```
+
+```cjs
+const {
+  getDiffieHellman,
+} = require('node:crypto');
+
+const alice = getDiffieHellman('modp14');
+const bob = getDiffieHellman('modp14');
+
+alice.generateKeys();
+bob.generateKeys();
+
+const aliceSecret = alice.computeSecret(bob.getPublicKey(), null, 'hex');
+const bobSecret = bob.computeSecret(alice.getPublicKey(), null, 'hex');
+
+/* aliceSecret 和 bobSecret 应该相同 */
+console.log(aliceSecret === bobSecret);
+```
+
+### `crypto.getFips()`
+
+<!-- YAML
+added: v10.0.0
+-->
+
+* 返回: {number} 当且仅当当前正在使用符合 FIPS 的加密提供程序时为 `1`，否则为 `0`。未来的 semver-major 版本可能会将此 API 的返回类型更改为 {boolean}。
+
+### `crypto.getHashes()`
+
+<!-- YAML
+added: v0.9.3
+-->
+
+* 返回: {string\[]} 支持的哈希算法名称数组，例如 `'RSA-SHA256'`。哈希算法也称为“摘要”算法。
+
+```mjs
+const {
+  getHashes,
+} = await import('node:crypto');
+
+console.log(getHashes()); // ['DSA', 'DSA-SHA', 'DSA-SHA1', ...]
+```
+
+```cjs
+const {
+  getHashes,
+} = require('node:crypto');
+
+console.log(getHashes()); // ['DSA', 'DSA-SHA', 'DSA-SHA1', ...]
+```
+
+### `crypto.getRandomValues(typedArray)`
+
+<!-- YAML
+added: v17.4.0
+-->
+
+* `typedArray` {Buffer|TypedArray|DataView|ArrayBuffer}
+* 返回: {Buffer|TypedArray|DataView|ArrayBuffer} 返回 `typedArray`。
+
+[`crypto.webcrypto.getRandomValues()`][] 的便捷别名。此实现不符合 Web Crypto 规范，要编写与 Web 兼容的代码，请改用 [`crypto.webcrypto.getRandomValues()`][]。
+
+### `crypto.hash(algorithm, data[, options])`
+
+<!-- YAML
+added:
+ - v21.7.0
+ - v20.12.0
+changes:
+  - version: v24.4.0
+    pr-url: https://github.com/nodejs/node/pull/58121
+    description: The `outputLength` option was added for XOF hash functions.
+-->
+
+> Stability: 1.2 - Release candidate
+
+* `algorithm` {string|undefined}
+* `data` {string|Buffer|TypedArray|DataView} 当 `data` 是字符串时，它将在被哈希之前编码为 UTF-8。如果希望对字符串输入使用不同的输入编码，用户可以使用 `TextEncoder` 或 `Buffer.from()` 将字符串编码为 `TypedArray`，然后将编码后的 `TypedArray` 传递给此 API。
+* `options` {Object|string}
+  * `outputEncoding` {string} 用于编码返回的摘要的[编码][encoding]。**默认值:** `'hex'`。
+  * `outputLength` {number} 对于 XOF 哈希函数（如 'shake256'），`outputLength` 选项可用于指定所需的输出长度（字节）。
+* 返回: {string|Buffer}
+
+用于创建数据的一次性哈希摘要的实用程序。当哈希较小量（<= 5MB）且立即可用的数据时，它可能比基于对象的 `crypto.createHash()` 更快。如果数据可能很大或是流式的，仍然建议使用 `crypto.createHash()`。
+
+`algorithm` 取决于平台上 OpenSSL 版本支持的可用算法。例如 `'sha256'`、`'sha512'` 等。在 OpenSSL 的最新版本中，`openssl list -digest-algorithms` 将显示可用的摘要算法。
+
+如果 `options` 是字符串，则它指定 `outputEncoding`。
+
+示例：
+
+```cjs
+const crypto = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+// 哈希字符串并将结果作为十六进制编码的字符串返回。
+const string = 'Node.js';
+// 10b3493287f831e81a438811a1ffba01f8cec4b7
+console.log(crypto.hash('sha1', string));
+
+// 将 base64 编码的字符串编码为 Buffer，对其进行哈希处理，并将结果作为缓冲区返回。
+const base64 = 'Tm9kZS5qcw==';
+// <Buffer 10 b3 49 32 87 f8 31 e8 1a 43 88 11 a1 ff ba 01 f8 ce c4 b7>
+console.log(crypto.hash('sha1', Buffer.from(base64, 'base64'), 'buffer'));
+```
+
+```mjs
+import crypto from 'node:crypto';
+import { Buffer } from 'node:buffer';
+
+// 哈希字符串并将结果作为十六进制编码的字符串返回。
+const string = 'Node.js';
+// 10b3493287f831e81a438811a1ffba01f8cec4b7
+console.log(crypto.hash('sha1', string));
+
+// 将 base64 编码的字符串编码为 Buffer，对其进行哈希处理，并将结果作为缓冲区返回。
+const base64 = 'Tm9kZS5qcw==';
+// <Buffer 10 b3 49 32 87 f8 31 e8 1a 43 88 11 a1 ff ba 01 f8 ce c4 b7>
+console.log(crypto.hash('sha1', Buffer.from(base64, 'base64'), 'buffer'));
+```
+
+### `crypto.hkdf(digest, ikm, salt, info, keylen, callback)`
+
+<!-- YAML
+added: v15.0.0
+changes:
+  - version:
+    - v18.8.0
+    - v16.18.0
+    pr-url: https://github.com/nodejs/node/pull/44201
+    description: The input keying material can now be zero-length.
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+-->
+
+* `digest` {string} 要使用的摘要算法。
+* `ikm` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject} 输入密钥材料。必须提供但可以为零长度。
+* `salt` {string|ArrayBuffer|Buffer|TypedArray|DataView} 盐值。必须提供但可以为零长度。
+* `info` {string|ArrayBuffer|Buffer|TypedArray|DataView} 附加信息值。必须提供但可以为零长度，且不能超过 1024 字节。
+* `keylen` {number} 要生成的密钥长度。必须大于 0。允许的最大值是所选摘要函数产生的字节数的 `255` 倍（例如，`sha512` 生成 64 字节的哈希，使最大 HKDF 输出为 16320 字节）。
+* `callback` {Function}
+  * `err` {Error}
+  * `derivedKey` {ArrayBuffer}
+
+HKDF 是 RFC 5869 中定义的简单密钥派生函数。给定的 `ikm`、`salt` 和 `info` 与 `digest` 一起用于派生 `keylen` 字节的密钥。
+
+提供的 `callback` 函数使用两个参数调用：`err` 和 `derivedKey`。如果在派生密钥时发生错误，`err` 将被设置；否则 `err` 将为 `null`。成功生成的 `derivedKey` 将作为 {ArrayBuffer} 传递给回调。如果任何输入参数指定了无效的值或类型，将抛出错误。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const {
+  hkdf,
+} = await import('node:crypto');
+
+hkdf('sha512', 'key', 'salt', 'info', 64, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(Buffer.from(derivedKey).toString('hex'));  // '24156e2...5391653'
+});
+```
+
+```cjs
+const {
+  hkdf,
+} = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+hkdf('sha512', 'key', 'salt', 'info', 64, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(Buffer.from(derivedKey).toString('hex'));  // '24156e2...5391653'
+});
+```
+
+### `crypto.hkdfSync(digest, ikm, salt, info, keylen)`
+
+<!-- YAML
+added: v15.0.0
+changes:
+  - version:
+    - v18.8.0
+    - v16.18.0
+    pr-url: https://github.com/nodejs/node/pull/44201
+    description: The input keying material can now be zero-length.
+-->
+
+* `digest` {string} 要使用的摘要算法。
+* `ikm` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject} 输入密钥材料。必须提供但可以为零长度。
+* `salt` {string|ArrayBuffer|Buffer|TypedArray|DataView} 盐值。必须提供但可以为零长度。
+* `info` {string|ArrayBuffer|Buffer|TypedArray|DataView} 附加信息值。必须提供但可以为零长度，且不能超过 1024 字节。
+* `keylen` {number} 要生成的密钥长度。必须大于 0。允许的最大值是所选摘要函数产生的字节数的 `255` 倍（例如，`sha512` 生成 64 字节的哈希，使最大 HKDF 输出为 16320 字节）。
+* 返回: {ArrayBuffer}
+
+提供同步的 HKDF 密钥派生函数，如 RFC 5869 所定义。给定的 `ikm`、`salt` 和 `info` 与 `digest` 一起用于派生 `keylen` 字节的密钥。
+
+成功生成的 `derivedKey` 将作为 {ArrayBuffer} 返回。
+
+如果任何输入参数指定了无效的值或类型，或者无法生成派生密钥，将抛出错误。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const {
+  hkdfSync,
+} = await import('node:crypto');
+
+const derivedKey = hkdfSync('sha512', 'key', 'salt', 'info', 64);
+console.log(Buffer.from(derivedKey).toString('hex'));  // '24156e2...5391653'
+```
+
+```cjs
+const {
+  hkdfSync,
+} = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const derivedKey = hkdfSync('sha512', 'key', 'salt', 'info', 64);
+console.log(Buffer.from(derivedKey).toString('hex'));  // '24156e2...5391653'
+```
+
+### `crypto.pbkdf2(password, salt, iterations, keylen, digest, callback)`
+
+<!-- YAML
+added: v0.5.5
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The password and salt arguments can also be ArrayBuffer
+                 instances.
+  - version: v14.0.0
+    pr-url: https://github.com/nodejs/node/pull/30578
+    description: The `iterations` parameter is now restricted to positive
+                 values. Earlier releases treated other values as one.
+  - version: v8.0.0
+    pr-url: https://github.com/nodejs/node/pull/11305
+    description: The `digest` parameter is always required now.
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/4047
+    description: Calling this function without passing the `digest` parameter
+                 is deprecated now and will emit a warning.
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default encoding for `password` if it is a string changed
+                 from `binary` to `utf8`.
+-->
+
+* `password` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `salt` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `iterations` {number}
+* `keylen` {number}
+* `digest` {string}
+* `callback` {Function}
+  * `err` {Error}
+  * `derivedKey` {Buffer}
+
+提供异步的基于密码的密钥派生函数 2 (PBKDF2) 实现。应用由 `digest` 指定的选定 HMAC 摘要算法，从 `password`、`salt` 和 `iterations` 派生请求的字节长度 (`keylen`) 的密钥。
+
+提供的 `callback` 函数使用两个参数调用：`err` 和 `derivedKey`。如果在派生密钥时发生错误，`err` 将被设置；否则 `err` 将为 `null`。默认情况下，成功生成的 `derivedKey` 将作为 [`Buffer`][] 传递给回调。如果任何输入参数指定了无效的值或类型，将抛出错误。
+
+`iterations` 参数必须设置为尽可能高的数字。迭代次数越多，派生密钥越安全，但需要更长的时间完成。
+
+`salt` 应尽可能唯一。建议盐值是随机的，并且至少 16 字节长。有关详细信息，请参见 [NIST SP 800-132][]。
+
+当为 `password` 或 `salt` 传递字符串时，请考虑[将字符串用作加密 API 输入时的注意事项][]。
+
+```mjs
+const {
+  pbkdf2,
+} = await import('node:crypto');
+
+pbkdf2('secret', 'salt', 100000, 64, 'sha512', (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // '3745e48...08d59ae'
+});
+```
+
+```cjs
+const {
+  pbkdf2,
+} = require('node:crypto');
+
+pbkdf2('secret', 'salt', 100000, 64, 'sha512', (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // '3745e48...08d59ae'
+});
+```
+
+可以使用 [`crypto.getHashes()`][] 检索支持的摘要函数数组。
+
+此 API 使用 libuv 的线程池，这对某些应用程序可能产生令人惊讶和负面的性能影响；有关更多信息，请参见 [`UV_THREADPOOL_SIZE`][] 文档。
+
+### `crypto.pbkdf2Sync(password, salt, iterations, keylen, digest)`
+
+<!-- YAML
+added: v0.9.3
+changes:
+  - version: v14.0.0
+    pr-url: https://github.com/nodejs/node/pull/30578
+    description: The `iterations` parameter is now restricted to positive
+                 values. Earlier releases treated other values as one.
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/4047
+    description: Calling this function without passing the `digest` parameter
+                 is deprecated now and will emit a warning.
+  - version: v6.0.0
+    pr-url: https://github.com/nodejs/node/pull/5522
+    description: The default encoding for `password` if it is a string changed
+                 from `binary` to `utf8`.
+-->
+
+* `password` {string|Buffer|TypedArray|DataView}
+* `salt` {string|Buffer|TypedArray|DataView}
+* `iterations` {number}
+* `keylen` {number}
+* `digest` {string}
+* 返回: {Buffer}
+
+提供同步的基于密码的密钥派生函数 2 (PBKDF2) 实现。应用由 `digest` 指定的选定 HMAC 摘要算法，从 `password`、`salt` 和 `iterations` 派生请求的字节长度 (`keylen`) 的密钥。
+
+如果发生错误，将抛出 `Error`，否则派生密钥将作为 [`Buffer`][] 返回。
+
+`iterations` 参数必须设置为尽可能高的数字。迭代次数越多，派生密钥越安全，但需要更长的时间完成。
+
+`salt` 应尽可能唯一。建议盐值是随机的，并且至少 16 字节长。有关详细信息，请参见 [NIST SP 800-132][]。
+
+当为 `password` 或 `salt` 传递字符串时，请考虑[将字符串用作加密 API 输入时的注意事项][]。
+
+```mjs
+const {
+  pbkdf2Sync,
+} = await import('node:crypto');
+
+const key = pbkdf2Sync('secret', 'salt', 100000, 64, 'sha512');
+console.log(key.toString('hex'));  // '3745e48...08d59ae'
+```
+
+```cjs
+const {
+  pbkdf2Sync,
+} = require('node:crypto');
+
+const key = pbkdf2Sync('secret', 'salt', 100000, 64, 'sha512');
+console.log(key.toString('hex'));  // '3745e48...08d59ae'
+```
+
+可以使用 [`crypto.getHashes()`][] 检索支持的摘要函数数组。
+
+### `crypto.privateDecrypt(privateKey, buffer)`
+
+<!-- YAML
+added: v0.11.14
+changes:
+  - version:
+      - v21.6.2
+      - v20.11.1
+      - v18.19.1
+    pr-url: https://github.com/nodejs-private/node-private/pull/515
+    description: The `RSA_PKCS1_PADDING` padding was disabled unless the
+                 OpenSSL build supports implicit rejection.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: Added string, ArrayBuffer, and CryptoKey as allowable key
+                 types. The oaepLabel can be an ArrayBuffer. The buffer can
+                 be a string or ArrayBuffer. All types that accept buffers
+                 are limited to a maximum of 2 ** 31 - 1 bytes.
+  - version: v12.11.0
+    pr-url: https://github.com/nodejs/node/pull/29489
+    description: The `oaepLabel` option was added.
+  - version: v12.9.0
+    pr-url: https://github.com/nodejs/node/pull/28335
+    description: The `oaepHash` option was added.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: This function now supports key objects.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `privateKey` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+  * `oaepHash` {string} 用于 OAEP 填充和 MGF1 的哈希函数。**默认值:** `'sha1'`
+  * `oaepLabel` {string|ArrayBuffer|Buffer|TypedArray|DataView} 用于 OAEP 填充的标签。如果未指定，则不使用标签。
+  * `padding` {crypto.constants} `crypto.constants` 中定义的可选填充值，可能是：`crypto.constants.RSA_NO_PADDING`、`crypto.constants.RSA_PKCS1_PADDING` 或 `crypto.constants.RSA_PKCS1_OAEP_PADDING`。
+* `buffer` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* 返回: {Buffer} 包含解密内容的新 `Buffer`。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用 `privateKey` 解密 `buffer`。`buffer` 之前使用相应的公钥加密，例如使用 [`crypto.publicEncrypt()`][]。
+
+如果 `privateKey` 不是 [`KeyObject`][]，此函数的行为将如同将 `privateKey` 传递给 [`crypto.createPrivateKey()`][]。如果它是一个对象，则可以传递 `padding` 属性。否则，此函数使用 `RSA_PKCS1_OAEP_PADDING`。
+
+在 [`crypto.privateDecrypt()`][] 中使用 `crypto.constants.RSA_PKCS1_PADDING` 需要 OpenSSL 支持隐式拒绝 (`rsa_pkcs1_implicit_rejection`)。如果 Node.js 使用的 OpenSSL 版本不支持此功能，尝试使用 `RSA_PKCS1_PADDING` 将失败。
+
+### `crypto.privateEncrypt(privateKey, buffer)`
+
+<!-- YAML
+added: v1.1.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: Added string, ArrayBuffer, and CryptoKey as allowable key
+                 types. The passphrase can be an ArrayBuffer. The buffer can
+                 be a string or ArrayBuffer. All types that accept buffers
+                 are limited to a maximum of 2 ** 31 - 1 bytes.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: This function now supports key objects.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `privateKey` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+  * `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey} PEM 编码的私钥。
+  * `passphrase` {string|ArrayBuffer|Buffer|TypedArray|DataView} 私钥的可选密码。
+  * `padding` {crypto.constants} `crypto.constants` 中定义的可选填充值，可能是：`crypto.constants.RSA_NO_PADDING` 或 `crypto.constants.RSA_PKCS1_PADDING`。
+  * `encoding` {string} 当 `buffer`、`key` 或 `passphrase` 是字符串时使用的字符串编码。
+* `buffer` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* 返回: {Buffer} 包含加密内容的新 `Buffer`。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用 `privateKey` 加密 `buffer`。返回的数据可以使用相应的公钥解密，例如使用 [`crypto.publicDecrypt()`][]。
+
+如果 `privateKey` 不是 [`KeyObject`][]，此函数的行为将如同将 `privateKey` 传递给 [`crypto.createPrivateKey()`][]。如果它是一个对象，则可以传递 `padding` 属性。否则，此函数使用 `RSA_PKCS1_PADDING`。
+
+### `crypto.publicDecrypt(key, buffer)`
+
+<!-- YAML
+added: v1.1.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: Added string, ArrayBuffer, and CryptoKey as allowable key
+                 types. The passphrase can be an ArrayBuffer. The buffer can
+                 be a string or ArrayBuffer. All types that accept buffers
+                 are limited to a maximum of 2 ** 31 - 1 bytes.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: This function now supports key objects.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+  * `passphrase` {string|ArrayBuffer|Buffer|TypedArray|DataView} 私钥的可选密码。
+  * `padding` {crypto.constants} `crypto.constants` 中定义的可选填充值，可能是：`crypto.constants.RSA_NO_PADDING` 或 `crypto.constants.RSA_PKCS1_PADDING`。
+  * `encoding` {string} 当 `buffer`、`key` 或 `passphrase` 是字符串时使用的字符串编码。
+* `buffer` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* 返回: {Buffer} 包含解密内容的新 `Buffer`。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用 `key` 解密 `buffer`。`buffer` 之前使用相应的私钥加密，例如使用 [`crypto.privateEncrypt()`][]。
+
+如果 `key` 不是 [`KeyObject`][]，此函数的行为将如同将 `key` 传递给 [`crypto.createPublicKey()`][]。如果它是一个对象，则可以传递 `padding` 属性。否则，此函数使用 `RSA_PKCS1_PADDING`。
+
+由于 RSA 公钥可以从私钥派生，因此可以传递私钥而不是公钥。
+
+### `crypto.publicEncrypt(key, buffer)`
+
+<!-- YAML
+added: v0.11.14
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: Added string, ArrayBuffer, and CryptoKey as allowable key
+                 types. The oaepLabel and passphrase can be ArrayBuffers. The
+                 buffer can be a string or ArrayBuffer. All types that accept
+                 buffers are limited to a maximum of 2 ** 31 - 1 bytes.
+  - version: v12.11.0
+    pr-url: https://github.com/nodejs/node/pull/29489
+    description: The `oaepLabel` option was added.
+  - version: v12.9.0
+    pr-url: https://github.com/nodejs/node/pull/28335
+    description: The `oaepHash` option was added.
+  - version: v11.6.0
+    pr-url: https://github.com/nodejs/node/pull/24234
+    description: This function now supports key objects.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+  * `key` {string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey} PEM 编码的公钥或私钥，{KeyObject} 或 {CryptoKey}。
+  * `oaepHash` {string} 用于 OAEP 填充和 MGF1 的哈希函数。**默认值:** `'sha1'`
+  * `oaepLabel` {string|ArrayBuffer|Buffer|TypedArray|DataView} 用于 OAEP 填充的标签。如果未指定，则不使用标签。
+  * `passphrase` {string|ArrayBuffer|Buffer|TypedArray|DataView} 私钥的可选密码。
+  * `padding` {crypto.constants} `crypto.constants` 中定义的可选填充值，可能是：`crypto.constants.RSA_NO_PADDING`、`crypto.constants.RSA_PKCS1_PADDING` 或 `crypto.constants.RSA_PKCS1_OAEP_PADDING`。
+  * `encoding` {string} 当 `buffer`、`key`、`oaepLabel` 或 `passphrase` 是字符串时使用的字符串编码。
+* `buffer` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* 返回: {Buffer} 包含加密内容的新 `Buffer`。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用 `key` 加密 `buffer` 的内容，并返回一个新的 [`Buffer`][] 包含加密内容。返回的数据可以使用相应的私钥解密，例如使用 [`crypto.privateDecrypt()`][]。
+
+如果 `key` 不是 [`KeyObject`][]，此函数的行为将如同将 `key` 传递给 [`crypto.createPublicKey()`][]。如果它是一个对象，则可以传递 `padding` 属性。否则，此函数使用 `RSA_PKCS1_OAEP_PADDING`。
+
+由于 RSA 公钥可以从私钥派生，因此可以传递私钥而不是公钥。
+
+### `crypto.randomBytes(size[, callback])`
+
+<!-- YAML
+added: v0.5.8
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v9.0.0
+    pr-url: https://github.com/nodejs/node/pull/16454
+    description: Passing `null` as the `callback` argument now throws
+                 `ERR_INVALID_CALLBACK`.
+-->
+
+* `size` {number} 要生成的字节数。`size` 不能大于 `2**31 - 1`。
+* `callback` {Function}
+  * `err` {Error}
+  * `buf` {Buffer}
+* 返回: {Buffer} 如果未提供 `callback` 函数。
+
+生成加密强度的伪随机数据。`size` 参数是一个数字，指示要生成的字节数。
+
+如果提供了 `callback` 函数，则字节是异步生成的，并且使用两个参数调用 `callback` 函数：`err` 和 `buf`。如果发生错误，`err` 将是一个 `Error` 对象；否则为 `null`。`buf` 参数是一个包含生成字节的 [`Buffer`][]。
+
+```mjs
+// 异步
+const {
+  randomBytes,
+} = await import('node:crypto');
+
+randomBytes(256, (err, buf) => {
+  if (err) throw err;
+  console.log(`${buf.length} bytes of random data: ${buf.toString('hex')}`);
+});
+```
+
+```cjs
+// 异步
+const {
+  randomBytes,
+} = require('node:crypto');
+
+randomBytes(256, (err, buf) => {
+  if (err) throw err;
+  console.log(`${buf.length} bytes of random data: ${buf.toString('hex')}`);
+});
+```
+
+如果未提供 `callback` 函数，则随机字节同步生成并作为 [`Buffer`][] 返回。如果生成字节时出现问题，将抛出错误。
+
+```mjs
+// 同步
+const {
+  randomBytes,
+} = await import('node:crypto');
+
+const buf = randomBytes(256);
+console.log(
+  `${buf.length} bytes of random data: ${buf.toString('hex')}`);
+```
+
+```cjs
+// 同步
+const {
+  randomBytes,
+} = require('node:crypto');
+
+const buf = randomBytes(256);
+console.log(
+  `${buf.length} bytes of random data: ${buf.toString('hex')}`);
+```
+
+`crypto.randomBytes()` 方法在熵可用之前不会完成。这通常不会超过几毫秒。唯一可能阻塞更长时间生成随机字节的时间是在启动后不久，当整个系统仍然熵不足时。
+
+此 API 使用 libuv 的线程池，这对某些应用程序可能产生令人惊讶和负面的性能影响；有关更多信息，请参见 [`UV_THREADPOOL_SIZE`][] 文档。
+
+`crypto.randomBytes()` 的异步版本在单个线程池请求中执行。为了最小化线程池任务长度的变化，在作为处理客户端请求的一部分时，对大的 `randomBytes` 请求进行分区。
+
+### `crypto.randomFill(buffer[, offset][, size], callback)`
+
+<!-- YAML
+added:
+  - v7.10.0
+  - v6.13.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v9.0.0
+    pr-url: https://github.com/nodejs/node/pull/15231
+    description: The `buffer` argument may be any `TypedArray` or `DataView`.
+-->
+
+* `buffer` {ArrayBuffer|Buffer|TypedArray|DataView} 必须提供。提供的 `buffer` 的大小不能大于 `2**31 - 1`。
+* `offset` {number} **默认值:** `0`
+* `size` {number} **默认值:** `buffer.length - offset`。`size` 不能大于 `2**31 - 1`。
+* `callback` {Function} `function(err, buf) {}`
+
+此函数类似于 [`crypto.randomBytes()`][]，但要求第一个参数是将被填充的 [`Buffer`][]。它还要求传入回调函数。
+
+如果未提供 `callback` 函数，将抛出错误。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const { randomFill } = await import('node:crypto');
+
+const buf = Buffer.alloc(10);
+randomFill(buf, (err, buf) => {
+  if (err) throw err;
+  console.log(buf.toString('hex'));
+});
+
+randomFill(buf, 5, (err, buf) => {
+  if (err) throw err;
+  console.log(buf.toString('hex'));
+});
+
+// 以上等价于以下：
+randomFill(buf, 5, 5, (err, buf) => {
+  if (err) throw err;
+  console.log(buf.toString('hex'));
+});
+```
+
+```cjs
+const { randomFill } = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const buf = Buffer.alloc(10);
+randomFill(buf, (err, buf) => {
+  if (err) throw err;
+  console.log(buf.toString('hex'));
+});
+
+randomFill(buf, 5, (err, buf) => {
+  if (err) throw err;
+  console.log(buf.toString('hex'));
+});
+
+// 以上等价于以下：
+randomFill(buf, 5, 5, (err, buf) => {
+  if (err) throw err;
+  console.log(buf.toString('hex'));
+});
+```
+
+任何 `ArrayBuffer`、`TypedArray` 或 `DataView` 实例都可以作为 `buffer` 传递。
+
+虽然这包括 `Float32Array` 和 `Float64Array` 的实例，但此函数不应用于生成随机浮点数。结果可能包含 `+Infinity`、`-Infinity` 和 `NaN`，即使数组仅包含有限数字，它们也不是从均匀随机分布中抽取的，并且没有有意义的上下界。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const { randomFill } = await import('node:crypto');
+
+const a = new Uint32Array(10);
+randomFill(a, (err, buf) => {
+  if (err) throw err;
+  console.log(Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength)
+    .toString('hex'));
+});
+
+const b = new DataView(new ArrayBuffer(10));
+randomFill(b, (err, buf) => {
+  if (err) throw err;
+  console.log(Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength)
+    .toString('hex'));
+});
+
+const c = new ArrayBuffer(10);
+randomFill(c, (err, buf) => {
+  if (err) throw err;
+  console.log(Buffer.from(buf).toString('hex'));
+});
+```
+
+```cjs
+const { randomFill } = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const a = new Uint32Array(10);
+randomFill(a, (err, buf) => {
+  if (err) throw err;
+  console.log(Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength)
+    .toString('hex'));
+});
+
+const b = new DataView(new ArrayBuffer(10));
+randomFill(b, (err, buf) => {
+  if (err) throw err;
+  console.log(Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength)
+    .toString('hex'));
+});
+
+const c = new ArrayBuffer(10);
+randomFill(c, (err, buf) => {
+  if (err) throw err;
+  console.log(Buffer.from(buf).toString('hex'));
+});
+```
+
+此 API 使用 libuv 的线程池，这对某些应用程序可能产生令人惊讶和负面的性能影响；有关更多信息，请参见 [`UV_THREADPOOL_SIZE`][] 文档。
+
+`crypto.randomFill()` 的异步版本在单个线程池请求中执行。为了最小化线程池任务长度的变化，在作为处理客户端请求的一部分时，对大的 `randomFill` 请求进行分区。
+
+### `crypto.randomFillSync(buffer[, offset][, size])`
+
+<!-- YAML
+added:
+  - v7.10.0
+  - v6.13.0
+changes:
+  - version: v9.0.0
+    pr-url: https://github.com/nodejs/node/pull/15231
+    description: The `buffer` argument may be any `TypedArray` or `DataView`.
+-->
+
+* `buffer` {ArrayBuffer|Buffer|TypedArray|DataView} 必须提供。提供的 `buffer` 的大小不能大于 `2**31 - 1`。
+* `offset` {number} **默认值:** `0`
+* `size` {number} **默认值:** `buffer.length - offset`。`size` 不能大于 `2**31 - 1`。
+* 返回: {ArrayBuffer|Buffer|TypedArray|DataView} 作为 `buffer` 参数传递的对象。
+
+[`crypto.randomFill()`][] 的同步版本。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const { randomFillSync } = await import('node:crypto');
+
+const buf = Buffer.alloc(10);
+console.log(randomFillSync(buf).toString('hex'));
+
+randomFillSync(buf, 5);
+console.log(buf.toString('hex'));
+
+// 以上等价于以下：
+randomFillSync(buf, 5, 5);
+console.log(buf.toString('hex'));
+```
+
+```cjs
+const { randomFillSync } = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const buf = Buffer.alloc(10);
+console.log(randomFillSync(buf).toString('hex'));
+
+randomFillSync(buf, 5);
+console.log(buf.toString('hex'));
+
+// 以上等价于以下：
+randomFillSync(buf, 5, 5);
+console.log(buf.toString('hex'));
+```
+
+任何 `ArrayBuffer`、`TypedArray` 或 `DataView` 实例都可以作为 `buffer` 传递。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const { randomFillSync } = await import('node:crypto');
+
+const a = new Uint32Array(10);
+console.log(Buffer.from(randomFillSync(a).buffer,
+                        a.byteOffset, a.byteLength).toString('hex'));
+
+const b = new DataView(new ArrayBuffer(10));
+console.log(Buffer.from(randomFillSync(b).buffer,
+                        b.byteOffset, b.byteLength).toString('hex'));
+
+const c = new ArrayBuffer(10);
+console.log(Buffer.from(randomFillSync(c)).toString('hex'));
+```
+
+```cjs
+const { randomFillSync } = require('node:crypto');
+const { Buffer } = require('node:buffer');
+
+const a = new Uint32Array(10);
+console.log(Buffer.from(randomFillSync(a).buffer,
+                        a.byteOffset, a.byteLength).toString('hex'));
+
+const b = new DataView(new ArrayBuffer(10));
+console.log(Buffer.from(randomFillSync(b).buffer,
+                        b.byteOffset, b.byteLength).toString('hex'));
+
+const c = new ArrayBuffer(10);
+console.log(Buffer.from(randomFillSync(c)).toString('hex'));
+```
+
+### `crypto.randomInt([min, ]max[, callback])`
+
+<!-- YAML
+added:
+  - v14.10.0
+  - v12.19.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+-->
+
+* `min` {integer} 随机范围的开始（包含）。**默认值:** `0`。
+* `max` {integer} 随机范围的结束（不包含）。
+* `callback` {Function} `function(err, n) {}`
+
+返回一个随机整数 `n`，使得 `min <= n < max`。此实现避免了[模偏差][]。
+
+范围 (`max - min`) 必须小于 2<sup>48</sup>。`min` 和 `max` 必须是[安全整数][]。
+
+如果未提供 `callback` 函数，则随机整数同步生成。
+
+```mjs
+// 异步
+const {
+  randomInt,
+} = await import('node:crypto');
+
+randomInt(3, (err, n) => {
+  if (err) throw err;
+  console.log(`Random number chosen from (0, 1, 2): ${n}`);
+});
+```
+
+```cjs
+// 异步
+const {
+  randomInt,
+} = require('node:crypto');
+
+randomInt(3, (err, n) => {
+  if (err) throw err;
+  console.log(`Random number chosen from (0, 1, 2): ${n}`);
+});
+```
+
+```mjs
+// 同步
+const {
+  randomInt,
+} = await import('node:crypto');
+
+const n = randomInt(3);
+console.log(`Random number chosen from (0, 1, 2): ${n}`);
+```
+
+```cjs
+// 同步
+const {
+  randomInt,
+} = require('node:crypto');
+
+const n = randomInt(3);
+console.log(`Random number chosen from (0, 1, 2): ${n}`);
+```
+
+```mjs
+// 带 `min` 参数
+const {
+  randomInt,
+} = await import('node:crypto');
+
+const n = randomInt(1, 7);
+console.log(`The dice rolled: ${n}`);
+```
+
+```cjs
+// 带 `min` 参数
+const {
+  randomInt,
+} = require('node:crypto');
+
+const n = randomInt(1, 7);
+console.log(`The dice rolled: ${n}`);
+```
+
+### `crypto.randomUUID([options])`
+
+<!-- YAML
+added:
+  - v15.6.0
+  - v14.17.0
+-->
+
+* `options` {Object}
+  * `disableEntropyCache` {boolean} 默认情况下，为了提高性能，Node.js 生成并缓存足够的随机数据以生成最多 128 个随机 UUID。要生成不使用缓存的 UUID，请将 `disableEntropyCache` 设置为 `true`。**默认值:** `false`。
+* 返回: {string}
+
+生成一个随机的 [RFC 4122][] 版本 4 UUID。UUID 使用加密伪随机数生成器生成。
+
+### `crypto.scrypt(password, salt, keylen[, options], callback)`
+
+<!-- YAML
+added: v10.5.0
+changes:
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The password and salt arguments can also be ArrayBuffer
+                 instances.
+  - version:
+     - v12.8.0
+     - v10.17.0
+    pr-url: https://github.com/nodejs/node/pull/28799
+    description: The `maxmem` value can now be any safe integer.
+  - version: v10.9.0
+    pr-url: https://github.com/nodejs/node/pull/21525
+    description: The `cost`, `blockSize` and `parallelization` option names
+                 have been added.
+-->
+
+* `password` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `salt` {string|ArrayBuffer|Buffer|TypedArray|DataView}
+* `keylen` {number}
+* `options` {Object}
+  * `cost` {number} CPU/内存成本参数。必须是大于一的 2 的幂。**默认值:** `16384`。
+  * `blockSize` {number} 块大小参数。**默认值:** `8`。
+  * `parallelization` {number} 并行化参数。**默认值:** `1`。
+  * `N` {number} `cost` 的别名。只能指定其中之一。
+  * `r` {number} `blockSize` 的别名。只能指定其中之一。
+  * `p` {number} `parallelization` 的别名。只能指定其中之一。
+  * `maxmem` {number} 内存上限。当（大约）`128 * N * r > maxmem` 时是错误的。**默认值:** `32 * 1024 * 1024`。
+* `callback` {Function}
+  * `err` {Error}
+  * `derivedKey` {Buffer}
+
+提供异步的 [scrypt][] 实现。Scrypt 是一种基于密码的密钥派生函数，其设计在计算和内存方面都很昂贵，以使暴力攻击无利可图。
+
+`salt` 应尽可能唯一。建议盐值是随机的，并且至少 16 字节长。有关详细信息，请参见 [NIST SP 800-132][]。
+
+当为 `password` 或 `salt` 传递字符串时，请考虑[将字符串用作加密 API 输入时的注意事项][]。
+
+`callback` 函数使用两个参数调用：`err` 和 `derivedKey`。如果密钥派生失败，`err` 是一个异常对象，否则 `err` 为 `null`。`derivedKey` 作为 [`Buffer`][] 传递给回调。
+
+当任何输入参数指定了无效的值或类型时，将抛出异常。
+
+```mjs
+const {
+  scrypt,
+} = await import('node:crypto');
+
+// 使用工厂默认值。
+scrypt('password', 'salt', 64, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // '3745e48...08d59ae'
+});
+// 使用自定义 N 参数。必须是 2 的幂。
+scrypt('password', 'salt', 64, { N: 1024 }, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // '3745e48...aa39b34'
+});
+```
+
+```cjs
+const {
+  scrypt,
+} = require('node:crypto');
+
+// 使用工厂默认值。
+scrypt('password', 'salt', 64, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // '3745e48...08d59ae'
+});
+// 使用自定义 N 参数。必须是 2 的幂。
+scrypt('password', 'salt', 64, { N: 1024 }, (err, derivedKey) => {
+  if (err) throw err;
+  console.log(derivedKey.toString('hex'));  // '3745e48...aa39b34'
+});
+```
+
+### `crypto.scryptSync(password, salt, keylen[, options])`
+
+<!-- YAML
+added: v10.5.0
+changes:
+  - version:
+     - v12.8.0
+     - v10.17.0
+    pr-url: https://github.com/nodejs/node/pull/28799
+    description: The `maxmem` value can now be any safe integer.
+  - version: v10.9.0
+    pr-url: https://github.com/nodejs/node/pull/21525
+    description: The `cost`, `blockSize` and `parallelization` option names
+                 have been added.
+-->
+
+* `password` {string|Buffer|TypedArray|DataView}
+* `salt` {string|Buffer|TypedArray|DataView}
+* `keylen` {number}
+* `options` {Object}
+  * `cost` {number} CPU/内存成本参数。必须是大于一的 2 的幂。**默认值:** `16384`。
+  * `blockSize` {number} 块大小参数。**默认值:** `8`。
+  * `parallelization` {number} 并行化参数。**默认值:** `1`。
+  * `N` {number} `cost` 的别名。只能指定其中之一。
+  * `r` {number} `blockSize` 的别名。只能指定其中之一。
+  * `p` {number} `parallelization` 的别名。只能指定其中之一。
+  * `maxmem` {number} 内存上限。当（大约）`128 * N * r > maxmem` 时是错误的。**默认值:** `32 * 1024 * 1024`。
+* 返回: {Buffer}
+
+提供同步的 [scrypt][] 实现。Scrypt 是一种基于密码的密钥派生函数，其设计在计算和内存方面都很昂贵，以使暴力攻击无利可图。
+
+`salt` 应尽可能唯一。建议盐值是随机的，并且至少 16 字节长。有关详细信息，请参见 [NIST SP 800-132][]。
+
+当为 `password` 或 `salt` 传递字符串时，请考虑[将字符串用作加密 API 输入时的注意事项][]。
+
+当密钥派生失败时抛出异常，否则派生密钥作为 [`Buffer`][] 返回。
+
+当任何输入参数指定了无效的值或类型时，将抛出异常。
+
+```mjs
+const {
+  scryptSync,
+} = await import('node:crypto');
+// 使用工厂默认值。
+
+const key1 = scryptSync('password', 'salt', 64);
+console.log(key1.toString('hex'));  // '3745e48...08d59ae'
+// 使用自定义 N 参数。必须是 2 的幂。
+const key2 = scryptSync('password', 'salt', 64, { N: 1024 });
+console.log(key2.toString('hex'));  // '3745e48...aa39b34'
+```
+
+```cjs
+const {
+  scryptSync,
+} = require('node:crypto');
+// 使用工厂默认值。
+
+const key1 = scryptSync('password', 'salt', 64);
+console.log(key1.toString('hex'));  // '3745e48...08d59ae'
+// 使用自定义 N 参数。必须是 2 的幂。
+const key2 = scryptSync('password', 'salt', 64, { N: 1024 });
+console.log(key2.toString('hex'));  // '3745e48...aa39b34'
+```
+
+### `crypto.secureHeapUsed()`
+
+<!-- YAML
+added: v15.6.0
+-->
+
+* 返回: {Object}
+  * `total` {number} 使用 `--secure-heap=n` 命令行标志指定的总分配安全堆大小。
+  * `min` {number} 使用 `--secure-heap-min` 命令行标志指定的从安全堆分配的最小值。
+  * `used` {number} 当前从安全堆分配的总字节数。
+  * `utilization` {number} `used` 与分配的总字节数 `total` 的计算比率。
+
+### `crypto.setEngine(engine[, flags])`
+
+<!-- YAML
+added: v0.11.11
+changes:
+  - version:
+    - v22.4.0
+    - v20.16.0
+    pr-url: https://github.com/nodejs/node/pull/53329
+    description: Custom engine support in OpenSSL 3 is deprecated.
+-->
+
+* `engine` {string}
+* `flags` {crypto.constants} **默认值:** `crypto.constants.ENGINE_METHOD_ALL`
+
+为部分或所有 OpenSSL 函数（由标志选择）加载并设置 `engine`。OpenSSL 3 中对自定义引擎的支持已弃用。
+
+`engine` 可以是引擎的 id 或引擎共享库的路径。
+
+可选的 `flags` 参数默认使用 `ENGINE_METHOD_ALL`。`flags` 是一个位字段，取以下一个或多个标志（在 `crypto.constants` 中定义）的混合：
+
+* `crypto.constants.ENGINE_METHOD_RSA`
+* `crypto.constants.ENGINE_METHOD_DSA`
+* `crypto.constants.ENGINE_METHOD_DH`
+* `crypto.constants.ENGINE_METHOD_RAND`
+* `crypto.constants.ENGINE_METHOD_EC`
+* `crypto.constants.ENGINE_METHOD_CIPHERS`
+* `crypto.constants.ENGINE_METHOD_DIGESTS`
+* `crypto.constants.ENGINE_METHOD_PKEY_METHS`
+* `crypto.constants.ENGINE_METHOD_PKEY_ASN1_METHS`
+* `crypto.constants.ENGINE_METHOD_ALL`
+* `crypto.constants.ENGINE_METHOD_NONE`
+
+### `crypto.setFips(bool)`
+
+<!-- YAML
+added: v10.0.0
+-->
+
+* `bool` {boolean} `true` 以启用 FIPS 模式。
+
+在支持 FIPS 的 Node.js 构建中启用符合 FIPS 的加密提供程序。如果 FIPS 模式不可用，则抛出错误。
+
+### `crypto.sign(algorithm, data, key[, callback])`
+
+<!-- YAML
+added: v12.0.0
+changes:
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59570
+    description: Add support for ML-DSA, Ed448, and SLH-DSA context parameter.
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59537
+    description: Add support for SLH-DSA signing.
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA signing.
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v15.12.0
+    pr-url: https://github.com/nodejs/node/pull/37500
+    description: Optional callback argument added.
+  - version:
+     - v13.2.0
+     - v12.16.0
+    pr-url: https://github.com/nodejs/node/pull/29292
+    description: This function now supports IEEE-P1363 DSA and ECDSA signatures.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `algorithm` {string | null | undefined}
+* `data` {ArrayBuffer|Buffer|TypedArray|DataView}
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+* `callback` {Function}
+  * `err` {Error}
+  * `signature` {Buffer}
+* 返回: {Buffer} 如果未提供 `callback` 函数。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用给定的私钥和算法计算并返回 `data` 的签名。如果 `algorithm` 为 `null` 或 `undefined`，则算法取决于密钥类型。
+
+对于 Ed25519、Ed448 和 ML-DSA，`algorithm` 必须为 `null` 或 `undefined`。
+
+如果 `key` 不是 [`KeyObject`][]，此函数的行为将如同将 `key` 传递给 [`crypto.createPrivateKey()`][]。如果它是一个对象，则可以传递以下附加属性：
+
+* `dsaEncoding` {string} 对于 DSA 和 ECDSA，此选项指定生成签名的格式。可以是以下之一：
+  * `'der'`（默认）：DER 编码的 ASN.1 签名结构编码 `(r, s)`。
+  * `'ieee-p1363'`: IEEE-P1363 中提出的签名格式 `r || s`。
+* `padding` {integer} RSA 的可选填充值，可以是以下之一：
+
+  * `crypto.constants.RSA_PKCS1_PADDING`（默认）
+  * `crypto.constants.RSA_PKCS1_PSS_PADDING`
+
+  `RSA_PKCS1_PSS_PADDING` 将使用 MGF1 与用于签名消息的相同哈希函数，如 [RFC 4055][] 第 3.1 节所指定。
+* `saltLength` {integer} 当填充为 `RSA_PKCS1_PSS_PADDING` 时的盐长度。特殊值 `crypto.constants.RSA_PSS_SALTLEN_DIGEST` 将盐长度设置为摘要大小，`crypto.constants.RSA_PSS_SALTLEN_MAX_SIGN`（默认）将其设置为最大允许值。
+* `context` {ArrayBuffer|Buffer|TypedArray|DataView} 对于 Ed448、ML-DSA 和 SLH-DSA，此选项指定用于区分使用相同密钥为不同目的生成的签名的可选上下文。
+
+如果提供了 `callback` 函数，则此函数使用 libuv 的线程池。
+
+### `crypto.subtle`
+
+<!-- YAML
+added: v17.4.0
+-->
+
+* 类型: {SubtleCrypto}
+
+[`crypto.webcrypto.subtle`][] 的便捷别名。
+
+### `crypto.timingSafeEqual(a, b)`
+
+<!-- YAML
+added: v6.6.0
+changes:
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The a and b arguments can also be ArrayBuffer.
+-->
+
+* `a` {ArrayBuffer|Buffer|TypedArray|DataView}
+* `b` {ArrayBuffer|Buffer|TypedArray|DataView}
+* 返回: {boolean}
+
+此函数使用恒定时间算法比较表示给定 `ArrayBuffer`、`TypedArray` 或 `DataView` 实例的底层字节。
+
+此函数不会泄漏时序信息，这些信息可能允许攻击者猜测其中一个值。这适用于比较 HMAC 摘要或秘密值，如身份验证 cookie 或[能力网址](https://www.w3.org/TR/capability-urls/)。
+
+`a` 和 `b` 必须都是 `Buffer`、`TypedArray` 或 `DataView`，并且它们必须具有相同的字节长度。如果 `a` 和 `b` 具有不同的字节长度，将抛出错误。
+
+如果 `a` 和 `b` 中至少有一个是每个条目多于一个字节的 `TypedArray`，例如 `Uint16Array`，则结果将使用平台字节序计算。
+
+<strong class="critical">当两个输入都是 `Float32Array` 或 `Float64Array` 时，由于 IEEE 754 浮点数的编码，此函数可能返回意外结果。特别是，`x === y` 和 `Object.is(x, y)` 都不意味着两个浮点数 `x` 和 `y` 的字节表示相等。</strong>
+
+使用 `crypto.timingSafeEqual` 不能保证_周围_代码是时序安全的。应注意确保周围代码不会引入时序漏洞。
+
+### `crypto.verify(algorithm, data, key, signature[, callback])`
+
+<!-- YAML
+added: v12.0.0
+changes:
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59570
+    description: Add support for ML-DSA, Ed448, and SLH-DSA context parameter.
+  - version: v24.8.0
+    pr-url: https://github.com/nodejs/node/pull/59537
+    description: Add support for SLH-DSA signature verification.
+  - version: v24.6.0
+    pr-url: https://github.com/nodejs/node/pull/59259
+    description: Add support for ML-DSA signature verification.
+  - version: v18.0.0
+    pr-url: https://github.com/nodejs/node/pull/41678
+    description: Passing an invalid callback to the `callback` argument
+                 now throws `ERR_INVALID_ARG_TYPE` instead of
+                 `ERR_INVALID_CALLBACK`.
+  - version: v15.12.0
+    pr-url: https://github.com/nodejs/node/pull/37500
+    description: Optional callback argument added.
+  - version: v15.0.0
+    pr-url: https://github.com/nodejs/node/pull/35093
+    description: The data, key, and signature arguments can also be ArrayBuffer.
+  - version:
+     - v13.2.0
+     - v12.16.0
+    pr-url: https://github.com/nodejs/node/pull/29292
+    description: This function now supports IEEE-P1363 DSA and ECDSA signatures.
+-->
+
+<!--lint disable maximum-line-length remark-lint-->
+
+* `algorithm` {string|null|undefined}
+* `data` {ArrayBuffer| Buffer|TypedArray|DataView}
+* `key` {Object|string|ArrayBuffer|Buffer|TypedArray|DataView|KeyObject|CryptoKey}
+* `signature` {ArrayBuffer|Buffer|TypedArray|DataView}
+* `callback` {Function}
+  * `err` {Error}
+  * `result` {boolean}
+* 返回: {boolean} 如果未提供 `callback` 函数，则根据数据和公钥的签名有效性返回 `true` 或 `false`。
+
+<!--lint enable maximum-line-length remark-lint-->
+
+使用给定的密钥和算法验证 `data` 的给定签名。如果 `algorithm` 为 `null` 或 `undefined`，则算法取决于密钥类型。
+
+对于 Ed25519、Ed448 和 ML-DSA，`algorithm` 必须为 `null` 或 `undefined`。
+
+如果 `key` 不是 [`KeyObject`][]，此函数的行为将如同将 `key` 传递给 [`crypto.createPublicKey()`][]。如果它是一个对象，则可以传递以下附加属性：
+
+* `dsaEncoding` {string} 对于 DSA 和 ECDSA，此选项指定签名的格式。可以是以下之一：
+  * `'der'`（默认）：DER 编码的 ASN.1 签名结构编码 `(r, s)`。
+  * `'ieee-p1363'`: IEEE-P1363 中提出的签名格式 `r || s`。
+* `padding` {integer} RSA 的可选填充值，可以是以下之一：
+
+  * `crypto.constants.RSA_PKCS1_PADDING`（默认）
+  * `crypto.constants.RSA_PKCS1_PSS_PADDING`
+
+  `RSA_PKCS1_PSS_PADDING` 将使用 MGF1 与用于签名消息的相同哈希函数，如 [RFC 4055][] 第 3.1 节所指定。
+* `saltLength` {integer} 当填充为 `RSA_PKCS1_PSS_PADDING` 时的盐长度。特殊值 `crypto.constants.RSA_PSS_SALTLEN_DIGEST` 将盐长度设置为摘要大小，`crypto.constants.RSA_PSS_SALTLEN_MAX_SIGN`（默认）将其设置为最大允许值。
+* `context` {ArrayBuffer|Buffer|TypedArray|DataView} 对于 Ed448、ML-DSA 和 SLH-DSA，此选项指定用于区分使用相同密钥为不同目的生成的签名的可选上下文。
+
+`signature` 参数是先前为 `data` 计算的签名。
+
+由于公钥可以从私钥派生，因此可以传递私钥或公钥作为 `key`。
+
+如果提供了 `callback` 函数，则此函数使用 libuv 的线程池。
+
+### `crypto.webcrypto`
+
+<!-- YAML
+added: v15.0.0
+-->
+
+类型: {Crypto} Web Crypto API 标准的实现。
+
+有关详细信息，请参见 [Web Crypto API 文档][]。
+
+## 注释
+
+### 将字符串用作加密 API 的输入
+
+出于历史原因，许多 Node.js 提供的加密 API 接受字符串作为输入，而底层加密算法处理字节序列。这些实例包括明文、密文、对称密钥、初始化向量、密码、盐、认证标签和附加认证数据。
+
+当将字符串传递给加密 API 时，请考虑以下因素。
+
+* 并非所有字节序列都是有效的 UTF-8 字符串。因此，当从字符串派生长度为 `n` 的字节序列时，其熵通常低于随机或伪随机 `n` 字节序列的熵。例如，没有 UTF-8 字符串会导致字节序列 `c0 af`。密钥几乎完全应该是随机或伪随机字节序列。
+* 类似地，当将随机或伪随机字节序列转换为 UTF-8 字符串时，不代表有效代码点的子序列可能会被 Unicode 替换字符（`U+FFFD`）替换。因此，结果 Unicode 字符串的字节表示可能不等于生成该字符串的字节序列。
+
+  ```js
+  const original = [0xc0, 0xaf];
+  const bytesAsString = Buffer.from(original).toString('utf8');
+  const stringAsBytes = Buffer.from(bytesAsString, 'utf8');
+  console.log(stringAsBytes);
+  // 打印 '<Buffer ef bf bd ef bf bd>'。
+  ```
+
+  密码、哈希函数、签名算法和密钥派生函数的输出是伪随机字节序列，不应用作 Unicode 字符串。
+* 当从用户输入获取字符串时，某些 Unicode 字符可以有多种等效表示形式，导致不同的字节序列。例如，当将用户密码传递给密钥派生函数（如 PBKDF2 或 scrypt）时，密钥派生函数的结果取决于字符串是使用组合字符还是分解字符。Node.js 不规范化字符表示。开发人员应考虑在将用户输入传递给加密 API 之前对其使用 [`String.prototype.normalize()`][]。
+
+### 旧版流 API（Node.js 0.10 之前）
+
+在存在统一的 Stream API 概念和用于处理二进制数据的 [`Buffer`][] 对象之前，就将 Crypto 模块添加到了 Node.js。因此，许多 `crypto` 类具有通常在其他实现[流][stream] API 的 Node.js 类上找不到的方法（例如 `update()`、`final()` 或 `digest()`）。此外，许多方法默认接受并返回 `'latin1'` 编码的字符串，而不是 `Buffer`。此默认值在 Node.js v0.8 之后更改为默认使用 [`Buffer`][] 对象。
+
+### 对弱或已破解算法的支持
+
+`node:crypto` 模块仍然支持一些已经破解且不推荐使用的算法。API 还允许使用密钥大小过小而无法安全使用的密码和哈希。
+
+用户应根据其安全要求全权负责选择加密算法和密钥大小。
+
+基于 [NIST SP 800-131A][] 的建议：
+
+* 在需要抗碰撞性的地方（如数字签名）不再接受 MD5 和 SHA-1。
+* 建议与 RSA、DSA 和 DH 算法一起使用的密钥至少为 2048 位，ECDSA 和 ECDH 曲线的密钥至少为 224 位，以安全使用数年。
+* `modp1`、`modp2` 和 `modp5` 的 DH 组的密钥大小小于 2048 位，不推荐使用。
+
+有关其他建议和详细信息，请参见参考文献。
+
+一些具有已知弱点且在实践中相关性不大的算法仅通过[旧版提供程序][]可用，该提供程序默认未启用。
+
+### CCM 模式
+
+CCM 是支持的 [AEAD 算法][]之一。使用此模式的应用程序在使用密码 API 时必须遵守某些限制：
+
+* 认证标签长度必须在密码创建期间通过设置 `authTagLength` 选项指定，并且必须是 4、6、8、10、12、14 或 16 字节之一。
+* 初始化向量（nonce）`N` 的长度必须在 7 到 13 字节之间（`7 ≤ N ≤ 13`）。
+* 明文的长度限制为 `2 ** (8 * (15 - N))` 字节。
+* 解密时，必须在调用 `update()` 之前通过 `setAuthTag()` 设置认证标签。否则，解密将失败，并且 `final()` 将根据 [RFC 3610][] 第 2.6 节抛出错误。
+* 在 CCM 模式下使用流方法（如 `write(data)`、`end(data)` 或 `pipe()`）可能会失败，因为 CCM 无法处理每个实例多个数据块。
+* 当传递附加认证数据 (AAD) 时，必须以字节为单位将实际消息的长度通过 `plaintextLength` 选项传递给 `setAAD()`。许多加密库在密文中包含认证标签，这意味着它们产生的密文长度为 `plaintextLength + authTagLength`。Node.js 不包含认证标签，因此密文长度始终为 `plaintextLength`。如果未使用 AAD，则这不是必需的。
+* 由于 CCM 一次性处理整个消息，`update()` 必须恰好调用一次。
+* 尽管调用 `update()` 足以加密/解密消息，但应用程序_必须_调用 `final()` 来计算或验证认证标签。
+
+```mjs
+import { Buffer } from 'node:buffer';
+const {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+} = await import('node:crypto');
+
+const key = 'keykeykeykeykeykeykeykey';
+const nonce = randomBytes(12);
+
+const aad = Buffer.from('0123456789', 'hex');
+
+const cipher = createCipheriv('aes-192-ccm', key, nonce, {
+  authTagLength: 16,
+});
+const plaintext = 'Hello world';
+cipher.setAAD(aad, {
+  plaintextLength: Buffer.byteLength(plaintext),
+});
+const ciphertext = cipher.update(plaintext, 'utf8');
+cipher.final();
+const tag = cipher.getAuthTag();
+
+// 现在传输 { ciphertext, nonce, tag }。
+
+const decipher = createDecipheriv('aes-192-ccm', key, nonce, {
+  authTagLength: 16,
+});
+decipher.setAuthTag(tag);
+decipher.setAAD(aad, {
+  plaintextLength: ciphertext.length,
+});
+const receivedPlaintext = decipher.update(ciphertext, null, 'utf8');
+
+try {
+  decipher.final();
+} catch (err) {
+  throw new Error('Authentication failed!', { cause: err });
+}
+
+console.log(receivedPlaintext);
+```
+
+```cjs
+const { Buffer } = require('node:buffer');
+const {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+} = require('node:crypto');
+
+const key = 'keykeykeykeykeykeykeykey';
+const nonce = randomBytes(12);
+
+const aad = Buffer.from('0123456789', 'hex');
+
+const cipher = createCipheriv('aes-192-ccm', key, nonce, {
+  authTagLength: 16,
+});
+const plaintext = 'Hello world';
+cipher.setAAD(aad, {
+  plaintextLength: Buffer.byteLength(plaintext),
+});
+const ciphertext = cipher.update(plaintext, 'utf8');
+cipher.final();
+const tag = cipher.getAuthTag();
+
+// 现在传输 { ciphertext, nonce, tag }。
+
+const decipher = createDecipheriv('aes-192-ccm', key, nonce, {
+  authTagLength: 16,
+});
+decipher.setAuthTag(tag);
+decipher.setAAD(aad, {
+  plaintextLength: ciphertext.length,
+});
+const receivedPlaintext = decipher.update(ciphertext, null, 'utf8');
+
+try {
+  decipher.final();
+} catch (err) {
+  throw new Error('Authentication failed!', { cause: err });
+}
+
+console.log(receivedPlaintext);
+```
+
+### FIPS 模式
+
+当使用 OpenSSL 3 时，Node.js 支持 FIPS 140-2，当与适当的 OpenSSL 3 提供程序一起使用时，例如可以按照 [OpenSSL 的 FIPS README 文件][]中的说明安装的 [OpenSSL 3 的 FIPS 提供程序][]。
+
+Node.js 的 FIPS 支持需要：
+
+* 正确安装的 OpenSSL 3 FIPS 提供程序。
+* OpenSSL 3 [FIPS 模块配置文件][]。
+* 引用 FIPS 模块配置文件的 OpenSSL 3 配置文件。
+
+Node.js 需要使用指向 FIPS 提供程序的 OpenSSL 配置文件进行配置。示例配置文件如下所示：
+
+```text
+nodejs_conf = nodejs_init
+
+.include /<绝对路径>/fipsmodule.cnf
+
+[nodejs_init]
+providers = provider_sect
+
+[provider_sect]
+default = default_sect
+# fips 部分名称应与包含的 fipsmodule.cnf 内的部分名称匹配。
+fips = fips_sect
+
+[default_sect]
+activate = 1
+```
+
+其中 `fipsmodule.cnf` 是 FIPS 提供程序安装步骤生成的 FIPS 模块配置文件：
+
+```bash
+openssl fipsinstall
+```
+
+将 `OPENSSL_CONF` 环境变量设置为指向您的配置文件，并将 `OPENSSL_MODULES` 设置为 FIPS 提供程序动态库的位置。例如：
+
+```bash
+export OPENSSL_CONF=/<配置文件路径>/nodejs.cnf
+export OPENSSL_MODULES=/<openssl 库路径>/ossl-modules
+```
+
+然后可以通过以下方式在 Node.js 中启用 FIPS 模式：
+
+* 使用 `--enable-fips` 或 `--force-fips` 命令行标志启动 Node.js。
+* 以编程方式调用 `crypto.setFips(true)`。
+
+或者，可以通过 OpenSSL 配置文件在 Node.js 中启用 FIPS 模式。例如：
+
+```text
+nodejs_conf = nodejs_init
+
+.include /<绝对路径>/fipsmodule.cnf
+
+[nodejs_init]
+providers = provider_sect
+alg_section = algorithm_sect
+
+[provider_sect]
+default = default_sect
+# fips 部分名称应与包含的 fipsmodule.cnf 内的部分名称匹配。
+fips = fips_sect
+
+[default_sect]
+activate = 1
+
+[algorithm_sect]
+default_properties = fips=yes
+```
+
+## 加密常量
+
+`crypto.constants` 导出的以下常量适用于 `node:crypto`、`node:tls` 和 `node:https` 模块的各种用途，并且通常特定于 OpenSSL。
+
+### OpenSSL 选项
+
+有关详细信息，请参见 [SSL OP 标志列表][]。
+
+<table>
+  <tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_ALL</code></td>
+    <td>在 OpenSSL 中应用多个错误修复。有关详细信息，请参见
+    <a href="https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_ALLOW_NO_DHE_KEX</code></td>
+    <td>指示 OpenSSL 允许 TLS v1.3 的非 [EC]DHE 密钥交换模式</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION</code></td>
+    <td>允许 OpenSSL 与未打补丁的客户端或服务器之间进行传统的不安全重新协商。有关详细信息，请参见
+    <a href="https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_CIPHER_SERVER_PREFERENCE</code></td>
+    <td>尝试在选择密码时使用服务器的首选项而不是客户端的首选项。行为取决于协议版本。有关详细信息，请参见
+    <a href="https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html">https://www.openssl.org/docs/man3.0/man3/SSL_CTX_set_options.html</a>。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_CISCO_ANYCONNECT</code></td>
+    <td>指示 OpenSSL 使用 Cisco 的 DTLS_BAD_VER 版本标识符。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_COOKIE_EXCHANGE</code></td>
+    <td>指示 OpenSSL 开启 cookie 交换。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_CRYPTOPRO_TLSEXT_BUG</code></td>
+    <td>指示 OpenSSL 添加来自 cryptopro 草案早期版本的 server-hello 扩展。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS</code></td>
+    <td>指示 OpenSSL 禁用 OpenSSL 0.9.6d 中添加的 SSL 3.0/TLS 1.0 漏洞修复。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_LEGACY_SERVER_CONNECT</code></td>
+    <td>允许初始连接到不支持 RI 的服务器。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_COMPRESSION</code></td>
+    <td>指示 OpenSSL 禁用对 SSL/TLS 压缩的支持。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_ENCRYPT_THEN_MAC</code></td>
+    <td>指示 OpenSSL 禁用 encrypt-then-MAC。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_QUERY_MTU</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_RENEGOTIATION</code></td>
+    <td>指示 OpenSSL 禁用重新协商。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION</code></td>
+    <td>指示 OpenSSL 在执行重新协商时始终启动新会话。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_SSLv2</code></td>
+    <td>指示 OpenSSL 关闭 SSL v2</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_SSLv3</code></td>
+    <td>指示 OpenSSL 关闭 SSL v3</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_TICKET</code></td>
+    <td>指示 OpenSSL 禁用 RFC4507bis 票据的使用。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_TLSv1</code></td>
+    <td>指示 OpenSSL 关闭 TLS v1</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_TLSv1_1</code></td>
+    <td>指示 OpenSSL 关闭 TLS v1.1</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_TLSv1_2</code></td>
+    <td>指示 OpenSSL 关闭 TLS v1.2</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_NO_TLSv1_3</code></td>
+    <td>指示 OpenSSL 关闭 TLS v1.3</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_PRIORITIZE_CHACHA</code></td>
+    <td>指示 OpenSSL 服务器在客户端支持时优先使用 ChaCha20-Poly1305。
+    如果未启用
+    <code>SSL_OP_CIPHER_SERVER_PREFERENCE</code>，
+    则此选项无效。</td>
+  </tr>
+  <tr>
+    <td><code>SSL_OP_TLS_ROLLBACK_BUG</code></td>
+    <td>指示 OpenSSL 禁用版本回滚攻击检测。</td>
+  </tr>
+</table>
+
+### OpenSSL 引擎常量
+
+<table>
+  <tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_RSA</code></td>
+    <td>将引擎使用限制为 RSA</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_DSA</code></td>
+    <td>将引擎使用限制为 DSA</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_DH</code></td>
+    <td>将引擎使用限制为 DH</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_RAND</code></td>
+    <td>将引擎使用限制为 RAND</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_EC</code></td>
+    <td>将引擎使用限制为 EC</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_CIPHERS</code></td>
+    <td>将引擎使用限制为 CIPHERS</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_DIGESTS</code></td>
+    <td>将引擎使用限制为 DIGESTS</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_PKEY_METHS</code></td>
+    <td>将引擎使用限制为 PKEY_METHS</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_PKEY_ASN1_METHS</code></td>
+    <td>将引擎使用限制为 PKEY_ASN1_METHS</td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_ALL</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>ENGINE_METHOD_NONE</code></td>
+    <td></td>
+  </tr>
+</table>
+
+### 其他 OpenSSL 常量
+
+<table>
+  <tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>DH_CHECK_P_NOT_SAFE_PRIME</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>DH_CHECK_P_NOT_PRIME</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>DH_UNABLE_TO_CHECK_GENERATOR</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>DH_NOT_SUITABLE_GENERATOR</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_PKCS1_PADDING</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_SSLV23_PADDING</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_NO_PADDING</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_PKCS1_OAEP_PADDING</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_X931_PADDING</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_PKCS1_PSS_PADDING</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>RSA_PSS_SALTLEN_DIGEST</code></td>
+    <td>在签名或验证时将 <code>RSA_PKCS1_PSS_PADDING</code> 的盐长度设置为摘要大小。</td>
+  </tr>
+  <tr>
+    <td><code>RSA_PSS_SALTLEN_MAX_SIGN</code></td>
+    <td>在签名数据时将 <code>RSA_PKCS1_PSS_PADDING</code> 的盐长度设置为最大允许值。</td>
+  </tr>
+  <tr>
+    <td><code>RSA_PSS_SALTLEN_AUTO</code></td>
+    <td>在验证签名时自动确定 <code>RSA_PKCS1_PSS_PADDING</code> 的盐长度。</td>
+  </tr>
+  <tr>
+    <td><code>POINT_CONVERSION_COMPRESSED</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>POINT_CONVERSION_UNCOMPRESSED</code></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><code>POINT_CONVERSION_HYBRID</code></td>
+    <td></td>
+  </tr>
+</table>
+
+### Node.js 加密常量
+
+<table>
+  <tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>defaultCoreCipherList</code></td>
+    <td>指定 Node.js 使用的内置默认密码列表。</td>
+  </tr>
+  <tr>
+    <td><code>defaultCipherList</code></td>
+    <td>指定当前 Node.js 进程使用的活动默认密码列表。</td>
+  </tr>
+</table>
+
+[^openssl30]: 需要 OpenSSL >= 3.0
+
+[^openssl32]: 需要 OpenSSL >= 3.2
+
+[^openssl35]: 需要 OpenSSL >= 3.5
+
+[AEAD 算法]: https://en.wikipedia.org/wiki/Authenticated_encryption
+[CCM 模式]: #ccm-模式
+[CVE-2021-44532]: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44532
+[注意事项]: #对弱或已破解算法的支持
+[加密常量]: #加密常量
+[FIPS 模块配置文件]: https://www.openssl.org/docs/man3.0/man5/fips_config.html
+[OpenSSL 3 的 FIPS 提供程序]: https://www.openssl.org/docs/man3.0/man7/crypto.html#FIPS-provider
+[HTML 5.2]: https://www.w3.org/TR/html52/changes.html#features-removed
+[JWK]: https://tools.ietf.org/html/rfc7517
+[密钥用途]: webcrypto.md#cryptokeyusages
+[NIST SP 800-131A]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-131Ar2.pdf
+[NIST SP 800-132]: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf
+[NIST SP 800-38D]: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
+[OpenSSL 的 FIPS README 文件]: https://github.com/openssl/openssl/blob/openssl-3.0/README-FIPS.md
+[OpenSSL 的 SPKAC 实现]: https://www.openssl.org/docs/man3.0/man1/openssl-spkac.html
+[RFC 1421]: https://www.rfc-editor.org/rfc/rfc1421.txt
+[RFC 2409]: https://www.rfc-editor.org/rfc/rfc2409.txt
+[RFC 2818]: https://www.rfc-editor.org/rfc/rfc2818.txt
+[RFC 3526]: https://www.rfc-editor.org/rfc/rfc3526.txt
+[RFC 3610]: https://www.rfc-editor.org/rfc/rfc3610.txt
+[RFC 4055]: https://www.rfc-editor.org/rfc/rfc4055.txt
+[RFC 4122]: https://www.rfc-editor.org/rfc/rfc4122.txt
+[RFC 5208]: https://www.rfc-editor.org/rfc/rfc5208.txt
+[RFC 5280]: https://www.rfc-editor.org/rfc/rfc5280.txt
+[Web Crypto API 文档]: webcrypto.md
+[`BN_is_prime_ex`]: https://www.openssl.org/docs/man1.1.1/man3/BN_is_prime_ex.html
+[`Buffer`]: buffer.md
+[`DH_generate_key()`]: https://www.openssl.org/docs/man3.0/man3/DH_generate_key.html
+[`DiffieHellmanGroup`]: #class-diffiehellmangroup
+[`KeyObject`]: #class-keyobject
+[`Sign`]: #class-sign
+[`String.prototype.normalize()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+[`UV_THREADPOOL_SIZE`]: cli.md#uv_threadpool_sizesize
+[`Verify`]: #class-verify
+[`cipher.final()`]: #cipherfinaloutputencoding
+[`cipher.update()`]: #cipherupdatedata-inputencoding-outputencoding
+[`crypto.createCipheriv()`]: #cryptocreatecipherivalgorithm-key-iv-options
+[`crypto.createDecipheriv()`]: #cryptocreatedecipherivalgorithm-key-iv-options
+[`crypto.createDiffieHellman()`]: #cryptocreatediffiehellmanprime-primeencoding-generator-generatorencoding
+[`crypto.createECDH()`]: #cryptocreateecdhcurvename
+[`crypto.createHash()`]: #cryptocreatehashalgorithm-options
+[`crypto.createHmac()`]: #cryptocreatehmacalgorithm-key-options
+[`crypto.createPrivateKey()`]: #cryptocreateprivatekeykey
+[`crypto.createPublicKey()`]: #cryptocreatepublickeykey
+[`crypto.createSecretKey()`]: #cryptocreatesecretkeykey-encoding
+[`crypto.createSign()`]: #cryptocreatesignalgorithm-options
+[`crypto.createVerify()`]: #cryptocreateverifyalgorithm-options
+[`crypto.generateKey()`]: #cryptogeneratekeytype-options-callback
+[`crypto.getCurves()`]: #cryptogetcurves
+[`crypto.getDiffieHellman()`]: #cryptogetdiffiehellmangroupname
+[`crypto.getHashes()`]: #cryptogethashes
+[`crypto.privateDecrypt()`]: #cryptoprivatedecryptprivatekey-buffer
+[`crypto.privateEncrypt()`]: #cryptoprivateencryptprivatekey-buffer
+[`crypto.publicDecrypt()`]: #cryptopublicdecryptkey-buffer
+[`crypto.publicEncrypt()`]: #cryptopublicencryptkey-buffer
+[`crypto.randomBytes()`]: #cryptorandombytessize-callback
+[`crypto.randomFill()`]: #cryptorandomfillbuffer-offset-size-callback
+[`crypto.webcrypto.getRandomValues()`]: webcrypto.md#cryptogetrandomvaluestypedarray
+[`crypto.webcrypto.subtle`]: webcrypto.md#class-subtlecrypto
+[`decipher.final()`]: #decipherfinaloutputencoding
+[`decipher.update()`]: #decipherupdatedata-inputencoding-outputencoding
+[`diffieHellman.generateKeys()`]: #diffiehellmangeneratekeysencoding
+[`diffieHellman.setPublicKey()`]: #diffiehellmansetpublickeypublickey-encoding
+[`ecdh.generateKeys()`]: #ecdhgeneratekeysencoding-format
+[`ecdh.setPrivateKey()`]: #ecdhsetprivatekeyprivatekey-encoding
+[`hash.digest()`]: #hashdigestencoding
+[`hash.update()`]: #hashupdatedata-inputencoding
+[`hmac.digest()`]: #hmacdigestencoding
+[`hmac.update()`]: #hmacupdatedata-inputencoding
+[`import()`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import
+[`keyObject.export()`]: #keyobjectexportoptions
+[`postMessage()`]: worker_threads.md#portpostmessagevalue-transferlist
+[`sign.sign()`]: #signsignprivatekey-outputencoding
+[`sign.update()`]: #signupdatedata-inputencoding
+[`stream.Writable` 选项]: stream.md#new-streamwritableoptions
+[`stream.transform` 选项]: stream.md#new-streamtransformoptions
+[`util.promisify()`]: util.md#utilpromisifyoriginal
+[`verify.update()`]: #verifyupdatedata-inputencoding
+[`verify.verify()`]: #verifyverifyobject-signature-signatureencoding
+[`x509.fingerprint256`]: #x509fingerprint256
+[`x509.verify(publicKey)`]: #x509verifypublickey
+[argon2]: https://www.rfc-editor.org/rfc/rfc9106.html
+[非对称密钥类型]: #asymmetric-key-types
+[将字符串用作加密 API 输入时的注意事项]: #将字符串用作加密-api-的输入
+[证书对象]: tls.md#certificate-object
+[编码]: buffer.md#buffers-and-character-encodings
+[初始化向量]: https://en.wikipedia.org/wiki/Initialization_vector
+[旧版提供程序]: cli.md#--openssl-legacy-provider
+[SSL OP 标志列表]: https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options
+[模偏差]: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#Modulo_bias
+[安全整数]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isSafeInteger
+[scrypt]: https://en.wikipedia.org/wiki/Scrypt
+[流]: stream.md
+[stream-writable-write]: stream.md#writablewritechunk-encoding-callback

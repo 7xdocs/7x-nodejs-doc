@@ -1,0 +1,3539 @@
+{
+  "type": "module",
+  "source": "doc/api/cli.md",
+  "introduced_in": "v5.9.1",
+  "miscs": [
+    {
+      "textRaw": "命令行 API",
+      "name": "命令行 API",
+      "introduced_in": "v5.9.1",
+      "type": "misc",
+      "desc": "<p>Node.js 提供了多种 CLI 选项。这些选项暴露了内置的调试功能、多种执行脚本的方式以及其他有用的运行时选项。</p>\n<p>要在终端中作为手册页查看此文档，请运行 <code>man node</code>。</p>",
+      "miscs": [
+        {
+          "textRaw": "概要",
+          "name": "概要",
+          "desc": "<p><code>node [options] [V8 options] [&#x3C;program-entry-point> | -e \"script\" | -] [--] [arguments]</code></p>\n<p><code>node inspect [&#x3C;program-entry-point> | -e \"script\" | &#x3C;host>:&#x3C;port>] …</code></p>\n<p><code>node --v8-options</code></p>\n<p>不带参数执行以启动 <a href=\"repl.html\">REPL</a>。</p>\n<p>有关 <code>node inspect</code> 的更多信息，请参阅 [调试器][] 文档。</p>",
+          "type": "misc",
+          "displayName": "概要"
+        },
+        {
+          "textRaw": "程序入口点",
+          "name": "程序入口点",
+          "desc": "<p>程序入口点是一个类似于说明符的字符串。如果该字符串不是绝对路径，则会从当前工作目录解析为相对路径。然后该路径由 <a href=\"modules.html\">CommonJS</a> 模块加载器解析。如果未找到相应的文件，则会抛出错误。</p>\n<p>如果找到文件，则在以下任何条件下，其路径将传递给 <a href=\"packages.html#modules-loaders\">ES 模块加载器</a>：</p>\n<ul>\n<li>程序启动时使用了强制入口点使用 ECMAScript 模块加载器加载的命令行标志，例如 <code>--import</code>。</li>\n<li>文件具有 <code>.mjs</code> 或 <code>.wasm</code> 扩展名。</li>\n<li>文件没有 <code>.cjs</code> 扩展名，并且最近的父级 <code>package.json</code> 文件包含一个值为 <code>\"module\"</code> 的顶层 <a href=\"packages.html#type\"><code>\"type\"</code></a> 字段。</li>\n</ul>\n<p>否则，文件将使用 CommonJS 模块加载器加载。有关更多详细信息，请参阅 <a href=\"packages.html#modules-loaders\">模块加载器</a>。</p>",
+          "modules": [
+            {
+              "textRaw": "ECMAScript 模块加载器入口点注意事项",
+              "name": "ecmascript_模块加载器入口点注意事项",
+              "desc": "<p>加载时，<a href=\"packages.html#modules-loaders\">ES 模块加载器</a> 会加载程序入口点，<code>node</code> 命令仅接受具有 <code>.js</code>、<code>.mjs</code> 或 <code>.cjs</code> 扩展名的文件作为输入。使用以下标志时，将启用其他文件扩展名：</p>\n<ul>\n<li><a href=\"#--experimental-addon-modules\"><code>--experimental-addon-modules</code></a> 用于具有 <code>.node</code> 扩展名的文件。</li>\n</ul>",
+              "type": "module",
+              "displayName": "ECMAScript 模块加载器入口点注意事项"
+            }
+          ],
+          "type": "misc",
+          "displayName": "程序入口点"
+        },
+        {
+          "textRaw": "选项",
+          "name": "选项",
+          "meta": {
+            "changes": [
+              {
+                "version": "v10.12.0",
+                "pr-url": "https://github.com/nodejs/node/pull/23020",
+                "description": "Underscores instead of dashes are now allowed for Node.js options as well, in addition to V8 options."
+              }
+            ]
+          },
+          "stability": 2,
+          "stabilityText": "Stable",
+          "desc": "<p>所有选项，包括 V8 选项，都允许单词之间用破折号（<code>-</code>）或下划线（<code>_</code>）分隔。例如，<code>--pending-deprecation</code> 等同于 <code>--pending_deprecation</code>。</p>\n<p>如果传递了接受单个值的选项（例如 <code>--max-http-header-size</code>）多次，则使用最后传递的值。来自命令行的选项优先于通过 <a href=\"#node_optionsoptions\"><code>NODE_OPTIONS</code></a> 环境变量传递的选项。</p>",
+          "modules": [
+            {
+              "textRaw": "`-`",
+              "name": "`-`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>标准输入的别名。类似于其他命令行实用程序中 <code>-</code> 的用法，表示从标准输入读取脚本，其余选项传递给该脚本。</p>",
+              "type": "module",
+              "displayName": "`-`"
+            },
+            {
+              "textRaw": "`--`",
+              "name": "`--`",
+              "meta": {
+                "added": [
+                  "v6.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>表示节点选项的结束。将剩余的参数传递给脚本。如果在此之前没有提供脚本文件名或 eval/print 脚本，则下一个参数将用作脚本文件名。</p>",
+              "type": "module",
+              "displayName": "`--`"
+            },
+            {
+              "textRaw": "`--abort-on-uncaught-exception`",
+              "name": "`--abort-on-uncaught-exception`",
+              "meta": {
+                "added": [
+                  "v0.10.8"
+                ],
+                "changes": []
+              },
+              "desc": "<p>中止而不是退出会生成一个核心文件，用于使用调试器（如 <code>lldb</code>、<code>gdb</code> 和 <code>mdb</code>）进行事后分析。</p>\n<p>如果传递了此标志，仍然可以通过 <a href=\"process.html#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a>（以及通过使用它的 <code>node:domain</code> 模块）将行为设置为不中止。</p>",
+              "type": "module",
+              "displayName": "`--abort-on-uncaught-exception`"
+            },
+            {
+              "textRaw": "`--allow-addons`",
+              "name": "`--allow-addons`",
+              "meta": {
+                "added": [
+                  "v21.6.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>使用 <a href=\"permissions.html#permission-model\">权限模型</a> 时，进程默认将无法使用原生插件。\n除非用户在启动 Node.js 时显式传递 <code>--allow-addons</code> 标志，否则尝试这样做将抛出 <code>ERR_DLOPEN_DISABLED</code>。</p>\n<p>示例：</p>\n<pre><code class=\"language-cjs\">// 尝试 require 一个原生插件\nrequire('nodejs-addon-example');\n</code></pre>\n<pre><code class=\"language-console\">$ node --permission --allow-fs-read=* index.js\nnode:internal/modules/cjs/loader:1319\n  return process.dlopen(module, path.toNamespacedPath(filename));\n                 ^\n\nError: Cannot load native addon because loading addons is disabled.\n    at Module._extensions..node (node:internal/modules/cjs/loader:1319:18)\n    at Module.load (node:internal/modules/cjs/loader:1091:32)\n    at Module._load (node:internal/modules/cjs/loader:938:12)\n    at Module.require (node:internal/modules/cjs/loader:1115:19)\n    at require (node:internal/modules/helpers:130:18)\n    at Object.&#x3C;anonymous> (/home/index.js:1:15)\n    at Module._compile (node:internal/modules/cjs/loader:1233:14)\n    at Module._extensions..js (node:internal/modules/cjs/loader:1287:10)\n    at Module.load (node:internal/modules/cjs/loader:1091:32)\n    at Module._load (node:internal/modules/cjs/loader:938:12) {\n  code: 'ERR_DLOPEN_DISABLED'\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "`--allow-addons`"
+            },
+            {
+              "textRaw": "`--allow-child-process`",
+              "name": "`--allow-child-process`",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58853",
+                    "description": "When spawning process with the permission model enabled. The flags are inherit to the child Node.js process through NODE_OPTIONS environment variable."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>使用 <a href=\"permissions.html#permission-model\">权限模型</a> 时，进程默认将无法生成任何子进程。\n除非用户在启动 Node.js 时显式传递 <code>--allow-child-process</code> 标志，否则尝试这样做将抛出 <code>ERR_ACCESS_DENIED</code>。</p>\n<p>示例：</p>\n<pre><code class=\"language-js\">const childProcess = require('node:child_process');\n// 尝试绕过权限\nchildProcess.spawn('node', ['-e', 'require(\"fs\").writeFileSync(\"/new-file\", \"example\")']);\n</code></pre>\n<pre><code class=\"language-console\">$ node --permission --allow-fs-read=* index.js\nnode:internal/child_process:388\n  const err = this._handle.spawn(options);\n                           ^\n\nError: Access to this API has been restricted\n    at ChildProcess.spawn (node:internal/child_process:388:28)\n    at node:internal/main/run_main_module:17:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'ChildProcess'\n}\n</code></pre>\n<p><code>child_process.fork()</code> API 从父进程继承执行参数。这意味着如果 Node.js 在启用权限模型的情况下启动并且设置了 <code>--allow-child-process</code> 标志，则使用 <code>child_process.fork()</code> 创建的任何子进程将自动接收所有相关的权限模型标志。</p>\n<p>此行为也适用于 <code>child_process.spawn()</code>，但在那种情况下，标志是通过 <code>NODE_OPTIONS</code> 环境变量传播的，而不是直接通过进程参数。</p>",
+              "type": "module",
+              "displayName": "`--allow-child-process`"
+            },
+            {
+              "textRaw": "`--allow-fs-read`",
+              "name": "`--allow-fs-read`",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58579",
+                    "description": "Entrypoints of your application are allowed to be read implicitly."
+                  },
+                  {
+                    "version": [
+                      "v23.5.0",
+                      "v22.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56201",
+                    "description": "Permission Model and --allow-fs flags are stable."
+                  },
+                  {
+                    "version": "v20.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/49047",
+                    "description": "Paths delimited by comma (`,`) are no longer allowed."
+                  }
+                ]
+              },
+              "desc": "<p>此标志使用 <a href=\"permissions.html#permission-model\">权限模型</a> 配置文件系统读取权限。</p>\n<p><code>--allow-fs-read</code> 标志的有效参数是：</p>\n<ul>\n<li><code>*</code> - 允许所有 <code>FileSystemRead</code> 操作。</li>\n<li>可以使用多个 <code>--allow-fs-read</code> 标志允许多个路径。\n示例 <code>--allow-fs-read=/folder1/ --allow-fs-read=/folder1/</code></li>\n</ul>\n<p>示例可以在 <a href=\"permissions.html#file-system-permissions\">文件系统权限</a> 文档中找到。</p>\n<p>初始化器模块和自定义的 <code>--require</code> 模块具有隐式的读取权限。</p>\n<pre><code class=\"language-console\">$ node --permission -r custom-require.js -r custom-require-2.js index.js\n</code></pre>\n<ul>\n<li><code>custom-require.js</code>、<code>custom-require-2.js</code> 和 <code>index.js</code> 将默认在允许读取的列表中。</li>\n</ul>\n<pre><code class=\"language-js\">process.permission.has('fs.read', 'index.js'); // true\nprocess.permission.has('fs.read', 'custom-require.js'); // true\nprocess.permission.has('fs.read', 'custom-require-2.js'); // true\n</code></pre>",
+              "type": "module",
+              "displayName": "`--allow-fs-read`"
+            },
+            {
+              "textRaw": "`--allow-fs-write`",
+              "name": "`--allow-fs-write`",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.5.0",
+                      "v22.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56201",
+                    "description": "Permission Model and --allow-fs flags are stable."
+                  },
+                  {
+                    "version": "v20.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/49047",
+                    "description": "Paths delimited by comma (`,`) are no longer allowed."
+                  }
+                ]
+              },
+              "desc": "<p>此标志使用 <a href=\"permissions.html#permission-model\">权限模型</a> 配置文件系统写入权限。</p>\n<p><code>--allow-fs-write</code> 标志的有效参数是：</p>\n<ul>\n<li><code>*</code> - 允许所有 <code>FileSystemWrite</code> 操作。</li>\n<li>可以使用多个 <code>--allow-fs-write</code> 标志允许多个路径。\n示例 <code>--allow-fs-write=/folder1/ --allow-fs-write=/folder1/</code></li>\n</ul>\n<p>不再允许使用逗号（<code>,</code>）分隔的路径。\n当传递带有逗号的单个标志时，将显示警告。</p>\n<p>示例可以在 <a href=\"permissions.html#file-system-permissions\">文件系统权限</a> 文档中找到。</p>",
+              "type": "module",
+              "displayName": "`--allow-fs-write`"
+            },
+            {
+              "textRaw": "`--allow-wasi`",
+              "name": "`--allow-wasi`",
+              "meta": {
+                "added": [
+                  "v22.3.0",
+                  "v20.16.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>使用 <a href=\"permissions.html#permission-model\">权限模型</a> 时，进程默认将无法创建任何 WASI 实例。\n出于安全原因，除非用户在主 Node.js 进程中显式传递 <code>--allow-wasi</code> 标志，否则调用将抛出 <code>ERR_ACCESS_DENIED</code>。</p>\n<p>示例：</p>\n<pre><code class=\"language-js\">const { WASI } = require('node:wasi');\n// 尝试绕过权限\nnew WASI({\n  version: 'preview1',\n  // 尝试挂载整个文件系统\n  preopens: {\n    '/': '/',\n  },\n});\n</code></pre>\n<pre><code class=\"language-console\">$ node --permission --allow-fs-read=* index.js\n\nError: Access to this API has been restricted\n    at node:internal/main/run_main_module:30:49 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'WASI',\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "`--allow-wasi`"
+            },
+            {
+              "textRaw": "`--allow-worker`",
+              "name": "`--allow-worker`",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>使用 <a href=\"permissions.html#permission-model\">权限模型</a> 时，进程默认将无法创建任何工作线程。\n出于安全原因，除非用户在主 Node.js 进程中显式传递 <code>--allow-worker</code> 标志，否则调用将抛出 <code>ERR_ACCESS_DENIED</code>。</p>\n<p>示例：</p>\n<pre><code class=\"language-js\">const { Worker } = require('node:worker_threads');\n// 尝试绕过权限\nnew Worker(__filename);\n</code></pre>\n<pre><code class=\"language-console\">$ node --permission --allow-fs-read=* index.js\n\nError: Access to this API has been restricted\n    at node:internal/main/run_main_module:17:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'WorkerThreads'\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "`--allow-worker`"
+            },
+            {
+              "textRaw": "`--build-snapshot`",
+              "name": "`--build-snapshot`",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>在进程退出时生成快照 blob 并将其写入磁盘，稍后可以使用 <code>--snapshot-blob</code> 加载。</p>\n<p>构建快照时，如果未指定 <code>--snapshot-blob</code>，则默认情况下生成的 blob 将写入当前工作目录中的 <code>snapshot.blob</code>。否则，它将写入 <code>--snapshot-blob</code> 指定的路径。</p>\n<pre><code class=\"language-console\">$ echo \"globalThis.foo = 'I am from the snapshot'\" > snapshot.js\n\n# 运行 snapshot.js 来初始化应用程序并将其状态快照到 snapshot.blob。\n$ node --snapshot-blob snapshot.blob --build-snapshot snapshot.js\n\n$ echo \"console.log(globalThis.foo)\" > index.js\n\n# 加载生成的快照并从 index.js 启动应用程序。\n$ node --snapshot-blob snapshot.blob index.js\nI am from the snapshot\n</code></pre>\n<p><a href=\"v8.html#startup-snapshot-api\"><code>v8.startupSnapshot</code> API</a> 可用于在快照构建时指定入口点，从而避免在反序列化时需要额外的入口脚本：</p>\n<pre><code class=\"language-console\">$ echo \"require('v8').startupSnapshot.setDeserializeMainFunction(() => console.log('I am from the snapshot'))\" > snapshot.js\n$ node --snapshot-blob snapshot.blob --build-snapshot snapshot.js\n$ node --snapshot-blob snapshot.blob\nI am from the snapshot\n</code></pre>\n<p>有关更多信息，请查看 <a href=\"v8.html#startup-snapshot-api\"><code>v8.startupSnapshot</code> API</a> 文档。</p>\n<p>目前对运行时快照的支持是实验性的，因为：</p>\n<ol>\n<li>快照中尚不支持用户态模块，因此只能快照一个单个文件。然而，用户可以在构建快照之前使用他们选择的打包工具将他们的应用程序打包成单个脚本。</li>\n<li>只有一部分内置模块在快照中工作，尽管 Node.js 核心测试套件检查了一些相当复杂的应用程序可以被快照。正在添加对更多模块的支持。如果在构建快照时发生任何崩溃或错误行为，请在 <a href=\"https://github.com/nodejs/node/issues\">Node.js 问题跟踪器</a> 中提交报告，并在 <a href=\"https://github.com/nodejs/node/issues/44014\">用户态快照的跟踪问题</a> 中链接到它。</li>\n</ol>",
+              "type": "module",
+              "displayName": "`--build-snapshot`"
+            },
+            {
+              "textRaw": "`--build-snapshot-config`",
+              "name": "`--build-snapshot-config`",
+              "meta": {
+                "added": [
+                  "v21.6.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>指定一个 JSON 配置文件的路径，该文件配置快照创建行为。</p>\n<p>目前支持以下选项：</p>\n<ul>\n<li><code>builder</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 必需。提供在构建快照之前执行的脚本的名称，就像已使用 <code>builder</code> 作为主脚本名称传递了 <a href=\"#--build-snapshot\"><code>--build-snapshot</code></a> 一样。</li>\n<li><code>withoutCodeCache</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 可选。包含代码缓存会减少在快照中包含的函数在编译上花费的时间，但代价是更大的快照大小并可能破坏快照的可移植性。</li>\n</ul>\n<p>使用此标志时，在命令行上提供的其他脚本文件将不会被执行，而是被解释为常规命令行参数。</p>",
+              "type": "module",
+              "displayName": "`--build-snapshot-config`"
+            },
+            {
+              "textRaw": "`-c`, `--check`",
+              "name": "`-c`,_`--check`",
+              "meta": {
+                "added": [
+                  "v5.0.0",
+                  "v4.2.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v10.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/19600",
+                    "description": "The `--require` option is now supported when checking a file."
+                  }
+                ]
+              },
+              "desc": "<p>语法检查脚本而不执行。</p>",
+              "type": "module",
+              "displayName": "`-c`, `--check`"
+            },
+            {
+              "textRaw": "`--completion-bash`",
+              "name": "`--completion-bash`",
+              "meta": {
+                "added": [
+                  "v10.12.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印可源的 bash 补全脚本。</p>\n<pre><code class=\"language-bash\">node --completion-bash > node_bash_completion\nsource node_bash_completion\n</code></pre>",
+              "type": "module",
+              "displayName": "`--completion-bash`"
+            },
+            {
+              "textRaw": "`-C condition`, `--conditions=condition`",
+              "name": "`-c_condition`,_`--conditions=condition`",
+              "meta": {
+                "added": [
+                  "v14.9.0",
+                  "v12.19.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.9.0",
+                      "v20.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/54209",
+                    "description": "The flag is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>提供自定义的 <a href=\"packages.html#conditional-exports\">条件导出</a> 解析条件。</p>\n<p>允许任意数量的自定义字符串条件名称。</p>\n<p>Node.js 的默认条件 <code>\"node\"</code>、<code>\"default\"</code>、<code>\"import\"</code> 和 <code>\"require\"</code> 将始终按定义应用。</p>\n<p>例如，使用 \"development\" 解析运行模块：</p>\n<pre><code class=\"language-bash\">node -C development app.js\n</code></pre>",
+              "type": "module",
+              "displayName": "`-C condition`, `--conditions=condition`"
+            },
+            {
+              "textRaw": "`--cpu-prof`",
+              "name": "`--cpu-prof`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--cpu-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>在启动时启动 V8 CPU 分析器，并在退出前将 CPU 分析文件写入磁盘。</p>\n<p>如果未指定 <code>--cpu-prof-dir</code>，则生成的分析文件将放在当前工作目录中。</p>\n<p>如果未指定 <code>--cpu-prof-name</code>，则生成的分析文件命名为 <code>CPU.${yyyymmdd}.${hhmmss}.${pid}.${tid}.${seq}.cpuprofile</code>。</p>\n<pre><code class=\"language-console\">$ node --cpu-prof index.js\n$ ls *.cpuprofile\nCPU.20190409.202950.15293.0.0.cpuprofile\n</code></pre>\n<p>如果指定了 <code>--cpu-prof-name</code>，则提供的值将用作文件名的模板。支持以下占位符，并在运行时被替换：</p>\n<ul>\n<li><code>${pid}</code> — 当前进程 ID</li>\n</ul>\n<pre><code class=\"language-console\">$ node --cpu-prof --cpu-prof-name 'CPU.${pid}.cpuprofile' index.js\n$ ls *.cpuprofile\nCPU.15293.cpuprofile\n</code></pre>",
+              "type": "module",
+              "displayName": "`--cpu-prof`"
+            },
+            {
+              "textRaw": "`--cpu-prof-dir`",
+              "name": "`--cpu-prof-dir`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--cpu-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>指定由 <code>--cpu-prof</code> 生成的 CPU 分析文件将被放置的目录。</p>\n<p>默认值由 <a href=\"#--diagnostic-dirdirectory\"><code>--diagnostic-dir</code></a> 命令行选项控制。</p>",
+              "type": "module",
+              "displayName": "`--cpu-prof-dir`"
+            },
+            {
+              "textRaw": "`--cpu-prof-interval`",
+              "name": "`--cpu-prof-interval`",
+              "meta": {
+                "added": [
+                  "v12.2.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--cpu-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>指定由 <code>--cpu-prof</code> 生成的 CPU 分析文件的采样间隔（以微秒为单位）。默认为 1000 微秒。</p>",
+              "type": "module",
+              "displayName": "`--cpu-prof-interval`"
+            },
+            {
+              "textRaw": "`--cpu-prof-name`",
+              "name": "`--cpu-prof-name`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--cpu-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>指定由 <code>--cpu-prof</code> 生成的 CPU 分析文件的文件名。</p>",
+              "type": "module",
+              "displayName": "`--cpu-prof-name`"
+            },
+            {
+              "textRaw": "`--diagnostic-dir=directory`",
+              "name": "`--diagnostic-dir=directory`",
+              "desc": "<p>设置所有诊断输出文件写入的目录。默认为当前工作目录。</p>\n<p>影响以下内容的默认输出目录：</p>\n<ul>\n<li><a href=\"#--cpu-prof-dir\"><code>--cpu-prof-dir</code></a></li>\n<li><a href=\"#--heap-prof-dir\"><code>--heap-prof-dir</code></a></li>\n<li><a href=\"#--redirect-warningsfile\"><code>--redirect-warnings</code></a></li>\n</ul>",
+              "type": "module",
+              "displayName": "`--diagnostic-dir=directory`"
+            },
+            {
+              "textRaw": "`--disable-proto=mode`",
+              "name": "`--disable-proto=mode`",
+              "meta": {
+                "added": [
+                  "v13.12.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>禁用 <code>Object.prototype.__proto__</code> 属性。如果 <code>mode</code> 是 <code>delete</code>，则该属性将被完全移除。如果 <code>mode</code> 是 <code>throw</code>，则访问该属性将抛出带有代码 <code>ERR_PROTO_ACCESS</code> 的异常。</p>",
+              "type": "module",
+              "displayName": "`--disable-proto=mode`"
+            },
+            {
+              "textRaw": "`--disable-sigusr1`",
+              "name": "`--disable-sigusr1`",
+              "meta": {
+                "added": [
+                  "v23.7.0",
+                  "v22.14.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59707",
+                    "description": "The option is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>禁用通过向进程发送 <code>SIGUSR1</code> 信号来启动调试会话的能力。</p>",
+              "type": "module",
+              "displayName": "`--disable-sigusr1`"
+            },
+            {
+              "textRaw": "`--disable-warning=code-or-type`",
+              "name": "`--disable-warning=code-or-type`",
+              "meta": {
+                "added": [
+                  "v21.3.0",
+                  "v20.11.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>通过 <code>code</code> 或 <code>type</code> 禁用特定的进程警告。</p>\n<p>从 <a href=\"process.html#processemitwarningwarning-options\"><code>process.emitWarning()</code></a> 发出的警告可能包含 <code>code</code> 和 <code>type</code>。此选项将不发出具有匹配 <code>code</code> 或 <code>type</code> 的警告。</p>\n<p><a href=\"deprecations.html#list-of-deprecated-apis\">弃用警告列表</a>。</p>\n<p>Node.js 核心警告类型有：<code>DeprecationWarning</code> 和 <code>ExperimentalWarning</code></p>\n<p>例如，当使用 <code>node --disable-warning=DEP0025</code> 执行时，以下脚本将不会发出 <a href=\"deprecations.html#dep0025-requirenodesys\">DEP0025 <code>require('node:sys')</code></a>：</p>\n<pre><code class=\"language-mjs\">import sys from 'node:sys';\n</code></pre>\n<pre><code class=\"language-cjs\">const sys = require('node:sys');\n</code></pre>\n<p>例如，当使用 <code>node --disable-warning=ExperimentalWarning</code> 执行时，以下脚本将发出 <a href=\"deprecations.html#dep0025-requirenodesys\">DEP0025 <code>require('node:sys')</code></a>，但不会发出任何实验性警告（例如在 &#x3C;=v21 中的 <a href=\"vm.html#vmmeasurememoryoptions\">ExperimentalWarning: <code>vm.measureMemory</code> is an experimental feature</a>）：</p>\n<pre><code class=\"language-mjs\">import sys from 'node:sys';\nimport vm from 'node:vm';\n\nvm.measureMemory();\n</code></pre>\n<pre><code class=\"language-cjs\">const sys = require('node:sys');\nconst vm = require('node:vm');\n\nvm.measureMemory();\n</code></pre>",
+              "type": "module",
+              "displayName": "`--disable-warning=code-or-type`"
+            },
+            {
+              "textRaw": "`--disable-wasm-trap-handler`",
+              "name": "`--disable-wasm-trap-handler`",
+              "meta": {
+                "added": [
+                  "v22.2.0",
+                  "v20.15.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>默认情况下，Node.js 启用基于陷阱处理程序的 WebAssembly 边界检查。因此，V8 不需要在从 WebAssembly 编译的代码中插入内联边界检查，这可能会显著加速 WebAssembly 执行，但这种优化需要分配一个大的虚拟内存笼（目前是 10GB）。如果由于系统配置或硬件限制，Node.js 进程无法访问足够大的虚拟内存地址空间，用户将无法运行任何涉及在此虚拟内存笼中分配的 WebAssembly，并将看到内存不足错误。</p>\n<pre><code class=\"language-console\">$ ulimit -v 5000000\n$ node -p \"new WebAssembly.Memory({ initial: 10, maximum: 100 });\"\n[eval]:1\nnew WebAssembly.Memory({ initial: 10, maximum: 100 });\n^\n\nRangeError: WebAssembly.Memory(): could not allocate memory\n    at [eval]:1:1\n    at runScriptInThisContext (node:internal/vm:209:10)\n    at node:internal/process/execution:118:14\n    at [eval]-wrapper:6:24\n    at runScript (node:internal/process/execution:101:62)\n    at evalScript (node:internal/process/execution:136:3)\n    at node:internal/main/eval_string:49:3\n\n</code></pre>\n<p><code>--disable-wasm-trap-handler</code> 禁用此优化，以便当 Node.js 进程可用的虚拟内存地址空间低于 V8 WebAssembly 内存笼所需时，用户至少可以运行 WebAssembly（性能较差）。</p>",
+              "type": "module",
+              "displayName": "`--disable-wasm-trap-handler`"
+            },
+            {
+              "textRaw": "`--disallow-code-generation-from-strings`",
+              "name": "`--disallow-code-generation-from-strings`",
+              "meta": {
+                "added": [
+                  "v9.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>使从字符串生成代码的内置语言特性（如 <code>eval</code> 和 <code>new Function</code>）抛出异常。这不影响 Node.js <code>node:vm</code> 模块。</p>",
+              "type": "module",
+              "displayName": "`--disallow-code-generation-from-strings`"
+            },
+            {
+              "textRaw": "`--dns-result-order=order`",
+              "name": "`--dns-result-order=order`",
+              "meta": {
+                "added": [
+                  "v16.4.0",
+                  "v14.18.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.1.0",
+                      "v20.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52492",
+                    "description": "The `ipv6first` is supported now."
+                  },
+                  {
+                    "version": "v17.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/39987",
+                    "description": "Changed default value to `verbatim`."
+                  }
+                ]
+              },
+              "desc": "<p>设置 <a href=\"dns.html#dnslookuphostname-options-callback\"><code>dns.lookup()</code></a> 和 <a href=\"dns.html#dnspromiseslookuphostname-options\"><code>dnsPromises.lookup()</code></a> 中 <code>order</code> 的默认值。值可以是：</p>\n<ul>\n<li><code>ipv4first</code>：将默认 <code>order</code> 设置为 <code>ipv4first</code>。</li>\n<li><code>ipv6first</code>：将默认 <code>order</code> 设置为 <code>ipv6first</code>。</li>\n<li><code>verbatim</code>：将默认 <code>order</code> 设置为 <code>verbatim</code>。</li>\n</ul>\n<p>默认为 <code>verbatim</code>，并且 <a href=\"dns.html#dnssetdefaultresultorderorder\"><code>dns.setDefaultResultOrder()</code></a> 的优先级高于 <code>--dns-result-order</code>。</p>",
+              "type": "module",
+              "displayName": "`--dns-result-order=order`"
+            },
+            {
+              "textRaw": "`--enable-fips`",
+              "name": "`--enable-fips`",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在启动时启用符合 FIPS 的加密。（要求 Node.js 针对 FIPS 兼容的 OpenSSL 构建。）</p>",
+              "type": "module",
+              "displayName": "`--enable-fips`"
+            },
+            {
+              "textRaw": "`--enable-network-family-autoselection`",
+              "name": "`--enable-network-family-autoselection`",
+              "meta": {
+                "added": [
+                  "v18.18.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用族自动选择算法，除非连接选项显式禁用它。</p>",
+              "type": "module",
+              "displayName": "`--enable-network-family-autoselection`"
+            },
+            {
+              "textRaw": "`--enable-source-maps`",
+              "name": "`--enable-source-maps`",
+              "meta": {
+                "added": [
+                  "v12.12.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v15.11.0",
+                      "v14.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37362",
+                    "description": "This API is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>为堆栈跟踪启用 <a href=\"https://tc39.es/ecma426/\">Source Map</a> 支持。</p>\n<p>当使用转译器（如 TypeScript）时，应用程序抛出的堆栈跟踪引用的是转译后的代码，而不是原始源代码位置。<code>--enable-source-maps</code> 启用 Source Maps 的缓存，并尽力报告相对于原始源文件的堆栈跟踪。</p>\n<p>覆盖 <code>Error.prepareStackTrace</code> 可能会阻止 <code>--enable-source-maps</code> 修改堆栈跟踪。在覆盖函数中调用并返回原始 <code>Error.prepareStackTrace</code> 的结果，以使用 source maps 修改堆栈跟踪。</p>\n<pre><code class=\"language-js\">const originalPrepareStackTrace = Error.prepareStackTrace;\nError.prepareStackTrace = (error, trace) => {\n  // 修改 error 和 trace 并使用原始的 Error.prepareStackTrace 格式化堆栈跟踪。\n  return originalPrepareStackTrace(error, trace);\n};\n</code></pre>\n<p>注意，启用 source maps 可能会在访问 <code>Error.stack</code> 时给应用程序带来延迟。如果在应用程序中频繁访问 <code>Error.stack</code>，请考虑 <code>--enable-source-maps</code> 的性能影响。</p>",
+              "type": "module",
+              "displayName": "`--enable-source-maps`"
+            },
+            {
+              "textRaw": "`--entry-url`",
+              "name": "`--entry-url`",
+              "meta": {
+                "added": [
+                  "v23.0.0",
+                  "v22.10.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>当存在时，Node.js 会将入口点解释为 URL，而不是路径。</p>\n<p>遵循 <a href=\"esm.html#modules-ecmascript-modules\">ECMAScript 模块</a> 解析规则。</p>\n<p>URL 中的任何查询参数或哈希将通过 <a href=\"esm.html#importmetaurl\"><code>import.meta.url</code></a> 访问。</p>\n<pre><code class=\"language-bash\">node --entry-url 'file:///path/to/file.js?queryparams=work#and-hashes-too'\nnode --entry-url 'file.ts?query#hash'\nnode --entry-url 'data:text/javascript,console.log(\"Hello\")'\n</code></pre>",
+              "type": "module",
+              "displayName": "`--entry-url`"
+            },
+            {
+              "textRaw": "`--env-file-if-exists=file`",
+              "name": "`--env-file-if-exists=file`",
+              "meta": {
+                "added": [
+                  "v22.9.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59925",
+                    "description": "The `--env-file-if-exists` flag is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>行为与 <a href=\"#--env-filefile\"><code>--env-file</code></a> 相同，但如果文件不存在则不会抛出错误。</p>",
+              "type": "module",
+              "displayName": "`--env-file-if-exists=file`"
+            },
+            {
+              "textRaw": "`--env-file=file`",
+              "name": "`--env-file=file`",
+              "meta": {
+                "added": [
+                  "v20.6.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59925",
+                    "description": "The `--env-file` flag is no longer experimental."
+                  },
+                  {
+                    "version": [
+                      "v21.7.0",
+                      "v20.12.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/51289",
+                    "description": "Add support to multi-line values."
+                  }
+                ]
+              },
+              "desc": "<p>从相对于当前目录的文件加载环境变量，使其在 <code>process.env</code> 上对应用程序可用。配置 Node.js 的 <a href=\"#environment-variables\">环境变量</a>，例如 <code>NODE_OPTIONS</code>，会被解析并应用。如果同一个变量在环境和文件中都有定义，则环境中的值优先。</p>\n<p>您可以传递多个 <code>--env-file</code> 参数。后续文件会覆盖先前文件中定义的变量。</p>\n<p>如果文件不存在，则会抛出错误。</p>\n<pre><code class=\"language-bash\">node --env-file=.env --env-file=.development.env index.js\n</code></pre>\n<p>文件的格式应为每行一个环境变量名称和值的键值对，用 <code>=</code> 分隔：</p>\n<pre><code class=\"language-text\">PORT=3000\n</code></pre>\n<p><code>#</code> 之后的任何文本都被视为注释：</p>\n<pre><code class=\"language-text\"># 这是一个注释\nPORT=3000 # 这也是一个注释\n</code></pre>\n<p>值可以用以下引号开头和结尾：<code>`</code>、<code>\"</code> 或 <code>'</code>。它们会从值中省略。</p>\n<pre><code class=\"language-text\">USERNAME=\"nodejs\" # 将得到 `nodejs` 作为值。\n</code></pre>\n<p>支持多行值：</p>\n<pre><code class=\"language-text\">MULTI_LINE=\"THIS IS\nA MULTILINE\"\n# 将得到 `THIS IS\\nA MULTILINE` 作为值。\n</code></pre>\n<p>键前的 export 关键字被忽略：</p>\n<pre><code class=\"language-text\">export USERNAME=\"nodejs\" # 将得到 `nodejs` 作为值。\n</code></pre>\n<p>如果您想从可能不存在的文件加载环境变量，可以使用 <a href=\"#--env-file-if-existsfile\"><code>--env-file-if-exists</code></a> 标志代替。</p>",
+              "type": "module",
+              "displayName": "`--env-file=file`"
+            },
+            {
+              "textRaw": "`-e`, `--eval \"script\"`",
+              "name": "`-e`,_`--eval_\"script\"`",
+              "meta": {
+                "added": [
+                  "v0.5.2"
+                ],
+                "changes": [
+                  {
+                    "version": "v22.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/53725",
+                    "description": "Eval now supports experimental type-stripping."
+                  },
+                  {
+                    "version": "v5.11.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/5348",
+                    "description": "Built-in libraries are now available as predefined variables."
+                  }
+                ]
+              },
+              "desc": "<p>将后续参数作为 JavaScript 求值。REPL 中预定义的模块也可以在 <code>script</code> 中使用。</p>\n<p>在 Windows 上，使用 <code>cmd.exe</code> 时单引号无法正常工作，因为它只识别双引号 <code>\"</code> 用于引用。在 Powershell 或 Git bash 中，<code>'</code> 和 <code>\"</code> 都可使用。</p>\n<p>可以运行包含内联类型的代码，除非提供了 <a href=\"#--no-experimental-strip-types\"><code>--no-experimental-strip-types</code></a> 标志。</p>",
+              "type": "module",
+              "displayName": "`-e`, `--eval \"script\"`"
+            },
+            {
+              "textRaw": "`--experimental-addon-modules`",
+              "name": "`--experimental-addon-modules`",
+              "meta": {
+                "added": [
+                  "v23.6.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>启用对 <code>.node</code> 插件的实验性导入支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-addon-modules`"
+            },
+            {
+              "textRaw": "`--experimental-config-file=config`",
+              "name": "`--experimental-config-file=config`",
+              "meta": {
+                "added": [
+                  "v23.10.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>如果存在，Node.js 将在指定路径查找配置文件。Node.js 将读取配置文件并应用设置。配置文件应是一个具有以下结构的 JSON 文件。<code>$schema</code> 中的 <code>vX.Y.Z</code> 必须替换为您使用的 Node.js 版本。</p>\n<pre><code class=\"language-json\">{\n  \"$schema\": \"https://nodejs.org/dist/vX.Y.Z/docs/node-config-schema.json\",\n  \"nodeOptions\": {\n    \"import\": [\n      \"amaro/strip\"\n    ],\n    \"watch-path\": \"src\",\n    \"watch-preserve-output\": true\n  },\n  \"testRunner\": {\n    \"test-isolation\": \"process\"\n  }\n}\n</code></pre>\n<p>配置文件支持特定命名空间的选项：</p>\n<ul>\n<li>\n<p><code>nodeOptions</code> 字段包含在 <a href=\"#node_optionsoptions\"><code>NODE_OPTIONS</code></a> 中允许的 CLI 标志。</p>\n</li>\n<li>\n<p>像 <code>testRunner</code> 这样的命名空间字段包含特定于该子系统的配置。</p>\n</li>\n</ul>\n<p>不支持无操作标志。\n目前并非所有 V8 标志都受支持。</p>\n<p>可以使用 <a href=\"../node-config-schema.json\">官方 JSON 模式</a> 来验证配置文件，这可能因 Node.js 版本而异。配置文件中的每个键对应于可以作为命令行参数传递的标志。键的值是传递给标志的值。</p>\n<p>例如，上面的配置文件等效于以下命令行参数：</p>\n<pre><code class=\"language-bash\">node --import amaro/strip --watch-path=src --watch-preserve-output --test-isolation=process\n</code></pre>\n<p>配置的优先级如下：</p>\n<ol>\n<li>NODE_OPTIONS 和命令行选项</li>\n<li>配置文件</li>\n<li>Dotenv NODE_OPTIONS</li>\n</ol>\n<p>配置文件中的值不会覆盖环境变量和命令行选项中的值，但会覆盖由 <code>--env-file</code> 标志解析的 <code>NODE_OPTIONS</code> 环境文件中的值。</p>\n<p>在同一或不同命名空间中不能重复键。</p>\n<p>如果配置文件包含未知键或不能在命名空间中使用的键，配置解析器将抛出错误。</p>\n<p>Node.js 不会对用户提供的配置进行清理或验证，因此 <strong>绝不</strong> 使用不受信任的配置文件。</p>",
+              "type": "module",
+              "displayName": "`--experimental-config-file=config`"
+            },
+            {
+              "textRaw": "`--experimental-default-config-file`",
+              "name": "`--experimental-default-config-file`",
+              "meta": {
+                "added": [
+                  "v23.10.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>如果存在 <code>--experimental-default-config-file</code> 标志，Node.js 将在当前工作目录中查找 <code>node.config.json</code> 文件并将其作为配置文件加载。</p>",
+              "type": "module",
+              "displayName": "`--experimental-default-config-file`"
+            },
+            {
+              "textRaw": "`--experimental-eventsource`",
+              "name": "`--experimental-eventsource`",
+              "meta": {
+                "added": [
+                  "v22.3.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在全局作用域上启用 <a href=\"https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events\">EventSource Web API</a> 的暴露。</p>",
+              "type": "module",
+              "displayName": "`--experimental-eventsource`"
+            },
+            {
+              "textRaw": "`--experimental-import-meta-resolve`",
+              "name": "`--experimental-import-meta-resolve`",
+              "meta": {
+                "added": [
+                  "v13.9.0",
+                  "v12.16.2"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v20.6.0",
+                      "v18.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/49028",
+                    "description": "synchronous import.meta.resolve made available by default, with the flag retained for enabling the experimental second argument as previously supported."
+                  }
+                ]
+              },
+              "desc": "<p>启用实验性的 <code>import.meta.resolve()</code> 父 URL 支持，允许传递第二个 <code>parentURL</code> 参数用于上下文解析。</p>\n<p>以前控制整个 <code>import.meta.resolve</code> 功能。</p>",
+              "type": "module",
+              "displayName": "`--experimental-import-meta-resolve`"
+            },
+            {
+              "textRaw": "`--experimental-inspector-network-resource`",
+              "name": "`--experimental-inspector-network-resource`",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>启用对检查器网络资源的实验性支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-inspector-network-resource`"
+            },
+            {
+              "textRaw": "`--experimental-loader=module`",
+              "name": "`--experimental-loader=module`",
+              "meta": {
+                "added": [
+                  "v8.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.6.1",
+                      "v22.13.1",
+                      "v20.18.2"
+                    ],
+                    "pr-url": "https://github.com/nodejs-private/node-private/pull/629",
+                    "description": "Using this feature with the permission model enabled requires passing `--allow-worker`."
+                  },
+                  {
+                    "version": "v12.11.1",
+                    "pr-url": "https://github.com/nodejs/node/pull/29752",
+                    "description": "This flag was renamed from `--loader` to `--experimental-loader`."
+                  }
+                ]
+              },
+              "desc": "<blockquote>\n<p>不鼓励使用此标志，并可能在未来的 Node.js 版本中移除。请改用\n<a href=\"module.html#enabling\">带有 <code>register()</code> 的 <code>--import</code></a>。</p>\n</blockquote>\n<p>指定包含导出的 <a href=\"module.html#customization-hooks\">模块自定义钩子</a> 的 <code>module</code>。<code>module</code> 可以是任何被接受为 <a href=\"esm.html#import-specifiers\"><code>import</code> 说明符</a> 的字符串。</p>\n<p>如果与 <a href=\"permissions.html#permission-model\">权限模型</a> 一起使用，此功能需要传递 <code>--allow-worker</code>。</p>",
+              "type": "module",
+              "displayName": "`--experimental-loader=module`"
+            },
+            {
+              "textRaw": "`--experimental-network-inspection`",
+              "name": "`--experimental-network-inspection`",
+              "meta": {
+                "added": [
+                  "v22.6.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>启用与 Chrome DevTools 进行网络检查的实验性支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-network-inspection`"
+            },
+            {
+              "textRaw": "`--experimental-print-required-tla`",
+              "name": "`--experimental-print-required-tla`",
+              "meta": {
+                "added": [
+                  "v22.0.0",
+                  "v20.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果被 <code>require()</code> 的 ES 模块包含顶层 <code>await</code>，此标志允许 Node.js 评估该模块，尝试定位顶层 await，并打印它们的位置以帮助用户找到它们。</p>",
+              "type": "module",
+              "displayName": "`--experimental-print-required-tla`"
+            },
+            {
+              "textRaw": "`--experimental-require-module`",
+              "name": "`--experimental-require-module`",
+              "meta": {
+                "added": [
+                  "v22.0.0",
+                  "v20.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.0.0",
+                      "v22.12.0",
+                      "v20.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/55085",
+                    "description": "This is now true by default."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>支持在 <code>require()</code> 中加载同步的 ES 模块图。</p>\n<p>参见 <a href=\"modules.html#loading-ecmascript-modules-using-require\">使用 <code>require()</code> 加载 ECMAScript 模块</a>。</p>",
+              "type": "module",
+              "displayName": "`--experimental-require-module`"
+            },
+            {
+              "textRaw": "`--experimental-sea-config`",
+              "name": "`--experimental-sea-config`",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>使用此标志生成可以注入到 Node.js 二进制文件中的 blob，以生成 [单一可执行应用程序][]。有关详细信息，请参阅关于 <a href=\"single-executable-applications.html#generating-single-executable-preparation-blobs\">此配置</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--experimental-sea-config`"
+            },
+            {
+              "textRaw": "`--experimental-shadow-realm`",
+              "name": "`--experimental-shadow-realm`",
+              "meta": {
+                "added": [
+                  "v19.0.0",
+                  "v18.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>使用此标志启用 <a href=\"https://github.com/tc39/proposal-shadowrealm\">ShadowRealm</a> 支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-shadow-realm`"
+            },
+            {
+              "textRaw": "`--experimental-test-coverage`",
+              "name": "`--experimental-test-coverage`",
+              "meta": {
+                "added": [
+                  "v19.7.0",
+                  "v18.15.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v20.1.0",
+                      "v18.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/47686",
+                    "description": "This option can be used with `--test`."
+                  }
+                ]
+              },
+              "desc": "<p>与 <code>node:test</code> 模块一起使用时，会生成代码覆盖率报告作为测试运行器输出的一部分。如果没有运行测试，则不会生成覆盖率报告。有关更多详细信息，请参阅关于 <a href=\"test.html#collecting-code-coverage\">从测试收集代码覆盖率</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--experimental-test-coverage`"
+            },
+            {
+              "textRaw": "`--experimental-test-module-mocks`",
+              "name": "`--experimental-test-module-mocks`",
+              "meta": {
+                "added": [
+                  "v22.3.0",
+                  "v20.18.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.6.1",
+                      "v22.13.1",
+                      "v20.18.2"
+                    ],
+                    "pr-url": "https://github.com/nodejs-private/node-private/pull/629",
+                    "description": "Using this feature with the permission model enabled requires passing `--allow-worker`."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>在测试运行器中启用模块模拟。</p>\n<p>如果与 <a href=\"permissions.html#permission-model\">权限模型</a> 一起使用，此功能需要传递 <code>--allow-worker</code>。</p>",
+              "type": "module",
+              "displayName": "`--experimental-test-module-mocks`"
+            },
+            {
+              "textRaw": "`--experimental-transform-types`",
+              "name": "`--experimental-transform-types`",
+              "meta": {
+                "added": [
+                  "v22.7.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".2 - Release candidate",
+              "desc": "<p>启用将仅限 TypeScript 的语法转换为 JavaScript 代码。隐含 <code>--enable-source-maps</code>。</p>",
+              "type": "module",
+              "displayName": "`--experimental-transform-types`"
+            },
+            {
+              "textRaw": "`--experimental-vm-modules`",
+              "name": "`--experimental-vm-modules`",
+              "meta": {
+                "added": [
+                  "v9.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 <code>node:vm</code> 模块中启用实验性的 ES 模块支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-vm-modules`"
+            },
+            {
+              "textRaw": "`--experimental-wasi-unstable-preview1`",
+              "name": "`--experimental-wasi-unstable-preview1`",
+              "meta": {
+                "added": [
+                  "v13.3.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v20.0.0",
+                      "v18.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/47286",
+                    "description": "This option is no longer required as WASI is enabled by default, but can still be passed."
+                  },
+                  {
+                    "version": "v13.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/30980",
+                    "description": "changed from `--experimental-wasi-unstable-preview0` to `--experimental-wasi-unstable-preview1`."
+                  }
+                ]
+              },
+              "desc": "<p>启用实验性的 WebAssembly 系统接口 (WASI) 支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-wasi-unstable-preview1`"
+            },
+            {
+              "textRaw": "`--experimental-webstorage`",
+              "name": "`--experimental-webstorage`",
+              "meta": {
+                "added": [
+                  "v22.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用实验性的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API\"><code>Web Storage</code></a> 支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-webstorage`"
+            },
+            {
+              "textRaw": "`--experimental-worker-inspection`",
+              "name": "`--experimental-worker-inspection`",
+              "meta": {
+                "added": [
+                  "v24.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>启用与 Chrome DevTools 进行工作线程检查的实验性支持。</p>",
+              "type": "module",
+              "displayName": "`--experimental-worker-inspection`"
+            },
+            {
+              "textRaw": "`--expose-gc`",
+              "name": "`--expose-gc`",
+              "meta": {
+                "added": [
+                  "v22.3.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental. This flag is inherited from V8 and is subject to change upstream.",
+              "desc": "<p>此标志将暴露 V8 的 gc 扩展。</p>\n<pre><code class=\"language-js\">if (globalThis.gc) {\n  globalThis.gc();\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "`--expose-gc`"
+            },
+            {
+              "textRaw": "`--force-context-aware`",
+              "name": "`--force-context-aware`",
+              "meta": {
+                "added": [
+                  "v12.12.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>禁止加载非 <a href=\"addons.html#context-aware-addons\">上下文感知</a> 的原生插件。</p>",
+              "type": "module",
+              "displayName": "`--force-context-aware`"
+            },
+            {
+              "textRaw": "`--force-fips`",
+              "name": "`--force-fips`",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在启动时强制启用符合 FIPS 的加密。（无法从脚本代码中禁用。）（与 <code>--enable-fips</code> 的要求相同。）</p>",
+              "type": "module",
+              "displayName": "`--force-fips`"
+            },
+            {
+              "textRaw": "`--force-node-api-uncaught-exceptions-policy`",
+              "name": "`--force-node-api-uncaught-exceptions-policy`",
+              "meta": {
+                "added": [
+                  "v18.3.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 Node-API 异步回调上强制执行 <code>uncaughtException</code> 事件。</p>\n<p>为了防止现有的插件崩溃进程，此标志默认未启用。将来，此标志将默认启用以强制执行正确的行为。</p>",
+              "type": "module",
+              "displayName": "`--force-node-api-uncaught-exceptions-policy`"
+            },
+            {
+              "textRaw": "`--frozen-intrinsics`",
+              "name": "`--frozen-intrinsics`",
+              "meta": {
+                "added": [
+                  "v11.12.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>启用实验性的冻结内置对象，如 <code>Array</code> 和 <code>Object</code>。</p>\n<p>仅支持根上下文。不保证 <code>globalThis.Array</code> 确实是默认的内置对象引用。在此标志下代码可能会中断。</p>\n<p>为了允许添加 polyfill，<a href=\"#-r---require-module\"><code>--require</code></a> 和 <a href=\"#--importmodule\"><code>--import</code></a> 都在冻结内置对象之前运行。</p>",
+              "type": "module",
+              "displayName": "`--frozen-intrinsics`"
+            },
+            {
+              "textRaw": "`--heap-prof`",
+              "name": "`--heap-prof`",
+              "meta": {
+                "added": [
+                  "v12.4.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--heap-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>在启动时启动 V8 堆分析器，并在退出前将堆分析文件写入磁盘。</p>\n<p>如果未指定 <code>--heap-prof-dir</code>，则生成的分析文件将放在当前工作目录中。</p>\n<p>如果未指定 <code>--heap-prof-name</code>，则生成的分析文件命名为 <code>Heap.${yyyymmdd}.${hhmmss}.${pid}.${tid}.${seq}.heapprofile</code>。</p>\n<pre><code class=\"language-console\">$ node --heap-prof index.js\n$ ls *.heapprofile\nHeap.20190409.202950.15293.0.001.heapprofile\n</code></pre>",
+              "type": "module",
+              "displayName": "`--heap-prof`"
+            },
+            {
+              "textRaw": "`--heap-prof-dir`",
+              "name": "`--heap-prof-dir`",
+              "meta": {
+                "added": [
+                  "v12.4.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--heap-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>指定由 <code>--heap-prof</code> 生成的堆分析文件将被放置的目录。</p>\n<p>默认值由 <a href=\"#--diagnostic-dirdirectory\"><code>--diagnostic-dir</code></a> 命令行选项控制。</p>",
+              "type": "module",
+              "displayName": "`--heap-prof-dir`"
+            },
+            {
+              "textRaw": "`--heap-prof-interval`",
+              "name": "`--heap-prof-interval`",
+              "meta": {
+                "added": [
+                  "v12.4.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--heap-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>指定由 <code>--heap-prof</code> 生成的堆分析文件的平均采样间隔（以字节为单位）。默认为 512 * 1024 字节。</p>",
+              "type": "module",
+              "displayName": "`--heap-prof-interval`"
+            },
+            {
+              "textRaw": "`--heap-prof-name`",
+              "name": "`--heap-prof-name`",
+              "meta": {
+                "added": [
+                  "v12.4.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.4.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53343",
+                    "description": "The `--heap-prof` flags are now stable."
+                  }
+                ]
+              },
+              "desc": "<p>指定由 <code>--heap-prof</code> 生成的堆分析文件的文件名。</p>",
+              "type": "module",
+              "displayName": "`--heap-prof-name`"
+            },
+            {
+              "textRaw": "`--heapsnapshot-near-heap-limit=max_count`",
+              "name": "`--heapsnapshot-near-heap-limit=max_count`",
+              "meta": {
+                "added": [
+                  "v15.1.0",
+                  "v14.18.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>当 V8 堆使用量接近堆限制时，将 V8 堆快照写入磁盘。<code>count</code> 应该是一个非负整数（在这种情况下，Node.js 将向磁盘写入不超过 <code>max_count</code> 个快照）。</p>\n<p>生成快照时，可能会触发垃圾回收并降低堆使用量。因此，在 Node.js 实例最终耗尽内存之前，可能会将多个快照写入磁盘。这些堆快照可以进行比较，以确定在连续拍摄快照的时间段内分配了哪些对象。不保证 Node.js 会向磁盘写入恰好 <code>max_count</code> 个快照，但当 <code>max_count</code> 大于 <code>0</code> 时，它会尽力在 Node.js 实例耗尽内存之前生成至少一个且最多 <code>max_count</code> 个快照。</p>\n<p>生成 V8 快照需要时间和内存（V8 堆管理的内存和 V8 堆外部的原生内存）。堆越大，需要的资源就越多。Node.js 将调整 V8 堆以适应额外的 V8 堆内存开销，并尽力避免使用进程可用的所有内存。当进程使用的内存超过系统认为合适的值时，根据系统配置，进程可能会被系统突然终止。</p>\n<pre><code class=\"language-console\">$ node --max-old-space-size=100 --heapsnapshot-near-heap-limit=3 index.js\nWrote snapshot to Heap.20200430.100036.49580.0.001.heapsnapshot\nWrote snapshot to Heap.20200430.100037.49580.0.002.heapsnapshot\nWrote snapshot to Heap.20200430.100038.49580.0.003.heapsnapshot\n\n&#x3C;--- Last few GCs --->\n\n[49580:0x110000000]     4826 ms: Mark-sweep 130.6 (147.8) -> 130.5 (147.8) MB, 27.4 / 0.0 ms  (average mu = 0.126, current mu = 0.034) allocation failure scavenge might not succeed\n[49580:0x110000000]     4845 ms: Mark-sweep 130.6 (147.8) -> 130.6 (147.8) MB, 18.8 / 0.0 ms  (average mu = 0.088, current mu = 0.031) allocation failure scavenge might not succeed\n\n\n&#x3C;--- JS stacktrace --->\n\nFATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory\n....\n</code></pre>",
+              "type": "module",
+              "displayName": "`--heapsnapshot-near-heap-limit=max_count`"
+            },
+            {
+              "textRaw": "`--heapsnapshot-signal=signal`",
+              "name": "`--heapsnapshot-signal=signal`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用一个信号处理程序，当收到指定信号时，导致 Node.js 进程写入堆转储。<code>signal</code> 必须是一个有效的信号名称。默认禁用。</p>\n<pre><code class=\"language-console\">$ node --heapsnapshot-signal=SIGUSR2 index.js &#x26;\n$ ps aux\nUSER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nnode         1  5.5  6.1 787252 247004 ?       Ssl  16:43   0:02 node --heapsnapshot-signal=SIGUSR2 index.js\n$ kill -USR2 1\n$ ls\nHeap.20190718.133405.15554.0.001.heapsnapshot\n</code></pre>",
+              "type": "module",
+              "displayName": "`--heapsnapshot-signal=signal`"
+            },
+            {
+              "textRaw": "`-h`, `--help`",
+              "name": "`-h`,_`--help`",
+              "meta": {
+                "added": [
+                  "v0.1.3"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印节点命令行选项。此选项的输出比本文档更简略。</p>",
+              "type": "module",
+              "displayName": "`-h`, `--help`"
+            },
+            {
+              "textRaw": "`--icu-data-dir=file`",
+              "name": "`--icu-data-dir=file`",
+              "meta": {
+                "added": [
+                  "v0.11.15"
+                ],
+                "changes": []
+              },
+              "desc": "<p>指定 ICU 数据加载路径。（覆盖 <code>NODE_ICU_DATA</code>。）</p>",
+              "type": "module",
+              "displayName": "`--icu-data-dir=file`"
+            },
+            {
+              "textRaw": "`--import=module`",
+              "name": "`--import=module`",
+              "meta": {
+                "added": [
+                  "v19.0.0",
+                  "v18.18.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>在启动时预加载指定的模块。如果多次提供该标志，每个模块将按它们出现的顺序依次执行，从 <a href=\"#node_optionsoptions\"><code>NODE_OPTIONS</code></a> 中提供的模块开始。</p>\n<p>遵循 <a href=\"esm.html#modules-ecmascript-modules\">ECMAScript 模块</a> 解析规则。\n使用 <a href=\"#-r---require-module\"><code>--require</code></a> 加载 <a href=\"modules.html\">CommonJS 模块</a>。\n使用 <code>--require</code> 预加载的模块将在使用 <code>--import</code> 预加载的模块之前运行。</p>\n<p>模块被预加载到主线程以及任何工作线程、分叉进程或集群进程中。</p>",
+              "type": "module",
+              "displayName": "`--import=module`"
+            },
+            {
+              "textRaw": "`--input-type=type`",
+              "name": "`--input-type=type`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v23.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/56350",
+                    "description": "Add support for `-typescript` values."
+                  },
+                  {
+                    "version": [
+                      "v22.7.0",
+                      "v20.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53619",
+                    "description": "ESM syntax detection is enabled by default."
+                  }
+                ]
+              },
+              "desc": "<p>这将配置 Node.js 将 <code>--eval</code> 或 <code>STDIN</code> 输入解释为 CommonJS 或作为 ES 模块。有效值为 <code>\"commonjs\"</code>、<code>\"module\"</code>、<code>\"module-typescript\"</code> 和 <code>\"commonjs-typescript\"</code>。<code>\"-typescript\"</code> 值在使用 <code>--no-experimental-strip-types</code> 标志时不可用。默认无值，或者如果传递了 <code>--no-experimental-detect-module</code> 则为 <code>\"commonjs\"</code>。</p>\n<p>如果未提供 <code>--input-type</code>，Node.js 将尝试通过以下步骤检测语法：</p>\n<ol>\n<li>将输入作为 CommonJS 运行。</li>\n<li>如果步骤 1 失败，将输入作为 ES 模块运行。</li>\n<li>如果步骤 2 因 SyntaxError 失败，则剥离类型。</li>\n<li>如果步骤 3 因错误代码 <a href=\"errors.html#err_unsupported_typescript_syntax\"><code>ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX</code></a> 或 <a href=\"errors.html#err_invalid_typescript_syntax\"><code>ERR_INVALID_TYPESCRIPT_SYNTAX</code></a> 失败，则抛出步骤 2 的错误，包括 TypeScript 错误在消息中，否则作为 CommonJS 运行。</li>\n<li>如果步骤 4 失败，将输入作为 ES 模块运行。</li>\n</ol>\n<p>为了避免多次语法检测的延迟，可以使用 <code>--input-type=type</code> 标志来指定应如何解释 <code>--eval</code> 输入。</p>\n<p>REPL 不支持此选项。将 <code>--input-type=module</code> 与 <a href=\"#-p---print-script\"><code>--print</code></a> 一起使用将抛出错误，因为 <code>--print</code> 不支持 ES 模块语法。</p>",
+              "type": "module",
+              "displayName": "`--input-type=type`"
+            },
+            {
+              "textRaw": "`--insecure-http-parser`",
+              "name": "`--insecure-http-parser`",
+              "meta": {
+                "added": [
+                  "v13.4.0",
+                  "v12.15.0",
+                  "v10.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 HTTP 解析器上启用宽松标志。这可能允许与不符合规范的 HTTP 实现进行互操作。</p>\n<p>启用后，解析器将接受以下内容：</p>\n<ul>\n<li>无效的 HTTP 标头值。</li>\n<li>无效的 HTTP 版本。</li>\n<li>允许消息同时包含 <code>Transfer-Encoding</code> 和 <code>Content-Length</code> 标头。</li>\n<li>当存在 <code>Connection: close</code> 时，允许消息后有额外数据。</li>\n<li>在提供 <code>chunked</code> 后允许额外的传输编码。</li>\n<li>允许使用 <code>\\n</code> 作为令牌分隔符而不是 <code>\\r\\n</code>。</li>\n<li>允许在块后不提供 <code>\\r\\n</code>。</li>\n<li>允许在块大小和 <code>\\r\\n</code> 之间存在空格。</li>\n</ul>\n<p>以上所有内容都会使您的应用程序面临请求走私或投毒攻击。避免使用此选项。</p>\n<!-- Anchor to make sure old links find a target -->\n<p><a id=\"inspector_security\"></a></p>",
+              "modules": [
+                {
+                  "textRaw": "警告：将检查器绑定到公共 IP:端口组合是不安全的",
+                  "name": "警告：将检查器绑定到公共_ip:端口组合是不安全的",
+                  "desc": "<p>将检查器绑定到具有开放端口的公共 IP（包括 <code>0.0.0.0</code>）是不安全的，因为它允许外部主机连接到检查器并执行 <a href=\"https://www.owasp.org/index.php/Code_Injection\">远程代码执行</a> 攻击。</p>\n<p>如果指定了主机，请确保：</p>\n<ul>\n<li>主机无法从公共网络访问。</li>\n<li>防火墙不允许在端口上进行不需要的连接。</li>\n</ul>\n<p><strong>更具体地说，如果端口（默认为 <code>9229</code>）没有防火墙保护，<code>--inspect=0.0.0.0</code> 是不安全的。</strong></p>\n<p>有关更多信息，请参阅 <a href=\"https://nodejs.org/en/docs/guides/debugging-getting-started/#security-implications\">调试安全影响</a> 部分。</p>",
+                  "type": "module",
+                  "displayName": "警告：将检查器绑定到公共 IP:端口组合是不安全的"
+                }
+              ],
+              "type": "module",
+              "displayName": "`--insecure-http-parser`"
+            },
+            {
+              "textRaw": "`--inspect-brk[=[host:]port]`",
+              "name": "`--inspect-brk[=[host:]port]`",
+              "meta": {
+                "added": [
+                  "v7.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 <code>host:port</code> 上激活检查器并在用户脚本开始时中断。默认 <code>host:port</code> 是 <code>127.0.0.1:9229</code>。如果指定了端口 <code>0</code>，将使用随机可用端口。</p>\n<p>有关 Node.js 调试器的进一步说明，请参阅 <a href=\"debugger.html#v8-inspector-integration-for-nodejs\">Node.js 的 V8 检查器集成</a>。</p>",
+              "type": "module",
+              "displayName": "`--inspect-brk[=[host:]port]`"
+            },
+            {
+              "textRaw": "`--inspect-port=[host:]port`",
+              "name": "`--inspect-port=[host:]port`",
+              "meta": {
+                "added": [
+                  "v7.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置检查器激活时使用的 <code>host:port</code>。在通过发送 <code>SIGUSR1</code> 信号激活检查器时很有用。除非传递了 <a href=\"#--disable-sigusr1\"><code>--disable-sigusr1</code></a>。</p>\n<p>默认主机是 <code>127.0.0.1</code>。如果指定了端口 <code>0</code>，将使用随机可用端口。</p>\n<p>请参阅下面关于 <code>host</code> 参数使用的 <a href=\"#warning-binding-inspector-to-a-public-ipport-combination-is-insecure\">安全警告</a>。</p>",
+              "type": "module",
+              "displayName": "`--inspect-port=[host:]port`"
+            },
+            {
+              "textRaw": "`--inspect-publish-uid=stderr,http`",
+              "name": "`--inspect-publish-uid=stderr,http`",
+              "desc": "<p>指定检查器 Web Socket URL 的暴露方式。</p>\n<p>默认情况下，检查器 websocket URL 在 stderr 中可用，并在 <code>http://host:port/json/list</code> 端点下可用。</p>",
+              "type": "module",
+              "displayName": "`--inspect-publish-uid=stderr,http`"
+            },
+            {
+              "textRaw": "`--inspect-wait[=[host:]port]`",
+              "name": "`--inspect-wait[=[host:]port]`",
+              "meta": {
+                "added": [
+                  "v22.2.0",
+                  "v20.15.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 <code>host:port</code> 上激活检查器并等待调试器附加。默认 <code>host:port</code> 是 <code>127.0.0.1:9229</code>。如果指定了端口 <code>0</code>，将使用随机可用端口。</p>\n<p>有关 Node.js 调试器的进一步说明，请参阅 <a href=\"debugger.html#v8-inspector-integration-for-nodejs\">Node.js 的 V8 检查器集成</a>。</p>",
+              "type": "module",
+              "displayName": "`--inspect-wait[=[host:]port]`"
+            },
+            {
+              "textRaw": "`--inspect[=[host:]port]`",
+              "name": "`--inspect[=[host:]port]`",
+              "meta": {
+                "added": [
+                  "v6.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 <code>host:port</code> 上激活检查器。默认为 <code>127.0.0.1:9229</code>。如果指定了端口 <code>0</code>，将使用随机可用端口。</p>\n<p>V8 检查器集成允许工具（如 Chrome DevTools 和 IDE）调试和分析 Node.js 实例。这些工具通过 tcp 端口附加到 Node.js 实例，并使用 <a href=\"https://chromedevtools.github.io/devtools-protocol/\">Chrome DevTools 协议</a> 进行通信。有关 Node.js 调试器的进一步说明，请参阅 <a href=\"debugger.html#v8-inspector-integration-for-nodejs\">Node.js 的 V8 检查器集成</a>。</p>",
+              "type": "module",
+              "displayName": "`--inspect[=[host:]port]`"
+            },
+            {
+              "textRaw": "`-i`, `--interactive`",
+              "name": "`-i`,_`--interactive`",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": []
+              },
+              "desc": "<p>即使标准输入似乎不是终端，也会打开 REPL。</p>",
+              "type": "module",
+              "displayName": "`-i`, `--interactive`"
+            },
+            {
+              "textRaw": "`--jitless`",
+              "name": "`--jitless`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental. This flag is inherited from V8 and is subject to change upstream.",
+              "desc": "<p>禁用 <a href=\"https://v8.dev/blog/jitless\">运行时分配可执行内存</a>。出于安全原因，在某些平台上可能需要这样做。它也可以减少其他平台上的攻击面，但性能影响可能很严重。</p>",
+              "type": "module",
+              "displayName": "`--jitless`"
+            },
+            {
+              "textRaw": "`--localstorage-file=file`",
+              "name": "`--localstorage-file=file`",
+              "meta": {
+                "added": [
+                  "v22.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>用于存储 <code>localStorage</code> 数据的文件。如果文件不存在，则在首次访问 <code>localStorage</code> 时创建。同一文件可能由多个 Node.js 进程并发共享。除非 Node.js 使用 <code>--experimental-webstorage</code> 标志启动，否则此标志无效。</p>",
+              "type": "module",
+              "displayName": "`--localstorage-file=file`"
+            },
+            {
+              "textRaw": "`--max-http-header-size=size`",
+              "name": "`--max-http-header-size=size`",
+              "meta": {
+                "added": [
+                  "v11.6.0",
+                  "v10.15.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v13.13.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/32520",
+                    "description": "Change maximum default size of HTTP headers from 8 KiB to 16 KiB."
+                  }
+                ]
+              },
+              "desc": "<p>指定 HTTP 标头的最大大小（以字节为单位）。默认为 16 KiB。</p>",
+              "type": "module",
+              "displayName": "`--max-http-header-size=size`"
+            },
+            {
+              "textRaw": "`--max-old-space-size-percentage=PERCENTAGE`",
+              "name": "`--max-old-space-size-percentage=percentage`",
+              "desc": "<p>将 V8 旧内存部分的最大内存大小设置为可用系统内存的百分比。当同时指定此标志和 <code>--max-old-space-size</code> 时，此标志优先。</p>\n<p><code>PERCENTAGE</code> 参数必须是一个大于 0 且最多为 100 的数字，表示分配给 V8 堆的可用系统内存的百分比。</p>\n<pre><code class=\"language-bash\"># 使用 50% 的可用系统内存\nnode --max-old-space-size-percentage=50 index.js\n\n# 使用 75% 的可用系统内存\nnode --max-old-space-size-percentage=75 index.js\n</code></pre>",
+              "type": "module",
+              "displayName": "`--max-old-space-size-percentage=PERCENTAGE`"
+            },
+            {
+              "textRaw": "`--napi-modules`",
+              "name": "`--napi-modules`",
+              "meta": {
+                "added": [
+                  "v7.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>此选项无效。为了兼容性而保留。</p>",
+              "type": "module",
+              "displayName": "`--napi-modules`"
+            },
+            {
+              "textRaw": "`--network-family-autoselection-attempt-timeout`",
+              "name": "`--network-family-autoselection-attempt-timeout`",
+              "meta": {
+                "added": [
+                  "v22.1.0",
+                  "v20.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置网络族自动选择尝试超时的默认值。有关更多信息，请参阅 <a href=\"net.html#netgetdefaultautoselectfamilyattempttimeout\"><code>net.getDefaultAutoSelectFamilyAttemptTimeout()</code></a>。</p>",
+              "type": "module",
+              "displayName": "`--network-family-autoselection-attempt-timeout`"
+            },
+            {
+              "textRaw": "`--no-addons`",
+              "name": "`--no-addons`",
+              "meta": {
+                "added": [
+                  "v16.10.0",
+                  "v14.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>禁用 <code>node-addons</code> 导出条件以及禁用加载原生插件。当指定 <code>--no-addons</code> 时，调用 <code>process.dlopen</code> 或 require 原生 C++ 插件将失败并抛出异常。</p>",
+              "type": "module",
+              "displayName": "`--no-addons`"
+            },
+            {
+              "textRaw": "`--no-async-context-frame`",
+              "name": "`--no-async-context-frame`",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>禁用由 <code>AsyncContextFrame</code> 支持的 <a href=\"async_context.html#class-asynclocalstorage\"><code>AsyncLocalStorage</code></a> 的使用，并使用依赖 async_hooks 的先前实现。先前的模型被保留以与 Electron 兼容，并用于上下文流可能不同的情况。但是，如果发现流有差异，请报告。</p>",
+              "type": "module",
+              "displayName": "`--no-async-context-frame`"
+            },
+            {
+              "textRaw": "`--no-deprecation`",
+              "name": "`--no-deprecation`",
+              "meta": {
+                "added": [
+                  "v0.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>静默弃用警告。</p>",
+              "type": "module",
+              "displayName": "`--no-deprecation`"
+            },
+            {
+              "textRaw": "`--no-experimental-detect-module`",
+              "name": "`--no-experimental-detect-module`",
+              "meta": {
+                "added": [
+                  "v21.1.0",
+                  "v20.10.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.7.0",
+                      "v20.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53619",
+                    "description": "Syntax detection is enabled by default."
+                  }
+                ]
+              },
+              "desc": "<p>禁用使用 <a href=\"packages.html#syntax-detection\">语法检测</a> 来确定模块类型。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-detect-module`"
+            },
+            {
+              "textRaw": "`--no-experimental-global-navigator`",
+              "name": "`--no-experimental-global-navigator`",
+              "meta": {
+                "added": [
+                  "v21.2.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>禁止在全局作用域上暴露 <a href=\"globals.html#navigator\">Navigator API</a>。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-global-navigator`"
+            },
+            {
+              "textRaw": "`--no-experimental-repl-await`",
+              "name": "`--no-experimental-repl-await`",
+              "meta": {
+                "added": [
+                  "v16.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>使用此标志禁用 REPL 中的顶层 await。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-repl-await`"
+            },
+            {
+              "textRaw": "`--no-experimental-require-module`",
+              "name": "`--no-experimental-require-module`",
+              "meta": {
+                "added": [
+                  "v22.0.0",
+                  "v20.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.0.0",
+                      "v22.12.0",
+                      "v20.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/55085",
+                    "description": "This is now false by default."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>禁用支持在 <code>require()</code> 中加载同步 ES 模块图。</p>\n<p>参见 <a href=\"modules.html#loading-ecmascript-modules-using-require\">使用 <code>require()</code> 加载 ECMAScript 模块</a>。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-require-module`"
+            },
+            {
+              "textRaw": "`--no-experimental-sqlite`",
+              "name": "`--no-experimental-sqlite`",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.4.0",
+                      "v22.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/55890",
+                    "description": "SQLite is unflagged but still experimental."
+                  }
+                ]
+              },
+              "desc": "<p>禁用实验性的 <a href=\"sqlite.html\"><code>node:sqlite</code></a> 模块。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-sqlite`"
+            },
+            {
+              "textRaw": "`--no-experimental-strip-types`",
+              "name": "`--no-experimental-strip-types`",
+              "meta": {
+                "added": [
+                  "v22.6.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v23.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/56350",
+                    "description": "Type stripping is enabled by default."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".2 - Release candidate",
+              "desc": "<p>禁用对 TypeScript 文件的实验性类型剥离。有关更多信息，请参阅 <a href=\"typescript.html#type-stripping\">TypeScript 类型剥离</a> 文档。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-strip-types`"
+            },
+            {
+              "textRaw": "`--no-experimental-websocket`",
+              "name": "`--no-experimental-websocket`",
+              "meta": {
+                "added": [
+                  "v22.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>禁止在全局作用域上暴露 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/WebSocket\" class=\"type\">&lt;WebSocket&gt;</a>。</p>",
+              "type": "module",
+              "displayName": "`--no-experimental-websocket`"
+            },
+            {
+              "textRaw": "`--no-extra-info-on-fatal-exception`",
+              "name": "`--no-extra-info-on-fatal-exception`",
+              "meta": {
+                "added": [
+                  "v17.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>隐藏导致退出的致命异常的额外信息。</p>",
+              "type": "module",
+              "displayName": "`--no-extra-info-on-fatal-exception`"
+            },
+            {
+              "textRaw": "`--no-force-async-hooks-checks`",
+              "name": "`--no-force-async-hooks-checks`",
+              "meta": {
+                "added": [
+                  "v9.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>禁用对 <code>async_hooks</code> 的运行时检查。当 <code>async_hooks</code> 启用时，这些仍将动态启用。</p>",
+              "type": "module",
+              "displayName": "`--no-force-async-hooks-checks`"
+            },
+            {
+              "textRaw": "`--no-global-search-paths`",
+              "name": "`--no-global-search-paths`",
+              "meta": {
+                "added": [
+                  "v16.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>不从全局路径（如 <code>$HOME/.node_modules</code> 和 <code>$NODE_PATH</code>）搜索模块。</p>",
+              "type": "module",
+              "displayName": "`--no-global-search-paths`"
+            },
+            {
+              "textRaw": "`--no-network-family-autoselection`",
+              "name": "`--no-network-family-autoselection`",
+              "meta": {
+                "added": [
+                  "v19.4.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46790",
+                    "description": "The flag was renamed from `--no-enable-network-family-autoselection` to `--no-network-family-autoselection`. The old name can still work as an alias."
+                  }
+                ]
+              },
+              "desc": "<p>禁用族自动选择算法，除非连接选项显式启用它。</p>",
+              "type": "module",
+              "displayName": "`--no-network-family-autoselection`"
+            },
+            {
+              "textRaw": "`--no-warnings`",
+              "name": "`--no-warnings`",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>静默所有进程警告（包括弃用警告）。</p>",
+              "type": "module",
+              "displayName": "`--no-warnings`"
+            },
+            {
+              "textRaw": "`--node-memory-debug`",
+              "name": "`--node-memory-debug`",
+              "meta": {
+                "added": [
+                  "v15.0.0",
+                  "v14.18.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用对 Node.js 内部内存泄漏的额外调试检查。这通常仅对调试 Node.js 本身的开发人员有用。</p>",
+              "type": "module",
+              "displayName": "`--node-memory-debug`"
+            },
+            {
+              "textRaw": "`--openssl-config=file`",
+              "name": "`--openssl-config=file`",
+              "meta": {
+                "added": [
+                  "v6.9.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在启动时加载 OpenSSL 配置文件。除其他用途外，如果 Node.js 针对启用 FIPS 的 OpenSSL 构建，这可用于启用符合 FIPS 的加密。</p>",
+              "type": "module",
+              "displayName": "`--openssl-config=file`"
+            },
+            {
+              "textRaw": "`--openssl-legacy-provider`",
+              "name": "`--openssl-legacy-provider`",
+              "meta": {
+                "added": [
+                  "v17.0.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用 OpenSSL 3.0 传统提供程序。有关更多信息，请参阅 <a href=\"https://www.openssl.org/docs/man3.0/man7/OSSL_PROVIDER-legacy.html\">OSSL_PROVIDER-legacy</a>。</p>",
+              "type": "module",
+              "displayName": "`--openssl-legacy-provider`"
+            },
+            {
+              "textRaw": "`--openssl-shared-config`",
+              "name": "`--openssl-shared-config`",
+              "meta": {
+                "added": [
+                  "v18.5.0",
+                  "v16.17.0",
+                  "v14.21.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用从 OpenSSL 配置文件中读取默认配置部分 <code>openssl_conf</code>。默认配置文件名为 <code>openssl.cnf</code>，但可以使用环境变量 <code>OPENSSL_CONF</code> 或使用命令行选项 <code>--openssl-config</code> 来更改。默认 OpenSSL 配置文件的位置取决于 OpenSSL 如何链接到 Node.js。共享 OpenSSL 配置可能会有不必要的后果，建议使用特定于 Node.js 的配置部分，即 <code>nodejs_conf</code>，当不使用此选项时，这是默认的。</p>",
+              "type": "module",
+              "displayName": "`--openssl-shared-config`"
+            },
+            {
+              "textRaw": "`--pending-deprecation`",
+              "name": "`--pending-deprecation`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>发出待弃用警告。</p>\n<p>待弃用通常与运行时弃用相同，但显著的区别是它们默认是关闭的，除非设置了 <code>--pending-deprecation</code> 命令行标志或 <code>NODE_PENDING_DEPRECATION=1</code> 环境变量，否则不会发出。待弃用用于提供一种选择性的“早期警告”机制，开发人员可以利用它来检测已弃用的 API 使用情况。</p>",
+              "type": "module",
+              "displayName": "`--pending-deprecation`"
+            },
+            {
+              "textRaw": "`--permission`",
+              "name": "`--permission`",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.5.0",
+                      "v22.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56201",
+                    "description": "Permission Model is now stable."
+                  }
+                ]
+              },
+              "desc": "<p>为当前进程启用权限模型。启用后，以下权限受到限制：</p>\n<ul>\n<li>文件系统 - 可通过 <a href=\"#--allow-fs-read\"><code>--allow-fs-read</code></a>、<a href=\"#--allow-fs-write\"><code>--allow-fs-write</code></a> 标志管理</li>\n<li>子进程 - 可通过 <a href=\"#--allow-child-process\"><code>--allow-child-process</code></a> 标志管理</li>\n<li>工作线程 - 可通过 <a href=\"#--allow-worker\"><code>--allow-worker</code></a> 标志管理</li>\n<li>WASI - 可通过 <a href=\"#--allow-wasi\"><code>--allow-wasi</code></a> 标志管理</li>\n<li>插件 - 可通过 <a href=\"#--allow-addons\"><code>--allow-addons</code></a> 标志管理</li>\n</ul>",
+              "type": "module",
+              "displayName": "`--permission`"
+            },
+            {
+              "textRaw": "`--preserve-symlinks`",
+              "name": "`--preserve-symlinks`",
+              "meta": {
+                "added": [
+                  "v6.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>指示模块加载器在解析和缓存模块时保留符号链接。</p>\n<p>默认情况下，当 Node.js 从符号链接到不同磁盘位置的路径加载模块时，Node.js 将解引用该链接，并使用模块的实际磁盘“真实路径”作为标识符和作为定位其他依赖模块的根路径。在大多数情况下，此默认行为是可接受的。但是，当使用符号链接的对等依赖项时，如下例所示，如果 <code>moduleA</code> 尝试将 <code>moduleB</code> 作为对等依赖项 require，则默认行为会导致抛出异常：</p>\n<pre><code class=\"language-text\">{appDir}\n ├── app\n │   ├── index.js\n │   └── node_modules\n │       ├── moduleA -> {appDir}/moduleA\n │       └── moduleB\n │           ├── index.js\n │           └── package.json\n └── moduleA\n     ├── index.js\n     └── package.json\n</code></pre>\n<p><code>--preserve-symlinks</code> 命令行标志指示 Node.js 对模块使用符号链接路径而不是真实路径，从而可以找到符号链接的对等依赖项。</p>\n<p>但是，请注意，使用 <code>--preserve-symlinks</code> 可能会有其他副作用。具体来说，如果从依赖树中的多个位置链接符号链接的 <em>原生</em> 模块，则这些模块可能无法加载（Node.js 会将它们视为两个单独的模块，并尝试多次加载该模块，导致抛出异常）。</p>\n<p><code>--preserve-symlinks</code> 标志不适用于主模块，这允许 <code>node --preserve-symlinks node_module/.bin/&#x3C;foo></code> 工作。要对主模块应用相同的行为，请同时使用 <code>--preserve-symlinks-main</code>。</p>",
+              "type": "module",
+              "displayName": "`--preserve-symlinks`"
+            },
+            {
+              "textRaw": "`--preserve-symlinks-main`",
+              "name": "`--preserve-symlinks-main`",
+              "meta": {
+                "added": [
+                  "v10.2.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>指示模块加载器在解析和缓存主模块（<code>require.main</code>）时保留符号链接。</p>\n<p>此标志的存在是为了使主模块可以选择加入与 <code>--preserve-symlinks</code> 给予所有其他导入相同的行为；然而，它们是单独的标志，以便与旧版本的 Node.js 向后兼容。</p>\n<p><code>--preserve-symlinks-main</code> 不意味着 <code>--preserve-symlinks</code>；当不希望解析相对路径之前遵循符号链接时，除了 <code>--preserve-symlinks</code> 之外，请使用 <code>--preserve-symlinks-main</code>。</p>\n<p>有关更多信息，请参阅 <a href=\"#--preserve-symlinks\"><code>--preserve-symlinks</code></a>。</p>",
+              "type": "module",
+              "displayName": "`--preserve-symlinks-main`"
+            },
+            {
+              "textRaw": "`-p`, `--print \"script\"`",
+              "name": "`-p`,_`--print_\"script\"`",
+              "meta": {
+                "added": [
+                  "v0.6.4"
+                ],
+                "changes": [
+                  {
+                    "version": "v5.11.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/5348",
+                    "description": "Built-in libraries are now available as predefined variables."
+                  }
+                ]
+              },
+              "desc": "<p>与 <code>-e</code> 相同，但打印结果。</p>",
+              "type": "module",
+              "displayName": "`-p`, `--print \"script\"`"
+            },
+            {
+              "textRaw": "`--prof`",
+              "name": "`--prof`",
+              "meta": {
+                "added": [
+                  "v2.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>生成 V8 分析器输出。</p>",
+              "type": "module",
+              "displayName": "`--prof`"
+            },
+            {
+              "textRaw": "`--prof-process`",
+              "name": "`--prof-process`",
+              "meta": {
+                "added": [
+                  "v5.2.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>处理使用 V8 选项 <code>--prof</code> 生成的 V8 分析器输出。</p>",
+              "type": "module",
+              "displayName": "`--prof-process`"
+            },
+            {
+              "textRaw": "`--redirect-warnings=file`",
+              "name": "`--redirect-warnings=file`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将进程警告写入给定文件而不是打印到 stderr。如果文件不存在，将被创建；如果存在，将被追加。如果尝试将警告写入文件时发生错误，则警告将改为写入 stderr。</p>\n<p><code>file</code> 名称可以是绝对路径。如果不是，它将写入的默认目录由 <a href=\"#--diagnostic-dirdirectory\"><code>--diagnostic-dir</code></a> 命令行选项控制。</p>",
+              "type": "module",
+              "displayName": "`--redirect-warnings=file`"
+            },
+            {
+              "textRaw": "`--report-compact`",
+              "name": "`--report-compact`",
+              "meta": {
+                "added": [
+                  "v13.12.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>以紧凑格式、单行 JSON 写入报告，比旨在供人类阅读的默认多行格式更容易被日志处理系统使用。</p>",
+              "type": "module",
+              "displayName": "`--report-compact`"
+            },
+            {
+              "textRaw": "`--report-dir=directory`, `report-directory=directory`",
+              "name": "`--report-dir=directory`,_`report-directory=directory`",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This option is no longer experimental."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/27312",
+                    "description": "Changed from `--diagnostic-report-directory` to `--report-directory`."
+                  }
+                ]
+              },
+              "desc": "<p>生成报告的位置。</p>",
+              "type": "module",
+              "displayName": "`--report-dir=directory`, `report-directory=directory`"
+            },
+            {
+              "textRaw": "`--report-exclude-env`",
+              "name": "`--report-exclude-env`",
+              "meta": {
+                "added": [
+                  "v23.3.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当传递 <code>--report-exclude-env</code> 时，生成的诊断报告将不包含 <code>environmentVariables</code> 数据。</p>",
+              "type": "module",
+              "displayName": "`--report-exclude-env`"
+            },
+            {
+              "textRaw": "`--report-exclude-network`",
+              "name": "`--report-exclude-network`",
+              "meta": {
+                "added": [
+                  "v22.0.0",
+                  "v20.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>从诊断报告中排除 <code>header.networkInterfaces</code>。默认情况下未设置此选项，并且网络接口被包括在内。</p>",
+              "type": "module",
+              "displayName": "`--report-exclude-network`"
+            },
+            {
+              "textRaw": "`--report-filename=filename`",
+              "name": "`--report-filename=filename`",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This option is no longer experimental."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/27312",
+                    "description": "changed from `--diagnostic-report-filename` to `--report-filename`."
+                  }
+                ]
+              },
+              "desc": "<p>报告将写入的文件名。</p>\n<p>如果文件名设置为 <code>'stdout'</code> 或 <code>'stderr'</code>，则报告将分别写入进程的 stdout 或 stderr。</p>",
+              "type": "module",
+              "displayName": "`--report-filename=filename`"
+            },
+            {
+              "textRaw": "`--report-on-fatalerror`",
+              "name": "`--report-on-fatalerror`",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v14.0.0",
+                      "v13.14.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32496",
+                    "description": "This option is no longer experimental."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/27312",
+                    "description": "changed from `--diagnostic-report-on-fatalerror` to `--report-on-fatalerror`."
+                  }
+                ]
+              },
+              "desc": "<p>在致命错误（Node.js 运行时内部错误，如内存不足）导致应用程序终止时触发报告。用于检查各种诊断数据元素（如堆、栈、事件循环状态、资源消耗等）以推理致命错误。</p>",
+              "type": "module",
+              "displayName": "`--report-on-fatalerror`"
+            },
+            {
+              "textRaw": "`--report-on-signal`",
+              "name": "`--report-on-signal`",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This option is no longer experimental."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/27312",
+                    "description": "changed from `--diagnostic-report-on-signal` to `--report-on-signal`."
+                  }
+                ]
+              },
+              "desc": "<p>在接收到指定（或预定义）信号给运行的 Node.js 进程时生成报告。触发报告的信号通过 <code>--report-signal</code> 指定。</p>",
+              "type": "module",
+              "displayName": "`--report-on-signal`"
+            },
+            {
+              "textRaw": "`--report-signal=signal`",
+              "name": "`--report-signal=signal`",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This option is no longer experimental."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/27312",
+                    "description": "changed from `--diagnostic-report-signal` to `--report-signal`."
+                  }
+                ]
+              },
+              "desc": "<p>设置或重置用于报告生成的信号（Windows 上不支持）。默认信号是 <code>SIGUSR2</code>。</p>",
+              "type": "module",
+              "displayName": "`--report-signal=signal`"
+            },
+            {
+              "textRaw": "`--report-uncaught-exception`",
+              "name": "`--report-uncaught-exception`",
+              "meta": {
+                "added": [
+                  "v11.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v18.8.0",
+                      "v16.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/44208",
+                    "description": "Report is not generated if the uncaught exception is handled."
+                  },
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32242",
+                    "description": "This option is no longer experimental."
+                  },
+                  {
+                    "version": "v12.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/27312",
+                    "description": "changed from `--diagnostic-report-uncaught-exception` to `--report-uncaught-exception`."
+                  }
+                ]
+              },
+              "desc": "<p>当进程由于未捕获的异常退出时启用报告生成。在与原生栈和其他运行时环境数据结合检查 JavaScript 栈时非常有用。</p>",
+              "type": "module",
+              "displayName": "`--report-uncaught-exception`"
+            },
+            {
+              "textRaw": "`-r`, `--require module`",
+              "name": "`-r`,_`--require_module`",
+              "meta": {
+                "added": [
+                  "v1.6.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.0.0",
+                      "v22.12.0",
+                      "v20.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/51977",
+                    "description": "This option also supports ECMAScript module."
+                  }
+                ]
+              },
+              "desc": "<p>在启动时预加载指定的模块。</p>\n<p>遵循 <code>require()</code> 的模块解析规则。<code>module</code> 可以是文件路径，也可以是节点模块名称。</p>\n<p>使用 <code>--require</code> 预加载的模块将在使用 <code>--import</code> 预加载的模块之前运行。</p>\n<p>模块被预加载到主线程以及任何工作线程、分叉进程或集群进程中。</p>",
+              "type": "module",
+              "displayName": "`-r`, `--require module`"
+            },
+            {
+              "textRaw": "`--run`",
+              "name": "`--run`",
+              "meta": {
+                "added": [
+                  "v22.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v22.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/53032",
+                    "description": "NODE_RUN_SCRIPT_NAME environment variable is added."
+                  },
+                  {
+                    "version": "v22.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/53058",
+                    "description": "NODE_RUN_PACKAGE_JSON_PATH environment variable is added."
+                  },
+                  {
+                    "version": "v22.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/53154",
+                    "description": "Traverses up to the root directory and finds a `package.json` file to run the command from, and updates `PATH` environment variable accordingly."
+                  }
+                ]
+              },
+              "desc": "<p>这从 package.json 的 <code>\"scripts\"</code> 对象运行指定的命令。如果提供了不存在的 <code>\"command\"</code>，它将列出可用的脚本。</p>\n<p><code>--run</code> 将遍历到根目录并找到一个 <code>package.json</code> 文件来运行命令。</p>\n<p><code>--run</code> 为当前目录的每个祖先将 <code>./node_modules/.bin</code> 添加到 <code>PATH</code>，以便在存在多个 <code>node_modules</code> 目录的不同文件夹中执行二进制文件，如果 <code>ancestor-folder/node_modules/.bin</code> 是一个目录。</p>\n<p><code>--run</code> 在包含相关 <code>package.json</code> 的目录中执行命令。</p>\n<p>例如，以下命令将运行当前文件夹中 <code>package.json</code> 的 <code>test</code> 脚本：</p>\n<pre><code class=\"language-console\">$ node --run test\n</code></pre>\n<p>您还可以向命令传递参数。<code>--</code> 之后的任何参数将附加到脚本：</p>\n<pre><code class=\"language-console\">$ node --run test -- --verbose\n</code></pre>",
+              "modules": [
+                {
+                  "textRaw": "有意限制",
+                  "name": "有意限制",
+                  "desc": "<p><code>node --run</code> 并不意味着匹配 <code>npm run</code> 或其他包管理器的 <code>run</code> 命令的行为。Node.js 的实现有意更有限，以便专注于最常见用例的顶级性能。\n其他 <code>run</code> 实现中故意排除的一些功能是：</p>\n<ul>\n<li>除了指定的脚本外，还运行 <code>pre</code> 或 <code>post</code> 脚本。</li>\n<li>定义包管理器特定的环境变量。</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "有意限制"
+                },
+                {
+                  "textRaw": "环境变量",
+                  "name": "环境变量",
+                  "desc": "<p>使用 <code>--run</code> 运行脚本时会设置以下环境变量：</p>\n<ul>\n<li><code>NODE_RUN_SCRIPT_NAME</code>：正在运行的脚本的名称。例如，如果使用 <code>--run</code> 运行 <code>test</code>，则此变量的值将为 <code>test</code>。</li>\n<li><code>NODE_RUN_PACKAGE_JSON_PATH</code>：正在处理的 <code>package.json</code> 的路径。</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "环境变量"
+                }
+              ],
+              "type": "module",
+              "displayName": "`--run`"
+            },
+            {
+              "textRaw": "`--secure-heap-min=n`",
+              "name": "`--secure-heap-min=n`",
+              "meta": {
+                "added": [
+                  "v15.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当使用 <code>--secure-heap</code> 时，<code>--secure-heap-min</code> 标志指定从安全堆分配的最小值。最小值为 <code>2</code>。最大值是 <code>--secure-heap</code> 或 <code>2147483647</code> 中的较小者。给定的值必须是 2 的幂。</p>",
+              "type": "module",
+              "displayName": "`--secure-heap-min=n`"
+            },
+            {
+              "textRaw": "`--secure-heap=n`",
+              "name": "`--secure-heap=n`",
+              "meta": {
+                "added": [
+                  "v15.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>初始化一个 <code>n</code> 字节的 OpenSSL 安全堆。初始化后，在密钥生成和其他操作期间，OpenSSL 会将安全堆用于选定类型的分配。例如，这有助于防止敏感信息因指针溢出或不足而泄漏。</p>\n<p>安全堆是固定大小的，无法在运行时调整大小，因此，如果使用，选择足够大的堆以覆盖所有应用程序用途非常重要。</p>\n<p>给定的堆大小必须是 2 的幂。任何小于 2 的值将禁用安全堆。</p>\n<p>安全堆默认禁用。</p>\n<p>安全堆在 Windows 上不可用。</p>\n<p>有关更多详细信息，请参阅 <a href=\"https://www.openssl.org/docs/man3.0/man3/CRYPTO_secure_malloc_init.html\"><code>CRYPTO_secure_malloc_init</code></a>。</p>",
+              "type": "module",
+              "displayName": "`--secure-heap=n`"
+            },
+            {
+              "textRaw": "`--snapshot-blob=path`",
+              "name": "`--snapshot-blob=path`",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>与 <code>--build-snapshot</code> 一起使用时，<code>--snapshot-blob</code> 指定生成的快照 blob 写入的路径。如果未指定，生成的 blob 将写入当前工作目录中的 <code>snapshot.blob</code>。</p>\n<p>不与 <code>--build-snapshot</code> 一起使用时，<code>--snapshot-blob</code> 指定用于恢复应用程序状态的 blob 的路径。</p>\n<p>加载快照时，Node.js 会检查：</p>\n<ol>\n<li>运行的 Node.js 二进制文件的版本、架构和平台与生成快照的二进制文件完全相同。</li>\n<li>V8 标志和 CPU 功能与生成快照的二进制文件兼容。</li>\n</ol>\n<p>如果它们不匹配，Node.js 拒绝加载快照并以状态码 1 退出。</p>",
+              "type": "module",
+              "displayName": "`--snapshot-blob=path`"
+            },
+            {
+              "textRaw": "`--test`",
+              "name": "`--test`",
+              "meta": {
+                "added": [
+                  "v18.1.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46983",
+                    "description": "The test runner is now stable."
+                  },
+                  {
+                    "version": [
+                      "v19.2.0",
+                      "v18.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/45214",
+                    "description": "Test runner now supports running in watch mode."
+                  }
+                ]
+              },
+              "desc": "<p>启动 Node.js 命令行测试运行器。此标志不能与 <code>--watch-path</code>、<code>--check</code>、<code>--eval</code>、<code>--interactive</code> 或检查器结合使用。有关更多详细信息，请参阅关于 <a href=\"test.html#running-tests-from-the-command-line\">从命令行运行测试</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--test`"
+            },
+            {
+              "textRaw": "`--test-concurrency`",
+              "name": "`--test-concurrency`",
+              "meta": {
+                "added": [
+                  "v21.0.0",
+                  "v20.10.0",
+                  "v18.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>测试运行器 CLI 将并发执行的最大测试文件数。如果 <code>--test-isolation</code> 设置为 <code>'none'</code>，则忽略此标志，并发性为一。否则，并发性默认为 <code>os.availableParallelism() - 1</code>。</p>",
+              "type": "module",
+              "displayName": "`--test-concurrency`"
+            },
+            {
+              "textRaw": "`--test-coverage-branches=threshold`",
+              "name": "`--test-coverage-branches=threshold`",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>要求覆盖分支的最小百分比。如果代码覆盖率未达到指定的阈值，进程将以代码 <code>1</code> 退出。</p>",
+              "type": "module",
+              "displayName": "`--test-coverage-branches=threshold`"
+            },
+            {
+              "textRaw": "`--test-coverage-exclude`",
+              "name": "`--test-coverage-exclude`",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>使用 glob 模式从代码覆盖率中排除特定文件，该模式可以匹配绝对和相对文件路径。</p>\n<p>此选项可以指定多次以排除多个 glob 模式。</p>\n<p>如果同时提供了 <code>--test-coverage-exclude</code> 和 <code>--test-coverage-include</code>，文件必须满足 <strong>两者</strong> 标准才能包含在覆盖率报告中。</p>\n<p>默认情况下，所有匹配的测试文件都从覆盖率报告中排除。指定此选项将覆盖默认行为。</p>",
+              "type": "module",
+              "displayName": "`--test-coverage-exclude`"
+            },
+            {
+              "textRaw": "`--test-coverage-functions=threshold`",
+              "name": "`--test-coverage-functions=threshold`",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>要求覆盖函数的最小百分比。如果代码覆盖率未达到指定的阈值，进程将以代码 <code>1</code> 退出。</p>",
+              "type": "module",
+              "displayName": "`--test-coverage-functions=threshold`"
+            },
+            {
+              "textRaw": "`--test-coverage-include`",
+              "name": "`--test-coverage-include`",
+              "meta": {
+                "added": [
+                  "v22.5.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>使用 glob 模式在代码覆盖率中包含特定文件，该模式可以匹配绝对和相对文件路径。</p>\n<p>此选项可以指定多次以包含多个 glob 模式。</p>\n<p>如果同时提供了 <code>--test-coverage-exclude</code> 和 <code>--test-coverage-include</code>，文件必须满足 <strong>两者</strong> 标准才能包含在覆盖率报告中。</p>",
+              "type": "module",
+              "displayName": "`--test-coverage-include`"
+            },
+            {
+              "textRaw": "`--test-coverage-lines=threshold`",
+              "name": "`--test-coverage-lines=threshold`",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "desc": "<p>要求覆盖行的最小百分比。如果代码覆盖率未达到指定的阈值，进程将以代码 <code>1</code> 退出。</p>",
+              "type": "module",
+              "displayName": "`--test-coverage-lines=threshold`"
+            },
+            {
+              "textRaw": "`--test-force-exit`",
+              "name": "`--test-force-exit`",
+              "meta": {
+                "added": [
+                  "v22.0.0",
+                  "v20.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>配置测试运行器在所有已知测试执行完成后退出进程，即使事件循环本应保持活动状态。</p>",
+              "type": "module",
+              "displayName": "`--test-force-exit`"
+            },
+            {
+              "textRaw": "`--test-global-setup=module`",
+              "name": "`--test-global-setup=module`",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".0 - Early development",
+              "desc": "<p>指定一个在所有测试执行之前将被评估的模块，并可用于为测试设置全局状态或固定装置。</p>\n<p>有关更多详细信息，请参阅关于 <a href=\"test.html#global-setup-and-teardown\">全局设置和拆卸</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--test-global-setup=module`"
+            },
+            {
+              "textRaw": "`--test-isolation=mode`",
+              "name": "`--test-isolation=mode`",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v23.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/56298",
+                    "description": "This flag was renamed from `--experimental-test-isolation` to `--test-isolation`."
+                  }
+                ]
+              },
+              "desc": "<p>配置测试运行器中使用的测试隔离类型。当 <code>mode</code> 为 <code>'process'</code> 时，每个测试文件在单独的子进程中运行。当 <code>mode</code> 为 <code>'none'</code> 时，所有测试文件在与测试运行器相同的进程中运行。默认的隔离模式是 <code>'process'</code>。如果不存在 <code>--test</code> 标志，则忽略此标志。有关更多信息，请参阅 <a href=\"test.html#test-runner-execution-model\">测试运行器执行模型</a> 部分。</p>",
+              "type": "module",
+              "displayName": "`--test-isolation=mode`"
+            },
+            {
+              "textRaw": "`--test-name-pattern`",
+              "name": "`--test-name-pattern`",
+              "meta": {
+                "added": [
+                  "v18.11.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46983",
+                    "description": "The test runner is now stable."
+                  }
+                ]
+              },
+              "desc": "<p>一个正则表达式，配置测试运行器仅执行名称与提供模式匹配的测试。有关更多详细信息，请参阅关于 <a href=\"test.html#filtering-tests-by-name\">按名称过滤测试</a> 的文档。</p>\n<p>如果同时提供了 <code>--test-name-pattern</code> 和 <code>--test-skip-pattern</code>，测试必须满足 <strong>两者</strong> 要求才能被执行。</p>",
+              "type": "module",
+              "displayName": "`--test-name-pattern`"
+            },
+            {
+              "textRaw": "`--test-only`",
+              "name": "`--test-only`",
+              "meta": {
+                "added": [
+                  "v18.0.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46983",
+                    "description": "The test runner is now stable."
+                  }
+                ]
+              },
+              "desc": "<p>配置测试运行器仅执行设置了 <code>only</code> 选项的顶层测试。当禁用测试隔离时，不需要此标志。</p>",
+              "type": "module",
+              "displayName": "`--test-only`"
+            },
+            {
+              "textRaw": "`--test-reporter`",
+              "name": "`--test-reporter`",
+              "meta": {
+                "added": [
+                  "v19.6.0",
+                  "v18.15.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46983",
+                    "description": "The test runner is now stable."
+                  }
+                ]
+              },
+              "desc": "<p>运行测试时使用的测试报告器。有关更多详细信息，请参阅关于 <a href=\"test.html#test-reporters\">测试报告器</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--test-reporter`"
+            },
+            {
+              "textRaw": "`--test-reporter-destination`",
+              "name": "`--test-reporter-destination`",
+              "meta": {
+                "added": [
+                  "v19.6.0",
+                  "v18.15.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46983",
+                    "description": "The test runner is now stable."
+                  }
+                ]
+              },
+              "desc": "<p>相应测试报告器的目标。有关更多详细信息，请参阅关于 <a href=\"test.html#test-reporters\">测试报告器</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--test-reporter-destination`"
+            },
+            {
+              "textRaw": "`--test-rerun-failures`",
+              "name": "`--test-rerun-failures`",
+              "meta": {
+                "added": [
+                  "v24.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一个文件的路径，允许测试运行器在运行之间持久化测试套件的状态。测试运行器将使用此文件来确定哪些测试已经成功或失败，允许重新运行失败的测试而无需重新运行整个测试套件。如果该文件不存在，测试运行器将创建它。有关更多详细信息，请参阅关于 <a href=\"test.html#rerunning-failed-tests\">测试重新运行</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`--test-rerun-failures`"
+            },
+            {
+              "textRaw": "`--test-shard`",
+              "name": "`--test-shard`",
+              "meta": {
+                "added": [
+                  "v20.5.0",
+                  "v18.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>要执行的测试套件分片，格式为 <code>&#x3C;index>/&#x3C;total></code>，其中</p>\n<ul>\n<li><code>index</code> 是一个正整数，表示划分部分的索引。</li>\n<li><code>total</code> 是一个正整数，表示划分部分的总数。</li>\n</ul>\n<p>此命令将把所有测试文件分成 <code>total</code> 个相等的部分，并且只运行恰好位于 <code>index</code> 部分中的那些。</p>\n<p>例如，要将测试套件分成三个部分，请使用：</p>\n<pre><code class=\"language-bash\">node --test --test-shard=1/3\nnode --test --test-shard=2/3\nnode --test --test-shard=3/3\n</code></pre>",
+              "type": "module",
+              "displayName": "`--test-shard`"
+            },
+            {
+              "textRaw": "`--test-skip-pattern`",
+              "name": "`--test-skip-pattern`",
+              "meta": {
+                "added": [
+                  "v22.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一个正则表达式，配置测试运行器跳过名称与提供模式匹配的测试。有关更多详细信息，请参阅关于 <a href=\"test.html#filtering-tests-by-name\">按名称过滤测试</a> 的文档。</p>\n<p>如果同时提供了 <code>--test-name-pattern</code> 和 <code>--test-skip-pattern</code>，测试必须满足 <strong>两者</strong> 要求才能被执行。</p>",
+              "type": "module",
+              "displayName": "`--test-skip-pattern`"
+            },
+            {
+              "textRaw": "`--test-timeout`",
+              "name": "`--test-timeout`",
+              "meta": {
+                "added": [
+                  "v21.2.0",
+                  "v20.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>测试执行将在多少毫秒后失败。如果未指定，子测试从其父级继承此值。默认值为 <code>Infinity</code>。</p>",
+              "type": "module",
+              "displayName": "`--test-timeout`"
+            },
+            {
+              "textRaw": "`--test-update-snapshots`",
+              "name": "`--test-update-snapshots`",
+              "meta": {
+                "added": [
+                  "v22.3.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.4.0",
+                      "v22.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/55897",
+                    "description": "Snapshot testing is no longer experimental."
+                  }
+                ]
+              },
+              "desc": "<p>重新生成测试运行器用于 <a href=\"test.html#snapshot-testing\">快照测试</a> 的快照文件。</p>",
+              "type": "module",
+              "displayName": "`--test-update-snapshots`"
+            },
+            {
+              "textRaw": "`--throw-deprecation`",
+              "name": "`--throw-deprecation`",
+              "meta": {
+                "added": [
+                  "v0.11.14"
+                ],
+                "changes": []
+              },
+              "desc": "<p>对弃用抛出错误。</p>",
+              "type": "module",
+              "displayName": "`--throw-deprecation`"
+            },
+            {
+              "textRaw": "`--title=title`",
+              "name": "`--title=title`",
+              "meta": {
+                "added": [
+                  "v10.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在启动时设置 <code>process.title</code>。</p>",
+              "type": "module",
+              "displayName": "`--title=title`"
+            },
+            {
+              "textRaw": "`--tls-cipher-list=list`",
+              "name": "`--tls-cipher-list=list`",
+              "meta": {
+                "added": [
+                  "v4.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>指定替代的默认 TLS 密码套件列表。要求 Node.js 构建时支持加密（默认）。</p>",
+              "type": "module",
+              "displayName": "`--tls-cipher-list=list`"
+            },
+            {
+              "textRaw": "`--tls-keylog=file`",
+              "name": "`--tls-keylog=file`",
+              "meta": {
+                "added": [
+                  "v13.2.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将 TLS 密钥材料记录到文件。密钥材料采用 NSS <code>SSLKEYLOGFILE</code> 格式，可供软件（如 Wireshark）用于解密 TLS 流量。</p>",
+              "type": "module",
+              "displayName": "`--tls-keylog=file`"
+            },
+            {
+              "textRaw": "`--tls-max-v1.2`",
+              "name": "`--tls-max-v1.2`",
+              "meta": {
+                "added": [
+                  "v12.0.0",
+                  "v10.20.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将 <a href=\"tls.html#tlsdefault_max_version\"><code>tls.DEFAULT_MAX_VERSION</code></a> 设置为 'TLSv1.2'。用于禁用对 TLSv1.3 的支持。</p>",
+              "type": "module",
+              "displayName": "`--tls-max-v1.2`"
+            },
+            {
+              "textRaw": "`--tls-max-v1.3`",
+              "name": "`--tls-max-v1.3`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将默认 <a href=\"tls.html#tlsdefault_max_version\"><code>tls.DEFAULT_MAX_VERSION</code></a> 设置为 'TLSv1.3'。用于启用对 TLSv1.3 的支持。</p>",
+              "type": "module",
+              "displayName": "`--tls-max-v1.3`"
+            },
+            {
+              "textRaw": "`--tls-min-v1.0`",
+              "name": "`--tls-min-v1.0`",
+              "meta": {
+                "added": [
+                  "v12.0.0",
+                  "v10.20.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将默认 <a href=\"tls.html#tlsdefault_min_version\"><code>tls.DEFAULT_MIN_VERSION</code></a> 设置为 'TLSv1'。用于与旧的 TLS 客户端或服务器兼容。</p>",
+              "type": "module",
+              "displayName": "`--tls-min-v1.0`"
+            },
+            {
+              "textRaw": "`--tls-min-v1.1`",
+              "name": "`--tls-min-v1.1`",
+              "meta": {
+                "added": [
+                  "v12.0.0",
+                  "v10.20.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将默认 <a href=\"tls.html#tlsdefault_min_version\"><code>tls.DEFAULT_MIN_VERSION</code></a> 设置为 'TLSv1.1'。用于与旧的 TLS 客户端或服务器兼容。</p>",
+              "type": "module",
+              "displayName": "`--tls-min-v1.1`"
+            },
+            {
+              "textRaw": "`--tls-min-v1.2`",
+              "name": "`--tls-min-v1.2`",
+              "meta": {
+                "added": [
+                  "v12.2.0",
+                  "v10.20.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将默认 <a href=\"tls.html#tlsdefault_min_version\"><code>tls.DEFAULT_MIN_VERSION</code></a> 设置为 'TLSv1.2'。这是 12.x 及更高版本的默认值，但为了与旧版本的 Node.js 兼容，支持此选项。</p>",
+              "type": "module",
+              "displayName": "`--tls-min-v1.2`"
+            },
+            {
+              "textRaw": "`--tls-min-v1.3`",
+              "name": "`--tls-min-v1.3`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将默认 <a href=\"tls.html#tlsdefault_min_version\"><code>tls.DEFAULT_MIN_VERSION</code></a> 设置为 'TLSv1.3'。用于禁用对 TLSv1.2 的支持，因为 TLSv1.3 不如 TLSv1.3 安全。</p>",
+              "type": "module",
+              "displayName": "`--tls-min-v1.3`"
+            },
+            {
+              "textRaw": "`--trace-deprecation`",
+              "name": "`--trace-deprecation`",
+              "meta": {
+                "added": [
+                  "v0.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印弃用的堆栈跟踪。</p>",
+              "type": "module",
+              "displayName": "`--trace-deprecation`"
+            },
+            {
+              "textRaw": "`--trace-env`",
+              "name": "`--trace-env`",
+              "meta": {
+                "added": [
+                  "v23.4.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印当前 Node.js 实例中完成的任何环境变量访问的信息到 stderr，包括：</p>\n<ul>\n<li>Node.js 内部完成的环境变量读取。</li>\n<li>形式为 <code>process.env.KEY = \"SOME VALUE\"</code> 的写入。</li>\n<li>形式为 <code>process.env.KEY</code> 的读取。</li>\n<li>形式为 <code>Object.defineProperty(process.env, 'KEY', {...})</code> 的定义。</li>\n<li>形式为 <code>Object.hasOwn(process.env, 'KEY')</code>、<code>process.env.hasOwnProperty('KEY')</code> 或 <code>'KEY' in process.env</code> 的查询。</li>\n<li>形式为 <code>delete process.env.KEY</code> 的删除。</li>\n<li>形式为 <code>...process.env</code> 或 <code>Object.keys(process.env)</code> 的枚举。</li>\n</ul>\n<p>仅打印被访问的环境变量的名称。不打印值。</p>\n<p>要打印访问的堆栈跟踪，请使用 <code>--trace-env-js-stack</code> 和/或 <code>--trace-env-native-stack</code>。</p>",
+              "type": "module",
+              "displayName": "`--trace-env`"
+            },
+            {
+              "textRaw": "`--trace-env-js-stack`",
+              "name": "`--trace-env-js-stack`",
+              "meta": {
+                "added": [
+                  "v23.4.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>除了 <code>--trace-env</code> 的功能外，还打印访问的 JavaScript 堆栈跟踪。</p>",
+              "type": "module",
+              "displayName": "`--trace-env-js-stack`"
+            },
+            {
+              "textRaw": "`--trace-env-native-stack`",
+              "name": "`--trace-env-native-stack`",
+              "meta": {
+                "added": [
+                  "v23.4.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>除了 <code>--trace-env</code> 的功能外，还打印访问的原生堆栈跟踪。</p>",
+              "type": "module",
+              "displayName": "`--trace-env-native-stack`"
+            },
+            {
+              "textRaw": "`--trace-event-categories`",
+              "name": "`--trace-event-categories`",
+              "meta": {
+                "added": [
+                  "v7.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当使用 <code>--trace-events-enabled</code> 启用跟踪事件跟踪时，应跟踪的逗号分隔的类别列表。</p>",
+              "type": "module",
+              "displayName": "`--trace-event-categories`"
+            },
+            {
+              "textRaw": "`--trace-event-file-pattern`",
+              "name": "`--trace-event-file-pattern`",
+              "meta": {
+                "added": [
+                  "v9.8.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>指定跟踪事件数据的文件路径的模板字符串，它支持 <code>${rotation}</code> 和 <code>${pid}</code>。</p>",
+              "type": "module",
+              "displayName": "`--trace-event-file-pattern`"
+            },
+            {
+              "textRaw": "`--trace-events-enabled`",
+              "name": "`--trace-events-enabled`",
+              "meta": {
+                "added": [
+                  "v7.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>启用跟踪事件跟踪信息的收集。</p>",
+              "type": "module",
+              "displayName": "`--trace-events-enabled`"
+            },
+            {
+              "textRaw": "`--trace-exit`",
+              "name": "`--trace-exit`",
+              "meta": {
+                "added": [
+                  "v13.5.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>每当环境主动退出时打印堆栈跟踪，即调用 <code>process.exit()</code>。</p>",
+              "type": "module",
+              "displayName": "`--trace-exit`"
+            },
+            {
+              "textRaw": "`--trace-require-module=mode`",
+              "name": "`--trace-require-module=mode`",
+              "meta": {
+                "added": [
+                  "v23.5.0",
+                  "v22.13.0",
+                  "v20.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印有关 <a href=\"modules.html#loading-ecmascript-modules-using-require\">使用 <code>require()</code> 加载 ECMAScript 模块</a> 的使用信息。</p>\n<p>当 <code>mode</code> 为 <code>all</code> 时，打印所有使用情况。当 <code>mode</code> 为 <code>no-node-modules</code> 时，排除来自 <code>node_modules</code> 文件夹的使用情况。</p>",
+              "type": "module",
+              "displayName": "`--trace-require-module=mode`"
+            },
+            {
+              "textRaw": "`--trace-sigint`",
+              "name": "`--trace-sigint`",
+              "meta": {
+                "added": [
+                  "v13.9.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在 SIGINT 上打印堆栈跟踪。</p>",
+              "type": "module",
+              "displayName": "`--trace-sigint`"
+            },
+            {
+              "textRaw": "`--trace-sync-io`",
+              "name": "`--trace-sync-io`",
+              "meta": {
+                "added": [
+                  "v2.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在事件循环的第一轮之后检测到同步 I/O 时打印堆栈跟踪。</p>",
+              "type": "module",
+              "displayName": "`--trace-sync-io`"
+            },
+            {
+              "textRaw": "`--trace-tls`",
+              "name": "`--trace-tls`",
+              "meta": {
+                "added": [
+                  "v12.2.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>将 TLS 数据包跟踪信息打印到 <code>stderr</code>。这可用于调试 TLS 连接问题。</p>",
+              "type": "module",
+              "displayName": "`--trace-tls`"
+            },
+            {
+              "textRaw": "`--trace-uncaught`",
+              "name": "`--trace-uncaught`",
+              "meta": {
+                "added": [
+                  "v13.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印未捕获异常的堆栈跟踪；通常，打印与创建 <code>Error</code> 相关的堆栈跟踪，而此选项使 Node.js 也打印与抛出值相关的堆栈跟踪（该值不需要是 <code>Error</code> 实例）。</p>\n<p>启用此选项可能会对垃圾回收行为产生负面影响。</p>",
+              "type": "module",
+              "displayName": "`--trace-uncaught`"
+            },
+            {
+              "textRaw": "`--trace-warnings`",
+              "name": "`--trace-warnings`",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印进程警告（包括弃用）的堆栈跟踪。</p>",
+              "type": "module",
+              "displayName": "`--trace-warnings`"
+            },
+            {
+              "textRaw": "`--track-heap-objects`",
+              "name": "`--track-heap-objects`",
+              "meta": {
+                "added": [
+                  "v2.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>跟踪堆对象分配以获取堆快照。</p>",
+              "type": "module",
+              "displayName": "`--track-heap-objects`"
+            },
+            {
+              "textRaw": "`--unhandled-rejections=mode`",
+              "name": "`--unhandled-rejections=mode`",
+              "meta": {
+                "added": [
+                  "v12.0.0",
+                  "v10.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v15.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/33021",
+                    "description": "Changed default mode to `throw`. Previously, a warning was emitted."
+                  }
+                ]
+              },
+              "desc": "<p>使用此标志可以更改发生未处理的拒绝时应发生的情况。可以选择以下模式之一：</p>\n<ul>\n<li><code>throw</code>：发出 <a href=\"process.html#event-unhandledrejection\"><code>unhandledRejection</code></a>。如果未设置此钩子，则将未处理的拒绝作为未捕获的异常抛出。这是默认值。</li>\n<li><code>strict</code>：将未处理的拒绝作为未捕获的异常抛出。如果异常被处理，则发出 <a href=\"process.html#event-unhandledrejection\"><code>unhandledRejection</code></a>。</li>\n<li><code>warn</code>：无论是否设置了 <a href=\"process.html#event-unhandledrejection\"><code>unhandledRejection</code></a> 钩子，始终触发警告，但不打印弃用警告。</li>\n<li><code>warn-with-error-code</code>：发出 <a href=\"process.html#event-unhandledrejection\"><code>unhandledRejection</code></a>。如果未设置此钩子，则触发警告，并将进程退出代码设置为 1。</li>\n<li><code>none</code>：静默所有警告。</li>\n</ul>\n<p>如果拒绝发生在命令行入口点的 ES 模块静态加载阶段，它将始终将其作为未捕获的异常抛出。</p>",
+              "type": "module",
+              "displayName": "`--unhandled-rejections=mode`"
+            },
+            {
+              "textRaw": "`--use-bundled-ca`, `--use-openssl-ca`",
+              "name": "`--use-bundled-ca`,_`--use-openssl-ca`",
+              "meta": {
+                "added": [
+                  "v6.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>使用当前 Node.js 版本提供的捆绑的 Mozilla CA 存储或使用 OpenSSL 的默认 CA 存储。默认存储可在构建时选择。</p>\n<p>由 Node.js 提供的捆绑 CA 存储是 Mozilla CA 存储的快照，在发布时固定。它在所有支持的平台上都是相同的。</p>\n<p>使用 OpenSSL 存储允许对存储进行外部修改。对于大多数 Linux 和 BSD 发行版，此存储由发行版维护者和系统管理员维护。OpenSSL CA 存储位置取决于 OpenSSL 库的配置，但可以在运行时使用环境变量更改。</p>\n<p>参见 <code>SSL_CERT_DIR</code> 和 <code>SSL_CERT_FILE</code>。</p>",
+              "type": "module",
+              "displayName": "`--use-bundled-ca`, `--use-openssl-ca`"
+            },
+            {
+              "textRaw": "`--use-env-proxy`",
+              "name": "`--use-env-proxy`",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>启用后，Node.js 将在启动期间解析 <code>HTTP_PROXY</code>、<code>HTTPS_PROXY</code> 和 <code>NO_PROXY</code> 环境变量，并通过指定的代理隧道请求。</p>\n<p>这等同于设置 <a href=\"#node_use_env_proxy1\"><code>NODE_USE_ENV_PROXY=1</code></a> 环境变量。当两者都设置时，<code>--use-env-proxy</code> 优先。</p>",
+              "type": "module",
+              "displayName": "`--use-env-proxy`"
+            },
+            {
+              "textRaw": "`--use-largepages=mode`",
+              "name": "`--use-largepages=mode`",
+              "meta": {
+                "added": [
+                  "v13.6.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在启动时将 Node.js 静态代码重新映射到大内存页。如果目标系统支持，这将导致 Node.js 静态代码被移动到 2 MiB 页面而不是 4 KiB 页面。</p>\n<p><code>mode</code> 的有效值如下：</p>\n<ul>\n<li><code>off</code>：不会尝试映射。这是默认值。</li>\n<li><code>on</code>：如果操作系统支持，将尝试映射。映射失败将被忽略，并且消息将打印到标准错误。</li>\n<li><code>silent</code>：如果操作系统支持，将尝试映射。映射失败将被忽略，并且不会报告。</li>\n</ul>",
+              "type": "module",
+              "displayName": "`--use-largepages=mode`"
+            },
+            {
+              "textRaw": "`--use-system-ca`",
+              "name": "`--use-system-ca`",
+              "meta": {
+                "added": [
+                  "v23.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v23.9.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/57009",
+                    "description": "Added support on non-Windows and non-macOS."
+                  }
+                ]
+              },
+              "desc": "<p>Node.js 使用系统存储中存在的受信任 CA 证书以及 <code>--use-bundled-ca</code> 选项和 <code>NODE_EXTRA_CA_CERTS</code> 环境变量。在 Windows 和 macOS 以外的平台上，这会从 OpenSSL 信任的目录和文件加载证书，类似于 <code>--use-openssl-ca</code>，不同之处在于它在首次加载后缓存证书。</p>\n<p>在 Windows 和 macOS 上，证书信任策略计划遵循 <a href=\"https://chromium.googlesource.com/chromium/src/+/main/net/data/ssl/chrome_root_store/faq.md#does-the-chrome-certificate-verifier-consider-local-trust-decisions\">Chromium 的本地受信任证书策略</a>：</p>\n<p>在 macOS 上，尊重以下设置：</p>\n<ul>\n<li>默认和系统钥匙串\n<ul>\n<li>信任：\n<ul>\n<li>任何“使用此证书时”标志设置为“始终信任”的证书，或</li>\n<li>任何“安全套接字层 (SSL)”标志设置为“始终信任”的证书。</li>\n</ul>\n</li>\n<li>不信任：\n<ul>\n<li>任何“使用此证书时”标志设置为“从不信任”的证书，或</li>\n<li>任何“安全套接字层 (SSL)”标志设置为“从不信任”的证书。</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p>在 Windows 上，尊重以下设置（与 Chromium 的策略不同，目前不支持不信任和中间 CA）：</p>\n<ul>\n<li>本地计算机（通过 <code>certlm.msc</code> 访问）\n<ul>\n<li>信任：\n<ul>\n<li>受信任的根证书颁发机构</li>\n<li>受信任的人员</li>\n<li>企业信任 -> 企业 -> 受信任的根证书颁发机构</li>\n<li>企业信任 -> 企业 -> 受信任的人员</li>\n<li>企业信任 -> 组策略 -> 受信任的根证书颁发机构</li>\n<li>企业信任 -> 组策略 -> 受信任的人员</li>\n</ul>\n</li>\n</ul>\n</li>\n<li>当前用户（通过 <code>certmgr.msc</code> 访问）\n<ul>\n<li>信任：\n<ul>\n<li>受信任的根证书颁发机构</li>\n<li>企业信任 -> 组策略 -> 受信任的根证书颁发机构</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<p>在 Windows 和 macOS 上，Node.js 将检查用户对证书的设置是否不禁止它们用于 TLS 服务器身份验证，然后再使用它们。</p>\n<p>在其他系统上，Node.js 从 Node.js 链接到的 OpenSSL 版本尊重的默认证书文件（通常是 <code>/etc/ssl/cert.pem</code>）和默认证书目录（通常是 <code>/etc/ssl/certs</code>）加载证书。这通常适用于主要 Linux 发行版和其他类 Unix 系统的约定。如果覆盖的 OpenSSL 环境变量（通常取决于 Node.js 链接到的 OpenSSL 的配置，是 <code>SSL_CERT_FILE</code> 和 <code>SSL_CERT_DIR</code>）已设置，则将使用指定的路径来加载证书而不是。这些环境变量可以用作变通方法，如果 Node.js 链接到的 OpenSSL 版本使用的常规路径由于某种原因与用户拥有的系统配置不一致。</p>",
+              "type": "module",
+              "displayName": "`--use-system-ca`"
+            },
+            {
+              "textRaw": "`--v8-options`",
+              "name": "`--v8-options`",
+              "meta": {
+                "added": [
+                  "v0.1.3"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印 V8 命令行选项。</p>",
+              "type": "module",
+              "displayName": "`--v8-options`"
+            },
+            {
+              "textRaw": "`--v8-pool-size=num`",
+              "name": "`--v8-pool-size=num`",
+              "meta": {
+                "added": [
+                  "v5.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置 V8 的线程池大小，该线程池将用于分配后台作业。</p>\n<p>如果设置为 <code>0</code>，则 Node.js 将基于并行量的估计选择线程池的适当大小。</p>\n<p>并行量是指给定机器中可以同时执行的计算数量。通常，它与 CPU 数量相同，但在虚拟机或容器等环境中可能会有所不同。</p>",
+              "type": "module",
+              "displayName": "`--v8-pool-size=num`"
+            },
+            {
+              "textRaw": "`-v`, `--version`",
+              "name": "`-v`,_`--version`",
+              "meta": {
+                "added": [
+                  "v0.1.3"
+                ],
+                "changes": []
+              },
+              "desc": "<p>打印节点的版本。</p>",
+              "type": "module",
+              "displayName": "`-v`, `--version`"
+            },
+            {
+              "textRaw": "`--watch`",
+              "name": "`--watch`",
+              "meta": {
+                "added": [
+                  "v18.11.0",
+                  "v16.19.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.0.0",
+                      "v20.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52074",
+                    "description": "Watch mode is now stable."
+                  },
+                  {
+                    "version": [
+                      "v19.2.0",
+                      "v18.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/45214",
+                    "description": "Test runner now supports running in watch mode."
+                  }
+                ]
+              },
+              "desc": "<p>以监视模式启动 Node.js。在监视模式下，监视文件中的更改会导致 Node.js 进程重启。默认情况下，监视模式将监视入口点以及任何 required 或 imported 的模块。使用 <code>--watch-path</code> 指定要监视的路径。</p>\n<p>此标志不能与 <code>--check</code>、<code>--eval</code>、<code>--interactive</code> 或 REPL 结合使用。</p>\n<p>注意：<code>--watch</code> 标志需要一个文件路径作为参数，并且与 <code>--run</code> 或内联脚本输入不兼容，因为 <code>--run</code> 优先并忽略监视模式。如果未提供文件，Node.js 将以状态码 <code>9</code> 退出。</p>\n<pre><code class=\"language-bash\">node --watch index.js\n</code></pre>",
+              "type": "module",
+              "displayName": "`--watch`"
+            },
+            {
+              "textRaw": "`--watch-kill-signal`",
+              "name": "`--watch-kill-signal`",
+              "meta": {
+                "added": [
+                  "v24.4.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>自定义在监视模式重启时发送给进程的信号。</p>\n<pre><code class=\"language-bash\">node --watch --watch-kill-signal SIGINT test.js\n</code></pre>",
+              "type": "module",
+              "displayName": "`--watch-kill-signal`"
+            },
+            {
+              "textRaw": "`--watch-path`",
+              "name": "`--watch-path`",
+              "meta": {
+                "added": [
+                  "v18.11.0",
+                  "v16.19.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.0.0",
+                      "v20.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52074",
+                    "description": "Watch mode is now stable."
+                  }
+                ]
+              },
+              "desc": "<p>以监视模式启动 Node.js 并指定要监视的路径。在监视模式下，监视路径中的更改会导致 Node.js 进程重启。这将关闭对 required 或 imported 模块的监视，即使与 <code>--watch</code> 结合使用也是如此。</p>\n<p>此标志不能与 <code>--check</code>、<code>--eval</code>、<code>--interactive</code>、<code>--test</code> 或 REPL 结合使用。</p>\n<p>注意：使用 <code>--watch-path</code> 隐式启用 <code>--watch</code>，这需要一个文件路径并且与 <code>--run</code> 不兼容，因为 <code>--run</code> 优先并忽略监视模式。</p>\n<pre><code class=\"language-bash\">node --watch-path=./src --watch-path=./tests index.js\n</code></pre>\n<p>此选项仅在 macOS 和 Windows 上受支持。在不支持该选项的平台上使用时会抛出 <code>ERR_FEATURE_UNAVAILABLE_ON_PLATFORM</code> 异常。</p>",
+              "type": "module",
+              "displayName": "`--watch-path`"
+            },
+            {
+              "textRaw": "`--watch-preserve-output`",
+              "name": "`--watch-preserve-output`",
+              "meta": {
+                "added": [
+                  "v19.3.0",
+                  "v18.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在监视模式重启进程时禁用清除控制台。</p>\n<pre><code class=\"language-bash\">node --watch --watch-preserve-output test.js\n</code></pre>",
+              "type": "module",
+              "displayName": "`--watch-preserve-output`"
+            },
+            {
+              "textRaw": "`--zero-fill-buffers`",
+              "name": "`--zero-fill-buffers`",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>自动零填充所有新分配的 <a href=\"buffer.html#class-buffer\"><code>Buffer</code></a> 和 <a href=\"buffer.html#class-slowbuffer\"><code>SlowBuffer</code></a> 实例。</p>",
+              "type": "module",
+              "displayName": "`--zero-fill-buffers`"
+            }
+          ],
+          "type": "misc",
+          "displayName": "选项"
+        },
+        {
+          "textRaw": "环境变量",
+          "name": "环境变量",
+          "stability": 2,
+          "stabilityText": "Stable",
+          "modules": [
+            {
+              "textRaw": "`FORCE_COLOR=[1, 2, 3]`",
+              "name": "`force_color=[1,_2,_3]`",
+              "desc": "<p><code>FORCE_COLOR</code> 环境变量用于启用 ANSI 彩色输出。值可以是：</p>\n<ul>\n<li><code>1</code>、<code>true</code> 或空字符串 <code>''</code> 表示 16 色支持，</li>\n<li><code>2</code> 表示 256 色支持，或</li>\n<li><code>3</code> 表示 1600 万色支持。</li>\n</ul>\n<p>当使用 <code>FORCE_COLOR</code> 并设置为支持的值时，<code>NO_COLOR</code> 和 <code>NODE_DISABLE_COLORS</code> 环境变量都会被忽略。</p>\n<p>任何其他值将导致彩色输出被禁用。</p>",
+              "type": "module",
+              "displayName": "`FORCE_COLOR=[1, 2, 3]`"
+            },
+            {
+              "textRaw": "`NODE_COMPILE_CACHE=dir`",
+              "name": "`node_compile_cache=dir`",
+              "meta": {
+                "added": [
+                  "v22.1.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>为 Node.js 实例启用 <a href=\"module.html#module-compile-cache\">模块编译缓存</a>。有关详细信息，请参阅 <a href=\"module.html#module-compile-cache\">模块编译缓存</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`NODE_COMPILE_CACHE=dir`"
+            },
+            {
+              "textRaw": "`NODE_DEBUG=module[,…]`",
+              "name": "`node_debug=module[,…]`",
+              "meta": {
+                "added": [
+                  "v0.1.32"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>','</code> 分隔的核心模块列表，应打印调试信息。</p>",
+              "type": "module",
+              "displayName": "`NODE_DEBUG=module[,…]`"
+            },
+            {
+              "textRaw": "`NODE_DEBUG_NATIVE=module[,…]`",
+              "name": "`node_debug_native=module[,…]`",
+              "desc": "<p><code>','</code> 分隔的核心 C++ 模块列表，应打印调试信息。</p>",
+              "type": "module",
+              "displayName": "`NODE_DEBUG_NATIVE=module[,…]`"
+            },
+            {
+              "textRaw": "`NODE_DISABLE_COLORS=1`",
+              "name": "`node_disable_colors=1`",
+              "meta": {
+                "added": [
+                  "v0.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置后，REPL 中将不使用颜色。</p>",
+              "type": "module",
+              "displayName": "`NODE_DISABLE_COLORS=1`"
+            },
+            {
+              "textRaw": "`NODE_DISABLE_COMPILE_CACHE=1`",
+              "name": "`node_disable_compile_cache=1`",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>为 Node.js 实例禁用 <a href=\"module.html#module-compile-cache\">模块编译缓存</a>。有关详细信息，请参阅 <a href=\"module.html#module-compile-cache\">模块编译缓存</a> 的文档。</p>",
+              "type": "module",
+              "displayName": "`NODE_DISABLE_COMPILE_CACHE=1`"
+            },
+            {
+              "textRaw": "`NODE_EXTRA_CA_CERTS=file`",
+              "name": "`node_extra_ca_certs=file`",
+              "meta": {
+                "added": [
+                  "v7.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置后，众所周知的“根”CA（如 VeriSign）将使用 <code>file</code> 中的额外证书进行扩展。该文件应包含一个或多个受信任的 PEM 格式证书。如果文件丢失或格式错误，将（一次）通过 <a href=\"process.html#processemitwarningwarning-options\"><code>process.emitWarning()</code></a> 发出消息，但任何错误 otherwise 将被忽略。</p>\n<p>当为 TLS 或 HTTPS 客户端或服务器显式指定 <code>ca</code> 选项属性时，既不使用众所周知的证书也不使用额外证书。</p>\n<p>当 <code>node</code> 作为 setuid root 运行或设置了 Linux 文件功能时，此环境变量将被忽略。</p>\n<p><code>NODE_EXTRA_CA_CERTS</code> 环境变量仅在 Node.js 进程首次启动时读取。在运行时使用 <code>process.env.NODE_EXTRA_CA_CERTS</code> 更改值对当前进程没有影响。</p>",
+              "type": "module",
+              "displayName": "`NODE_EXTRA_CA_CERTS=file`"
+            },
+            {
+              "textRaw": "`NODE_ICU_DATA=file`",
+              "name": "`node_icu_data=file`",
+              "meta": {
+                "added": [
+                  "v0.11.15"
+                ],
+                "changes": []
+              },
+              "desc": "<p>ICU（<code>Intl</code> 对象）数据的数据路径。在使用 small-icu 支持编译时将扩展链接的数据。</p>",
+              "type": "module",
+              "displayName": "`NODE_ICU_DATA=file`"
+            },
+            {
+              "textRaw": "`NODE_NO_WARNINGS=1`",
+              "name": "`node_no_warnings=1`",
+              "meta": {
+                "added": [
+                  "v6.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置为 <code>1</code> 时，进程警告被静默。</p>",
+              "type": "module",
+              "displayName": "`NODE_NO_WARNINGS=1`"
+            },
+            {
+              "textRaw": "`NODE_OPTIONS=options...`",
+              "name": "`node_options=options...`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一个空格分隔的命令行选项列表。<code>options...</code> 在命令行选项之前解释，因此命令行选项将覆盖或复合 <code>options...</code> 中的任何内容。如果使用了环境中不允许的选项（如 <code>-p</code> 或脚本文件），Node.js 将退出并报错。</p>\n<p>如果选项值包含空格，可以使用双引号进行转义：</p>\n<pre><code class=\"language-bash\">NODE_OPTIONS='--require \"./my path/file.js\"'\n</code></pre>\n<p>作为命令行选项传递的单例标志将覆盖传递给 <code>NODE_OPTIONS</code> 的相同标志：</p>\n<pre><code class=\"language-bash\"># 检查器将在端口 5555 上可用\nNODE_OPTIONS='--inspect=localhost:4444' node --inspect=localhost:5555\n</code></pre>\n<p>可以传递多次的标志将被视为其 <code>NODE_OPTIONS</code> 实例首先传递，然后是其命令行实例：</p>\n<pre><code class=\"language-bash\">NODE_OPTIONS='--require \"./a.js\"' node --require \"./b.js\"\n# 等同于：\nnode --require \"./a.js\" --require \"./b.js\"\n</code></pre>\n<p>允许的 Node.js 选项在以下列表中。如果一个选项同时支持 --XX 和 --no-XX 变体，则两者都支持，但下面列表中仅包含一个。</p>\n<!-- node-options-node start -->\n<ul>\n<li><code>--allow-addons</code></li>\n<li><code>--allow-child-process</code></li>\n<li><code>--allow-fs-read</code></li>\n<li><code>--allow-fs-write</code></li>\n<li><code>--allow-wasi</code></li>\n<li><code>--allow-worker</code></li>\n<li><code>--conditions</code>, <code>-C</code></li>\n<li><code>--cpu-prof-dir</code></li>\n<li><code>--cpu-prof-interval</code></li>\n<li><code>--cpu-prof-name</code></li>\n<li><code>--cpu-prof</code></li>\n<li><code>--diagnostic-dir</code></li>\n<li><code>--disable-proto</code></li>\n<li><code>--disable-sigusr1</code></li>\n<li><code>--disable-warning</code></li>\n<li><code>--disable-wasm-trap-handler</code></li>\n<li><code>--dns-result-order</code></li>\n<li><code>--enable-fips</code></li>\n<li><code>--enable-network-family-autoselection</code></li>\n<li><code>--enable-source-maps</code></li>\n<li><code>--entry-url</code></li>\n<li><code>--experimental-abortcontroller</code></li>\n<li><code>--experimental-addon-modules</code></li>\n<li><code>--experimental-detect-module</code></li>\n<li><code>--experimental-eventsource</code></li>\n<li><code>--experimental-import-meta-resolve</code></li>\n<li><code>--experimental-json-modules</code></li>\n<li><code>--experimental-loader</code></li>\n<li><code>--experimental-modules</code></li>\n<li><code>--experimental-print-required-tla</code></li>\n<li><code>--experimental-require-module</code></li>\n<li><code>--experimental-shadow-realm</code></li>\n<li><code>--experimental-specifier-resolution</code></li>\n<li><code>--experimental-test-isolation</code></li>\n<li><code>--experimental-top-level-await</code></li>\n<li><code>--experimental-transform-types</code></li>\n<li><code>--experimental-vm-modules</code></li>\n<li><code>--experimental-wasi-unstable-preview1</code></li>\n<li><code>--experimental-webstorage</code></li>\n<li><code>--force-context-aware</code></li>\n<li><code>--force-fips</code></li>\n<li><code>--force-node-api-uncaught-exceptions-policy</code></li>\n<li><code>--frozen-intrinsics</code></li>\n<li><code>--heap-prof-dir</code></li>\n<li><code>--heap-prof-interval</code></li>\n<li><code>--heap-prof-name</code></li>\n<li><code>--heap-prof</code></li>\n<li><code>--heapsnapshot-near-heap-limit</code></li>\n<li><code>--heapsnapshot-signal</code></li>\n<li><code>--http-parser</code></li>\n<li><code>--icu-data-dir</code></li>\n<li><code>--import</code></li>\n<li><code>--input-type</code></li>\n<li><code>--insecure-http-parser</code></li>\n<li><code>--inspect-brk</code></li>\n<li><code>--inspect-port</code>, <code>--debug-port</code></li>\n<li><code>--inspect-publish-uid</code></li>\n<li><code>--inspect-wait</code></li>\n<li><code>--inspect</code></li>\n<li><code>--localstorage-file</code></li>\n<li><code>--max-http-header-size</code></li>\n<li><code>--max-old-space-size-percentage</code></li>\n<li><code>--napi-modules</code></li>\n<li><code>--network-family-autoselection-attempt-timeout</code></li>\n<li><code>--no-addons</code></li>\n<li><code>--no-async-context-frame</code></li>\n<li><code>--no-deprecation</code></li>\n<li><code>--no-experimental-global-navigator</code></li>\n<li><code>--no-experimental-repl-await</code></li>\n<li><code>--no-experimental-sqlite</code></li>\n<li><code>--no-experimental-strip-types</code></li>\n<li><code>--no-experimental-websocket</code></li>\n<li><code>--no-extra-info-on-fatal-exception</code></li>\n<li><code>--no-force-async-hooks-checks</code></li>\n<li><code>--no-global-search-paths</code></li>\n<li><code>--no-network-family-autoselection</code></li>\n<li><code>--no-warnings</code></li>\n<li><code>--node-memory-debug</code></li>\n<li><code>--openssl-config</code></li>\n<li><code>--openssl-legacy-provider</code></li>\n<li><code>--openssl-shared-config</code></li>\n<li><code>--pending-deprecation</code></li>\n<li><code>--permission</code></li>\n<li><code>--preserve-symlinks-main</code></li>\n<li><code>--preserve-symlinks</code></li>\n<li><code>--prof-process</code></li>\n<li><code>--redirect-warnings</code></li>\n<li><code>--report-compact</code></li>\n<li><code>--report-dir</code>, <code>--report-directory</code></li>\n<li><code>--report-exclude-env</code></li>\n<li><code>--report-exclude-network</code></li>\n<li><code>--report-filename</code></li>\n<li><code>--report-on-fatalerror</code></li>\n<li><code>--report-on-signal</code></li>\n<li><code>--report-signal</code></li>\n<li><code>--report-uncaught-exception</code></li>\n<li><code>--require</code>, <code>-r</code></li>\n<li><code>--secure-heap-min</code></li>\n<li><code>--secure-heap</code></li>\n<li><code>--snapshot-blob</code></li>\n<li><code>--test-coverage-branches</code></li>\n<li><code>--test-coverage-exclude</code></li>\n<li><code>--test-coverage-functions</code></li>\n<li><code>--test-coverage-include</code></li>\n<li><code>--test-coverage-lines</code></li>\n<li><code>--test-global-setup</code></li>\n<li><code>--test-isolation</code></li>\n<li><code>--test-name-pattern</code></li>\n<li><code>--test-only</code></li>\n<li><code>--test-reporter-destination</code></li>\n<li><code>--test-reporter</code></li>\n<li><code>--test-rerun-failures</code></li>\n<li><code>--test-shard</code></li>\n<li><code>--test-skip-pattern</code></li>\n<li><code>--throw-deprecation</code></li>\n<li><code>--title</code></li>\n<li><code>--tls-cipher-list</code></li>\n<li><code>--tls-keylog</code></li>\n<li><code>--tls-max-v1.2</code></li>\n<li><code>--tls-max-v1.3</code></li>\n<li><code>--tls-min-v1.0</code></li>\n<li><code>--tls-min-v1.1</code></li>\n<li><code>--tls-min-v1.2</code></li>\n<li><code>--tls-min-v1.3</code></li>\n<li><code>--trace-deprecation</code></li>\n<li><code>--trace-env-js-stack</code></li>\n<li><code>--trace-env-native-stack</code></li>\n<li><code>--trace-env</code></li>\n<li><code>--trace-event-categories</code></li>\n<li><code>--trace-event-file-pattern</code></li>\n<li><code>--trace-events-enabled</code></li>\n<li><code>--trace-exit</code></li>\n<li><code>--trace-require-module</code></li>\n<li><code>--trace-sigint</code></li>\n<li><code>--trace-sync-io</code></li>\n<li><code>--trace-tls</code></li>\n<li><code>--trace-uncaught</code></li>\n<li><code>--trace-warnings</code></li>\n<li><code>--track-heap-objects</code></li>\n<li><code>--unhandled-rejections</code></li>\n<li><code>--use-bundled-ca</code></li>\n<li><code>--use-env-proxy</code></li>\n<li><code>--use-largepages</code></li>\n<li><code>--use-openssl-ca</code></li>\n<li><code>--use-system-ca</code></li>\n<li><code>--v8-pool-size</code></li>\n<li><code>--watch-kill-signal</code></li>\n<li><code>--watch-path</code></li>\n<li><code>--watch-preserve-output</code></li>\n<li><code>--watch</code></li>\n<li><code>--zero-fill-buffers</code></li>\n</ul>\n<!-- node-options-node end -->\n<p>允许的 V8 选项是：</p>\n<!-- node-options-v8 start -->\n<ul>\n<li><code>--abort-on-uncaught-exception</code></li>\n<li><code>--disallow-code-generation-from-strings</code></li>\n<li><code>--enable-etw-stack-walking</code></li>\n<li><code>--expose-gc</code></li>\n<li><code>--interpreted-frames-native-stack</code></li>\n<li><code>--jitless</code></li>\n<li><code>--max-old-space-size</code></li>\n<li><code>--max-semi-space-size</code></li>\n<li><code>--perf-basic-prof-only-functions</code></li>\n<li><code>--perf-basic-prof</code></li>\n<li><code>--perf-prof-unwinding-info</code></li>\n<li><code>--perf-prof</code></li>\n<li><code>--stack-trace-limit</code></li>\n</ul>\n<!-- node-options-v8 end -->\n<!-- node-options-others start -->\n<p><code>--perf-basic-prof-only-functions</code>、<code>--perf-basic-prof</code>、<code>--perf-prof-unwinding-info</code> 和 <code>--perf-prof</code> 仅在 Linux 上可用。</p>\n<p><code>--enable-etw-stack-walking</code> 仅在 Windows 上可用。</p>\n<!-- node-options-others end -->",
+              "type": "module",
+              "displayName": "`NODE_OPTIONS=options...`"
+            },
+            {
+              "textRaw": "`NODE_PATH=path[:…]`",
+              "name": "`node_path=path[:…]`",
+              "meta": {
+                "added": [
+                  "v0.1.32"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>':'</code> 分隔的目录列表，前缀到模块搜索路径。</p>\n<p>在 Windows 上，这是一个 <code>';'</code> 分隔的列表。</p>",
+              "type": "module",
+              "displayName": "`NODE_PATH=path[:…]`"
+            },
+            {
+              "textRaw": "`NODE_PENDING_DEPRECATION=1`",
+              "name": "`node_pending_deprecation=1`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置为 <code>1</code> 时，发出待弃用警告。</p>\n<p>待弃用通常与运行时弃用相同，但显著的区别是它们默认是关闭的，除非设置了 <code>--pending-deprecation</code> 命令行标志或 <code>NODE_PENDING_DEPRECATION=1</code> 环境变量，否则不会发出。待弃用用于提供一种选择性的“早期警告”机制，开发人员可以利用它来检测已弃用的 API 使用情况。</p>",
+              "type": "module",
+              "displayName": "`NODE_PENDING_DEPRECATION=1`"
+            },
+            {
+              "textRaw": "`NODE_PENDING_PIPE_INSTANCES=instances`",
+              "name": "`node_pending_pipe_instances=instances`",
+              "desc": "<p>设置管道服务器等待连接时待处理管道实例句柄的数量。此设置仅适用于 Windows。</p>",
+              "type": "module",
+              "displayName": "`NODE_PENDING_PIPE_INSTANCES=instances`"
+            },
+            {
+              "textRaw": "`NODE_PRESERVE_SYMLINKS=1`",
+              "name": "`node_preserve_symlinks=1`",
+              "meta": {
+                "added": [
+                  "v7.1.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置为 <code>1</code> 时，指示模块加载器在解析和缓存模块时保留符号链接。</p>",
+              "type": "module",
+              "displayName": "`NODE_PRESERVE_SYMLINKS=1`"
+            },
+            {
+              "textRaw": "`NODE_REDIRECT_WARNINGS=file`",
+              "name": "`node_redirect_warnings=file`",
+              "meta": {
+                "added": [
+                  "v8.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>设置后，进程警告将发送到给定文件而不是打印到 stderr。如果文件不存在，将被创建；如果存在，将被追加。如果尝试将警告写入文件时发生错误，则警告将改为写入 stderr。这等同于使用 <code>--redirect-warnings=file</code> 命令行标志。</p>",
+              "type": "module",
+              "displayName": "`NODE_REDIRECT_WARNINGS=file`"
+            },
+            {
+              "textRaw": "`NODE_REPL_EXTERNAL_MODULE=file`",
+              "name": "`node_repl_external_module=file`",
+              "meta": {
+                "added": [
+                  "v13.0.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.3.0",
+                      "v20.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52905",
+                    "description": "Remove the possibility to use this env var with kDisableNodeOptionsEnv for embedders."
+                  }
+                ]
+              },
+              "desc": "<p>指向 Node.js 模块的路径，该模块将代替内置 REPL 加载。将此值覆盖为空字符串（<code>''</code>）将使用内置 REPL。</p>",
+              "type": "module",
+              "displayName": "`NODE_REPL_EXTERNAL_MODULE=file`"
+            },
+            {
+              "textRaw": "`NODE_REPL_HISTORY=file`",
+              "name": "`node_repl_history=file`",
+              "meta": {
+                "added": [
+                  "v3.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>用于存储持久 REPL 历史记录的文件路径。默认路径是 <code>~/.node_repl_history</code>，由此变量覆盖。将值设置为空字符串（<code>''</code> 或 <code>' '</code>）将禁用持久 REPL 历史记录。</p>",
+              "type": "module",
+              "displayName": "`NODE_REPL_HISTORY=file`"
+            },
+            {
+              "textRaw": "`NODE_SKIP_PLATFORM_CHECK=value`",
+              "name": "`node_skip_platform_check=value`",
+              "meta": {
+                "added": [
+                  "v14.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果 <code>value</code> 等于 <code>'1'</code>，则在 Node.js 启动期间跳过对受支持平台的检查。Node.js 可能无法正确执行。在不支持的平台上遇到的任何问题将不会修复。</p>",
+              "type": "module",
+              "displayName": "`NODE_SKIP_PLATFORM_CHECK=value`"
+            },
+            {
+              "textRaw": "`NODE_TEST_CONTEXT=value`",
+              "name": "`node_test_context=value`",
+              "desc": "<p>如果 <code>value</code> 等于 <code>'child'</code>，测试报告器选项将被覆盖，测试输出将以 TAP 格式发送到 stdout。如果提供任何其他值，Node.js 不保证使用的报告器格式或其稳定性。</p>",
+              "type": "module",
+              "displayName": "`NODE_TEST_CONTEXT=value`"
+            },
+            {
+              "textRaw": "`NODE_TLS_REJECT_UNAUTHORIZED=value`",
+              "name": "`node_tls_reject_unauthorized=value`",
+              "desc": "<p>如果 <code>value</code> 等于 <code>'0'</code>，则对 TLS 连接禁用证书验证。这使得 TLS 以及扩展的 HTTPS 不安全。强烈建议不要使用此环境变量。</p>",
+              "type": "module",
+              "displayName": "`NODE_TLS_REJECT_UNAUTHORIZED=value`"
+            },
+            {
+              "textRaw": "`NODE_USE_ENV_PROXY=1`",
+              "name": "`node_use_env_proxy=1`",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>启用后，Node.js 将在启动期间解析 <code>HTTP_PROXY</code>、<code>HTTPS_PROXY</code> 和 <code>NO_PROXY</code> 环境变量，并通过指定的代理隧道请求。</p>\n<p>这也可以使用 <a href=\"#--use-env-proxy\"><code>--use-env-proxy</code></a> 命令行标志启用。当两者都设置时，<code>--use-env-proxy</code> 优先。</p>",
+              "type": "module",
+              "displayName": "`NODE_USE_ENV_PROXY=1`"
+            },
+            {
+              "textRaw": "`NODE_USE_SYSTEM_CA=1`",
+              "name": "`node_use_system_ca=1`",
+              "meta": {
+                "added": [
+                  "v24.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Node.js 使用系统存储中存在的受信任 CA 证书以及 <code>--use-bundled-ca</code> 选项和 <code>NODE_EXTRA_CA_CERTS</code> 环境变量。</p>\n<p>这也可以使用 <a href=\"#--use-system-ca\"><code>--use-system-ca</code></a> 命令行标志启用。当两者都设置时，<code>--use-system-ca</code> 优先。</p>",
+              "type": "module",
+              "displayName": "`NODE_USE_SYSTEM_CA=1`"
+            },
+            {
+              "textRaw": "`NODE_V8_COVERAGE=dir`",
+              "name": "`node_v8_coverage=dir`",
+              "desc": "<p>设置后，Node.js 将开始将 <a href=\"https://v8project.blogspot.com/2017/12/javascript-code-coverage.html\">V8 JavaScript 代码覆盖率</a> 和 <a href=\"https://tc39.es/ecma426/\">Source Map</a> 数据输出到作为参数提供的目录（覆盖率信息以 JSON 格式写入带有 <code>coverage</code> 前缀的文件）。</p>\n<p><code>NODE_V8_COVERAGE</code> 会自动传播到子进程，使得检测调用 <code>child_process.spawn()</code> 系列函数的应用程序更加容易。<code>NODE_V8_COVERAGE</code> 可以设置为空字符串，以防止传播。</p>",
+              "modules": [
+                {
+                  "textRaw": "覆盖率输出",
+                  "name": "覆盖率输出",
+                  "desc": "<p>覆盖率作为 <a href=\"https://chromedevtools.github.io/devtools-protocol/tot/Profiler#type-ScriptCoverage\">ScriptCoverage</a> 对象的数组输出在顶层键 <code>result</code> 上：</p>\n<pre><code class=\"language-json\">{\n  \"result\": [\n    {\n      \"scriptId\": \"67\",\n      \"url\": \"internal/tty.js\",\n      \"functions\": []\n    }\n  ]\n}\n</code></pre>",
+                  "type": "module",
+                  "displayName": "覆盖率输出"
+                },
+                {
+                  "textRaw": "Source map 缓存",
+                  "name": "source_map_缓存",
+                  "stability": 1,
+                  "stabilityText": "Experimental",
+                  "desc": "<p>如果找到，source map 数据将附加到 JSON 覆盖率对象的顶层键 <code>source-map-cache</code> 上。</p>\n<p><code>source-map-cache</code> 是一个对象，其键表示从中提取 source map 的文件，值包括原始 source-map URL（在键 <code>url</code> 中）、解析的 Source Map v3 信息（在键 <code>data</code> 中）以及源文件的行长度（在键 <code>lineLengths</code> 中）。</p>\n<pre><code class=\"language-json\">{\n  \"result\": [\n    {\n      \"scriptId\": \"68\",\n      \"url\": \"file:///absolute/path/to/source.js\",\n      \"functions\": []\n    }\n  ],\n  \"source-map-cache\": {\n    \"file:///absolute/path/to/source.js\": {\n      \"url\": \"./path-to-map.json\",\n      \"data\": {\n        \"version\": 3,\n        \"sources\": [\n          \"file:///absolute/path/to/original.js\"\n        ],\n        \"names\": [\n          \"Foo\",\n          \"console\",\n          \"info\"\n        ],\n        \"mappings\": \"MAAMA,IACJC,YAAaC\",\n        \"sourceRoot\": \"./\"\n      },\n      \"lineLengths\": [\n        13,\n        62,\n        38,\n        27\n      ]\n    }\n  }\n}\n</code></pre>",
+                  "type": "module",
+                  "displayName": "Source map 缓存"
+                }
+              ],
+              "type": "module",
+              "displayName": "`NODE_V8_COVERAGE=dir`"
+            },
+            {
+              "textRaw": "`NO_COLOR=<any>`",
+              "name": "`no_color=<any>`",
+              "desc": "<p><a href=\"https://no-color.org\"><code>NO_COLOR</code></a> 是 <code>NODE_DISABLE_COLORS</code> 的别名。环境变量的值是任意的。</p>",
+              "type": "module",
+              "displayName": "`NO_COLOR=<any>`"
+            },
+            {
+              "textRaw": "`OPENSSL_CONF=file`",
+              "name": "`openssl_conf=file`",
+              "meta": {
+                "added": [
+                  "v6.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在启动时加载 OpenSSL 配置文件。除其他用途外，如果 Node.js 使用 <code>./configure --openssl-fips</code> 构建，这可用于启用符合 FIPS 的加密。</p>\n<p>如果使用了 <a href=\"#--openssl-configfile\"><code>--openssl-config</code></a> 命令行选项，则忽略环境变量。</p>",
+              "type": "module",
+              "displayName": "`OPENSSL_CONF=file`"
+            },
+            {
+              "textRaw": "`SSL_CERT_DIR=dir`",
+              "name": "`ssl_cert_dir=dir`",
+              "meta": {
+                "added": [
+                  "v7.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果启用了 <code>--use-openssl-ca</code>，或者在 macOS 和 Windows 以外的平台上启用了 <code>--use-system-ca</code>，这将覆盖并设置 OpenSSL 包含受信任证书的目录。</p>\n<p>请注意，除非显式设置了子环境，否则此环境变量将由任何子进程继承，如果它们使用 OpenSSL，可能会导致它们信任与 node 相同的 CA。</p>",
+              "type": "module",
+              "displayName": "`SSL_CERT_DIR=dir`"
+            },
+            {
+              "textRaw": "`SSL_CERT_FILE=file`",
+              "name": "`ssl_cert_file=file`",
+              "meta": {
+                "added": [
+                  "v7.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果启用了 <code>--use-openssl-ca</code>，或者在 macOS 和 Windows 以外的平台上启用了 <code>--use-system-ca</code>，这将覆盖并设置 OpenSSL 包含受信任证书的文件。</p>\n<p>请注意，除非显式设置了子环境，否则此环境变量将由任何子进程继承，如果它们使用 OpenSSL，可能会导致它们信任与 node 相同的 CA。</p>",
+              "type": "module",
+              "displayName": "`SSL_CERT_FILE=file`"
+            },
+            {
+              "textRaw": "`TZ`",
+              "name": "`tz`",
+              "meta": {
+                "added": [
+                  "v0.0.1"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v16.2.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/38642",
+                    "description": "Changing the TZ variable using process.env.TZ = changes the timezone on Windows as well."
+                  },
+                  {
+                    "version": [
+                      "v13.0.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/20026",
+                    "description": "Changing the TZ variable using process.env.TZ = changes the timezone on POSIX systems."
+                  }
+                ]
+              },
+              "desc": "<p><code>TZ</code> 环境变量用于指定时区配置。</p>\n<p>虽然 Node.js 不支持 <a href=\"https://www.gnu.org/software/libc/manual/html_node/TZ-Variable.html\">其他环境中处理 <code>TZ</code> 的所有各种方式</a>，但它确实支持基本的 <a href=\"https://en.wikipedia.org/wiki/List_of_tz_database_time_zones\">时区 ID</a>（如 <code>'Etc/UTC'</code>、<code>'Europe/Paris'</code> 或 <code>'America/New_York'</code>）。它可能支持一些其他缩写或别名，但强烈不建议使用这些，并且不能保证。</p>\n<pre><code class=\"language-console\">$ TZ=Europe/Dublin node -pe \"new Date().toString()\"\nWed May 12 2021 20:30:48 GMT+0100 (Irish Standard Time)\n</code></pre>",
+              "type": "module",
+              "displayName": "`TZ`"
+            },
+            {
+              "textRaw": "`UV_THREADPOOL_SIZE=size`",
+              "name": "`uv_threadpool_size=size`",
+              "desc": "<p>将 libuv 线程池中使用的线程数设置为 <code>size</code> 个线程。</p>\n<p>Node.js 尽可能使用异步系统 API，但在它们不存在的地方，使用 libuv 的线程池基于同步系统 API 创建异步节点 API。使用线程池的 Node.js API 有：</p>\n<ul>\n<li>所有 <code>fs</code> API，除了文件监视器 API 和那些显式同步的 API</li>\n<li>异步加密 API，如 <code>crypto.pbkdf2()</code>、<code>crypto.scrypt()</code>、<code>crypto.randomBytes()</code>、<code>crypto.randomFill()</code>、<code>crypto.generateKeyPair()</code></li>\n<li><code>dns.lookup()</code></li>\n<li>所有 <code>zlib</code> API，除了那些显式同步的 API</li>\n</ul>\n<p>因为 libuv 的线程池具有固定大小，这意味着如果出于任何原因这些 API 中的任何一个花费很长时间，其他（看似无关的）在 libuv 线程池中运行的 API 将经历性能下降。为了缓解此问题，一个潜在的解决方案是通过将 <code>'UV_THREADPOOL_SIZE'</code> 环境变量设置为大于 <code>4</code>（其当前默认值）的值来增加 libuv 线程池的大小。然而，从进程内部使用 <code>process.env.UV_THREADPOOL_SIZE=size</code> 设置此值不能保证工作，因为线程池将在运行时初始化期间创建，远在用户代码运行之前。有关更多信息，请参阅 <a href=\"https://docs.libuv.org/en/latest/threadpool.html\">libuv 线程池文档</a>。</p>",
+              "type": "module",
+              "displayName": "`UV_THREADPOOL_SIZE=size`"
+            }
+          ],
+          "type": "misc",
+          "displayName": "环境变量"
+        },
+        {
+          "textRaw": "有用的 V8 选项",
+          "name": "有用的_v8_选项",
+          "desc": "<p>V8 有自己的一组 CLI 选项。任何提供给 <code>node</code> 的 V8 CLI 选项都将传递给 V8 处理。V8 的选项 <em>没有稳定性保证</em>。V8 团队自己并不认为它们是正式 API 的一部分，并保留随时更改它们的权利。同样，它们也不在 Node.js 稳定性保证的范围内。许多 V8 选项仅对 V8 开发人员有意义。尽管如此，有一小部分 V8 选项广泛适用于 Node.js，它们在此记录：</p>\n<!-- v8-options start -->",
+          "modules": [
+            {
+              "textRaw": "`--abort-on-uncaught-exception`",
+              "name": "`--abort-on-uncaught-exception`",
+              "type": "module",
+              "displayName": "`--abort-on-uncaught-exception`"
+            },
+            {
+              "textRaw": "`--disallow-code-generation-from-strings`",
+              "name": "`--disallow-code-generation-from-strings`",
+              "type": "module",
+              "displayName": "`--disallow-code-generation-from-strings`"
+            },
+            {
+              "textRaw": "`--enable-etw-stack-walking`",
+              "name": "`--enable-etw-stack-walking`",
+              "type": "module",
+              "displayName": "`--enable-etw-stack-walking`"
+            },
+            {
+              "textRaw": "`--expose-gc`",
+              "name": "`--expose-gc`",
+              "type": "module",
+              "displayName": "`--expose-gc`"
+            },
+            {
+              "textRaw": "`--harmony-shadow-realm`",
+              "name": "`--harmony-shadow-realm`",
+              "type": "module",
+              "displayName": "`--harmony-shadow-realm`"
+            },
+            {
+              "textRaw": "`--interpreted-frames-native-stack`",
+              "name": "`--interpreted-frames-native-stack`",
+              "desc": "<!-- Anchor to make sure old links find a target -->\n<p><a id=\"--max-old-space-sizesize-in-megabytes\"></a></p>",
+              "type": "module",
+              "displayName": "`--interpreted-frames-native-stack`"
+            },
+            {
+              "textRaw": "`--jitless`",
+              "name": "`--jitless`",
+              "desc": "<!-- Anchor to make sure old links find a target -->\n<p><a id=\"--max-old-space-sizesize-in-megabytes\"></a></p>",
+              "type": "module",
+              "displayName": "`--jitless`"
+            },
+            {
+              "textRaw": "`--max-old-space-size=SIZE` (in MiB)",
+              "name": "`--max-old-space-size=size`_(in_mib)",
+              "desc": "<p>设置 V8 旧内存部分的最大内存大小。当内存消耗接近限制时，V8 将花费更多时间在垃圾回收上，以释放未使用的内存。</p>\n<p>在具有 2 GiB 内存的机器上，考虑将其设置为 1536（1.5 GiB）以为其他用途留出一些内存并避免交换。</p>\n<pre><code class=\"language-bash\">node --max-old-space-size=1536 index.js\n</code></pre>\n<!-- Anchor to make sure old links find a target -->\n<p><a id=\"--max-semi-space-sizesize-in-megabytes\"></a></p>",
+              "type": "module",
+              "displayName": "`--max-old-space-size=SIZE` (in MiB)"
+            },
+            {
+              "textRaw": "`--max-semi-space-size=SIZE` (in MiB)",
+              "name": "`--max-semi-space-size=size`_(in_mib)",
+              "desc": "<p>以 MiB（mebibytes）设置 V8 的 <a href=\"https://v8.dev/blog/orinoco-parallel-scavenger\">清除垃圾回收器</a> 的 <a href=\"https://www.memorymanagement.org/glossary/s.html#semi.space\">半空间</a> 最大大小。增加半空间的最大大小可能会提高 Node.js 的吞吐量，但代价是更多内存消耗。</p>\n<p>由于 V8 堆的年轻代大小是半空间大小的三倍（参见 V8 中的 <a href=\"https://chromium.googlesource.com/v8/v8.git/+/refs/tags/10.3.129/src/heap/heap.cc#328\"><code>YoungGenerationSizeFromSemiSpaceSize</code></a>），半空间增加 1 MiB 适用于三个独立的半空间中的每一个，并导致堆大小增加 3 MiB。吞吐量的改进取决于您的工作负载（参见 <a href=\"https://github.com/nodejs/node/issues/42511\">#42511</a>）。</p>\n<p>默认值取决于内存限制。例如，在具有 512 MiB 内存限制的 64 位系统上，半空间的最大大小默认为 1 MiB。对于最多并包括 2GiB 的内存限制，在 64 位系统上半空间的最大默认大小将小于 16 MiB。</p>\n<p>要为您的应用程序获得最佳配置，您应该在为应用程序运行基准测试时尝试不同的 max-semi-space-size 值。</p>\n<p>例如，在 64 位系统上进行基准测试：</p>\n<pre><code class=\"language-bash\">for MiB in 16 32 64 128; do\n    node --max-semi-space-size=$MiB index.js\ndone\n</code></pre>",
+              "type": "module",
+              "displayName": "`--max-semi-space-size=SIZE` (in MiB)"
+            },
+            {
+              "textRaw": "`--perf-basic-prof`",
+              "name": "`--perf-basic-prof`",
+              "type": "module",
+              "displayName": "`--perf-basic-prof`"
+            },
+            {
+              "textRaw": "`--perf-basic-prof-only-functions`",
+              "name": "`--perf-basic-prof-only-functions`",
+              "type": "module",
+              "displayName": "`--perf-basic-prof-only-functions`"
+            },
+            {
+              "textRaw": "`--perf-prof`",
+              "name": "`--perf-prof`",
+              "type": "module",
+              "displayName": "`--perf-prof`"
+            },
+            {
+              "textRaw": "`--perf-prof-unwinding-info`",
+              "name": "`--perf-prof-unwinding-info`",
+              "type": "module",
+              "displayName": "`--perf-prof-unwinding-info`"
+            },
+            {
+              "textRaw": "`--prof`",
+              "name": "`--prof`",
+              "type": "module",
+              "displayName": "`--prof`"
+            },
+            {
+              "textRaw": "`--security-revert`",
+              "name": "`--security-revert`",
+              "desc": "<p>错误堆栈跟踪中收集的最大堆栈帧数。将其设置为 0 将禁用堆栈跟踪收集。默认值为 10。</p>\n<pre><code class=\"language-bash\">node --stack-trace-limit=12 -p -e \"Error.stackTraceLimit\" # 打印 12\n</code></pre>\n<!-- v8-options end -->",
+              "type": "module",
+              "displayName": "`--security-revert`"
+            },
+            {
+              "textRaw": "`--stack-trace-limit=limit`",
+              "name": "`--stack-trace-limit=limit`",
+              "desc": "<p>错误堆栈跟踪中收集的最大堆栈帧数。将其设置为 0 将禁用堆栈跟踪收集。默认值为 10。</p>\n<pre><code class=\"language-bash\">node --stack-trace-limit=12 -p -e \"Error.stackTraceLimit\" # 打印 12\n</code></pre>\n<!-- v8-options end -->",
+              "type": "module",
+              "displayName": "`--stack-trace-limit=limit`"
+            }
+          ],
+          "type": "misc",
+          "displayName": "有用的 V8 选项"
+        }
+      ]
+    }
+  ]
+}

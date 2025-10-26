@@ -1,0 +1,1729 @@
+{
+  "type": "module",
+  "source": "doc/api/vm.md",
+  "modules": [
+    {
+      "textRaw": "VM (执行 JavaScript)",
+      "name": "vm",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/vm.js\">lib/vm.js</a></p>\n<p><code>node:vm</code> 模块支持在 V8 虚拟机上下文中编译和运行代码。</p>\n<p><strong class=\"critical\"><code>node:vm</code> 模块不是安全机制。不要用它来运行不受信任的代码。</strong></p>\n<p>JavaScript 代码可以被编译并立即运行，或者编译、保存，然后稍后运行。</p>\n<p>一个常见的用例是在不同的 V8 上下文中运行代码。这意味着被调用的代码具有与调用代码不同的全局对象。</p>\n<p>可以通过将对象 <a href=\"#what-does-it-mean-to-contextify-an-object\"><em>contextifying</em></a> 来提供上下文。被调用的代码将上下文中的任何属性视为全局变量。被调用代码导致的全局变量的任何更改都会反映在上下文对象中。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst x = 1;\n\nconst context = { x: 2 };\nvm.createContext(context); // 上下文化对象。\n\nconst code = 'x += 40; var y = 17;';\n// `x` 和 `y` 是上下文中的全局变量。\n// 最初，x 的值为 2，因为这是 context.x 的值。\nvm.runInContext(code, context);\n\nconsole.log(context.x); // 42\nconsole.log(context.y); // 17\n\nconsole.log(x); // 1; y 未定义。\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "类：`vm.Script`",
+          "name": "类：`vm.script`",
+          "meta": {
+            "added": [
+              "v0.3.1"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>vm.Script</code> 类的实例包含预编译的脚本，这些脚本可以在特定的上下文中执行。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new vm.Script(code[, options])`",
+              "type": "ctor",
+              "name": "vm.Script",
+              "meta": {
+                "added": [
+                  "v0.3.1"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v21.7.0",
+                      "v20.12.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/51244",
+                    "description": "Added support for `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`."
+                  },
+                  {
+                    "version": [
+                      "v17.0.0",
+                      "v16.12.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/40249",
+                    "description": "Added support for import attributes to the `importModuleDynamically` parameter."
+                  },
+                  {
+                    "version": "v10.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/20300",
+                    "description": "The `produceCachedData` is deprecated in favour of `script.createCachedData()`."
+                  },
+                  {
+                    "version": "v5.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/4777",
+                    "description": "The `cachedData` and `produceCachedData` options are supported now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`code` {string} 要编译的 JavaScript 代码。",
+                      "name": "code",
+                      "type": "string",
+                      "desc": "要编译的 JavaScript 代码。"
+                    },
+                    {
+                      "textRaw": "`options` {Object|string}",
+                      "name": "options",
+                      "type": "Object|string",
+                      "options": [
+                        {
+                          "textRaw": "`filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。",
+                          "name": "filename",
+                          "type": "string",
+                          "desc": "指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。"
+                        },
+                        {
+                          "textRaw": "`lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。",
+                          "name": "lineOffset",
+                          "type": "number",
+                          "desc": "指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。"
+                        },
+                        {
+                          "textRaw": "`columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。",
+                          "name": "columnOffset",
+                          "type": "number",
+                          "desc": "指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。"
+                        },
+                        {
+                          "textRaw": "`cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。当提供时，`cachedDataRejected` 值将被设置为 `true` 或 `false`，取决于 V8 对数据的接受情况。",
+                          "name": "cachedData",
+                          "type": "Buffer|TypedArray|DataView",
+                          "desc": "提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。当提供时，`cachedDataRejected` 值将被设置为 `true` 或 `false`，取决于 V8 对数据的接受情况。"
+                        },
+                        {
+                          "textRaw": "`produceCachedData` {boolean} 当为 `true` 且不存在 `cachedData` 时，V8 将尝试为 `code` 生成代码缓存数据。成功后，将生成一个包含 V8 代码缓存数据的 `Buffer` 并存储在返回的 `vm.Script` 实例的 `cachedData` 属性中。`cachedDataProduced` 值将根据代码缓存数据是否成功生成而设置为 `true` 或 `false`。此选项**已弃用**，推荐使用 `script.createCachedData()`。**默认值:** `false`。",
+                          "name": "produceCachedData",
+                          "type": "boolean",
+                          "desc": "当为 `true` 且不存在 `cachedData` 时，V8 将尝试为 `code` 生成代码缓存数据。成功后，将生成一个包含 V8 代码缓存数据的 `Buffer` 并存储在返回的 `vm.Script` 实例的 `cachedData` 属性中。`cachedDataProduced` 值将根据代码缓存数据是否成功生成而设置为 `true` 或 `false`。此选项**已弃用**，推荐使用 `script.createCachedData()`。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`importModuleDynamically` {Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER} 用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                          "name": "importModuleDynamically",
+                          "type": "Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER",
+                          "desc": "用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果 <code>options</code> 是字符串，则它指定文件名。</p>\n<p>创建一个新的 <code>vm.Script</code> 对象会编译 <code>code</code> 但不会运行它。编译后的 <code>vm.Script</code> 可以在以后多次运行。<code>code</code> 不绑定到任何全局对象；相反，它在每次运行前绑定，仅针对该次运行。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`cachedDataRejected` 类型: {boolean|undefined}",
+              "type": "boolean|undefined",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v5.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当向 <code>vm.Script</code> 提供 <code>cachedData</code> 时，此值将根据 V8 对数据的接受情况设置为 <code>true</code> 或 <code>false</code>。否则该值为 <code>undefined</code>。</p>"
+            },
+            {
+              "textRaw": "`sourceMapURL` 类型: {string|undefined}",
+              "type": "string|undefined",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v19.1.0",
+                  "v18.13.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当脚本从包含 source map 魔术注释的源编译时，此属性将设置为 source map 的 URL。</p>\n<pre><code class=\"language-mjs\">import vm from 'node:vm';\n\nconst script = new vm.Script(`\nfunction myFunc() {}\n//# sourceMappingURL=sourcemap.json\n`);\n\nconsole.log(script.sourceMapURL);\n// 打印: sourcemap.json\n</code></pre>\n<pre><code class=\"language-cjs\">const vm = require('node:vm');\n\nconst script = new vm.Script(`\nfunction myFunc() {}\n//# sourceMappingURL=sourcemap.json\n`);\n\nconsole.log(script.sourceMapURL);\n// 打印: sourcemap.json\n</code></pre>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`script.createCachedData()`",
+              "type": "method",
+              "name": "createCachedData",
+              "meta": {
+                "added": [
+                  "v10.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Buffer}",
+                      "name": "返回",
+                      "type": "Buffer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个代码缓存，可用于 <code>Script</code> 构造函数的 <code>cachedData</code> 选项。返回一个 <code>Buffer</code>。此方法可以在任何时候调用任意次数。</p>\n<p><code>Script</code> 的代码缓存不包含任何 JavaScript 可观察状态。代码缓存可以安全地与脚本源一起保存，并多次用于构建新的 <code>Script</code> 实例。</p>\n<p><code>Script</code> 源中的函数可以被标记为延迟编译，它们在 <code>Script</code> 构造时不会被编译。这些函数将在首次调用时被编译。代码缓存序列化了 V8 当前已知的关于 <code>Script</code> 的元数据，它可以用来加速未来的编译。</p>\n<pre><code class=\"language-js\">const script = new vm.Script(`\nfunction add(a, b) {\n  return a + b;\n}\n\nconst x = add(1, 2);\n`);\n\nconst cacheWithoutAdd = script.createCachedData();\n// 在 `cacheWithoutAdd` 中，函数 `add()` 被标记为在调用时完全编译。\n\nscript.runInThisContext();\n\nconst cacheWithAdd = script.createCachedData();\n// `cacheWithAdd` 包含完全编译的函数 `add()`。\n</code></pre>"
+            },
+            {
+              "textRaw": "`script.runInContext(contextifiedObject[, options])`",
+              "type": "method",
+              "name": "runInContext",
+              "meta": {
+                "added": [
+                  "v0.3.1"
+                ],
+                "changes": [
+                  {
+                    "version": "v6.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/6635",
+                    "description": "The `breakOnSigint` option is supported now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`contextifiedObject` {Object} 一个由 `vm.createContext()` 方法返回的 [contextified][] 对象。",
+                      "name": "contextifiedObject",
+                      "type": "Object",
+                      "desc": "一个由 `vm.createContext()` 方法返回的 [contextified][] 对象。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。",
+                          "name": "displayErrors",
+                          "type": "boolean",
+                          "desc": "当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                          "name": "timeout",
+                          "type": "integer",
+                          "desc": "指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                        },
+                        {
+                          "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                          "name": "breakOnSigint",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {any} 脚本中执行的最后一个语句的结果。",
+                      "name": "返回",
+                      "type": "any",
+                      "desc": "脚本中执行的最后一个语句的结果。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在给定的 <code>contextifiedObject</code> 中运行 <code>vm.Script</code> 对象包含的已编译代码，并返回结果。运行的代码无法访问局部作用域。</p>\n<p>以下示例编译了增加一个全局变量、设置另一个全局变量的值的代码，然后多次执行该代码。全局变量包含在 <code>context</code> 对象中。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst context = {\n  animal: 'cat',\n  count: 2,\n};\n\nconst script = new vm.Script('count += 1; name = \"kitty\";');\n\nvm.createContext(context);\nfor (let i = 0; i &#x3C; 10; ++i) {\n  script.runInContext(context);\n}\n\nconsole.log(context);\n// 打印: { animal: 'cat', count: 12, name: 'kitty' }\n</code></pre>\n<p>使用 <code>timeout</code> 或 <code>breakOnSigint</code> 选项将导致启动新的事件循环和相应的线程，这会带来非零的性能开销。</p>"
+            },
+            {
+              "textRaw": "`script.runInNewContext([contextObject[, options]])`",
+              "type": "method",
+              "name": "runInNewContext",
+              "meta": {
+                "added": [
+                  "v0.3.1"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.8.0",
+                      "v20.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/54394",
+                    "description": "The `contextObject` argument now accepts `vm.constants.DONT_CONTEXTIFY`."
+                  },
+                  {
+                    "version": "v14.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/34023",
+                    "description": "The `microtaskMode` option is supported now."
+                  },
+                  {
+                    "version": "v10.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/19016",
+                    "description": "The `contextCodeGeneration` option is supported now."
+                  },
+                  {
+                    "version": "v6.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/6635",
+                    "description": "The `breakOnSigint` option is supported now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`contextObject` {Object|vm.constants.DONT\\_CONTEXTIFY|undefined} 可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。",
+                      "name": "contextObject",
+                      "type": "Object|vm.constants.DONT\\_CONTEXTIFY|undefined",
+                      "desc": "可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。",
+                          "name": "displayErrors",
+                          "type": "boolean",
+                          "desc": "当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                          "name": "timeout",
+                          "type": "integer",
+                          "desc": "指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                        },
+                        {
+                          "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                          "name": "breakOnSigint",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`contextName` {string} 新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。",
+                          "name": "contextName",
+                          "type": "string",
+                          "desc": "新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。"
+                        },
+                        {
+                          "textRaw": "`contextOrigin` {string} 对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。",
+                          "name": "contextOrigin",
+                          "type": "string",
+                          "desc": "对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。"
+                        },
+                        {
+                          "textRaw": "`contextCodeGeneration` {Object}",
+                          "name": "contextCodeGeneration",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`strings` {boolean} 如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。",
+                              "name": "strings",
+                              "type": "boolean",
+                              "desc": "如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。"
+                            },
+                            {
+                              "textRaw": "`wasm` {boolean} 如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。",
+                              "name": "wasm",
+                              "type": "boolean",
+                              "desc": "如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`microtaskMode` {string} 如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。",
+                          "name": "microtaskMode",
+                          "type": "string",
+                          "desc": "如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {any} 脚本中执行的最后一个语句的结果。",
+                      "name": "返回",
+                      "type": "any",
+                      "desc": "脚本中执行的最后一个语句的结果。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法是 <code>script.runInContext(vm.createContext(options), options)</code> 的快捷方式。它同时做了几件事：</p>\n<ol>\n<li>创建一个新的上下文。</li>\n<li>如果 <code>contextObject</code> 是一个对象，则使用新上下文对其进行 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a>。如果 <code>contextObject</code> 是 undefined，则创建一个新对象并对其进行 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a>。如果 <code>contextObject</code> 是 <a href=\"#vmconstantsdont_contextify\"><code>vm.constants.DONT_CONTEXTIFY</code></a>，则不 [contextify][] 任何东西。</li>\n<li>在创建的上下文中运行 <code>vm.Script</code> 对象包含的已编译代码。代码无法访问此方法被调用的作用域。</li>\n<li>返回结果。</li>\n</ol>\n<p>以下示例编译了设置全局变量的代码，然后在不同的上下文中多次执行该代码。全局变量设置并包含在每个单独的 <code>context</code> 中。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst script = new vm.Script('globalVar = \"set\"');\n\nconst contexts = [{}, {}, {}];\ncontexts.forEach((context) => {\n  script.runInNewContext(context);\n});\n\nconsole.log(contexts);\n// 打印: [{ globalVar: 'set' }, { globalVar: 'set' }, { globalVar: 'set' }]\n\n// 如果上下文是从上下文化对象创建的，这将抛出。\n// vm.constants.DONT_CONTEXTIFY 允许创建具有普通全局对象的上下文，这些对象可以被冻结。\nconst freezeScript = new vm.Script('Object.freeze(globalThis); globalThis;');\nconst frozenContext = freezeScript.runInNewContext(vm.constants.DONT_CONTEXTIFY);\n</code></pre>"
+            },
+            {
+              "textRaw": "`script.runInThisContext([options])`",
+              "type": "method",
+              "name": "runInThisContext",
+              "meta": {
+                "added": [
+                  "v0.3.1"
+                ],
+                "changes": [
+                  {
+                    "version": "v6.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/6635",
+                    "description": "The `breakOnSigint` option is supported now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。",
+                          "name": "displayErrors",
+                          "type": "boolean",
+                          "desc": "当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                          "name": "timeout",
+                          "type": "integer",
+                          "desc": "指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                        },
+                        {
+                          "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                          "name": "breakOnSigint",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {any} 脚本中执行的最后一个语句的结果。",
+                      "name": "返回",
+                      "type": "any",
+                      "desc": "脚本中执行的最后一个语句的结果。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在当前 <code>global</code> 对象的上下文中运行 <code>vm.Script</code> 包含的已编译代码。运行的代码无法访问局部作用域，但<em>可以</em>访问当前的 <code>global</code> 对象。</p>\n<p>以下示例编译了增加一个 <code>global</code> 变量的代码，然后多次执行该代码：</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nglobal.globalVar = 0;\n\nconst script = new vm.Script('globalVar += 1', { filename: 'myfile.vm' });\n\nfor (let i = 0; i &#x3C; 1000; ++i) {\n  script.runInThisContext();\n}\n\nconsole.log(globalVar);\n\n// 1000\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`vm.Script`"
+        },
+        {
+          "textRaw": "类：`vm.Module`",
+          "name": "类：`vm.module`",
+          "meta": {
+            "added": [
+              "v13.0.0",
+              "v12.16.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>此功能仅在启用 <code>--experimental-vm-modules</code> 命令标志时可用。</p>\n<p><code>vm.Module</code> 类提供了一个低级接口，用于在 VM 上下文中使用 ECMAScript 模块。它是 <code>vm.Script</code> 类的对应物，紧密反映了 ECMAScript 规范中定义的 <a href=\"https://tc39.es/ecma262/#sec-abstract-module-records\">模块记录</a>。</p>\n<p>然而，与 <code>vm.Script</code> 不同，每个 <code>vm.Module</code> 对象从创建起就绑定到一个上下文。</p>\n<p>使用 <code>vm.Module</code> 对象需要三个不同的步骤：创建/解析、链接和评估。以下示例说明了这三个步骤。</p>\n<p>此实现处于比 <a href=\"esm.html#modules-ecmascript-modules\">ECMAScript 模块加载器</a> 更低的级别。目前还没有办法与加载器交互，不过支持已在计划中。</p>\n<pre><code class=\"language-mjs\">import vm from 'node:vm';\n\nconst contextifiedObject = vm.createContext({\n  secret: 42,\n  print: console.log,\n});\n\n// 步骤 1\n//\n// 通过构造一个新的 `vm.SourceTextModule` 对象来创建一个模块。这\n// 会解析提供的源文本，如果出现任何问题则会抛出 `SyntaxError`。\n// 默认情况下，模块在顶级上下文中创建。但在这里，我们\n// 指定 `contextifiedObject` 作为此模块所属的上下文。\n//\n// 这里，我们尝试从模块 \"foo\" 获取默认导出，并\n// 将其放入本地绑定 \"secret\"。\n\nconst rootModule = new vm.SourceTextModule(`\n  import s from 'foo';\n  s;\n  print(s);\n`, { context: contextifiedObject });\n\n// 步骤 2\n//\n// 将此模块的导入依赖\"链接\"到它。\n//\n// 通过 `sourceTextModule.moduleRequests` 获取 SourceTextModule 的请求依赖项\n// 并解析它们。\n//\n// 即使没有依赖项的顶级模块也必须显式链接。传递\n// 给 `sourceTextModule.linkRequests(modules)` 的数组可以是\n// 空的。\n//\n// 注意：这是一个人为的例子，因为 resolveAndLinkDependencies\n// 每次被调用时都会创建一个新的 \"foo\" 模块。在完整的\n// 模块系统中，可能会使用缓存来避免重复模块。\n\nconst moduleMap = new Map([\n  ['root', rootModule],\n]);\n\nfunction resolveAndLinkDependencies(module) {\n  const requestedModules = module.moduleRequests.map((request) => {\n    // 在完整的模块系统中，resolveAndLinkDependencies 会\n    // 使用模块缓存键 `[specifier, attributes]` 解析模块。\n    // 在这个例子中，我们只使用说明符作为键。\n    const specifier = request.specifier;\n\n    let requestedModule = moduleMap.get(specifier);\n    if (requestedModule === undefined) {\n      requestedModule = new vm.SourceTextModule(`\n        // \"secret\" 变量指的是我们在创建上下文时添加到\n        // \"contextifiedObject\" 的全局变量。\n        export default secret;\n      `, { context: referencingModule.context });\n      moduleMap.set(specifier, linkedModule);\n      // 同时解析新模块的依赖项。\n      resolveAndLinkDependencies(requestedModule);\n    }\n\n    return requestedModule;\n  });\n\n  module.linkRequests(requestedModules);\n}\n\nresolveAndLinkDependencies(rootModule);\nrootModule.instantiate();\n\n// 步骤 3\n//\n// 评估模块。evaluate() 方法返回一个 promise，该 promise 将在\n// 模块评估完成后解析。\n\n// 打印 42。\nawait rootModule.evaluate();\n</code></pre>\n<pre><code class=\"language-cjs\">const vm = require('node:vm');\n\nconst contextifiedObject = vm.createContext({\n  secret: 42,\n  print: console.log,\n});\n\n(async () => {\n  // 步骤 1\n  //\n  // 通过构造一个新的 `vm.SourceTextModule` 对象来创建一个模块。这\n  // 会解析提供的源文本，如果出现任何问题则会抛出 `SyntaxError`。\n  // 默认情况下，模块在顶级上下文中创建。但在这里，我们\n  // 指定 `contextifiedObject` 作为此模块所属的上下文。\n  //\n  // 这里，我们尝试从模块 \"foo\" 获取默认导出，并\n  // 将其放入本地绑定 \"secret\"。\n\n  const rootModule = new vm.SourceTextModule(`\n    import s from 'foo';\n    s;\n    print(s);\n  `, { context: contextifiedObject });\n\n  // 步骤 2\n  //\n  // 将此模块的导入依赖\"链接\"到它。\n  //\n  // 通过 `sourceTextModule.moduleRequests` 获取 SourceTextModule 的请求依赖项\n  // 并解析它们。\n  //\n  // 即使没有依赖项的顶级模块也必须显式链接。传递\n  // 给 `sourceTextModule.linkRequests(modules)` 的数组可以是\n  // 空的。\n  //\n  // 注意：这是一个人为的例子，因为 resolveAndLinkDependencies\n  // 每次被调用时都会创建一个新的 \"foo\" 模块。在完整的\n  // 模块系统中，可能会使用缓存来避免重复模块。\n\n  const moduleMap = new Map([\n    ['root', rootModule],\n  ]);\n\n  function resolveAndLinkDependencies(module) {\n    const requestedModules = module.moduleRequests.map((request) => {\n      // 在完整的模块系统中，resolveAndLinkDependencies 会\n      // 使用模块缓存键 `[specifier, attributes]` 解析模块。\n      // 在这个例子中，我们只使用说明符作为键。\n      const specifier = request.specifier;\n\n      let requestedModule = moduleMap.get(specifier);\n      if (requestedModule === undefined) {\n        requestedModule = new vm.SourceTextModule(`\n          // \"secret\" 变量指的是我们在创建上下文时添加到\n          // \"contextifiedObject\" 的全局变量。\n          export default secret;\n        `, { context: referencingModule.context });\n        moduleMap.set(specifier, linkedModule);\n        // 同时解析新模块的依赖项。\n        resolveAndLinkDependencies(requestedModule);\n      }\n\n      return requestedModule;\n    });\n\n    module.linkRequests(requestedModules);\n  }\n\n  resolveAndLinkDependencies(rootModule);\n  rootModule.instantiate();\n\n  // 步骤 3\n  //\n  // 评估模块。evaluate() 方法返回一个 promise，该 promise 将在\n  // 模块评估完成后解析。\n\n  // 打印 42。\n  await rootModule.evaluate();\n})();\n</code></pre>",
+          "properties": [
+            {
+              "textRaw": "`error` 类型: {any}",
+              "type": "any",
+              "name": "类型",
+              "desc": "<p>如果 <code>module.status</code> 是 <code>'errored'</code>，此属性包含模块在评估期间抛出的异常。如果状态是其他任何值，访问此属性将导致抛出异常。</p>\n<p>值 <code>undefined</code> 不能用于没有抛出异常的情况，因为可能与 <code>throw undefined;</code> 产生歧义。</p>\n<p>对应于 ECMAScript 规范中 <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">循环模块记录</a> 的 <code>[[EvaluationError]]</code> 字段。</p>"
+            },
+            {
+              "textRaw": "`identifier` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "desc": "<p>当前模块的标识符，在构造函数中设置。</p>"
+            },
+            {
+              "textRaw": "`namespace` 类型: {Object}",
+              "type": "Object",
+              "name": "类型",
+              "desc": "<p>模块的命名空间对象。这仅在链接（<code>module.link()</code>）完成后可用。</p>\n<p>对应于 ECMAScript 规范中的 <a href=\"https://tc39.es/ecma262/#sec-getmodulenamespace\">GetModuleNamespace</a> 抽象操作。</p>"
+            },
+            {
+              "textRaw": "`status` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "desc": "<p>模块的当前状态。将是以下之一：</p>\n<ul>\n<li>\n<p><code>'unlinked'</code>：尚未调用 <code>module.link()</code>。</p>\n</li>\n<li>\n<p><code>'linking'</code>：已调用 <code>module.link()</code>，但链接器函数返回的 Promise 尚未全部解析。</p>\n</li>\n<li>\n<p><code>'linked'</code>：模块已成功链接，其所有依赖项都已链接，但尚未调用 <code>module.evaluate()</code>。</p>\n</li>\n<li>\n<p><code>'evaluating'</code>：模块正在通过自身或父模块的 <code>module.evaluate()</code> 进行评估。</p>\n</li>\n<li>\n<p><code>'evaluated'</code>：模块已成功评估。</p>\n</li>\n<li>\n<p><code>'errored'</code>：模块已评估，但抛出了异常。</p>\n</li>\n</ul>\n<p>除了 <code>'errored'</code>，此状态字符串对应于规范中的 <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">循环模块记录</a> 的 <code>[[Status]]</code> 字段。<code>'errored'</code> 对应于规范中的 <code>'evaluated'</code>，但 <code>[[EvaluationError]]</code> 设置为不是 <code>undefined</code> 的值。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`module.evaluate([options])`",
+              "type": "method",
+              "name": "evaluate",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`timeout` {integer} 指定在终止执行前评估的毫秒数。如果执行被中断，将抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                          "name": "timeout",
+                          "type": "integer",
+                          "desc": "指定在终止执行前评估的毫秒数。如果执行被中断，将抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                        },
+                        {
+                          "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                          "name": "breakOnSigint",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {Promise} 成功时使用 `undefined` 完成。",
+                      "name": "返回",
+                      "type": "Promise",
+                      "desc": "成功时使用 `undefined` 完成。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>评估模块。</p>\n<p>这必须在模块链接后调用；否则它将拒绝。它也可以在模块已经被评估时调用，在这种情况下，如果初始评估成功结束（<code>module.status</code> 是 <code>'evaluated'</code>），它将不执行任何操作，或者它将重新抛出初始评估导致的异常（<code>module.status</code> 是 <code>'errored'</code>）。</p>\n<p>当模块正在评估时（<code>module.status</code> 是 <code>'evaluating'</code>）不能调用此方法。</p>\n<p>对应于 ECMAScript 规范中 <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">循环模块记录</a> 的 <a href=\"https://tc39.es/ecma262/#sec-moduleevaluation\">Evaluate() 具体方法</a> 字段。</p>"
+            },
+            {
+              "textRaw": "`module.link(linker)`",
+              "type": "method",
+              "name": "link",
+              "meta": {
+                "changes": [
+                  {
+                    "version": [
+                      "v21.1.0",
+                      "v20.10.0",
+                      "v18.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/50141",
+                    "description": "The option `extra.assert` is renamed to `extra.attributes`. The former name is still provided for backward compatibility."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`linker` {Function}",
+                      "name": "linker",
+                      "type": "Function",
+                      "options": [
+                        {
+                          "textRaw": "`specifier` {string} 请求模块的说明符：```mjs import foo from 'foo'; // ^^^^^ 模块说明符 ```",
+                          "name": "specifier",
+                          "type": "string",
+                          "desc": "请求模块的说明符：```mjs import foo from 'foo'; // ^^^^^ 模块说明符 ```"
+                        },
+                        {
+                          "textRaw": "`referencingModule` {vm.Module} 调用 `link()` 的 `Module` 对象。",
+                          "name": "referencingModule",
+                          "type": "vm.Module",
+                          "desc": "调用 `link()` 的 `Module` 对象。"
+                        },
+                        {
+                          "textRaw": "`extra` {Object}",
+                          "name": "extra",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`attributes` {Object} 来自属性的数据：```mjs import foo from 'foo' with { name: 'value' }; // ^^^^^^^^^^^^^^^^^ 属性 ```根据 ECMA-262，如果存在不受支持的属性，宿主应触发错误。",
+                              "name": "attributes",
+                              "type": "Object",
+                              "desc": "来自属性的数据：```mjs import foo from 'foo' with { name: 'value' }; // ^^^^^^^^^^^^^^^^^ 属性 ```根据 ECMA-262，如果存在不受支持的属性，宿主应触发错误。"
+                            },
+                            {
+                              "textRaw": "`assert` {Object} `extra.attributes` 的别名。",
+                              "name": "assert",
+                              "type": "Object",
+                              "desc": "`extra.attributes` 的别名。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回: {vm.Module|Promise}",
+                          "name": "返回",
+                          "type": "vm.Module|Promise"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>链接模块依赖项。此方法必须在评估之前调用，并且每个模块只能调用一次。</p>\n<p>使用 <a href=\"#sourcetextmodulelinkrequestsmodules\"><code>sourceTextModule.linkRequests(modules)</code></a> 和 <a href=\"#sourcetextmoduleinstantiate\"><code>sourceTextModule.instantiate()</code></a> 来同步或异步链接模块。</p>\n<p>该函数预期返回一个 <code>Module</code> 对象或最终解析为 <code>Module</code> 对象的 <code>Promise</code>。返回的 <code>Module</code> 必须满足以下两个不变条件：</p>\n<ul>\n<li>它必须与父 <code>Module</code> 属于同一上下文。</li>\n<li>它的 <code>status</code> 不能是 <code>'errored'</code>。</li>\n</ul>\n<p>如果返回的 <code>Module</code> 的 <code>status</code> 是 <code>'unlinked'</code>，则将在返回的 <code>Module</code> 上递归调用此方法，并使用相同的提供的 <code>linker</code> 函数。</p>\n<p><code>link()</code> 返回一个 <code>Promise</code>，该 Promise 将在所有链接实例解析为有效的 <code>Module</code> 时解析，或者在链接器函数抛出异常或返回无效的 <code>Module</code> 时拒绝。</p>\n<p>链接器函数大致对应于 ECMAScript 规范中实现定义的 <a href=\"https://tc39.es/ecma262/#sec-hostresolveimportedmodule\">HostResolveImportedModule</a> 抽象操作，但有一些关键区别：</p>\n<ul>\n<li>链接器函数允许是异步的，而 <a href=\"https://tc39.es/ecma262/#sec-hostresolveimportedmodule\">HostResolveImportedModule</a> 是同步的。</li>\n</ul>\n<p>模块链接期间使用的实际 <a href=\"https://tc39.es/ecma262/#sec-hostresolveimportedmodule\">HostResolveImportedModule</a> 实现是返回在链接期间链接的模块的实现。因为在那个时候所有模块都已经完全链接，所以 <a href=\"https://tc39.es/ecma262/#sec-hostresolveimportedmodule\">HostResolveImportedModule</a> 实现根据规范是完全同步的。</p>\n<p>对应于 ECMAScript 规范中 <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">循环模块记录</a> 的 <a href=\"https://tc39.es/ecma262/#sec-moduledeclarationlinking\">Link() 具体方法</a> 字段。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`vm.Module`"
+        },
+        {
+          "textRaw": "类：`vm.SourceTextModule`",
+          "name": "类：`vm.sourcetextmodule`",
+          "meta": {
+            "added": [
+              "v9.6.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>此功能仅在启用 <code>--experimental-vm-modules</code> 命令标志时可用。</p>\n<ul>\n<li>扩展: <a href=\"vm.html#class-vmmodule\" class=\"type\">&lt;vm.Module&gt;</a></li>\n</ul>\n<p><code>vm.SourceTextModule</code> 类提供了 ECMAScript 规范中定义的 <a href=\"https://tc39.es/ecma262/#sec-source-text-module-records\">源文本模块记录</a>。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new vm.SourceTextModule(code[, options])`",
+              "type": "ctor",
+              "name": "vm.SourceTextModule",
+              "meta": {
+                "changes": [
+                  {
+                    "version": [
+                      "v17.0.0",
+                      "v16.12.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/40249",
+                    "description": "Added support for import attributes to the `importModuleDynamically` parameter."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`code` {string} 要解析的 JavaScript 模块代码",
+                      "name": "code",
+                      "type": "string",
+                      "desc": "要解析的 JavaScript 模块代码"
+                    },
+                    {
+                      "textRaw": "`options`",
+                      "name": "options",
+                      "options": [
+                        {
+                          "textRaw": "`identifier` {string} 在堆栈跟踪中使用的字符串。**默认值:** `'vm:module(i)'`，其中 `i` 是特定于上下文的递增索引。",
+                          "name": "identifier",
+                          "type": "string",
+                          "desc": "在堆栈跟踪中使用的字符串。**默认值:** `'vm:module(i)'`，其中 `i` 是特定于上下文的递增索引。"
+                        },
+                        {
+                          "textRaw": "`cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。`code` 必须与生成此 `cachedData` 的模块相同。",
+                          "name": "cachedData",
+                          "type": "Buffer|TypedArray|DataView",
+                          "desc": "提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。`code` 必须与生成此 `cachedData` 的模块相同。"
+                        },
+                        {
+                          "textRaw": "`context` {Object} 由 `vm.createContext()` 方法返回的 [contextified][] 对象，用于编译和评估此 `Module`。如果未指定上下文，模块将在当前执行上下文中进行评估。",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "由 `vm.createContext()` 方法返回的 [contextified][] 对象，用于编译和评估此 `Module`。如果未指定上下文，模块将在当前执行上下文中进行评估。"
+                        },
+                        {
+                          "textRaw": "`lineOffset` {integer} 指定此 `Module` 产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。",
+                          "name": "lineOffset",
+                          "type": "integer",
+                          "desc": "指定此 `Module` 产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。"
+                        },
+                        {
+                          "textRaw": "`columnOffset` {integer} 指定此 `Module` 产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。",
+                          "name": "columnOffset",
+                          "type": "integer",
+                          "desc": "指定此 `Module` 产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。"
+                        },
+                        {
+                          "textRaw": "`initializeImportMeta` {Function} 在此 `Module` 评估期间调用以初始化 `import.meta`。",
+                          "name": "initializeImportMeta",
+                          "type": "Function",
+                          "desc": "在此 `Module` 评估期间调用以初始化 `import.meta`。",
+                          "options": [
+                            {
+                              "textRaw": "`meta` {import.meta}",
+                              "name": "meta",
+                              "type": "import.meta"
+                            },
+                            {
+                              "textRaw": "`module` {vm.SourceTextModule}",
+                              "name": "module",
+                              "type": "vm.SourceTextModule"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`importModuleDynamically` {Function} 用于指定在此模块评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                          "name": "importModuleDynamically",
+                          "type": "Function",
+                          "desc": "用于指定在此模块评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个新的 <code>SourceTextModule</code> 实例。</p>\n<p>分配给 <code>import.meta</code> 对象的属性如果是对象，可能允许模块访问指定 <code>context</code> 之外的信息。使用 <code>vm.runInContext()</code> 在特定上下文中创建对象。</p>\n<pre><code class=\"language-mjs\">import vm from 'node:vm';\n\nconst contextifiedObject = vm.createContext({ secret: 42 });\n\nconst module = new vm.SourceTextModule(\n  'Object.getPrototypeOf(import.meta.prop).secret = secret;',\n  {\n    initializeImportMeta(meta) {\n      // 注意：此对象是在顶级上下文中创建的。因此，\n      // Object.getPrototypeOf(import.meta.prop) 指向的是\n      // 顶级上下文中的 Object.prototype，而不是\n      // contextifiedObject 中的那个。\n      meta.prop = {};\n    },\n  });\n// 该模块有一个空的 `moduleRequests` 数组。\nmodule.linkRequests([]);\nmodule.instantiate();\nawait module.evaluate();\n\n// 现在，Object.prototype.secret 将等于 42。\n//\n// 要解决此问题，请将上面的\n//     meta.prop = {};\n// 替换为\n//     meta.prop = vm.runInContext('{}', contextifiedObject);\n</code></pre>\n<pre><code class=\"language-cjs\">const vm = require('node:vm');\nconst contextifiedObject = vm.createContext({ secret: 42 });\n(async () => {\n  const module = new vm.SourceTextModule(\n    'Object.getPrototypeOf(import.meta.prop).secret = secret;',\n    {\n      initializeImportMeta(meta) {\n        // 注意：此对象是在顶级上下文中创建的。因此，\n        // Object.getPrototypeOf(import.meta.prop) 指向的是\n        // 顶级上下文中的 Object.prototype，而不是\n        // contextifiedObject 中的那个。\n        meta.prop = {};\n      },\n    });\n  // 该模块有一个空的 `moduleRequests` 数组。\n  module.linkRequests([]);\n  module.instantiate();\n  await module.evaluate();\n  // 现在，Object.prototype.secret 将等于 42。\n  //\n  // 要解决此问题，请将上面的\n  //     meta.prop = {};\n  // 替换为\n  //     meta.prop = vm.runInContext('{}', contextifiedObject);\n})();\n</code></pre>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`sourceTextModule.createCachedData()`",
+              "type": "method",
+              "name": "createCachedData",
+              "meta": {
+                "added": [
+                  "v13.7.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Buffer}",
+                      "name": "返回",
+                      "type": "Buffer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个代码缓存，可用于 <code>SourceTextModule</code> 构造函数的 <code>cachedData</code> 选项。返回一个 <code>Buffer</code>。此方法可以在模块评估之前调用任意次数。</p>\n<p><code>SourceTextModule</code> 的代码缓存不包含任何 JavaScript 可观察状态。代码缓存可以安全地与脚本源一起保存，并多次用于构建新的 <code>SourceTextModule</code> 实例。</p>\n<p><code>SourceTextModule</code> 源中的函数可以被标记为延迟编译，它们在 <code>SourceTextModule</code> 构造时不会被编译。这些函数将在首次调用时被编译。代码缓存序列化了 V8 当前已知的关于 <code>SourceTextModule</code> 的元数据，它可以用来加速未来的编译。</p>\n<pre><code class=\"language-js\">// 创建一个初始模块\nconst module = new vm.SourceTextModule('const a = 1;');\n\n// 从此模块创建缓存数据\nconst cachedData = module.createCachedData();\n\n// 使用缓存数据创建一个新模块。代码必须相同。\nconst module2 = new vm.SourceTextModule('const a = 1;', { cachedData });\n</code></pre>"
+            },
+            {
+              "textRaw": "`sourceTextModule.hasAsyncGraph()`",
+              "type": "method",
+              "name": "hasAsyncGraph",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>遍历依赖图，如果其依赖项中的任何模块或此模块本身包含顶级 <code>await</code> 表达式，则返回 <code>true</code>，否则返回 <code>false</code>。</p>\n<p>如果图足够大，搜索可能会很慢。</p>\n<p>这要求模块首先被实例化。如果模块尚未实例化，将抛出错误。</p>"
+            },
+            {
+              "textRaw": "`sourceTextModule.hasTopLevelAwait()`",
+              "type": "method",
+              "name": "hasTopLevelAwait",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回模块本身是否包含任何顶级 <code>await</code> 表达式。</p>\n<p>这对应于 ECMAScript 规范中 <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">循环模块记录</a> 的 <code>[[HasTLA]]</code> 字段。</p>"
+            },
+            {
+              "textRaw": "`sourceTextModule.instantiate()`",
+              "type": "method",
+              "name": "instantiate",
+              "meta": {
+                "added": [
+                  "v24.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {undefined}",
+                      "name": "返回",
+                      "type": "undefined"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>使用链接的请求模块实例化模块。</p>\n<p>这解析了模块的导入绑定，包括重新导出的绑定名称。如果有任何无法解析的绑定，将同步抛出错误。</p>\n<p>如果请求的模块包括循环依赖，则必须在调用此方法之前对循环中的所有模块调用 <a href=\"#sourcetextmodulelinkrequestsmodules\"><code>sourceTextModule.linkRequests(modules)</code></a> 方法。</p>"
+            },
+            {
+              "textRaw": "`sourceTextModule.linkRequests(modules)`",
+              "type": "method",
+              "name": "linkRequests",
+              "meta": {
+                "added": [
+                  "v24.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`modules` {vm.Module\\[]} 此模块依赖的 `vm.Module` 对象数组。数组中模块的顺序是 [`sourceTextModule.moduleRequests`][] 的顺序。",
+                      "name": "modules",
+                      "type": "vm.Module\\[]",
+                      "desc": "此模块依赖的 `vm.Module` 对象数组。数组中模块的顺序是 [`sourceTextModule.moduleRequests`][] 的顺序。"
+                    },
+                    {
+                      "textRaw": "返回: {undefined}",
+                      "name": "返回",
+                      "type": "undefined"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>链接模块依赖项。此方法必须在评估之前调用，并且每个模块只能调用一次。</p>\n<p><code>modules</code> 数组中模块实例的顺序应对应于解析的 <a href=\"#sourcetextmodulemodulerequests\"><code>sourceTextModule.moduleRequests</code></a> 的顺序。如果两个模块请求具有相同的说明符和导入属性，它们必须使用相同的模块实例解析，否则将抛出 <code>ERR_MODULE_LINK_MISMATCH</code>。例如，当链接此模块的请求时：</p>\n<!-- eslint-disable no-duplicate-imports -->\n<pre><code class=\"language-mjs\">import foo from 'foo';\nimport source Foo from 'foo';\n</code></pre>\n<!-- eslint-enable no-duplicate-imports -->\n<p><code>modules</code> 数组必须包含对同一实例的两个引用，因为两个模块请求是相同的，但处于两个阶段。</p>\n<p>如果模块没有依赖项，<code>modules</code> 数组可以为空。</p>\n<p>用户可以使用 <code>sourceTextModule.moduleRequests</code> 来实现 ECMAScript 规范中宿主定义的 <a href=\"https://tc39.es/ecma262/#sec-HostLoadImportedModule\">HostLoadImportedModule</a> 抽象操作，并使用 <code>sourceTextModule.linkRequests()</code> 在具有所有依赖项的模块上调用规范定义的 <a href=\"https://tc39.es/ecma262/#sec-FinishLoadingImportedModule\">FinishLoadingImportedModule</a>。</p>\n<p>由 <code>SourceTextModule</code> 的创建者决定依赖项的解析是同步还是异步。</p>\n<p>在 <code>modules</code> 数组中的每个模块链接后，调用 <a href=\"#sourcetextmoduleinstantiate\"><code>sourceTextModule.instantiate()</code></a>。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`dependencySpecifiers` 类型: {string\\[]}",
+              "type": "string\\[]",
+              "name": "类型",
+              "meta": {
+                "changes": [
+                  {
+                    "version": "v24.4.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/20300",
+                    "description": "This is deprecated in favour of `sourceTextModule.moduleRequests`."
+                  }
+                ]
+              },
+              "stability": 0,
+              "stabilityText": "Deprecated: 使用 [`sourceTextModule.moduleRequests`][] 代替。",
+              "desc": "<p>此模块所有依赖项的说明符。返回的数组被冻结以防止任何更改。</p>\n<p>对应于 ECMAScript 规范中 <a href=\"https://tc39.es/ecma262/#sec-cyclic-module-records\">循环模块记录</a> 的 <code>[[RequestedModules]]</code> 字段。</p>"
+            },
+            {
+              "textRaw": "`moduleRequests` 类型: {ModuleRequest\\[]} 此模块的依赖项。",
+              "type": "ModuleRequest\\[]",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v24.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>此模块请求的导入依赖项。返回的数组被冻结以防止任何更改。</p>\n<p>例如，给定一个源文本：</p>\n<!-- eslint-disable no-duplicate-imports -->\n<pre><code class=\"language-mjs\">import foo from 'foo';\nimport fooAlias from 'foo';\nimport bar from './bar.js';\nimport withAttrs from '../with-attrs.ts' with { arbitraryAttr: 'attr-val' };\nimport source Module from 'wasm-mod.wasm';\n</code></pre>\n<!-- eslint-enable no-duplicate-imports -->\n<p><code>sourceTextModule.moduleRequests</code> 的值将是：</p>\n<pre><code class=\"language-js\">[\n  {\n    specifier: 'foo',\n    attributes: {},\n    phase: 'evaluation',\n  },\n  {\n    specifier: 'foo',\n    attributes: {},\n    phase: 'evaluation',\n  },\n  {\n    specifier: './bar.js',\n    attributes: {},\n    phase: 'evaluation',\n  },\n  {\n    specifier: '../with-attrs.ts',\n    attributes: { arbitraryAttr: 'attr-val' },\n    phase: 'evaluation',\n  },\n  {\n    specifier: 'wasm-mod.wasm',\n    attributes: {},\n    phase: 'source',\n  },\n];\n</code></pre>",
+              "shortDesc": "此模块的依赖项。"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`vm.SourceTextModule`"
+        },
+        {
+          "textRaw": "类：`vm.SyntheticModule`",
+          "name": "类：`vm.syntheticmodule`",
+          "meta": {
+            "added": [
+              "v13.0.0",
+              "v12.16.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>此功能仅在启用 <code>--experimental-vm-modules</code> 命令标志时可用。</p>\n<ul>\n<li>扩展: <a href=\"vm.html#class-vmmodule\" class=\"type\">&lt;vm.Module&gt;</a></li>\n</ul>\n<p><code>vm.SyntheticModule</code> 类提供了 WebIDL 规范中定义的 <a href=\"https://tc39.es/ecma262/#sec-synthetic-module-records\">合成模块记录</a>。合成模块的目的是为向 ECMAScript 模块图暴露非 JavaScript 源提供通用接口。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst source = '{ \"a\": 1 }';\nconst module = new vm.SyntheticModule(['default'], function() {\n  const obj = JSON.parse(source);\n  this.setExport('default', obj);\n});\n\n// 在链接中使用 `module`...\n</code></pre>",
+          "ctors": [
+            {
+              "textRaw": "`new vm.SyntheticModule(exportNames, evaluateCallback[, options])`",
+              "type": "ctor",
+              "name": "vm.SyntheticModule",
+              "meta": {
+                "added": [
+                  "v13.0.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`exportNames` {string\\[]} 将从模块导出的名称数组。",
+                      "name": "exportNames",
+                      "type": "string\\[]",
+                      "desc": "将从模块导出的名称数组。"
+                    },
+                    {
+                      "textRaw": "`evaluateCallback` {Function} 在模块评估时调用。",
+                      "name": "evaluateCallback",
+                      "type": "Function",
+                      "desc": "在模块评估时调用。"
+                    },
+                    {
+                      "textRaw": "`options`",
+                      "name": "options",
+                      "options": [
+                        {
+                          "textRaw": "`identifier` {string} 在堆栈跟踪中使用的字符串。**默认值:** `'vm:module(i)'`，其中 `i` 是特定于上下文的递增索引。",
+                          "name": "identifier",
+                          "type": "string",
+                          "desc": "在堆栈跟踪中使用的字符串。**默认值:** `'vm:module(i)'`，其中 `i` 是特定于上下文的递增索引。"
+                        },
+                        {
+                          "textRaw": "`context` {Object} 由 `vm.createContext()` 方法返回的 [contextified][] 对象，用于编译和评估此 `Module`。",
+                          "name": "context",
+                          "type": "Object",
+                          "desc": "由 `vm.createContext()` 方法返回的 [contextified][] 对象，用于编译和评估此 `Module`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个新的 <code>SyntheticModule</code> 实例。</p>\n<p>分配给此实例导出的对象可能允许模块的导入者访问指定 <code>context</code> 之外的信息。使用 <code>vm.runInContext()</code> 在特定上下文中创建对象。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`syntheticModule.setExport(name, value)`",
+              "type": "method",
+              "name": "setExport",
+              "meta": {
+                "added": [
+                  "v13.0.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/59000",
+                    "description": "No longer need to call `syntheticModule.link()` before calling this method."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string} 要设置的导出名称。",
+                      "name": "name",
+                      "type": "string",
+                      "desc": "要设置的导出名称。"
+                    },
+                    {
+                      "textRaw": "`value` {any} 设置导出的值。",
+                      "name": "value",
+                      "type": "any",
+                      "desc": "设置导出的值。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法使用给定值设置模块导出绑定槽。</p>\n<pre><code class=\"language-mjs\">import vm from 'node:vm';\n\nconst m = new vm.SyntheticModule(['x'], () => {\n  m.setExport('x', 1);\n});\n\nawait m.evaluate();\n\nassert.strictEqual(m.namespace.x, 1);\n</code></pre>\n<pre><code class=\"language-cjs\">const vm = require('node:vm');\n(async () => {\n  const m = new vm.SyntheticModule(['x'], () => {\n    m.setExport('x', 1);\n  });\n  await m.evaluate();\n  assert.strictEqual(m.namespace.x, 1);\n})();\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`vm.SyntheticModule`"
+        },
+        {
+          "textRaw": "类型：`ModuleRequest`",
+          "name": "类型：`modulerequest`",
+          "meta": {
+            "added": [
+              "v24.4.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>类型: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>specifier</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 请求模块的说明符。</li>\n<li><code>attributes</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 传递给 <a href=\"https://tc39.es/ecma262/#prod-ImportDeclaration\">ImportDeclaration</a> 中 <a href=\"https://tc39.es/ecma262/#prod-WithClause\">WithClause</a> 的 <code>\"with\"</code> 值，如果未提供值则为空对象。</li>\n<li><code>phase</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 请求模块的阶段（<code>\"source\"</code> 或 <code>\"evaluation\"</code>）。</li>\n</ul>\n</li>\n</ul>\n<p><code>ModuleRequest</code> 表示请求导入具有给定导入属性和阶段的模块。</p>",
+          "type": "module",
+          "displayName": "类型：`ModuleRequest`"
+        },
+        {
+          "textRaw": "示例：在 VM 中运行 HTTP 服务器",
+          "name": "示例：在_vm_中运行_http_服务器",
+          "desc": "<p>当使用 <a href=\"#scriptruninthiscontextoptions\"><code>script.runInThisContext()</code></a> 或 <a href=\"#vmruninthiscontextcode-options\"><code>vm.runInThisContext()</code></a> 时，代码在当前 V8 全局上下文中执行。传递给此 VM 上下文的代码将具有其自己独立的作用域。</p>\n<p>为了使用 <code>node:http</code> 模块运行一个简单的 Web 服务器，传递给上下文的代码必须自己调用 <code>require('node:http')</code>，或者具有传递给它的 <code>node:http</code> 模块的引用。例如：</p>\n<pre><code class=\"language-js\">'use strict';\nconst vm = require('node:vm');\n\nconst code = `\n((require) => {\n  const http = require('node:http');\n\n  http.createServer((request, response) => {\n    response.writeHead(200, { 'Content-Type': 'text/plain' });\n    response.end('Hello World\\\\n');\n  }).listen(8124);\n\n  console.log('Server running at http://127.0.0.1:8124/');\n})`;\n\nvm.runInThisContext(code)(require);\n</code></pre>\n<p>上述情况中的 <code>require()</code> 与它传递自的上下文共享状态。当执行不受信任的代码时，这可能会引入风险，例如以不希望的方式更改上下文中的对象。</p>",
+          "type": "module",
+          "displayName": "示例：在 VM 中运行 HTTP 服务器"
+        },
+        {
+          "textRaw": "\"上下文化\"一个对象是什么意思？",
+          "name": "\"上下文化\"一个对象是什么意思？",
+          "desc": "<p>在 Node.js 中执行的所有 JavaScript 都在一个\"上下文\"的作用域内运行。根据 <a href=\"https://v8.dev/docs/embed#contexts\">V8 嵌入者指南</a>：</p>\n<blockquote>\n<p>在 V8 中，上下文是一个执行环境，允许独立的、不相关的 JavaScript 应用程序在 V8 的单个实例中运行。您必须明确指定希望任何 JavaScript 代码运行的上下文。</p>\n</blockquote>\n<p>当使用对象调用 <code>vm.createContext()</code> 方法时，<code>contextObject</code> 参数将用于包装 V8 上下文新实例的全局对象（如果 <code>contextObject</code> 是 <code>undefined</code>，将在上下文化之前从当前上下文创建一个新对象）。此 V8 上下文为使用 <code>node:vm</code> 模块方法运行的 <code>code</code> 提供了一个隔离的全局环境，使其可以在其中操作。创建 V8 上下文并将其与外部上下文中的 <code>contextObject</code> 关联的过程就是本文档所指的\"上下文化\"对象。</p>\n<p>上下文化会给上下文中的 <code>globalThis</code> 值带来一些怪癖。例如，它不能被冻结，并且它与外部上下文中的 <code>contextObject</code> 不是引用相等的。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\n// 未定义的 `contextObject` 选项使全局对象被上下文化。\nconst context = vm.createContext();\nconsole.log(vm.runInContext('globalThis', context) === context);  // false\n// 被上下文化的全局对象不能被冻结。\ntry {\n  vm.runInContext('Object.freeze(globalThis);', context);\n} catch (e) {\n  console.log(e); // TypeError: Cannot freeze\n}\nconsole.log(vm.runInContext('globalThis.foo = 1; foo;', context));  // 1\n</code></pre>\n<p>要创建一个具有普通全局对象并在外部上下文中访问全局代理且怪癖较少的上下文，请将 <code>vm.constants.DONT_CONTEXTIFY</code> 指定为 <code>contextObject</code> 参数。</p>",
+          "properties": [
+            {
+              "textRaw": "`vm.constants.DONT_CONTEXTIFY`",
+              "name": "DONT_CONTEXTIFY",
+              "desc": "<p>当在 vm API 中用作 <code>contextObject</code> 参数时，此常量指示 Node.js 创建一个上下文，而不以 Node.js 特定的方式用另一个对象包装其全局对象。因此，新上下文内部的 <code>globalThis</code> 值的行为更接近于普通对象。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\n// 使用 vm.constants.DONT_CONTEXTIFY 冻结全局对象。\nconst context = vm.createContext(vm.constants.DONT_CONTEXTIFY);\nvm.runInContext('Object.freeze(globalThis);', context);\ntry {\n  vm.runInContext('bar = 1; bar;', context);\n} catch (e) {\n  console.log(e); // Uncaught ReferenceError: bar is not defined\n}\n</code></pre>\n<p>当 <code>vm.constants.DONT_CONTEXTIFY</code> 用作 <a href=\"#vmcreatecontextcontextobject-options\"><code>vm.createContext()</code></a> 的 <code>contextObject</code> 参数时，返回的对象是一个代理类对象，指向新创建上下文中的全局对象，具有较少的 Node.js 特定怪癖。它与新上下文中的 <code>globalThis</code> 值是引用相等的，可以从外部修改，并可用于直接访问新上下文中的内置对象。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst context = vm.createContext(vm.constants.DONT_CONTEXTIFY);\n\n// 返回的对象与新上下文中的 globalThis 引用相等。\nconsole.log(vm.runInContext('globalThis', context) === context);  // true\n\n// 可用于直接访问新上下文中的全局变量。\nconsole.log(context.Array);  // [Function: Array]\nvm.runInContext('foo = 1;', context);\nconsole.log(context.foo);  // 1\ncontext.bar = 1;\nconsole.log(vm.runInContext('bar;', context));  // 1\n\n// 可以被冻结，并且它会影响内部上下文。\nObject.freeze(context);\ntry {\n  vm.runInContext('baz = 1; baz;', context);\n} catch (e) {\n  console.log(e); // Uncaught ReferenceError: baz is not defined\n}\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "\"上下文化\"一个对象是什么意思？"
+        },
+        {
+          "textRaw": "超时与异步任务和 Promise 的交互",
+          "name": "超时与异步任务和_promise_的交互",
+          "desc": "<p><code>Promise</code> 和 <code>async function</code> 可以安排由 JavaScript 引擎异步运行的任务。默认情况下，这些任务在当前堆栈上的所有 JavaScript 函数执行完毕后运行。这允许逃脱 <code>timeout</code> 和 <code>breakOnSigint</code> 选项的功能。</p>\n<p>例如，以下由 <code>vm.runInNewContext()</code> 执行的代码，超时为 5 毫秒，在 promise 解析后安排一个无限循环运行。计划的循环永远不会被超时中断：</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nfunction loop() {\n  console.log('entering loop');\n  while (1) console.log(Date.now());\n}\n\nvm.runInNewContext(\n  'Promise.resolve().then(() => loop());',\n  { loop, console },\n  { timeout: 5 },\n);\n// 这在 'entering loop' 之前打印 (!)\nconsole.log('done executing');\n</code></pre>\n<p>可以通过将 <code>microtaskMode: 'afterEvaluate'</code> 传递给创建 <code>Context</code> 的代码来解决这个问题：</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nfunction loop() {\n  while (1) console.log(Date.now());\n}\n\nvm.runInNewContext(\n  'Promise.resolve().then(() => loop());',\n  { loop, console },\n  { timeout: 5, microtaskMode: 'afterEvaluate' },\n);\n</code></pre>\n<p>在这种情况下，通过 <code>promise.then()</code> 安排的微任务将在从 <code>vm.runInNewContext()</code> 返回之前运行，并将被 <code>timeout</code> 功能中断。这仅适用于在 <code>vm.Context</code> 中运行的代码，因此例如 <a href=\"#vmruninthiscontextcode-options\"><code>vm.runInThisContext()</code></a> 不接受此选项。</p>\n<p>Promise 回调被放入它们创建时所在上下文的微任务队列中。例如，如果在上面的示例中将 <code>() => loop()</code> 替换为 <code>loop</code>，那么 <code>loop</code> 将被推入全局微任务队列，因为它是来自外部（主）上下文的函数，因此也将能够逃脱超时。</p>\n<p>如果异步调度函数如 <code>process.nextTick()</code>、<code>queueMicrotask()</code>、<code>setTimeout()</code>、<code>setImmediate()</code> 等在 <code>vm.Context</code> 内部可用，传递给它们的函数将被添加到全局队列中，这些队列由所有上下文共享。因此，传递给这些函数的回调也不受超时控制。</p>",
+          "modules": [
+            {
+              "textRaw": "当 `microtaskMode` 是 `'afterEvaluate'` 时，注意在上下文之间共享 Promise",
+              "name": "当_`microtaskmode`_是_`'afterevaluate'`_时，注意在上下文之间共享_promise",
+              "desc": "<p>在 <code>'afterEvaluate'</code> 模式下，<code>Context</code> 有自己的微任务队列，与外部（主）上下文使用的全局微任务队列分开。虽然此模式对于强制执行 <code>timeout</code> 和启用 <code>breakOnSigint</code> 与异步任务是必要的，但它也使得在上下文之间共享 Promise 具有挑战性。</p>\n<p>在下面的示例中，一个 promise 在内部上下文中创建并与外部上下文共享。当外部上下文 <code>await</code> 该 promise 时，外部上下文的执行流程以一种令人惊讶的方式被破坏：日志语句永远不会执行。</p>\n<pre><code class=\"language-mjs\">import * as vm from 'node:vm';\n\nconst inner_context = vm.createContext({}, { microtaskMode: 'afterEvaluate' });\n\n// runInContext() 返回在内部上下文中创建的 Promise。\nconst inner_promise = vm.runInContext(\n  'Promise.resolve()',\n  context,\n);\n\n// 作为执行 `await` 的一部分，JavaScript 运行时必须将一个任务\n// 排入 `inner_promise` 创建时所在上下文的微任务队列。\n// 一个任务被添加到内部微任务队列，但**它不会自动运行**：此任务将无限期保持挂起。\n//\n// 由于外部微任务队列为空，外部模块中的执行\n// 会落空，下面的日志语句永远不会执行。\nawait inner_promise;\n\nconsole.log('this will NOT be printed');\n</code></pre>\n<p>为了在不同微任务队列的上下文之间成功共享 promise，有必要确保每当外部上下文将任务排入内部微任务队列时，内部微任务队列上的任务将被运行。</p>\n<p>每当在此上下文上调用脚本或模块的 <code>runInContext()</code> 或 <code>SourceTextModule.evaluate()</code> 时，给定上下文的微任务队列上的任务就会运行。在我们的示例中，可以通过在 <code>await inner_promise</code> 之前安排第二次调用 <code>runInContext()</code> 来恢复正常的执行流程。</p>\n<pre><code class=\"language-mjs\">// 安排 `runInContext()` 以手动清空内部上下文微任务队列；它将在下面的 `await` 语句之后运行。\nsetImmediate(() => {\n  vm.runInContext('', context);\n});\n\nawait inner_promise;\n\nconsole.log('OK');\n</code></pre>\n<p><strong>注意：</strong> 严格来说，在这种模式下，<code>node:vm</code> 偏离了 ECMAScript 规范中<a href=\"https://tc39.es/ecma262/#sec-hostenqueuepromisejob\">排队作业</a>的字面意义，允许来自不同上下文的异步任务以与它们排队顺序不同的顺序运行。</p>",
+              "type": "module",
+              "displayName": "当 `microtaskMode` 是 `'afterEvaluate'` 时，注意在上下文之间共享 Promise"
+            }
+          ],
+          "type": "module",
+          "displayName": "超时与异步任务和 Promise 的交互"
+        },
+        {
+          "textRaw": "编译 API 中对动态 `import()` 的支持",
+          "name": "编译_api_中对动态_`import()`_的支持",
+          "desc": "<p>以下 API 支持 <code>importModuleDynamically</code> 选项，以在 vm 模块编译的代码中启用动态 <code>import()</code>。</p>\n<ul>\n<li><code>new vm.Script</code></li>\n<li><code>vm.compileFunction()</code></li>\n<li><code>new vm.SourceTextModule</code></li>\n<li><code>vm.runInThisContext()</code></li>\n<li><code>vm.runInContext()</code></li>\n<li><code>vm.runInNewContext()</code></li>\n<li><code>vm.createContext()</code></li>\n</ul>\n<p>此选项仍然是实验性模块 API 的一部分。我们不建议在生产环境中使用它。</p>",
+          "modules": [
+            {
+              "textRaw": "当未指定 `importModuleDynamically` 选项或为 undefined 时",
+              "name": "当未指定_`importmoduledynamically`_选项或为_undefined_时",
+              "desc": "<p>如果未指定此选项，或者它是 <code>undefined</code>，包含 <code>import()</code> 的代码仍然可以由 vm API 编译，但当编译的代码执行并实际调用 <code>import()</code> 时，结果将因 <a href=\"errors.html#err_vm_dynamic_import_callback_missing\"><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING</code></a> 而拒绝。</p>",
+              "type": "module",
+              "displayName": "当未指定 `importModuleDynamically` 选项或为 undefined 时"
+            },
+            {
+              "textRaw": "当 `importModuleDynamically` 是 `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` 时",
+              "name": "当_`importmoduledynamically`_是_`vm.constants.use_main_context_default_loader`_时",
+              "desc": "<p>此选项目前不支持 <code>vm.SourceTextModule</code>。</p>\n<p>使用此选项，当在编译的代码中发起 <code>import()</code> 时，Node.js 将使用主上下文的默认 ESM 加载器来加载请求的模块，并将其返回给正在执行的代码。</p>\n<p>这使得正在编译的代码可以访问 Node.js 内置模块，如 <code>fs</code> 或 <code>http</code>。如果代码在不同的上下文中执行，请注意从主上下文加载的模块创建的对象仍然来自主上下文，而不是新上下文中内置类的 <code>instanceof</code>。</p>\n<pre><code class=\"language-cjs\">const { Script, constants } = require('node:vm');\nconst script = new Script(\n  'import(\"node:fs\").then(({readFile}) => readFile instanceof Function)',\n  { importModuleDynamically: constants.USE_MAIN_CONTEXT_DEFAULT_LOADER });\n\n// false：从主上下文加载的 URL 不是新上下文中 Function 类的实例。\nscript.runInNewContext().then(console.log);\n</code></pre>\n<pre><code class=\"language-mjs\">import { Script, constants } from 'node:vm';\n\nconst script = new Script(\n  'import(\"node:fs\").then(({readFile}) => readFile instanceof Function)',\n  { importModuleDynamically: constants.USE_MAIN_CONTEXT_DEFAULT_LOADER });\n\n// false：从主上下文加载的 URL 不是新上下文中 Function 类的实例。\nscript.runInNewContext().then(console.log);\n</code></pre>\n<p>此选项还允许脚本或函数加载用户模块：</p>\n<pre><code class=\"language-mjs\">import { Script, constants } from 'node:vm';\nimport { resolve } from 'node:path';\nimport { writeFileSync } from 'node:fs';\n\n// 将 test.js 和 test.txt 写入当前正在运行的脚本所在的目录。\nwriteFileSync(resolve(import.meta.dirname, 'test.mjs'),\n              'export const filename = \"./test.json\";');\nwriteFileSync(resolve(import.meta.dirname, 'test.json'),\n              '{\"hello\": \"world\"}');\n\n// 编译一个脚本，该脚本加载 test.mjs，然后 test.json，就像脚本放在同一目录中一样。\nconst script = new Script(\n  `(async function() {\n    const { filename } = await import('./test.mjs');\n    return import(filename, { with: { type: 'json' } })\n  })();`,\n  {\n    filename: resolve(import.meta.dirname, 'test-with-default.js'),\n    importModuleDynamically: constants.USE_MAIN_CONTEXT_DEFAULT_LOADER,\n  });\n\n// { default: { hello: 'world' } }\nscript.runInThisContext().then(console.log);\n</code></pre>\n<pre><code class=\"language-cjs\">const { Script, constants } = require('node:vm');\nconst { resolve } = require('node:path');\nconst { writeFileSync } = require('node:fs');\n\n// 将 test.js 和 test.txt 写入当前正在运行的脚本所在的目录。\nwriteFileSync(resolve(__dirname, 'test.mjs'),\n              'export const filename = \"./test.json\";');\nwriteFileSync(resolve(__dirname, 'test.json'),\n              '{\"hello\": \"world\"}');\n\n// 编译一个脚本，该脚本加载 test.mjs，然后 test.json，就像脚本放在同一目录中一样。\nconst script = new Script(\n  `(async function() {\n    const { filename } = await import('./test.mjs');\n    return import(filename, { with: { type: 'json' } })\n  })();`,\n  {\n    filename: resolve(__dirname, 'test-with-default.js'),\n    importModuleDynamically: constants.USE_MAIN_CONTEXT_DEFAULT_LOADER,\n  });\n\n// { default: { hello: 'world' } }\nscript.runInThisContext().then(console.log);\n</code></pre>\n<p>使用主上下文的默认加载器加载用户模块有一些注意事项：</p>\n<ol>\n<li>被解析的模块将相对于传递给 <code>vm.Script</code> 或 <code>vm.compileFunction()</code> 的 <code>filename</code> 选项。解析可以使用绝对路径或 URL 字符串的 <code>filename</code>。如果 <code>filename</code> 既不是绝对路径也不是 URL 的字符串，或者它是 undefined，解析将相对于进程的当前工作目录。对于 <code>vm.createContext()</code>，解析始终相对于当前工作目录，因为此选项仅在不存在引用脚本或模块时使用。</li>\n<li>对于任何解析为特定路径的 <code>filename</code>，一旦进程成功从该路径加载特定模块，结果可能会被缓存，随后从同一路径加载相同模块将返回相同的内容。如果 <code>filename</code> 是 URL 字符串，如果它具有不同的搜索参数，则缓存将不会被命中。对于不是 URL 字符串的 <code>filename</code>，目前无法绕过缓存行为。</li>\n</ol>",
+              "type": "module",
+              "displayName": "当 `importModuleDynamically` 是 `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER` 时"
+            },
+            {
+              "textRaw": "当 `importModuleDynamically` 是一个函数时",
+              "name": "当_`importmoduledynamically`_是一个函数时",
+              "desc": "<p>当 <code>importModuleDynamically</code> 是一个函数时，它将在编译的代码中调用 <code>import()</code> 时被调用，以便用户自定义应如何编译和评估请求的模块。目前，必须使用 <code>--experimental-vm-modules</code> 标志启动 Node.js 实例才能使此选项工作。如果未设置该标志，此回调将被忽略。如果评估的代码实际调用 <code>import()</code>，结果将因 <a href=\"errors.html#err_vm_dynamic_import_callback_missing_flag\"><code>ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG</code></a> 而拒绝。</p>\n<p>回调 <code>importModuleDynamically(specifier, referrer, importAttributes)</code> 具有以下签名：</p>\n<ul>\n<li><code>specifier</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 传递给 <code>import()</code> 的说明符</li>\n<li><code>referrer</code> <a href=\"vm.html#class-vmscript\" class=\"type\">&lt;vm.Script&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> | <a href=\"vm.html#class-vmsourcetextmodule\" class=\"type\">&lt;vm.SourceTextModule&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n引用者是 <code>new vm.Script</code>、<code>vm.runInThisContext</code>、<code>vm.runInContext</code> 和 <code>vm.runInNewContext</code> 的已编译 <code>vm.Script</code>。它是 <code>vm.compileFunction</code> 的已编译 <code>Function</code>，<code>new vm.SourceTextModule</code> 的已编译 <code>vm.SourceTextModule</code>，以及 <code>vm.createContext()</code> 的上下文 <code>Object</code>。</li>\n<li><code>importAttributes</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 传递给 <a href=\"https://tc39.es/proposal-import-attributes/#sec-evaluate-import-call\"><code>optionsExpression</code></a> 可选参数的 <code>\"with\"</code> 值，如果未提供值则为空对象。</li>\n<li><code>phase</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 动态导入的阶段（<code>\"source\"</code> 或 <code>\"evaluation\"</code>）。</li>\n<li>返回: <a href=\"https://tc39.github.io/ecma262/#sec-module-namespace-exotic-objects\" class=\"type\">&lt;Module Namespace Object&gt;</a> | <a href=\"vm.html#class-vmmodule\" class=\"type\">&lt;vm.Module&gt;</a> 返回 <code>vm.Module</code> 是推荐的，以便利用错误跟踪，并避免包含 <code>then</code> 函数导出的命名空间出现问题。</li>\n</ul>\n<pre><code class=\"language-mjs\">// 此脚本必须使用 --experimental-vm-modules 运行。\nimport { Script, SyntheticModule } from 'node:vm';\n\nconst script = new Script('import(\"foo.json\", { with: { type: \"json\" } })', {\n  async importModuleDynamically(specifier, referrer, importAttributes) {\n    console.log(specifier);  // 'foo.json'\n    console.log(referrer);   // 已编译的脚本\n    console.log(importAttributes);  // { type: 'json' }\n    const m = new SyntheticModule(['bar'], () => { });\n    await m.link(() => { });\n    m.setExport('bar', { hello: 'world' });\n    return m;\n  },\n});\nconst result = await script.runInThisContext();\nconsole.log(result);  //  { bar: { hello: 'world' } }\n</code></pre>\n<pre><code class=\"language-cjs\">// 此脚本必须使用 --experimental-vm-modules 运行。\nconst { Script, SyntheticModule } = require('node:vm');\n\n(async function main() {\n  const script = new Script('import(\"foo.json\", { with: { type: \"json\" } })', {\n    async importModuleDynamically(specifier, referrer, importAttributes) {\n      console.log(specifier);  // 'foo.json'\n      console.log(referrer);   // 已编译的脚本\n      console.log(importAttributes);  // { type: 'json' }\n      const m = new SyntheticModule(['bar'], () => { });\n      await m.link(() => { });\n      m.setExport('bar', { hello: 'world' });\n      return m;\n    },\n  });\n  const result = await script.runInThisContext();\n  console.log(result);  //  { bar: { hello: 'world' } }\n})();\n</code></pre>",
+              "type": "module",
+              "displayName": "当 `importModuleDynamically` 是一个函数时"
+            }
+          ],
+          "type": "module",
+          "displayName": "编译 API 中对动态 `import()` 的支持"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`vm.compileFunction(code[, params[, options]])`",
+          "type": "method",
+          "name": "compileFunction",
+          "meta": {
+            "added": [
+              "v10.10.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/51244",
+                "description": "Added support for `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`."
+              },
+              {
+                "version": [
+                  "v19.6.0",
+                  "v18.15.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/46320",
+                "description": "The return value now includes `cachedDataRejected` with the same semantics as the `vm.Script` version if the `cachedData` option was passed."
+              },
+              {
+                "version": [
+                  "v17.0.0",
+                  "v16.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/40249",
+                "description": "Added support for import attributes to the `importModuleDynamically` parameter."
+              },
+              {
+                "version": "v15.9.0",
+                "pr-url": "https://github.com/nodejs/node/pull/35431",
+                "description": "Added `importModuleDynamically` option again."
+              },
+              {
+                "version": "v14.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/33364",
+                "description": "Removal of `importModuleDynamically` due to compatibility issues."
+              },
+              {
+                "version": [
+                  "v14.1.0",
+                  "v13.14.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/32985",
+                "description": "The `importModuleDynamically` option is now supported."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`code` {string} 要编译的函数体。",
+                  "name": "code",
+                  "type": "string",
+                  "desc": "要编译的函数体。"
+                },
+                {
+                  "textRaw": "`params` {string\\[]} 包含函数所有参数的字符串数组。",
+                  "name": "params",
+                  "type": "string\\[]",
+                  "desc": "包含函数所有参数的字符串数组。"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `''`。",
+                      "name": "filename",
+                      "type": "string",
+                      "desc": "指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `''`。"
+                    },
+                    {
+                      "textRaw": "`lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。",
+                      "name": "lineOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。",
+                      "name": "columnOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。这必须由之前对 [`vm.compileFunction()`][] 的调用产生，使用相同的 `code` 和 `params`。",
+                      "name": "cachedData",
+                      "type": "Buffer|TypedArray|DataView",
+                      "desc": "提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。这必须由之前对 [`vm.compileFunction()`][] 的调用产生，使用相同的 `code` 和 `params`。"
+                    },
+                    {
+                      "textRaw": "`produceCachedData` {boolean} 指定是否生成新的缓存数据。**默认值:** `false`。",
+                      "name": "produceCachedData",
+                      "type": "boolean",
+                      "desc": "指定是否生成新的缓存数据。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "`parsingContext` {Object} 应在其中编译所述函数的 [contextified][] 对象。",
+                      "name": "parsingContext",
+                      "type": "Object",
+                      "desc": "应在其中编译所述函数的 [contextified][] 对象。"
+                    },
+                    {
+                      "textRaw": "`contextExtensions` {Object\\[]} 包含一组上下文扩展（包装当前作用域的对象）的数组，在编译时应用。**默认值:** `[]`。",
+                      "name": "contextExtensions",
+                      "type": "Object\\[]",
+                      "desc": "包含一组上下文扩展（包装当前作用域的对象）的数组，在编译时应用。**默认值:** `[]`。"
+                    },
+                    {
+                      "textRaw": "`importModuleDynamically` {Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER} 用于指定在此函数评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                      "name": "importModuleDynamically",
+                      "type": "Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER",
+                      "desc": "用于指定在此函数评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {Function}",
+                  "name": "返回",
+                  "type": "Function"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>将给定的代码编译到提供的上下文中（如果未提供上下文，则使用当前上下文），并将其包装在具有给定 <code>params</code> 的函数中返回。</p>"
+        },
+        {
+          "textRaw": "`vm.createContext([contextObject[, options]])`",
+          "type": "method",
+          "name": "createContext",
+          "meta": {
+            "added": [
+              "v0.3.1"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v22.8.0",
+                  "v20.18.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/54394",
+                "description": "The `contextObject` argument now accepts `vm.constants.DONT_CONTEXTIFY`."
+              },
+              {
+                "version": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/51244",
+                "description": "Added support for `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`."
+              },
+              {
+                "version": [
+                  "v21.2.0",
+                  "v20.11.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/50360",
+                "description": "The `importModuleDynamically` option is supported now."
+              },
+              {
+                "version": "v14.6.0",
+                "pr-url": "https://github.com/nodejs/node/pull/34023",
+                "description": "The `microtaskMode` option is supported now."
+              },
+              {
+                "version": "v10.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/19398",
+                "description": "The first argument can no longer be a function."
+              },
+              {
+                "version": "v10.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/19016",
+                "description": "The `codeGeneration` option is supported now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`contextObject` {Object|vm.constants.DONT\\_CONTEXTIFY|undefined} 可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。",
+                  "name": "contextObject",
+                  "type": "Object|vm.constants.DONT\\_CONTEXTIFY|undefined",
+                  "desc": "可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`name` {string} 新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。",
+                      "name": "name",
+                      "type": "string",
+                      "desc": "新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。"
+                    },
+                    {
+                      "textRaw": "`origin` {string} 对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。",
+                      "name": "origin",
+                      "type": "string",
+                      "desc": "对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。"
+                    },
+                    {
+                      "textRaw": "`codeGeneration` {Object}",
+                      "name": "codeGeneration",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`strings` {boolean} 如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。",
+                          "name": "strings",
+                          "type": "boolean",
+                          "desc": "如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`wasm` {boolean} 如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。",
+                          "name": "wasm",
+                          "type": "boolean",
+                          "desc": "如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`microtaskMode` {string} 如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本通过 [`script.runInContext()`][] 运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。",
+                      "name": "microtaskMode",
+                      "type": "string",
+                      "desc": "如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本通过 [`script.runInContext()`][] 运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。"
+                    },
+                    {
+                      "textRaw": "`importModuleDynamically` {Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER} 用于指定在此上下文中调用 `import()` 而没有引用脚本或模块时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                      "name": "importModuleDynamically",
+                      "type": "Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER",
+                      "desc": "用于指定在此上下文中调用 `import()` 而没有引用脚本或模块时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {Object} 上下文化对象。",
+                  "name": "返回",
+                  "type": "Object",
+                  "desc": "上下文化对象。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果给定的 <code>contextObject</code> 是一个对象，<code>vm.createContext()</code> 方法将<a href=\"#what-does-it-mean-to-contextify-an-object\">准备该对象</a>并返回对其的引用，以便可以在调用 <a href=\"#vmrunincontextcode-contextifiedobject-options\"><code>vm.runInContext()</code></a> 或 <a href=\"#scriptrunincontextcontextifiedobject-options\"><code>script.runInContext()</code></a> 时使用。在此类脚本内部，全局对象将被 <code>contextObject</code> 包装，保留其所有现有属性，同时也拥有任何标准<a href=\"https://tc39.es/ecma262/#sec-global-object\">全局对象</a>所具有的内置对象和函数。在 vm 模块运行的脚本之外，全局变量将保持不变。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nglobal.globalVar = 3;\n\nconst context = { globalVar: 1 };\nvm.createContext(context);\n\nvm.runInContext('globalVar *= 2;', context);\n\nconsole.log(context);\n// 打印: { globalVar: 2 }\n\nconsole.log(global.globalVar);\n// 打印: 3\n</code></pre>\n<p>如果省略 <code>contextObject</code>（或显式传递为 <code>undefined</code>），将返回一个新的空的 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a> 对象。</p>\n<p>当新创建上下文中的全局对象被 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a> 时，与普通全局对象相比，它有一些怪癖。例如，它不能被冻结。要创建一个没有上下文化怪癖的上下文，请将 <a href=\"#vmconstantsdont_contextify\"><code>vm.constants.DONT_CONTEXTIFY</code></a> 作为 <code>contextObject</code> 参数传递。有关详细信息，请参阅 <a href=\"#vmconstantsdont_contextify\"><code>vm.constants.DONT_CONTEXTIFY</code></a> 的文档。</p>\n<p><code>vm.createContext()</code> 方法主要用于创建单个上下文，该上下文可用于运行多个脚本。例如，如果模拟 Web 浏览器，该方法可用于创建表示窗口全局对象的单个上下文，然后在该上下文中一起运行所有 <code>&#x3C;script></code> 标签。</p>\n<p>提供的上下文的 <code>name</code> 和 <code>origin</code> 通过 Inspector API 可见。</p>"
+        },
+        {
+          "textRaw": "`vm.isContext(object)`",
+          "type": "method",
+          "name": "isContext",
+          "meta": {
+            "added": [
+              "v0.11.7"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`object` {Object}",
+                  "name": "object",
+                  "type": "Object"
+                },
+                {
+                  "textRaw": "返回: {boolean}",
+                  "name": "返回",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>如果给定的 <code>object</code> 对象已使用 <a href=\"#vmcreatecontextcontextobject-options\"><code>vm.createContext()</code></a> 进行 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a>，或者它是使用 <a href=\"#vmconstantsdont_contextify\"><code>vm.constants.DONT_CONTEXTIFY</code></a> 创建的上下文的全局对象，则返回 <code>true</code>。</p>"
+        },
+        {
+          "textRaw": "`vm.measureMemory([options])`",
+          "type": "method",
+          "name": "measureMemory",
+          "meta": {
+            "added": [
+              "v13.10.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p>测量 V8 已知的并由当前 V8 隔离器已知的所有上下文或主上下文使用的内存。</p>\n<ul>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 可选。\n<ul>\n<li><code>mode</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> <code>'summary'</code> 或 <code>'detailed'</code>。在摘要模式下，仅返回为主上下文测量的内存。在详细模式下，将返回为当前 V8 隔离器已知的所有上下文测量的内存。<strong>默认值:</strong> <code>'summary'</code></li>\n<li><code>execution</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> <code>'default'</code> 或 <code>'eager'</code>。使用默认执行，promise 直到下一个计划的垃圾回收开始后才会解析，这可能需要一段时间（或者如果程序在下一个 GC 之前退出，则永远不会解析）。使用急切执行，将立即启动 GC 来测量内存。<strong>默认值:</strong> <code>'default'</code></li>\n</ul>\n</li>\n<li>返回: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a> 如果内存测量成功，promise 将使用包含内存使用信息的对象解析。否则它将因 <code>ERR_CONTEXT_NOT_INITIALIZED</code> 错误而被拒绝。</li>\n</ul>\n<p>Promise 可能解析的对象的格式特定于 V8 引擎，并且可能从一个版本的 V8 更改为下一个版本。</p>\n<p>返回的结果与 <code>v8.getHeapSpaceStatistics()</code> 返回的统计信息不同，因为 <code>vm.measureMemory()</code> 测量当前 V8 实例中每个 V8 特定上下文可访问的内存，而 <code>v8.getHeapSpaceStatistics()</code> 的结果测量当前 V8 实例中每个堆空间占用的内存。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n// 测量主上下文使用的内存。\nvm.measureMemory({ mode: 'summary' })\n  // 这与 vm.measureMemory() 相同\n  .then((result) => {\n    // 当前格式是：\n    // {\n    //   total: {\n    //      jsMemoryEstimate: 2418479, jsMemoryRange: [ 2418479, 2745799 ]\n    //    }\n    // }\n    console.log(result);\n  });\n\nconst context = vm.createContext({ a: 1 });\nvm.measureMemory({ mode: 'detailed', execution: 'eager' })\n  .then((result) => {\n    // 在此处引用上下文，以便在测量完成之前不会被 GC 回收。\n    console.log(context.a);\n    // {\n    //   total: {\n    //     jsMemoryEstimate: 2574732,\n    //     jsMemoryRange: [ 2574732, 2904372 ]\n    //   },\n    //   current: {\n    //     jsMemoryEstimate: 2438996,\n    //     jsMemoryRange: [ 2438996, 2768636 ]\n    //   },\n    //   other: [\n    //     {\n    //       jsMemoryEstimate: 135736,\n    //       jsMemoryRange: [ 135736, 465376 ]\n    //     }\n    //   ]\n    // }\n    console.log(result);\n  });\n</code></pre>"
+        },
+        {
+          "textRaw": "`vm.runInContext(code, contextifiedObject[, options])`",
+          "type": "method",
+          "name": "runInContext",
+          "meta": {
+            "added": [
+              "v0.3.1"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/51244",
+                "description": "Added support for `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`."
+              },
+              {
+                "version": [
+                  "v17.0.0",
+                  "v16.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/40249",
+                "description": "Added support for import attributes to the `importModuleDynamically` parameter."
+              },
+              {
+                "version": "v6.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/6635",
+                "description": "The `breakOnSigint` option is supported now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`code` {string} 要编译和运行的 JavaScript 代码。",
+                  "name": "code",
+                  "type": "string",
+                  "desc": "要编译和运行的 JavaScript 代码。"
+                },
+                {
+                  "textRaw": "`contextifiedObject` {Object} 在编译和运行 `code` 时将用作 `global` 的 [contextified][] 对象。",
+                  "name": "contextifiedObject",
+                  "type": "Object",
+                  "desc": "在编译和运行 `code` 时将用作 `global` 的 [contextified][] 对象。"
+                },
+                {
+                  "textRaw": "`options` {Object|string}",
+                  "name": "options",
+                  "type": "Object|string",
+                  "options": [
+                    {
+                      "textRaw": "`filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。",
+                      "name": "filename",
+                      "type": "string",
+                      "desc": "指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。"
+                    },
+                    {
+                      "textRaw": "`lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。",
+                      "name": "lineOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。",
+                      "name": "columnOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。",
+                      "name": "displayErrors",
+                      "type": "boolean",
+                      "desc": "当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。"
+                    },
+                    {
+                      "textRaw": "`timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                      "name": "timeout",
+                      "type": "integer",
+                      "desc": "指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                    },
+                    {
+                      "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                      "name": "breakOnSigint",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。",
+                      "name": "cachedData",
+                      "type": "Buffer|TypedArray|DataView",
+                      "desc": "提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。"
+                    },
+                    {
+                      "textRaw": "`importModuleDynamically` {Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER} 用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                      "name": "importModuleDynamically",
+                      "type": "Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER",
+                      "desc": "用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>vm.runInContext()</code> 方法编译 <code>code</code>，在 <code>contextifiedObject</code> 的上下文中运行它，然后返回结果。运行的代码无法访问局部作用域。<code>contextifiedObject</code> 对象<em>必须</em>先前已使用 <a href=\"#vmcreatecontextcontextobject-options\"><code>vm.createContext()</code></a> 方法进行 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a>。</p>\n<p>如果 <code>options</code> 是字符串，则它指定文件名。</p>\n<p>以下示例使用单个 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a> 对象编译和执行不同的脚本：</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst contextObject = { globalVar: 1 };\nvm.createContext(contextObject);\n\nfor (let i = 0; i &#x3C; 10; ++i) {\n  vm.runInContext('globalVar *= 2;', contextObject);\n}\nconsole.log(contextObject);\n// 打印: { globalVar: 1024 }\n</code></pre>"
+        },
+        {
+          "textRaw": "`vm.runInNewContext(code[, contextObject[, options]])`",
+          "type": "method",
+          "name": "runInNewContext",
+          "meta": {
+            "added": [
+              "v0.3.1"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v22.8.0",
+                  "v20.18.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/54394",
+                "description": "The `contextObject` argument now accepts `vm.constants.DONT_CONTEXTIFY`."
+              },
+              {
+                "version": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/51244",
+                "description": "Added support for `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`."
+              },
+              {
+                "version": [
+                  "v17.0.0",
+                  "v16.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/40249",
+                "description": "Added support for import attributes to the `importModuleDynamically` parameter."
+              },
+              {
+                "version": "v14.6.0",
+                "pr-url": "https://github.com/nodejs/node/pull/34023",
+                "description": "The `microtaskMode` option is supported now."
+              },
+              {
+                "version": "v10.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/19016",
+                "description": "The `contextCodeGeneration` option is supported now."
+              },
+              {
+                "version": "v6.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/6635",
+                "description": "The `breakOnSigint` option is supported now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`code` {string} 要编译和运行的 JavaScript 代码。",
+                  "name": "code",
+                  "type": "string",
+                  "desc": "要编译和运行的 JavaScript 代码。"
+                },
+                {
+                  "textRaw": "`contextObject` {Object|vm.constants.DONT\\_CONTEXTIFY|undefined} 可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。",
+                  "name": "contextObject",
+                  "type": "Object|vm.constants.DONT\\_CONTEXTIFY|undefined",
+                  "desc": "可以是 [`vm.constants.DONT_CONTEXTIFY`][] 或将被 [contextified][] 的对象。如果为 `undefined`，为了向后兼容性，将创建一个空的上下文化对象。"
+                },
+                {
+                  "textRaw": "`options` {Object|string}",
+                  "name": "options",
+                  "type": "Object|string",
+                  "options": [
+                    {
+                      "textRaw": "`filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。",
+                      "name": "filename",
+                      "type": "string",
+                      "desc": "指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。"
+                    },
+                    {
+                      "textRaw": "`lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。",
+                      "name": "lineOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。",
+                      "name": "columnOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。",
+                      "name": "displayErrors",
+                      "type": "boolean",
+                      "desc": "当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。"
+                    },
+                    {
+                      "textRaw": "`timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                      "name": "timeout",
+                      "type": "integer",
+                      "desc": "指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                    },
+                    {
+                      "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                      "name": "breakOnSigint",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "`contextName` {string} 新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。",
+                      "name": "contextName",
+                      "type": "string",
+                      "desc": "新创建上下文的人类可读名称。**默认值:** `'VM Context i'`，其中 `i` 是所创建上下文的递增数字索引。"
+                    },
+                    {
+                      "textRaw": "`contextOrigin` {string} 对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。",
+                      "name": "contextOrigin",
+                      "type": "string",
+                      "desc": "对应于新创建上下文的[来源][origin]，用于显示目的。来源应格式化为 URL，但仅包含方案、主机和端口（如果需要），类似于 [`URL`][] 对象的 [`url.origin`][] 属性的值。最值得注意的是，此字符串应省略尾部斜杠，因为那表示路径。**默认值:** `''`。"
+                    },
+                    {
+                      "textRaw": "`contextCodeGeneration` {Object}",
+                      "name": "contextCodeGeneration",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`strings` {boolean} 如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。",
+                          "name": "strings",
+                          "type": "boolean",
+                          "desc": "如果设置为 false，任何对 `eval` 或函数构造函数（`Function`、`GeneratorFunction` 等）的调用都将抛出 `EvalError`。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`wasm` {boolean} 如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。",
+                          "name": "wasm",
+                          "type": "boolean",
+                          "desc": "如果设置为 false，任何编译 WebAssembly 模块的尝试都将抛出 `WebAssembly.CompileError`。**默认值:** `true`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。",
+                      "name": "cachedData",
+                      "type": "Buffer|TypedArray|DataView",
+                      "desc": "提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。"
+                    },
+                    {
+                      "textRaw": "`importModuleDynamically` {Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER} 用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                      "name": "importModuleDynamically",
+                      "type": "Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER",
+                      "desc": "用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                    },
+                    {
+                      "textRaw": "`microtaskMode` {string} 如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。",
+                      "name": "microtaskMode",
+                      "type": "string",
+                      "desc": "如果设置为 `afterEvaluate`，微任务（通过 `Promise` 和 `async function` 调度的任务）将在脚本运行后立即运行。在这种情况下，它们包含在 `timeout` 和 `breakOnSigint` 范围内。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {any} 脚本中执行的最后一个语句的结果。",
+                  "name": "返回",
+                  "type": "any",
+                  "desc": "脚本中执行的最后一个语句的结果。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>此方法是 <code>(new vm.Script(code, options)).runInContext(vm.createContext(options), options)</code> 的快捷方式。如果 <code>options</code> 是字符串，则它指定文件名。</p>\n<p>它同时做了几件事：</p>\n<ol>\n<li>创建一个新的上下文。</li>\n<li>如果 <code>contextObject</code> 是一个对象，则使用新上下文对其进行 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a>。如果 <code>contextObject</code> 是 undefined，则创建一个新对象并对其进行 <a href=\"#what-does-it-mean-to-contextify-an-object\">contextified</a>。如果 <code>contextObject</code> 是 <a href=\"#vmconstantsdont_contextify\"><code>vm.constants.DONT_CONTEXTIFY</code></a>，则不 [contextify][] 任何东西。</li>\n<li>将代码编译为 <code>vm.Script</code></li>\n<li>在创建的上下文中运行已编译的代码。代码无法访问此方法被调用的作用域。</li>\n<li>返回结果。</li>\n</ol>\n<p>以下示例编译并执行增加全局变量并设置新变量的代码。这些全局变量包含在 <code>contextObject</code> 中。</p>\n<pre><code class=\"language-js\">const vm = require('node:vm');\n\nconst contextObject = {\n  animal: 'cat',\n  count: 2,\n};\n\nvm.runInNewContext('count += 1; name = \"kitty\"', contextObject);\nconsole.log(contextObject);\n// 打印: { animal: 'cat', count: 3, name: 'kitty' }\n\n// 如果上下文是从上下文化对象创建的，这将抛出。\n// vm.constants.DONT_CONTEXTIFY 允许创建具有普通全局对象的上下文，这些对象可以被冻结。\nconst frozenContext = vm.runInNewContext('Object.freeze(globalThis); globalThis;', vm.constants.DONT_CONTEXTIFY);\n</code></pre>"
+        },
+        {
+          "textRaw": "`vm.runInThisContext(code[, options])`",
+          "type": "method",
+          "name": "runInThisContext",
+          "meta": {
+            "added": [
+              "v0.3.1"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/51244",
+                "description": "Added support for `vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`."
+              },
+              {
+                "version": [
+                  "v17.0.0",
+                  "v16.12.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/40249",
+                "description": "Added support for import attributes to the `importModuleDynamically` parameter."
+              },
+              {
+                "version": "v6.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/6635",
+                "description": "The `breakOnSigint` option is supported now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`code` {string} 要编译和运行的 JavaScript 代码。",
+                  "name": "code",
+                  "type": "string",
+                  "desc": "要编译和运行的 JavaScript 代码。"
+                },
+                {
+                  "textRaw": "`options` {Object|string}",
+                  "name": "options",
+                  "type": "Object|string",
+                  "options": [
+                    {
+                      "textRaw": "`filename` {string} 指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。",
+                      "name": "filename",
+                      "type": "string",
+                      "desc": "指定此脚本产生的堆栈跟踪中使用的文件名。**默认值:** `'evalmachine.<anonymous>'`。"
+                    },
+                    {
+                      "textRaw": "`lineOffset` {number} 指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。",
+                      "name": "lineOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的行号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`columnOffset` {number} 指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。",
+                      "name": "columnOffset",
+                      "type": "number",
+                      "desc": "指定此脚本产生的堆栈跟踪中显示的首行列号偏移量。**默认值:** `0`。"
+                    },
+                    {
+                      "textRaw": "`displayErrors` {boolean} 当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。",
+                      "name": "displayErrors",
+                      "type": "boolean",
+                      "desc": "当为 `true` 时，如果在编译 `code` 时发生 [`Error`][]，导致错误的代码行会附加到堆栈跟踪中。**默认值:** `true`。"
+                    },
+                    {
+                      "textRaw": "`timeout` {integer} 指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。",
+                      "name": "timeout",
+                      "type": "integer",
+                      "desc": "指定在执行终止前执行 `code` 的毫秒数。如果执行被终止，将会抛出 [`Error`][]。此值必须是一个严格的正整数。"
+                    },
+                    {
+                      "textRaw": "`breakOnSigint` {boolean} 如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。",
+                      "name": "breakOnSigint",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，接收 `SIGINT` (<kbd>Ctrl</kbd>+<kbd>C</kbd>) 将终止执行并抛出 [`Error`][]。在脚本执行期间，通过 `process.on('SIGINT')` 附加的事件现有处理程序将被禁用，但在之后会继续工作。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "`cachedData` {Buffer|TypedArray|DataView} 提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。",
+                      "name": "cachedData",
+                      "type": "Buffer|TypedArray|DataView",
+                      "desc": "提供可选的 `Buffer`、`TypedArray` 或 `DataView`，其中包含 V8 为所提供的源代码生成的代码缓存数据。"
+                    },
+                    {
+                      "textRaw": "`importModuleDynamically` {Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER} 用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。",
+                      "name": "importModuleDynamically",
+                      "type": "Function|vm.constants.USE\\_MAIN\\_CONTEXT\\_DEFAULT\\_LOADER",
+                      "desc": "用于指定在此脚本评估期间调用 `import()` 时应如何加载模块。此选项是实验性模块 API 的一部分。我们不建议在生产环境中使用它。详细信息请参阅 [编译 API 中对动态 `import()` 的支持][]。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {any} 脚本中执行的最后一个语句的结果。",
+                  "name": "返回",
+                  "type": "any",
+                  "desc": "脚本中执行的最后一个语句的结果。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>vm.runInThisContext()</code> 编译 <code>code</code>，在当前 <code>global</code> 的上下文中运行它，并返回结果。运行的代码无法访问局部作用域，但可以访问当前的 <code>global</code> 对象。</p>\n<p>如果 <code>options</code> 是字符串，则它指定文件名。</p>\n<p>以下示例说明了使用 <code>vm.runInThisContext()</code> 和 JavaScript <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval\"><code>eval()</code></a> 函数运行相同的代码：</p>\n<!-- eslint-disable prefer-const -->\n<pre><code class=\"language-js\">const vm = require('node:vm');\nlet localVar = 'initial value';\n\nconst vmResult = vm.runInThisContext('localVar = \"vm\";');\nconsole.log(`vmResult: '${vmResult}', localVar: '${localVar}'`);\n// 打印: vmResult: 'vm', localVar: 'initial value'\n\nconst evalResult = eval('localVar = \"eval\";');\nconsole.log(`evalResult: '${evalResult}', localVar: '${localVar}'`);\n// 打印: evalResult: 'eval', localVar: 'eval'\n</code></pre>\n<p>因为 <code>vm.runInThisContext()</code> 无法访问局部作用域，<code>localVar</code>  unchanged。相反，直接的 <code>eval()</code> 调用<em>可以</em>访问局部作用域，因此值 <code>localVar</code> 被更改。这样，<code>vm.runInThisContext()</code> 非常像<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#direct_and_indirect_eval\">间接的 <code>eval()</code> 调用</a>，例如 <code>(0,eval)('code')</code>。</p>"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`constants` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v21.7.0",
+              "v20.12.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>返回一个包含 VM 操作常用常量的对象。</p>",
+          "properties": [
+            {
+              "textRaw": "`vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER`",
+              "name": "USE_MAIN_CONTEXT_DEFAULT_LOADER",
+              "meta": {
+                "added": [
+                  "v21.7.0",
+                  "v20.12.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "desc": "<p>一个常量，可用作 <code>vm.Script</code> 和 <code>vm.compileFunction()</code> 的 <code>importModuleDynamically</code> 选项，以便 Node.js 使用主上下文的默认 ESM 加载器来加载请求的模块。</p>\n<p>详细信息请参阅 <a href=\"#support-of-dynamic-import-in-compilation-apis\">编译 API 中对动态 <code>import()</code> 的支持</a>。</p>"
+            }
+          ]
+        }
+      ],
+      "type": "module",
+      "displayName": "vm"
+    }
+  ]
+}

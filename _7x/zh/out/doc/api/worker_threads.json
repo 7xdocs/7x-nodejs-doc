@@ -1,0 +1,1735 @@
+{
+  "type": "module",
+  "source": "doc/api/worker_threads.md",
+  "modules": [
+    {
+      "textRaw": "Worker threads",
+      "name": "worker_threads",
+      "introduced_in": "v10.5.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/worker_threads.js\">lib/worker_threads.js</a></p>\n<p><code>node:worker_threads</code> 模块允许使用并行执行 JavaScript 的线程。要访问该模块：</p>\n<pre><code class=\"language-mjs\">import worker from 'node:worker_threads';\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst worker = require('node:worker_threads');\n</code></pre>\n<p>工作线程（线程）对于执行 CPU 密集型的 JavaScript 操作非常有用。它们对于 I/O 密集型工作的帮助不大。Node.js 内置的异步 I/O 操作比工作线程更高效。</p>\n<p>与 <code>child_process</code> 或 <code>cluster</code> 不同，<code>worker_threads</code> 可以共享内存。它们通过传输 <code>ArrayBuffer</code> 实例或共享 <code>SharedArrayBuffer</code> 实例来实现这一点。</p>\n<pre><code class=\"language-mjs\">import {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} from 'node:worker_threads';\n\nif (!isMainThread) {\n  const { parse } = await import('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n\nexport default function parseJSAsync(script) {\n  return new Promise((resolve, reject) => {\n    const worker = new Worker(new URL(import.meta.url), {\n      workerData: script,\n    });\n    worker.on('message', resolve);\n    worker.on('error', reject);\n    worker.on('exit', (code) => {\n      if (code !== 0)\n        reject(new Error(`Worker stopped with exit code ${code}`));\n    });\n  });\n};\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst {\n  Worker,\n  isMainThread,\n  parentPort,\n  workerData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  module.exports = function parseJSAsync(script) {\n    return new Promise((resolve, reject) => {\n      const worker = new Worker(__filename, {\n        workerData: script,\n      });\n      worker.on('message', resolve);\n      worker.on('error', reject);\n      worker.on('exit', (code) => {\n        if (code !== 0)\n          reject(new Error(`Worker stopped with exit code ${code}`));\n      });\n    });\n  };\n} else {\n  const { parse } = require('some-js-parsing-library');\n  const script = workerData;\n  parentPort.postMessage(parse(script));\n}\n</code></pre>\n<p>上面的例子为每个 <code>parseJSAsync()</code> 调用生成一个工作线程。在实践中，对于这类任务，应使用工作线程池。否则，创建 Worker 的开销可能会超过其好处。</p>\n<p>当实现工作线程池时，使用 <a href=\"async_hooks.html#class-asyncresource\"><code>AsyncResource</code></a> API 来告知诊断工具（例如，为了提供异步堆栈跟踪）任务与其结果之间的关联关系。有关示例实现，请参阅 <code>async_hooks</code> 文档中的 <a href=\"async_context.html#using-asyncresource-for-a-worker-thread-pool\">\"对 <code>Worker</code> 线程池使用 <code>AsyncResource</code>\"</a>。</p>\n<p>默认情况下，工作线程会继承非进程特定的选项。请参考 [<code>Worker 构造函数选项</code>][] 以了解如何自定义工作线程选项，特别是 <code>argv</code> 和 <code>execArgv</code> 选项。</p>",
+      "methods": [
+        {
+          "textRaw": "`worker.getEnvironmentData(key)`",
+          "type": "method",
+          "name": "getEnvironmentData",
+          "meta": {
+            "added": [
+              "v15.12.0",
+              "v14.18.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v17.5.0",
+                  "v16.15.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/41272",
+                "description": "No longer experimental."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`key` {any} 任何可以作为 {Map} 键的任意、可克隆的 JavaScript 值。",
+                  "name": "key",
+                  "type": "any",
+                  "desc": "任何可以作为 {Map} 键的任意、可克隆的 JavaScript 值。"
+                },
+                {
+                  "textRaw": "返回: {any}",
+                  "name": "返回",
+                  "type": "any"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>在工作线程内部，<code>worker.getEnvironmentData()</code> 返回传递给生成线程的 <code>worker.setEnvironmentData()</code> 的数据的克隆。每个新的 <code>Worker</code> 会自动接收环境数据的自己的副本。</p>\n<pre><code class=\"language-mjs\">import {\n  Worker,\n  isMainThread,\n  setEnvironmentData,\n  getEnvironmentData,\n} from 'node:worker_threads';\n\nif (isMainThread) {\n  setEnvironmentData('Hello', 'World!');\n  const worker = new Worker(new URL(import.meta.url));\n} else {\n  console.log(getEnvironmentData('Hello'));  // 打印 'World!'。\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst {\n  Worker,\n  isMainThread,\n  setEnvironmentData,\n  getEnvironmentData,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  setEnvironmentData('Hello', 'World!');\n  const worker = new Worker(__filename);\n} else {\n  console.log(getEnvironmentData('Hello'));  // 打印 'World!'。\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`worker.markAsUntransferable(object)`",
+          "type": "method",
+          "name": "markAsUntransferable",
+          "meta": {
+            "added": [
+              "v14.5.0",
+              "v12.19.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`object` {any} 任何 JavaScript 值。",
+                  "name": "object",
+                  "type": "any",
+                  "desc": "任何 JavaScript 值。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>将对象标记为不可传输。如果 <code>object</code> 出现在 <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a> 调用的传输列表中，则会抛出错误。如果 <code>object</code> 是原始值，则此操作无效。</p>\n<p>特别是，这对于可以被克隆而不是传输的对象是有意义的，并且这些对象被发送端的其他对象使用。例如，Node.js 使用此方法标记其用于 <a href=\"buffer.html#static-method-bufferallocunsafesize\"><code>Buffer</code> 池</a> 的 <code>ArrayBuffer</code>。</p>\n<p>此操作不可撤销。</p>\n<pre><code class=\"language-mjs\">import { MessageChannel, markAsUntransferable } from 'node:worker_threads';\n\nconst pooledBuffer = new ArrayBuffer(8);\nconst typedArray1 = new Uint8Array(pooledBuffer);\nconst typedArray2 = new Float64Array(pooledBuffer);\n\nmarkAsUntransferable(pooledBuffer);\n\nconst { port1 } = new MessageChannel();\ntry {\n  // 这将抛出错误，因为 pooledBuffer 不可传输。\n  port1.postMessage(typedArray1, [ typedArray1.buffer ]);\n} catch (error) {\n  // error.name === 'DataCloneError'\n}\n\n// 以下行打印 typedArray1 的内容——它仍然拥有其内存且未被传输。如果没有 `markAsUntransferable()`，这将打印一个空的 Uint8Array，并且 postMessage 调用会成功。\n// typedArray2 也完好无损。\nconsole.log(typedArray1);\nconsole.log(typedArray2);\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { MessageChannel, markAsUntransferable } = require('node:worker_threads');\n\nconst pooledBuffer = new ArrayBuffer(8);\nconst typedArray1 = new Uint8Array(pooledBuffer);\nconst typedArray2 = new Float64Array(pooledBuffer);\n\nmarkAsUntransferable(pooledBuffer);\n\nconst { port1 } = new MessageChannel();\ntry {\n  // 这将抛出错误，因为 pooledBuffer 不可传输。\n  port1.postMessage(typedArray1, [ typedArray1.buffer ]);\n} catch (error) {\n  // error.name === 'DataCloneError'\n}\n\n// 以下行打印 typedArray1 的内容——它仍然拥有其内存且未被传输。如果没有 `markAsUntransferable()`，这将打印一个空的 Uint8Array，并且 postMessage 调用会成功。\n// typedArray2 也完好无损。\nconsole.log(typedArray1);\nconsole.log(typedArray2);\n</code></pre>\n<p>浏览器中没有等效的 API。</p>"
+        },
+        {
+          "textRaw": "`worker.isMarkedAsUntransferable(object)`",
+          "type": "method",
+          "name": "isMarkedAsUntransferable",
+          "meta": {
+            "added": [
+              "v21.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`object` {any} 任何 JavaScript 值。",
+                  "name": "object",
+                  "type": "any",
+                  "desc": "任何 JavaScript 值。"
+                },
+                {
+                  "textRaw": "返回: {boolean}",
+                  "name": "返回",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>检查对象是否已使用 <a href=\"#workermarkasuntransferableobject\"><code>markAsUntransferable()</code></a> 标记为不可传输。</p>\n<pre><code class=\"language-mjs\">import { markAsUntransferable, isMarkedAsUntransferable } from 'node:worker_threads';\n\nconst pooledBuffer = new ArrayBuffer(8);\nmarkAsUntransferable(pooledBuffer);\n\nisMarkedAsUntransferable(pooledBuffer);  // 返回 true。\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { markAsUntransferable, isMarkedAsUntransferable } = require('node:worker_threads');\n\nconst pooledBuffer = new ArrayBuffer(8);\nmarkAsUntransferable(pooledBuffer);\n\nisMarkedAsUntransferable(pooledBuffer);  // 返回 true。\n</code></pre>\n<p>浏览器中没有等效的 API。</p>"
+        },
+        {
+          "textRaw": "`worker.markAsUncloneable(object)`",
+          "type": "method",
+          "name": "markAsUncloneable",
+          "meta": {
+            "added": [
+              "v23.0.0",
+              "v22.10.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`object` {any} 任何 JavaScript 值。",
+                  "name": "object",
+                  "type": "any",
+                  "desc": "任何 JavaScript 值。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>将对象标记为不可克隆。如果 <code>object</code> 在 <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a> 调用中用作 <a href=\"#event-message\"><code>message</code></a>，则会抛出错误。如果 <code>object</code> 是原始值，则此操作无效。</p>\n<p>这对 <code>ArrayBuffer</code> 或任何 <code>Buffer</code> 类对象没有影响。</p>\n<p>此操作不可撤销。</p>\n<pre><code class=\"language-mjs\">import { markAsUncloneable } from 'node:worker_threads';\n\nconst anyObject = { foo: 'bar' };\nmarkAsUncloneable(anyObject);\nconst { port1 } = new MessageChannel();\ntry {\n  // 这将抛出错误，因为 anyObject 不可克隆。\n  port1.postMessage(anyObject);\n} catch (error) {\n  // error.name === 'DataCloneError'\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { markAsUncloneable } = require('node:worker_threads');\n\nconst anyObject = { foo: 'bar' };\nmarkAsUncloneable(anyObject);\nconst { port1 } = new MessageChannel();\ntry {\n  // 这将抛出错误，因为 anyObject 不可克隆。\n  port1.postMessage(anyObject);\n} catch (error) {\n  // error.name === 'DataCloneError'\n}\n</code></pre>\n<p>浏览器中没有等效的 API。</p>"
+        },
+        {
+          "textRaw": "`worker.moveMessagePortToContext(port, contextifiedSandbox)`",
+          "type": "method",
+          "name": "moveMessagePortToContext",
+          "meta": {
+            "added": [
+              "v11.13.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`port` {MessagePort} 要传输的消息端口。",
+                  "name": "port",
+                  "type": "MessagePort",
+                  "desc": "要传输的消息端口。"
+                },
+                {
+                  "textRaw": "`contextifiedSandbox` {Object} 一个由 `vm.createContext()` 方法返回的 [contextified][] 对象。",
+                  "name": "contextifiedSandbox",
+                  "type": "Object",
+                  "desc": "一个由 `vm.createContext()` 方法返回的 [contextified][] 对象。"
+                },
+                {
+                  "textRaw": "返回: {MessagePort}",
+                  "name": "返回",
+                  "type": "MessagePort"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>将 <code>MessagePort</code> 传输到不同的 <a href=\"vm.html\"><code>vm</code></a> 上下文。原始的 <code>port</code> 对象变得不可用，返回的 <code>MessagePort</code> 实例取代其位置。</p>\n<p>返回的 <code>MessagePort</code> 是目标上下文中的一个对象，并继承自其全局 <code>Object</code> 类。传递给 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/MessagePort/onmessage\"><code>port.onmessage()</code></a> 监听器的对象也在目标上下文中创建，并继承自其全局 <code>Object</code> 类。</p>\n<p>但是，创建的 <code>MessagePort</code> 不再继承自 <a href=\"events.html#class-eventtarget\" class=\"type\">&lt;EventTarget&gt;</a>，并且只能使用 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/MessagePort/onmessage\"><code>port.onmessage()</code></a> 来接收事件。</p>"
+        },
+        {
+          "textRaw": "`worker.postMessageToThread(threadId, value[, transferList][, timeout])`",
+          "type": "method",
+          "name": "postMessageToThread",
+          "meta": {
+            "added": [
+              "v22.5.0",
+              "v20.19.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": ".1 - Active development",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`threadId` {number} 目标线程 ID。如果线程 ID 无效，将抛出 [`ERR_WORKER_MESSAGING_FAILED`][] 错误。如果目标线程 ID 是当前线程 ID，将抛出 [`ERR_WORKER_MESSAGING_SAME_THREAD`][] 错误。",
+                  "name": "threadId",
+                  "type": "number",
+                  "desc": "目标线程 ID。如果线程 ID 无效，将抛出 [`ERR_WORKER_MESSAGING_FAILED`][] 错误。如果目标线程 ID 是当前线程 ID，将抛出 [`ERR_WORKER_MESSAGING_SAME_THREAD`][] 错误。"
+                },
+                {
+                  "textRaw": "`value` {any} 要发送的值。",
+                  "name": "value",
+                  "type": "any",
+                  "desc": "要发送的值。"
+                },
+                {
+                  "textRaw": "`transferList` {Object\\[]} 如果 `value` 中传递了一个或多个 `MessagePort` 类对象，则这些项需要 `transferList`，否则会抛出 [`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`][]。有关更多信息，请参阅 [`port.postMessage()`][]。",
+                  "name": "transferList",
+                  "type": "Object\\[]",
+                  "desc": "如果 `value` 中传递了一个或多个 `MessagePort` 类对象，则这些项需要 `transferList`，否则会抛出 [`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`][]。有关更多信息，请参阅 [`port.postMessage()`][]。"
+                },
+                {
+                  "textRaw": "`timeout` {number} 等待消息传递的毫秒数。默认为 `undefined`，表示永远等待。如果操作超时，将抛出 [`ERR_WORKER_MESSAGING_TIMEOUT`][] 错误。",
+                  "name": "timeout",
+                  "type": "number",
+                  "desc": "等待消息传递的毫秒数。默认为 `undefined`，表示永远等待。如果操作超时，将抛出 [`ERR_WORKER_MESSAGING_TIMEOUT`][] 错误。"
+                },
+                {
+                  "textRaw": "返回: {Promise} 如果目标线程成功处理了消息，则 Promise 会完成。",
+                  "name": "返回",
+                  "type": "Promise",
+                  "desc": "如果目标线程成功处理了消息，则 Promise 会完成。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>向另一个工作线程发送一个值，通过其线程 ID 标识。</p>\n<p>如果目标线程没有监听 <code>workerMessage</code> 事件，则操作将抛出 <a href=\"errors.html#err_worker_messaging_failed\"><code>ERR_WORKER_MESSAGING_FAILED</code></a> 错误。</p>\n<p>如果目标线程在处理 <code>workerMessage</code> 事件时抛出错误，则操作将抛出 <a href=\"errors.html#err_worker_messaging_errored\"><code>ERR_WORKER_MESSAGING_ERRORED</code></a> 错误。</p>\n<p>当目标线程不是当前线程的直接父线程或子线程时，应使用此方法。如果两个线程是父子关系，请使用 <a href=\"#workerpostmessagevalue-transferlist\"><code>require('node:worker_threads').parentPort.postMessage()</code></a> 和 <a href=\"#workerpostmessagevalue-transferlist\"><code>worker.postMessage()</code></a> 来让线程通信。</p>\n<p>下面的例子展示了 <code>postMessageToThread</code> 的用法：它创建了 10 个嵌套线程，最后一个线程将尝试与主线程通信。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport {\n  postMessageToThread,\n  threadId,\n  workerData,\n  Worker,\n} from 'node:worker_threads';\n\nconst channel = new BroadcastChannel('sync');\nconst level = workerData?.level ?? 0;\n\nif (level &#x3C; 10) {\n  const worker = new Worker(new URL(import.meta.url), {\n    workerData: { level: level + 1 },\n  });\n}\n\nif (level === 0) {\n  process.on('workerMessage', (value, source) => {\n    console.log(`${source} -> ${threadId}:`, value);\n    postMessageToThread(source, { message: 'pong' });\n  });\n} else if (level === 10) {\n  process.on('workerMessage', (value, source) => {\n    console.log(`${source} -> ${threadId}:`, value);\n    channel.postMessage('done');\n    channel.close();\n  });\n\n  await postMessageToThread(0, { message: 'ping' });\n}\n\nchannel.onmessage = channel.close;\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst process = require('node:process');\nconst {\n  postMessageToThread,\n  threadId,\n  workerData,\n  Worker,\n} = require('node:worker_threads');\n\nconst channel = new BroadcastChannel('sync');\nconst level = workerData?.level ?? 0;\n\nif (level &#x3C; 10) {\n  const worker = new Worker(__filename, {\n    workerData: { level: level + 1 },\n  });\n}\n\nif (level === 0) {\n  process.on('workerMessage', (value, source) => {\n    console.log(`${source} -> ${threadId}:`, value);\n    postMessageToThread(source, { message: 'pong' });\n  });\n} else if (level === 10) {\n  process.on('workerMessage', (value, source) => {\n    console.log(`${source} -> ${threadId}:`, value);\n    channel.postMessage('done');\n    channel.close();\n  });\n\n  postMessageToThread(0, { message: 'ping' });\n}\n\nchannel.onmessage = channel.close;\n</code></pre>"
+        },
+        {
+          "textRaw": "`worker.receiveMessageOnPort(port)`",
+          "type": "method",
+          "name": "receiveMessageOnPort",
+          "meta": {
+            "added": [
+              "v12.3.0"
+            ],
+            "changes": [
+              {
+                "version": "v15.12.0",
+                "pr-url": "https://github.com/nodejs/node/pull/37535",
+                "description": "The port argument can also refer to a `BroadcastChannel` now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`port` {MessagePort|BroadcastChannel}",
+                  "name": "port",
+                  "type": "MessagePort|BroadcastChannel"
+                },
+                {
+                  "textRaw": "返回: {Object|undefined}",
+                  "name": "返回",
+                  "type": "Object|undefined"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>从给定的 <code>MessagePort</code> 接收单条消息。如果没有可用消息，则返回 <code>undefined</code>，否则返回一个具有单个 <code>message</code> 属性的对象，该属性包含消息负载，对应于 <code>MessagePort</code> 队列中最旧的消息。</p>\n<pre><code class=\"language-mjs\">import { MessageChannel, receiveMessageOnPort } from 'node:worker_threads';\nconst { port1, port2 } = new MessageChannel();\nport1.postMessage({ hello: 'world' });\n\nconsole.log(receiveMessageOnPort(port2));\n// 打印: { message: { hello: 'world' } }\nconsole.log(receiveMessageOnPort(port2));\n// 打印: undefined\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { MessageChannel, receiveMessageOnPort } = require('node:worker_threads');\nconst { port1, port2 } = new MessageChannel();\nport1.postMessage({ hello: 'world' });\n\nconsole.log(receiveMessageOnPort(port2));\n// 打印: { message: { hello: 'world' } }\nconsole.log(receiveMessageOnPort(port2));\n// 打印: undefined\n</code></pre>\n<p>使用此函数时，不会发出 <code>'message'</code> 事件，也不会调用 <code>onmessage</code> 监听器。</p>"
+        },
+        {
+          "textRaw": "`worker.setEnvironmentData(key[, value])`",
+          "type": "method",
+          "name": "setEnvironmentData",
+          "meta": {
+            "added": [
+              "v15.12.0",
+              "v14.18.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v17.5.0",
+                  "v16.15.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/41272",
+                "description": "No longer experimental."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`key` {any} 任何可以作为 {Map} 键的任意、可克隆的 JavaScript 值。",
+                  "name": "key",
+                  "type": "any",
+                  "desc": "任何可以作为 {Map} 键的任意、可克隆的 JavaScript 值。"
+                },
+                {
+                  "textRaw": "`value` {any} 任何将被克隆并自动传递给所有新 `Worker` 实例的任意、可克隆的 JavaScript 值。如果 `value` 作为 `undefined` 传递，则之前为 `key` 设置的任何值将被删除。",
+                  "name": "value",
+                  "type": "any",
+                  "desc": "任何将被克隆并自动传递给所有新 `Worker` 实例的任意、可克隆的 JavaScript 值。如果 `value` 作为 `undefined` 传递，则之前为 `key` 设置的任何值将被删除。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>worker.setEnvironmentData()</code> API 设置当前线程以及从当前上下文生成的所有新 <code>Worker</code> 实例中 <code>worker.getEnvironmentData()</code> 的内容。</p>"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`isInternalThread` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v23.7.0",
+              "v22.14.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果此代码运行在内部的 <a href=\"#class-worker\"><code>Worker</code></a> 线程内（例如加载器线程），则为 <code>true</code>。</p>\n<pre><code class=\"language-bash\">node --experimental-loader ./loader.js main.js\n</code></pre>\n<pre><code class=\"language-mjs\">// loader.js\nimport { isInternalThread } from 'node:worker_threads';\nconsole.log(isInternalThread);  // true\n</code></pre>\n<pre><code class=\"language-cjs\">// loader.js\n'use strict';\n\nconst { isInternalThread } = require('node:worker_threads');\nconsole.log(isInternalThread);  // true\n</code></pre>\n<pre><code class=\"language-mjs\">// main.js\nimport { isInternalThread } from 'node:worker_threads';\nconsole.log(isInternalThread);  // false\n</code></pre>\n<pre><code class=\"language-cjs\">// main.js\n'use strict';\n\nconst { isInternalThread } = require('node:worker_threads');\nconsole.log(isInternalThread);  // false\n</code></pre>"
+        },
+        {
+          "textRaw": "`isMainThread` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果此代码不在 <a href=\"#class-worker\"><code>Worker</code></a> 线程内运行，则为 <code>true</code>。</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread } from 'node:worker_threads';\n\nif (isMainThread) {\n  // 这会在 Worker 实例内部重新加载当前文件。\n  new Worker(new URL(import.meta.url));\n} else {\n  console.log('Inside Worker!');\n  console.log(isMainThread);  // 打印 'false'。\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread } = require('node:worker_threads');\n\nif (isMainThread) {\n  // 这会在 Worker 实例内部重新加载当前文件。\n  new Worker(__filename);\n} else {\n  console.log('Inside Worker!');\n  console.log(isMainThread);  // 打印 'false'。\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`parentPort` 类型: {null|MessagePort}",
+          "type": "null|MessagePort",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>如果此线程是一个 <a href=\"#class-worker\"><code>Worker</code></a>，则这是一个允许与父线程通信的 <a href=\"#class-messageport\"><code>MessagePort</code></a>。使用 <code>parentPort.postMessage()</code> 发送的消息在父线程中可以通过 <code>worker.on('message')</code> 获取，而使用 <code>worker.postMessage()</code> 从父线程发送的消息在此线程中可以通过 <code>parentPort.on('message')</code> 获取。</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread, parentPort } from 'node:worker_threads';\n\nif (isMainThread) {\n  const worker = new Worker(new URL(import.meta.url));\n  worker.once('message', (message) => {\n    console.log(message);  // 打印 'Hello, world!'。\n  });\n  worker.postMessage('Hello, world!');\n} else {\n  // 当收到来自父线程的消息时，将其发送回去：\n  parentPort.once('message', (message) => {\n    parentPort.postMessage(message);\n  });\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread, parentPort } = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename);\n  worker.once('message', (message) => {\n    console.log(message);  // 打印 'Hello, world!'。\n  });\n  worker.postMessage('Hello, world!');\n} else {\n  // 当收到来自父线程的消息时，将其发送回去：\n  parentPort.once('message', (message) => {\n    parentPort.postMessage(message);\n  });\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`resourceLimits` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v13.2.0",
+              "v12.16.0"
+            ],
+            "changes": []
+          },
+          "options": [
+            {
+              "textRaw": "`maxYoungGenerationSizeMb` {number}",
+              "name": "maxYoungGenerationSizeMb",
+              "type": "number"
+            },
+            {
+              "textRaw": "`maxOldGenerationSizeMb` {number}",
+              "name": "maxOldGenerationSizeMb",
+              "type": "number"
+            },
+            {
+              "textRaw": "`codeRangeSizeMb` {number}",
+              "name": "codeRangeSizeMb",
+              "type": "number"
+            },
+            {
+              "textRaw": "`stackSizeMb` {number}",
+              "name": "stackSizeMb",
+              "type": "number"
+            }
+          ],
+          "desc": "<p>提供此 Worker 线程内部的 JS 引擎资源约束集。如果 <code>resourceLimits</code> 选项传递给了 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数，则与此匹配其值。</p>\n<p>如果此代码在主线程中使用，则其值为空对象。</p>"
+        },
+        {
+          "textRaw": "`SHARE_ENV` 类型: {symbol}",
+          "type": "symbol",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v11.14.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>一个特殊值，可以作为 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数的 <code>env</code> 选项传递，表示当前线程和 Worker 线程应共享对同一组环境变量的读写访问权限。</p>\n<pre><code class=\"language-mjs\">import process from 'node:process';\nimport { Worker, SHARE_ENV } from 'node:worker_threads';\nnew Worker('process.env.SET_IN_WORKER = \"foo\"', { eval: true, env: SHARE_ENV })\n  .on('exit', () => {\n    console.log(process.env.SET_IN_WORKER);  // 打印 'foo'。\n  });\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, SHARE_ENV } = require('node:worker_threads');\nnew Worker('process.env.SET_IN_WORKER = \"foo\"', { eval: true, env: SHARE_ENV })\n  .on('exit', () => {\n    console.log(process.env.SET_IN_WORKER);  // 打印 'foo'。\n  });\n</code></pre>"
+        },
+        {
+          "textRaw": "`threadId` 类型: {integer}",
+          "type": "integer",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>当前线程的整数标识符。在对应的 worker 对象上（如果有），它可作为 <a href=\"#workerthreadid_1\"><code>worker.threadId</code></a> 使用。此值在单个进程内的每个 <a href=\"#class-worker\"><code>Worker</code></a> 实例中是唯一的。</p>"
+        },
+        {
+          "textRaw": "`threadName` {string|null}",
+          "type": "string|null",
+          "name": "threadName",
+          "meta": {
+            "added": [
+              "v24.6.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>当前线程的字符串标识符，如果线程未运行则为 null。在对应的 worker 对象上（如果有），它可作为 <a href=\"#workerthreadname_1\"><code>worker.threadName</code></a> 使用。</p>"
+        },
+        {
+          "textRaw": "`worker.workerData`",
+          "name": "workerData",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>一个任意的 JavaScript 值，包含传递给此线程的 <code>Worker</code> 构造函数的数据的克隆。</p>\n<p>数据是使用 <a href=\"#portpostmessagevalue-transferlist\"><code>postMessage()</code></a> 进行克隆的，遵循 [HTML 结构化克隆算法][]。</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread, workerData } from 'node:worker_threads';\n\nif (isMainThread) {\n  const worker = new Worker(new URL(import.meta.url), { workerData: 'Hello, world!' });\n} else {\n  console.log(workerData);  // 打印 'Hello, world!'。\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread, workerData } = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename, { workerData: 'Hello, world!' });\n} else {\n  console.log(workerData);  // 打印 'Hello, world!'。\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`locks` {LockManager}",
+          "type": "LockManager",
+          "name": "locks",
+          "meta": {
+            "added": [
+              "v24.5.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p><a href=\"#class-lockmanager\"><code>LockManager</code></a> 的一个实例，可用于协调对同一进程内可能跨多个线程共享的资源的访问。该 API 镜像了 [浏览器 <code>LockManager</code>][] 的语义。</p>",
+          "modules": [
+            {
+              "textRaw": "类：`Lock`",
+              "name": "类：`lock`",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>Lock</code> 接口提供有关通过 <a href=\"#locksrequestname-options-callback\"><code>locks.request()</code></a> 授予的锁的信息。</p>",
+              "properties": [
+                {
+                  "textRaw": "`name` {string}",
+                  "type": "string",
+                  "name": "name",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>锁的名称。</p>"
+                },
+                {
+                  "textRaw": "`mode` {string}",
+                  "type": "string",
+                  "name": "mode",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>锁的模式。可以是 <code>shared</code> 或 <code>exclusive</code>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`Lock`"
+            },
+            {
+              "textRaw": "类：`LockManager`",
+              "name": "类：`lockmanager`",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>LockManager</code> 接口提供了请求和检查锁的方法。要获取 <code>LockManager</code> 实例，请使用：</p>\n<pre><code class=\"language-mjs\">import { locks } from 'node:worker_threads';\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { locks } = require('node:worker_threads');\n</code></pre>\n<p>此实现与 [浏览器 <code>LockManager</code>][] API 匹配。</p>",
+              "methods": [
+                {
+                  "textRaw": "`locks.request(name[, options], callback)`",
+                  "type": "method",
+                  "name": "request",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`name` {string}",
+                          "name": "name",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`mode` {string} 可以是 `'exclusive'` 或 `'shared'`。**默认值:** `'exclusive'`。",
+                              "name": "mode",
+                              "type": "string",
+                              "desc": "可以是 `'exclusive'` 或 `'shared'`。**默认值:** `'exclusive'`。"
+                            },
+                            {
+                              "textRaw": "`ifAvailable` {boolean} 如果为 `true`，则仅当锁未被持有时才会授予请求。如果无法授予，`callback` 将使用 `null` 而不是 `Lock` 实例调用。**默认值:** `false`。",
+                              "name": "ifAvailable",
+                              "type": "boolean",
+                              "desc": "如果为 `true`，则仅当锁未被持有时才会授予请求。如果无法授予，`callback` 将使用 `null` 而不是 `Lock` 实例调用。**默认值:** `false`。"
+                            },
+                            {
+                              "textRaw": "`steal` {boolean} 如果为 `true`，则任何具有相同名称的现有锁都会被释放，并且请求立即被授予，抢占任何排队的请求。**默认值:** `false`。",
+                              "name": "steal",
+                              "type": "boolean",
+                              "desc": "如果为 `true`，则任何具有相同名称的现有锁都会被释放，并且请求立即被授予，抢占任何排队的请求。**默认值:** `false`。"
+                            },
+                            {
+                              "textRaw": "`signal` {AbortSignal} 可用于中止挂起（但尚未授予）的锁请求。",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "可用于中止挂起（但尚未授予）的锁请求。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`callback` {Function} 一旦锁被授予（或者如果 `ifAvailable` 为 `true` 且锁不可用，则立即使用 `null` 调用）。当函数返回时，锁会自动释放，或者——如果函数返回一个 Promise——当该 Promise 敲定时释放。",
+                          "name": "callback",
+                          "type": "Function",
+                          "desc": "一旦锁被授予（或者如果 `ifAvailable` 为 `true` 且锁不可用，则立即使用 `null` 调用）。当函数返回时，锁会自动释放，或者——如果函数返回一个 Promise——当该 Promise 敲定时释放。"
+                        },
+                        {
+                          "textRaw": "返回: {Promise} 在锁被释放后解决。",
+                          "name": "返回",
+                          "type": "Promise",
+                          "desc": "在锁被释放后解决。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { locks } from 'node:worker_threads';\n\nawait locks.request('my_resource', async (lock) => {\n  // 锁已被获取。\n});\n// 锁在此处已被释放。\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { locks } = require('node:worker_threads');\n\nlocks.request('my_resource', async (lock) => {\n  // 锁已被获取。\n}).then(() => {\n  // 锁在此处已被释放。\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`locks.query()`",
+                  "type": "method",
+                  "name": "query",
+                  "meta": {
+                    "added": [
+                      "v24.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回: {Promise}",
+                          "name": "返回",
+                          "type": "Promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>使用描述当前进程持有的和挂起的锁的 <code>LockManagerSnapshot</code> 进行解决。</p>\n<pre><code class=\"language-mjs\">import { locks } from 'node:worker_threads';\n\nconst snapshot = await locks.query();\nfor (const lock of snapshot.held) {\n  console.log(`held lock: name ${lock.name}, mode ${lock.mode}`);\n}\nfor (const pending of snapshot.pending) {\n  console.log(`pending lock: name ${pending.name}, mode ${pending.mode}`);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { locks } = require('node:worker_threads');\n\nlocks.query().then((snapshot) => {\n  for (const lock of snapshot.held) {\n    console.log(`held lock: name ${lock.name}, mode ${lock.mode}`);\n  }\n  for (const pending of snapshot.pending) {\n    console.log(`pending lock: name ${pending.name}, mode ${pending.mode}`);\n  }\n});\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`LockManager`"
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "textRaw": "类：`BroadcastChannel extends EventTarget`",
+          "name": "类：`broadcastchannel_extends_eventtarget`",
+          "meta": {
+            "added": [
+              "v15.4.0"
+            ],
+            "changes": [
+              {
+                "version": "v18.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/41271",
+                "description": "No longer experimental."
+              }
+            ]
+          },
+          "desc": "<p><code>BroadcastChannel</code> 的实例允许与绑定到同一通道名称的所有其他 <code>BroadcastChannel</code> 实例进行异步的一对多通信。</p>\n<pre><code class=\"language-mjs\">import {\n  isMainThread,\n  BroadcastChannel,\n  Worker,\n} from 'node:worker_threads';\n\nconst bc = new BroadcastChannel('hello');\n\nif (isMainThread) {\n  let c = 0;\n  bc.onmessage = (event) => {\n    console.log(event.data);\n    if (++c === 10) bc.close();\n  };\n  for (let n = 0; n &#x3C; 10; n++)\n    new Worker(new URL(import.meta.url));\n} else {\n  bc.postMessage('hello from every worker');\n  bc.close();\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst {\n  isMainThread,\n  BroadcastChannel,\n  Worker,\n} = require('node:worker_threads');\n\nconst bc = new BroadcastChannel('hello');\n\nif (isMainThread) {\n  let c = 0;\n  bc.onmessage = (event) => {\n    console.log(event.data);\n    if (++c === 10) bc.close();\n  };\n  for (let n = 0; n &#x3C; 10; n++)\n    new Worker(__filename);\n} else {\n  bc.postMessage('hello from every worker');\n  bc.close();\n}\n</code></pre>",
+          "ctors": [
+            {
+              "textRaw": "`new BroadcastChannel(name)`",
+              "type": "ctor",
+              "name": "BroadcastChannel",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {any} 要连接到的通道名称。允许任何可以使用 `` `${name}` `` 转换为字符串的 JavaScript 值。",
+                      "name": "name",
+                      "type": "any",
+                      "desc": "要连接到的通道名称。允许任何可以使用 `` `${name}` `` 转换为字符串的 JavaScript 值。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`broadcastChannel.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>关闭 <code>BroadcastChannel</code> 连接。</p>"
+            },
+            {
+              "textRaw": "`broadcastChannel.postMessage(message)`",
+              "type": "method",
+              "name": "postMessage",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`message` {any} 任何可克隆的 JavaScript 值。",
+                      "name": "message",
+                      "type": "any",
+                      "desc": "任何可克隆的 JavaScript 值。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`broadcastChannel.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>与 <code>unref()</code> 相反。在先前 <code>unref()</code> 过的 BroadcastChannel 上调用 <code>ref()</code> <em>不会</em> 让程序退出（如果它是唯一活动的句柄，这是默认行为）。如果端口已被 <code>ref()</code>，再次调用 <code>ref()</code> 没有效果。</p>"
+            },
+            {
+              "textRaw": "`broadcastChannel.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>在 BroadcastChannel 上调用 <code>unref()</code> 允许线程退出，如果这是事件系统中唯一活动的句柄。如果 BroadcastChannel 已经是 <code>unref()</code> 状态，再次调用 <code>unref()</code> 没有效果。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`onmessage` 类型: {Function} 当收到消息时使用单个 `MessageEvent` 参数调用。",
+              "type": "Function",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "当收到消息时使用单个 `MessageEvent` 参数调用。"
+            },
+            {
+              "textRaw": "`onmessageerror` 类型: {Function} 当接收到的消息无法反序列化时调用。",
+              "type": "Function",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v15.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "当接收到的消息无法反序列化时调用。"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`BroadcastChannel extends EventTarget`"
+        },
+        {
+          "textRaw": "类：`MessageChannel`",
+          "name": "类：`messagechannel`",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>worker.MessageChannel</code> 类的实例表示一个异步的、双向的通信通道。<code>MessageChannel</code> 没有自己的方法。<code>new MessageChannel()</code> 产生一个具有 <code>port1</code> 和 <code>port2</code> 属性的对象，这些属性引用链接的 <a href=\"#class-messageport\"><code>MessagePort</code></a> 实例。</p>\n<pre><code class=\"language-mjs\">import { MessageChannel } from 'node:worker_threads';\n\nconst { port1, port2 } = new MessageChannel();\nport1.on('message', (message) => console.log('received', message));\nport2.postMessage({ foo: 'bar' });\n// 从 `port1.on('message')` 监听器打印: received { foo: 'bar' }\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { MessageChannel } = require('node:worker_threads');\n\nconst { port1, port2 } = new MessageChannel();\nport1.on('message', (message) => console.log('received', message));\nport2.postMessage({ foo: 'bar' });\n// 从 `port1.on('message')` 监听器打印: received { foo: 'bar' }\n</code></pre>",
+          "type": "module",
+          "displayName": "类：`MessageChannel`"
+        },
+        {
+          "textRaw": "类：`MessagePort`",
+          "name": "类：`messageport`",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v14.7.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/34057",
+                "description": "This class now inherits from `EventTarget` rather than from `EventEmitter`."
+              }
+            ]
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"events.html#class-eventtarget\" class=\"type\">&lt;EventTarget&gt;</a></li>\n</ul>\n<p><code>worker.MessagePort</code> 类的实例表示一个异步的、双向通信通道的一端。它可以用于在不同的 <a href=\"#class-worker\"><code>Worker</code></a> 之间传输结构化数据、内存区域和其他 <code>MessagePort</code>。</p>\n<p>此实现与 [浏览器 <code>MessagePort</code>][] 匹配。</p>",
+          "modules": [
+            {
+              "textRaw": "事件：`'close'`",
+              "name": "事件：`'close'`",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一旦通道的任一端断开连接，就会发出 <code>'close'</code> 事件。</p>\n<pre><code class=\"language-mjs\">import { MessageChannel } from 'node:worker_threads';\nconst { port1, port2 } = new MessageChannel();\n\n// 打印:\n//   foobar\n//   closed!\nport2.on('message', (message) => console.log(message));\nport2.on('close', () => console.log('closed!'));\n\nport1.postMessage('foobar');\nport1.close();\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { MessageChannel } = require('node:worker_threads');\nconst { port1, port2 } = new MessageChannel();\n\n// 打印:\n//   foobar\n//   closed!\nport2.on('message', (message) => console.log(message));\nport2.on('close', () => console.log('closed!'));\n\nport1.postMessage('foobar');\nport1.close();\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'close'`"
+            },
+            {
+              "textRaw": "事件：`'message'`",
+              "name": "事件：`'message'`",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> 传输的值</li>\n</ul>\n<p>对于任何传入的消息，都会发出 <code>'message'</code> 事件，其中包含 <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a> 的克隆输入。</p>\n<p>此事件上的监听器接收传递给 <code>postMessage()</code> 的 <code>value</code> 参数的克隆，没有其他参数。</p>",
+              "type": "module",
+              "displayName": "事件：`'message'`"
+            },
+            {
+              "textRaw": "事件：`'messageerror'`",
+              "name": "事件：`'messageerror'`",
+              "meta": {
+                "added": [
+                  "v14.5.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> 一个 Error 对象</li>\n</ul>\n<p>当反序列化消息失败时，会发出 <code>'messageerror'</code> 事件。</p>\n<p>目前，当在接收端实例化发布的 JS 对象时发生错误，会发出此事件。这种情况很少见，但可能发生，例如，当某些 Node.js API 对象在 <code>vm.Context</code> 中接收时（其中 Node.js API 目前不可用）。</p>",
+              "type": "module",
+              "displayName": "事件：`'messageerror'`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`port.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>禁用连接任一端进一步发送消息。当不再通过此 <code>MessagePort</code> 进行通信时，可以调用此方法。</p>\n<p>[<code>'close'</code> 事件][] 会在作为通道一部分的两个 <code>MessagePort</code> 实例上发出。</p>"
+            },
+            {
+              "textRaw": "`port.postMessage(value[, transferList])`",
+              "type": "method",
+              "name": "postMessage",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v21.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/47604",
+                    "description": "An error is thrown when an untransferable object is in the transfer list."
+                  },
+                  {
+                    "version": [
+                      "v15.14.0",
+                      "v14.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37917",
+                    "description": "Add 'BlockList' to the list of cloneable types."
+                  },
+                  {
+                    "version": [
+                      "v15.9.0",
+                      "v14.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37155",
+                    "description": "Add 'Histogram' types to the list of cloneable types."
+                  },
+                  {
+                    "version": "v15.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/36804",
+                    "description": "Added `X509Certificate` to the list of cloneable types."
+                  },
+                  {
+                    "version": "v15.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/35093",
+                    "description": "Added `CryptoKey` to the list of cloneable types."
+                  },
+                  {
+                    "version": [
+                      "v14.5.0",
+                      "v12.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/33360",
+                    "description": "Added `KeyObject` to the list of cloneable types."
+                  },
+                  {
+                    "version": [
+                      "v14.5.0",
+                      "v12.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/33772",
+                    "description": "Added `FileHandle` to the list of transferable types."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`value` {any}",
+                      "name": "value",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`transferList` {Object\\[]}",
+                      "name": "transferList",
+                      "type": "Object\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 JavaScript 值发送到此通道的接收端。<code>value</code> 以与 [HTML 结构化克隆算法][] 兼容的方式进行传输。</p>\n<p>特别是，与 <code>JSON</code> 的显著区别是：</p>\n<ul>\n<li><code>value</code> 可以包含循环引用。</li>\n<li><code>value</code> 可以包含内置 JS 类型的实例，例如 <code>RegExp</code>、<code>BigInt</code>、<code>Map</code>、<code>Set</code> 等。</li>\n<li><code>value</code> 可以包含类型化数组，包括使用 <code>ArrayBuffer</code> 和 <code>SharedArrayBuffer</code> 的数组。</li>\n<li><code>value</code> 可以包含 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module\"><code>WebAssembly.Module</code></a> 实例。</li>\n<li><code>value</code> 可能不包含本地（C++ 支持的）对象，除了：\n<ul>\n<li><a href=\"webcrypto.html#class-cryptokey\" class=\"type\">&lt;CryptoKey&gt;</a>、</li>\n<li><a href=\"fs.html#class-filehandle\" class=\"type\">&lt;FileHandle&gt;</a>、</li>\n<li><a href=\"perf_hooks.html#class-histogram\" class=\"type\">&lt;Histogram&gt;</a>、</li>\n<li><a href=\"crypto.html#class-keyobject\" class=\"type\">&lt;KeyObject&gt;</a>、</li>\n<li><a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a>、</li>\n<li><a href=\"net.html#class-netblocklist\" class=\"type\">&lt;net.BlockList&gt;</a>、</li>\n<li><a href=\"net.html#class-netsocketaddress\" class=\"type\">&lt;net.SocketAddress&gt;</a>、</li>\n<li><a href=\"crypto.html#class-x509certificate\" class=\"type\">&lt;X509Certificate&gt;</a>。</li>\n</ul>\n</li>\n</ul>\n<pre><code class=\"language-mjs\">import { MessageChannel } from 'node:worker_threads';\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (message) => console.log(message));\n\nconst circularData = {};\ncircularData.foo = circularData;\n// 打印: { foo: [Circular] }\nport2.postMessage(circularData);\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { MessageChannel } = require('node:worker_threads');\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (message) => console.log(message));\n\nconst circularData = {};\ncircularData.foo = circularData;\n// 打印: { foo: [Circular] }\nport2.postMessage(circularData);\n</code></pre>\n<p><code>transferList</code> 可以是 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a>、<a href=\"#class-messageport\"><code>MessagePort</code></a> 和 <a href=\"fs.html#class-filehandle\"><code>FileHandle</code></a> 对象的列表。传输后，它们在通道的发送端不再可用（即使它们不包含在 <code>value</code> 中）。与 [子进程][] 不同，目前不支持传输句柄，例如网络套接字。</p>\n<p>如果 <code>value</code> 包含 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\" class=\"type\">&lt;SharedArrayBuffer&gt;</a> 实例，则可以从任一线程访问它们。它们不能列在 <code>transferList</code> 中。</p>\n<p><code>value</code> 可能仍然包含不在 <code>transferList</code> 中的 <code>ArrayBuffer</code> 实例；在这种情况下，底层内存被复制而不是移动。</p>\n<pre><code class=\"language-mjs\">import { MessageChannel } from 'node:worker_threads';\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (message) => console.log(message));\n\nconst uint8Array = new Uint8Array([ 1, 2, 3, 4 ]);\n// 这会发布 `uint8Array` 的副本：\nport2.postMessage(uint8Array);\n// 这不会复制数据，但会使 `uint8Array` 不可用：\nport2.postMessage(uint8Array, [ uint8Array.buffer ]);\n\n// `sharedUint8Array` 的内存可以从原始端和通过 `.on('message')` 接收的副本访问：\nconst sharedUint8Array = new Uint8Array(new SharedArrayBuffer(4));\nport2.postMessage(sharedUint8Array);\n\n// 这会将一个新创建的消息端口传输给接收者。\n// 例如，这可以用于在同一父线程的多个 `Worker` 子线程之间创建通信通道。\nconst otherChannel = new MessageChannel();\nport2.postMessage({ port: otherChannel.port1 }, [ otherChannel.port1 ]);\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { MessageChannel } = require('node:worker_threads');\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (message) => console.log(message));\n\nconst uint8Array = new Uint8Array([ 1, 2, 3, 4 ]);\n// 这会发布 `uint8Array` 的副本：\nport2.postMessage(uint8Array);\n// 这不会复制数据，但会使 `uint8Array` 不可用：\nport2.postMessage(uint8Array, [ uint8Array.buffer ]);\n\n// `sharedUint8Array` 的内存可以从原始端和通过 `.on('message')` 接收的副本访问：\nconst sharedUint8Array = new Uint8Array(new SharedArrayBuffer(4));\nport2.postMessage(sharedUint8Array);\n\n// 这会将一个新创建的消息端口传输给接收者。\n// 例如，这可以用于在同一父线程的多个 `Worker` 子线程之间创建通信通道。\nconst otherChannel = new MessageChannel();\nport2.postMessage({ port: otherChannel.port1 }, [ otherChannel.port1 ]);\n</code></pre>\n<p>消息对象会立即被克隆，发布后修改它不会产生副作用。</p>\n<p>有关此 API 背后的序列化和反序列化机制的更多信息，请参阅 <a href=\"v8.html#serialization-api\"><code>node:v8</code> 模块的序列化 API</a>。</p>",
+              "modules": [
+                {
+                  "textRaw": "传输 TypedArrays 和 Buffers 时的注意事项",
+                  "name": "传输_typedarrays_和_buffers_时的注意事项",
+                  "desc": "<p>所有 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> 实例都是底层 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> 的视图。也就是说，实际上是 <code>ArrayBuffer</code> 存储原始数据，而 <code>TypedArray</code> 和 <code>Buffer</code> 对象提供了一种查看和操作数据的方式。有可能且常见的是在同一 <code>ArrayBuffer</code> 实例上创建多个视图。在使用传输列表传输 <code>ArrayBuffer</code> 时必须非常小心，因为这样做会导致共享同一 <code>ArrayBuffer</code> 的所有 <code>TypedArray</code> 和 <code>Buffer</code> 实例变得不可用。</p>\n<pre><code class=\"language-js\">const ab = new ArrayBuffer(10);\n\nconst u1 = new Uint8Array(ab);\nconst u2 = new Uint16Array(ab);\n\nconsole.log(u2.length);  // 打印 5\n\nport.postMessage(u1, [u1.buffer]);\n\nconsole.log(u2.length);  // 打印 0\n</code></pre>\n<p>对于 <code>Buffer</code> 实例，具体来说，底层 <code>ArrayBuffer</code> 是否可以传输或克隆完全取决于实例的创建方式，这通常无法可靠地确定。</p>\n<p>可以使用 <a href=\"#workermarkasuntransferableobject\"><code>markAsUntransferable()</code></a> 标记 <code>ArrayBuffer</code>，以指示它应始终被克隆而从不传输。</p>\n<p>根据 <code>Buffer</code> 实例的创建方式，它可能拥有也可能不拥有其底层 <code>ArrayBuffer</code>。除非已知 <code>Buffer</code> 实例拥有它，否则不得传输 <code>ArrayBuffer</code>。特别是，对于从内部 <code>Buffer</code> 池创建的 <code>Buffer</code>（例如，使用 <code>Buffer.from()</code> 或 <code>Buffer.allocUnsafe()</code>），传输它们是不可能的，它们总是被克隆，这会发送整个 <code>Buffer</code> 池的副本。此行为可能会带来意外的更高内存使用量和可能的安全问题。</p>\n<p>有关 <code>Buffer</code> 池的更多详细信息，请参阅 <a href=\"buffer.html#static-method-bufferallocunsafesize\"><code>Buffer.allocUnsafe()</code></a>。</p>\n<p>使用 <code>Buffer.alloc()</code> 或 <code>Buffer.allocUnsafeSlow()</code> 创建的 <code>Buffer</code> 实例的 <code>ArrayBuffer</code> 始终可以传输，但这样做会使这些 <code>ArrayBuffer</code> 的所有其他现有视图不可用。</p>",
+                  "type": "module",
+                  "displayName": "传输 TypedArrays 和 Buffers 时的注意事项"
+                },
+                {
+                  "textRaw": "克隆具有原型、类和访问器的对象时的注意事项",
+                  "name": "克隆具有原型、类和访问器的对象时的注意事项",
+                  "desc": "<p>由于对象克隆使用 [HTML 结构化克隆算法][]，因此不会保留不可枚举的属性、属性访问器和对象原型。特别是，<a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> 对象在接收端将被读取为普通的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\" class=\"type\">&lt;Uint8Array&gt;</a>，而 JavaScript 类的实例将被克隆为普通的 JavaScript 对象。</p>\n<!-- eslint-disable no-unused-private-class-members -->\n<pre><code class=\"language-js\">const b = Symbol('b');\n\nclass Foo {\n  #a = 1;\n  constructor() {\n    this[b] = 2;\n    this.c = 3;\n  }\n\n  get d() { return 4; }\n}\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => console.log(data);\n\nport2.postMessage(new Foo());\n\n// 打印: { c: 3 }\n</code></pre>\n<p>此限制扩展到许多内置对象，例如全局 <code>URL</code> 对象：</p>\n<pre><code class=\"language-js\">const { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => console.log(data);\n\nport2.postMessage(new URL('https://example.org'));\n\n// 打印: { }\n</code></pre>",
+                  "type": "module",
+                  "displayName": "克隆具有原型、类和访问器的对象时的注意事项"
+                }
+              ]
+            },
+            {
+              "textRaw": "`port.hasRef()`",
+              "type": "method",
+              "name": "hasRef",
+              "meta": {
+                "added": [
+                  "v18.1.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/57513",
+                    "description": "Marking the API stable."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果为 true，则 <code>MessagePort</code> 对象将保持 Node.js 事件循环活动。</p>"
+            },
+            {
+              "textRaw": "`port.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>与 <code>unref()</code> 相反。在先前 <code>unref()</code> 过的端口上调用 <code>ref()</code> <em>不会</em> 让程序退出（如果它是唯一活动的句柄，这是默认行为）。如果端口已被 <code>ref()</code>，再次调用 <code>ref()</code> 没有效果。</p>\n<p>如果使用 <code>.on('message')</code> 附加或移除监听器，端口会根据事件是否存在监听器自动 <code>ref()</code> 和 <code>unref()</code>。</p>"
+            },
+            {
+              "textRaw": "`port.start()`",
+              "type": "method",
+              "name": "start",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>开始在此 <code>MessagePort</code> 上接收消息。当将此端口用作事件发射器时，一旦附加了 <code>'message'</code> 监听器，就会自动调用此方法。</p>\n<p>此方法的存在是为了与 Web <code>MessagePort</code> API 保持对等。在 Node.js 中，它仅在无事件监听器存在时忽略消息时有用。Node.js 在处理 <code>.onmessage</code> 时也有所不同。设置它会自动调用 <code>.start()</code>，但取消设置它会让消息排队，直到设置新的处理程序或端口被丢弃。</p>"
+            },
+            {
+              "textRaw": "`port.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>在端口上调用 <code>unref()</code> 允许线程退出，如果这是事件系统中唯一活动的句柄。如果端口已经是 <code>unref()</code> 状态，再次调用 <code>unref()</code> 没有效果。</p>\n<p>如果使用 <code>.on('message')</code> 附加或移除监听器，端口会根据事件是否存在监听器自动 <code>ref()</code> 和 <code>unref()</code>。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`MessagePort`"
+        },
+        {
+          "textRaw": "类：`Worker`",
+          "name": "类：`worker`",
+          "meta": {
+            "added": [
+              "v10.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"events.html#class-eventemitter\" class=\"type\">&lt;EventEmitter&gt;</a></li>\n</ul>\n<p><code>Worker</code> 类代表一个独立的 JavaScript 执行线程。大多数 Node.js API 在其中可用。</p>\n<p>Worker 环境内的显著差异是：</p>\n<ul>\n<li><a href=\"process.html#processstdin\"><code>process.stdin</code></a>、<a href=\"process.html#processstdout\"><code>process.stdout</code></a> 和 <a href=\"process.html#processstderr\"><code>process.stderr</code></a> 流可能被父线程重定向。</li>\n<li><a href=\"#workerismainthread\"><code>require('node:worker_threads').isMainThread</code></a> 属性设置为 <code>false</code>。</li>\n<li><a href=\"#workerparentport\"><code>require('node:worker_threads').parentPort</code></a> 消息端口可用。</li>\n<li><a href=\"process.html#processexitcode\"><code>process.exit()</code></a> 不会停止整个程序，仅停止单个线程，并且 <a href=\"process.html#processabort\"><code>process.abort()</code></a> 不可用。</li>\n<li><a href=\"process.html#processchdirdirectory\"><code>process.chdir()</code></a> 和设置组或用户 ID 的 <code>process</code> 方法不可用。</li>\n<li><a href=\"process.html#processenv\"><code>process.env</code></a> 是父线程环境变量的副本，除非另有指定。对一个副本的更改在其他线程中不可见，并且对本地插件不可见（除非将 <a href=\"#workershare_env\"><code>worker.SHARE_ENV</code></a> 作为 <code>env</code> 选项传递给 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数）。在 Windows 上，与主线程不同，环境变量的副本以区分大小写的方式操作。</li>\n<li><a href=\"process.html#processtitle\"><code>process.title</code></a> 无法修改。</li>\n<li>信号不会通过 <a href=\"process.html#signal-events\"><code>process.on('...')</code></a> 传递。</li>\n<li>执行可能在任何时候由于调用 <a href=\"#workerterminate\"><code>worker.terminate()</code></a> 而停止。</li>\n<li>来自父进程的 IPC 通道不可访问。</li>\n<li>不支持 <a href=\"tracing.html\"><code>trace_events</code></a> 模块。</li>\n<li>本地插件只有在满足 <a href=\"addons.html#worker-support\">某些条件</a> 时才能从多个线程加载。</li>\n</ul>\n<p>在其他 <code>Worker</code> 内部创建 <code>Worker</code> 实例是可能的。</p>\n<p>与 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API\">Web Workers</a> 和 [<code>node:cluster</code> 模块][] 类似，可以通过线程间消息传递实现双向通信。在内部，<code>Worker</code> 具有一对内置的 <a href=\"#class-messageport\"><code>MessagePort</code></a>，它们在 <code>Worker</code> 创建时已经相互关联。虽然父端的 <code>MessagePort</code> 对象没有直接暴露，但其功能通过父线程的 <code>Worker</code> 对象上的 <a href=\"#workerpostmessagevalue-transferlist\"><code>worker.postMessage()</code></a> 和 <a href=\"#event-message_1\"><code>worker.on('message')</code></a> 事件暴露。</p>\n<p>要创建自定义消息通道（鼓励使用自定义通道而不是使用默认的全局通道，因为它有助于分离关注点），用户可以在任一线程上创建 <code>MessageChannel</code> 对象，并通过预先存在的通道（例如全局通道）将该 <code>MessageChannel</code> 上的一个 <code>MessagePort</code> 传递给另一个线程。</p>\n<p>有关消息如何传递以及可以通过线程屏障成功传输哪种 JavaScript 值的更多信息，请参阅 <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a>。</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport {\n  Worker, MessageChannel, MessagePort, isMainThread, parentPort,\n} from 'node:worker_threads';\nif (isMainThread) {\n  const worker = new Worker(new URL(import.meta.url));\n  const subChannel = new MessageChannel();\n  worker.postMessage({ hereIsYourPort: subChannel.port1 }, [subChannel.port1]);\n  subChannel.port2.on('message', (value) => {\n    console.log('received:', value);\n  });\n} else {\n  parentPort.once('message', (value) => {\n    assert(value.hereIsYourPort instanceof MessagePort);\n    value.hereIsYourPort.postMessage('the worker is sending this');\n    value.hereIsYourPort.close();\n  });\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst assert = require('node:assert');\nconst {\n  Worker, MessageChannel, MessagePort, isMainThread, parentPort,\n} = require('node:worker_threads');\nif (isMainThread) {\n  const worker = new Worker(__filename);\n  const subChannel = new MessageChannel();\n  worker.postMessage({ hereIsYourPort: subChannel.port1 }, [subChannel.port1]);\n  subChannel.port2.on('message', (value) => {\n    console.log('received:', value);\n  });\n} else {\n  parentPort.once('message', (value) => {\n    assert(value.hereIsYourPort instanceof MessagePort);\n    value.hereIsYourPort.postMessage('the worker is sending this');\n    value.hereIsYourPort.close();\n  });\n}\n</code></pre>",
+          "ctors": [
+            {
+              "textRaw": "`new Worker(filename[, options])`",
+              "type": "ctor",
+              "name": "Worker",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v19.8.0",
+                      "v18.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/46832",
+                    "description": "Added support for a `name` option, which allows adding a name to worker title for debugging."
+                  },
+                  {
+                    "version": "v14.9.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/34584",
+                    "description": "The `filename` parameter can be a WHATWG `URL` object using `data:` protocol."
+                  },
+                  {
+                    "version": "v14.9.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/34394",
+                    "description": "The `trackUnmanagedFds` option was set to `true` by default."
+                  },
+                  {
+                    "version": [
+                      "v14.6.0",
+                      "v12.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/34303",
+                    "description": "The `trackUnmanagedFds` option was introduced."
+                  },
+                  {
+                    "version": [
+                      "v13.13.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32278",
+                    "description": "The `transferList` option was introduced."
+                  },
+                  {
+                    "version": [
+                      "v13.12.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/31664",
+                    "description": "The `filename` parameter can be a WHATWG `URL` object using `file:` protocol."
+                  },
+                  {
+                    "version": [
+                      "v13.4.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/30559",
+                    "description": "The `argv` option was introduced."
+                  },
+                  {
+                    "version": [
+                      "v13.2.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/26628",
+                    "description": "The `resourceLimits` option was introduced."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`filename` {string|URL} Worker 主脚本或模块的路径。必须是绝对路径或以 `./` 或 `../` 开头的相对路径（即相对于当前工作目录），或者是使用 `file:` 或 `data:` 协议的 WHATWG `URL` 对象。使用 [`data:` URL][] 时，数据基于 MIME 类型使用 [ECMAScript 模块加载器][] 进行解释。如果 `options.eval` 为 `true`，则这是一个包含 JavaScript 代码的字符串，而不是路径。",
+                      "name": "filename",
+                      "type": "string|URL",
+                      "desc": "Worker 主脚本或模块的路径。必须是绝对路径或以 `./` 或 `../` 开头的相对路径（即相对于当前工作目录），或者是使用 `file:` 或 `data:` 协议的 WHATWG `URL` 对象。使用 [`data:` URL][] 时，数据基于 MIME 类型使用 [ECMAScript 模块加载器][] 进行解释。如果 `options.eval` 为 `true`，则这是一个包含 JavaScript 代码的字符串，而不是路径。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`argv` {any\\[]} 参数列表，这些参数将被字符串化并附加到 Worker 内的 `process.argv`。这与 `workerData` 非常相似，但这些值在全局 `process.argv` 上可用，就像它们作为 CLI 选项传递给脚本一样。",
+                          "name": "argv",
+                          "type": "any\\[]",
+                          "desc": "参数列表，这些参数将被字符串化并附加到 Worker 内的 `process.argv`。这与 `workerData` 非常相似，但这些值在全局 `process.argv` 上可用，就像它们作为 CLI 选项传递给脚本一样。"
+                        },
+                        {
+                          "textRaw": "`env` {Object} 如果设置，则指定 Worker 内部 `process.env` 的初始值。作为一个特殊值，可以使用 [`worker.SHARE_ENV`][] 来指定父线程和子线程应共享它们的环境变量；在这种情况下，一个线程的 `process.env` 对象的更改也会影响另一个线程。**默认值:** `process.env`。",
+                          "name": "env",
+                          "type": "Object",
+                          "desc": "如果设置，则指定 Worker 内部 `process.env` 的初始值。作为一个特殊值，可以使用 [`worker.SHARE_ENV`][] 来指定父线程和子线程应共享它们的环境变量；在这种情况下，一个线程的 `process.env` 对象的更改也会影响另一个线程。**默认值:** `process.env`。"
+                        },
+                        {
+                          "textRaw": "`eval` {boolean} 如果为 `true` 且第一个参数是 `string`，则将构造函数的第一个参数解释为在线程上线后执行的脚本。",
+                          "name": "eval",
+                          "type": "boolean",
+                          "desc": "如果为 `true` 且第一个参数是 `string`，则将构造函数的第一个参数解释为在线程上线后执行的脚本。"
+                        },
+                        {
+                          "textRaw": "`execArgv` {string\\[]} 传递给 worker 的 node CLI 选项列表。不支持 V8 选项（例如 `--max-old-space-size`）和影响进程的选项（例如 `--title`）。如果设置，这将在 worker 内部作为 [`process.execArgv`][] 提供。默认情况下，选项从父线程继承。",
+                          "name": "execArgv",
+                          "type": "string\\[]",
+                          "desc": "传递给 worker 的 node CLI 选项列表。不支持 V8 选项（例如 `--max-old-space-size`）和影响进程的选项（例如 `--title`）。如果设置，这将在 worker 内部作为 [`process.execArgv`][] 提供。默认情况下，选项从父线程继承。"
+                        },
+                        {
+                          "textRaw": "`stdin` {boolean} 如果设置为 `true`，则 `worker.stdin` 提供一个可写流，其内容在 Worker 内部显示为 `process.stdin`。默认情况下，不提供任何数据。",
+                          "name": "stdin",
+                          "type": "boolean",
+                          "desc": "如果设置为 `true`，则 `worker.stdin` 提供一个可写流，其内容在 Worker 内部显示为 `process.stdin`。默认情况下，不提供任何数据。"
+                        },
+                        {
+                          "textRaw": "`stdout` {boolean} 如果设置为 `true`，则 `worker.stdout` 不会自动通过管道传输到父进程中的 `process.stdout`。",
+                          "name": "stdout",
+                          "type": "boolean",
+                          "desc": "如果设置为 `true`，则 `worker.stdout` 不会自动通过管道传输到父进程中的 `process.stdout`。"
+                        },
+                        {
+                          "textRaw": "`stderr` {boolean} 如果设置为 `true`，则 `worker.stderr` 不会自动通过管道传输到父进程中的 `process.stderr`。",
+                          "name": "stderr",
+                          "type": "boolean",
+                          "desc": "如果设置为 `true`，则 `worker.stderr` 不会自动通过管道传输到父进程中的 `process.stderr`。"
+                        },
+                        {
+                          "textRaw": "`workerData` {any} 任何被克隆并作为 [`require('node:worker_threads').workerData`][] 可用的 JavaScript 值。克隆过程如 [HTML 结构化克隆算法][] 所述，如果对象无法克隆（例如因为它包含 `function`），则会抛出错误。",
+                          "name": "workerData",
+                          "type": "any",
+                          "desc": "任何被克隆并作为 [`require('node:worker_threads').workerData`][] 可用的 JavaScript 值。克隆过程如 [HTML 结构化克隆算法][] 所述，如果对象无法克隆（例如因为它包含 `function`），则会抛出错误。"
+                        },
+                        {
+                          "textRaw": "`trackUnmanagedFds` {boolean} 如果设置为 `true`，则 Worker 会跟踪通过 [`fs.open()`][] 和 [`fs.close()`][] 管理的原始文件描述符，并在 Worker 退出时关闭它们，类似于其他资源，如网络套接字或通过 [`FileHandle`][] API 管理的文件描述符。此选项由所有嵌套的 `Worker` 自动继承。**默认值:** `true`。",
+                          "name": "trackUnmanagedFds",
+                          "type": "boolean",
+                          "desc": "如果设置为 `true`，则 Worker 会跟踪通过 [`fs.open()`][] 和 [`fs.close()`][] 管理的原始文件描述符，并在 Worker 退出时关闭它们，类似于其他资源，如网络套接字或通过 [`FileHandle`][] API 管理的文件描述符。此选项由所有嵌套的 `Worker` 自动继承。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`transferList` {Object\\[]} 如果 `workerData` 中传递了一个或多个 `MessagePort` 类对象，则这些项需要 `transferList`，否则会抛出 [`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`][]。有关更多信息，请参阅 [`port.postMessage()`][]。",
+                          "name": "transferList",
+                          "type": "Object\\[]",
+                          "desc": "如果 `workerData` 中传递了一个或多个 `MessagePort` 类对象，则这些项需要 `transferList`，否则会抛出 [`ERR_MISSING_MESSAGE_PORT_IN_TRANSFER_LIST`][]。有关更多信息，请参阅 [`port.postMessage()`][]。"
+                        },
+                        {
+                          "textRaw": "`resourceLimits` {Object} 新的 JS 引擎实例的可选资源限制集。达到这些限制会导致 `Worker` 实例终止。这些限制仅影响 JS 引擎，不影响外部数据，包括 `ArrayBuffer`。即使设置了这些限制，如果进程遇到全局内存不足情况，它仍然可能中止。",
+                          "name": "resourceLimits",
+                          "type": "Object",
+                          "desc": "新的 JS 引擎实例的可选资源限制集。达到这些限制会导致 `Worker` 实例终止。这些限制仅影响 JS 引擎，不影响外部数据，包括 `ArrayBuffer`。即使设置了这些限制，如果进程遇到全局内存不足情况，它仍然可能中止。",
+                          "options": [
+                            {
+                              "textRaw": "`maxOldGenerationSizeMb` {number} 主堆的最大大小（MB）。如果设置了命令行参数 [`--max-old-space-size`][]，它将覆盖此设置。",
+                              "name": "maxOldGenerationSizeMb",
+                              "type": "number",
+                              "desc": "主堆的最大大小（MB）。如果设置了命令行参数 [`--max-old-space-size`][]，它将覆盖此设置。"
+                            },
+                            {
+                              "textRaw": "`maxYoungGenerationSizeMb` {number} 用于最近创建的对象的堆空间的最大大小。如果设置了命令行参数 [`--max-semi-space-size`][]，它将覆盖此设置。",
+                              "name": "maxYoungGenerationSizeMb",
+                              "type": "number",
+                              "desc": "用于最近创建的对象的堆空间的最大大小。如果设置了命令行参数 [`--max-semi-space-size`][]，它将覆盖此设置。"
+                            },
+                            {
+                              "textRaw": "`codeRangeSizeMb` {number} 用于生成代码的预分配内存范围的大小。",
+                              "name": "codeRangeSizeMb",
+                              "type": "number",
+                              "desc": "用于生成代码的预分配内存范围的大小。"
+                            },
+                            {
+                              "textRaw": "`stackSizeMb` {number} 线程的默认最大堆栈大小。较小的值可能导致 Worker 实例不可用。**默认值:** `4`。",
+                              "name": "stackSizeMb",
+                              "type": "number",
+                              "desc": "线程的默认最大堆栈大小。较小的值可能导致 Worker 实例不可用。**默认值:** `4`。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`name` {string} 一个可选的 `name`，用于替换线程名称和 worker 标题以进行调试/识别，使最终标题为 `[worker ${id}] ${name}`。此参数有允许的最大大小，具体取决于操作系统。如果提供的名称超过限制，它将被截断。",
+                          "name": "name",
+                          "type": "string",
+                          "desc": "一个可选的 `name`，用于替换线程名称和 worker 标题以进行调试/识别，使最终标题为 `[worker ${id}] ${name}`。此参数有允许的最大大小，具体取决于操作系统。如果提供的名称超过限制，它将被截断。",
+                          "options": [
+                            {
+                              "textRaw": "最大大小：",
+                              "name": "最大大小：",
+                              "options": [
+                                {
+                                  "textRaw": "Windows：32,767 个字符",
+                                  "name": "Windows：32,767",
+                                  "desc": "个字符"
+                                },
+                                {
+                                  "textRaw": "macOS：64 个字符",
+                                  "name": "macOS：64",
+                                  "desc": "个字符"
+                                },
+                                {
+                                  "textRaw": "Linux：16 个字符",
+                                  "name": "Linux：16",
+                                  "desc": "个字符"
+                                },
+                                {
+                                  "textRaw": "NetBSD：限制为 `PTHREAD_MAX_NAMELEN_NP`",
+                                  "name": "NetBSD：限制为",
+                                  "desc": "`PTHREAD_MAX_NAMELEN_NP`"
+                                },
+                                {
+                                  "textRaw": "FreeBSD 和 OpenBSD：限制为 `MAXCOMLEN` **默认值:** `'WorkerThread'`。",
+                                  "name": "FreeBSD",
+                                  "desc": "和 OpenBSD：限制为 `MAXCOMLEN` **默认值:** `'WorkerThread'`。"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "事件：`'error'`",
+              "name": "事件：`'error'`",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>err</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n</ul>\n<p>如果工作线程抛出未捕获的异常，则会发出 <code>'error'</code> 事件。在这种情况下，worker 将被终止。</p>",
+              "type": "module",
+              "displayName": "事件：`'error'`"
+            },
+            {
+              "textRaw": "事件：`'exit'`",
+              "name": "事件：`'exit'`",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>exitCode</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;integer&gt;</a></li>\n</ul>\n<p>一旦 worker 停止，就会发出 <code>'exit'</code> 事件。如果 worker 通过调用 <a href=\"process.html#processexitcode\"><code>process.exit()</code></a> 退出，则 <code>exitCode</code> 参数是传递的退出码。如果 worker 被终止，则 <code>exitCode</code> 参数为 <code>1</code>。</p>\n<p>这是任何 <code>Worker</code> 实例发出的最终事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'exit'`"
+            },
+            {
+              "textRaw": "事件：`'message'`",
+              "name": "事件：`'message'`",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> 传输的值</li>\n</ul>\n<p>当工作线程调用了 <a href=\"#workerpostmessagevalue-transferlist\"><code>require('node:worker_threads').parentPort.postMessage()</code></a> 时，会发出 <code>'message'</code> 事件。有关更多详细信息，请参阅 <a href=\"#event-message\"><code>port.on('message')</code></a> 事件。</p>\n<p>从工作线程发送的所有消息都在 <code>Worker</code> 对象上发出 [<code>'exit'</code> 事件][] 之前发出。</p>",
+              "type": "module",
+              "displayName": "事件：`'message'`"
+            },
+            {
+              "textRaw": "事件：`'messageerror'`",
+              "name": "事件：`'messageerror'`",
+              "meta": {
+                "added": [
+                  "v14.5.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>error</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a> 一个 Error 对象</li>\n</ul>\n<p>当反序列化消息失败时，会发出 <code>'messageerror'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'messageerror'`"
+            },
+            {
+              "textRaw": "事件：`'online'`",
+              "name": "事件：`'online'`",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当工作线程开始执行 JavaScript 代码时，会发出 <code>'online'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'online'`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`worker.cpuUsage([prev])`",
+              "type": "method",
+              "name": "cpuUsage",
+              "meta": {
+                "added": [
+                  "v24.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法返回一个 <code>Promise</code>，该 Promise 将解决为一个与 <a href=\"process.html#processthreadcpuusagepreviousvalue\"><code>process.threadCpuUsage()</code></a> 相同的对象，或者如果 worker 不再运行，则拒绝并返回 <a href=\"errors.html#err_worker_not_running\"><code>ERR_WORKER_NOT_RUNNING</code></a> 错误。此方法允许从实际线程外部观察统计信息。</p>"
+            },
+            {
+              "textRaw": "`worker.getHeapSnapshot([options])`",
+              "type": "method",
+              "name": "getHeapSnapshot",
+              "meta": {
+                "added": [
+                  "v13.9.0",
+                  "v12.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.1.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44989",
+                    "description": "Support options to configure the heap snapshot."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`exposeInternals` {boolean} 如果为 true，则在堆快照中暴露内部结构。**默认值:** `false`。",
+                          "name": "exposeInternals",
+                          "type": "boolean",
+                          "desc": "如果为 true，则在堆快照中暴露内部结构。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`exposeNumericValues` {boolean} 如果为 true，则在人工字段中暴露数值。**默认值:** `false`。",
+                          "name": "exposeNumericValues",
+                          "type": "boolean",
+                          "desc": "如果为 true，则在人工字段中暴露数值。**默认值:** `false`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {Promise} 一个包含 V8 堆快照的可读流的 Promise",
+                      "name": "返回",
+                      "type": "Promise",
+                      "desc": "一个包含 V8 堆快照的可读流的 Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个可读流，用于获取 Worker 当前状态的 V8 快照。有关更多详细信息，请参阅 <a href=\"v8.html#v8getheapsnapshotoptions\"><code>v8.getHeapSnapshot()</code></a>。</p>\n<p>如果工作线程不再运行（这可能在发出 [<code>'exit'</code> 事件][] 之前发生），返回的 <code>Promise</code> 会立即被拒绝，并返回 <a href=\"errors.html#err_worker_not_running\"><code>ERR_WORKER_NOT_RUNNING</code></a> 错误。</p>"
+            },
+            {
+              "textRaw": "`worker.getHeapStatistics()`",
+              "type": "method",
+              "name": "getHeapStatistics",
+              "meta": {
+                "added": [
+                  "v24.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法返回一个 <code>Promise</code>，该 Promise 将解决为一个与 <a href=\"v8.html#v8getheapstatistics\"><code>v8.getHeapStatistics()</code></a> 相同的对象，或者如果 worker 不再运行，则拒绝并返回 <a href=\"errors.html#err_worker_not_running\"><code>ERR_WORKER_NOT_RUNNING</code></a> 错误。此方法允许从实际线程外部观察统计信息。</p>"
+            },
+            {
+              "textRaw": "`worker.postMessage(value[, transferList])`",
+              "type": "method",
+              "name": "postMessage",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`value` {any}",
+                      "name": "value",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "`transferList` {Object\\[]}",
+                      "name": "transferList",
+                      "type": "Object\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>向 worker 发送消息，该消息通过 <a href=\"#event-message\"><code>require('node:worker_threads').parentPort.on('message')</code></a> 接收。有关更多详细信息，请参阅 <a href=\"#portpostmessagevalue-transferlist\"><code>port.postMessage()</code></a>。</p>"
+            },
+            {
+              "textRaw": "`worker.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>与 <code>unref()</code> 相反，在先前 <code>unref()</code> 过的 worker 上调用 <code>ref()</code> <em>不会</em> 让程序退出（如果它是唯一活动的句柄，这是默认行为）。如果 worker 已被 <code>ref()</code>，再次调用 <code>ref()</code> 没有效果。</p>"
+            },
+            {
+              "textRaw": "`worker.startCpuProfile()`",
+              "type": "method",
+              "name": "startCpuProfile",
+              "meta": {
+                "added": [
+                  "v24.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>启动 CPU 分析，然后返回一个 Promise，该 Promise 以错误或 <code>CPUProfileHandle</code> 对象完成。此 API 支持 <code>await using</code> 语法。</p>\n<pre><code class=\"language-cjs\">const { Worker } = require('node:worker_threads');\n\nconst worker = new Worker(`\n  const { parentPort } = require('worker_threads');\n  parentPort.on('message', () => {});\n  `, { eval: true });\n\nworker.on('online', async () => {\n  const handle = await worker.startCpuProfile();\n  const profile = await handle.stop();\n  console.log(profile);\n  worker.terminate();\n});\n</code></pre>\n<p><code>await using</code> 示例。</p>\n<pre><code class=\"language-cjs\">const { Worker } = require('node:worker_threads');\n\nconst w = new Worker(`\n  const { parentPort } = require('node:worker_threads');\n  parentPort.on('message', () => {});\n  `, { eval: true });\n\nw.on('online', async () => {\n  // 返回时自动停止分析，并且分析数据将被丢弃\n  await using handle = await w.startCpuProfile();\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`worker.startHeapProfile()`",
+              "type": "method",
+              "name": "startHeapProfile",
+              "meta": {
+                "added": [
+                  "v24.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>启动堆分析，然后返回一个 Promise，该 Promise 以错误或 <code>HeapProfileHandle</code> 对象完成。此 API 支持 <code>await using</code> 语法。</p>\n<pre><code class=\"language-cjs\">const { Worker } = require('node:worker_threads');\n\nconst worker = new Worker(`\n  const { parentPort } = require('worker_threads');\n  parentPort.on('message', () => {});\n  `, { eval: true });\n\nworker.on('online', async () => {\n  const handle = await worker.startHeapProfile();\n  const profile = await handle.stop();\n  console.log(profile);\n  worker.terminate();\n});\n</code></pre>\n<p><code>await using</code> 示例。</p>\n<pre><code class=\"language-cjs\">const { Worker } = require('node:worker_threads');\n\nconst w = new Worker(`\n  const { parentPort } = require('node:worker_threads');\n  parentPort.on('message', () => {});\n  `, { eval: true });\n\nw.on('online', async () => {\n  // 返回时自动停止分析，并且分析数据将被丢弃\n  await using handle = await w.startHeapProfile();\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`worker.terminate()`",
+              "type": "method",
+              "name": "terminate",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v12.5.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/28021",
+                    "description": "This function now returns a Promise. Passing a callback is deprecated, and was useless up to this version, as the Worker was actually terminated synchronously. Terminating is now a fully asynchronous operation."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>尽快停止工作线程中的所有 JavaScript 执行。返回一个针对退出码的 Promise，该 Promise 在发出 [<code>'exit'</code> 事件][] 时完成。</p>"
+            },
+            {
+              "textRaw": "`worker.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>在 worker 上调用 <code>unref()</code> 允许线程退出，如果这是事件系统中唯一活动的句柄。如果 worker 已经是 <code>unref()</code> 状态，再次调用 <code>unref()</code> 没有效果。</p>"
+            },
+            {
+              "textRaw": "`worker[Symbol.asyncDispose]()`",
+              "type": "method",
+              "name": "[Symbol.asyncDispose]",
+              "meta": {
+                "added": [
+                  "v24.2.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>当处置作用域退出时，调用 <a href=\"#workerterminate\"><code>worker.terminate()</code></a>。</p>\n<pre><code class=\"language-js\">async function example() {\n  await using worker = new Worker('for (;;) {}', { eval: true });\n  // 当作用域退出时，Worker 会自动终止。\n}\n</code></pre>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`worker.performance`",
+              "name": "performance",
+              "meta": {
+                "added": [
+                  "v15.1.0",
+                  "v14.17.0",
+                  "v12.22.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>一个可用于从 worker 实例查询性能信息的对象。类似于 <a href=\"perf_hooks.html#perf_hooksperformance\"><code>perf_hooks.performance</code></a>。</p>",
+              "methods": [
+                {
+                  "textRaw": "`performance.eventLoopUtilization([utilization1[, utilization2]])`",
+                  "type": "method",
+                  "name": "eventLoopUtilization",
+                  "meta": {
+                    "added": [
+                      "v15.1.0",
+                      "v14.17.0",
+                      "v12.22.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`utilization1` {Object} 之前调用 `eventLoopUtilization()` 的结果。",
+                          "name": "utilization1",
+                          "type": "Object",
+                          "desc": "之前调用 `eventLoopUtilization()` 的结果。"
+                        },
+                        {
+                          "textRaw": "`utilization2` {Object} 在 `utilization1` 之前调用 `eventLoopUtilization()` 的结果。",
+                          "name": "utilization2",
+                          "type": "Object",
+                          "desc": "在 `utilization1` 之前调用 `eventLoopUtilization()` 的结果。"
+                        },
+                        {
+                          "textRaw": "返回: {Object}",
+                          "name": "返回",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`idle` {number}",
+                              "name": "idle",
+                              "type": "number"
+                            },
+                            {
+                              "textRaw": "`active` {number}",
+                              "name": "active",
+                              "type": "number"
+                            },
+                            {
+                              "textRaw": "`utilization` {number}",
+                              "name": "utilization",
+                              "type": "number"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>与 [<code>perf_hooks</code> 的 <code>eventLoopUtilization()</code>][] 相同的调用，只是返回的是 worker 实例的值。</p>\n<p>一个区别是，与主线程不同，worker 内的引导是在事件循环内完成的。因此，一旦 worker 的脚本开始执行，事件循环利用率就立即可用。</p>\n<p><code>idle</code> 时间不增加并不表示 worker 卡在引导中。以下示例显示 worker 的整个生命周期从未累积任何 <code>idle</code> 时间，但仍然能够处理消息。</p>\n<pre><code class=\"language-mjs\">import { Worker, isMainThread, parentPort } from 'node:worker_threads';\n\nif (isMainThread) {\n  const worker = new Worker(new URL(import.meta.url));\n  setInterval(() => {\n    worker.postMessage('hi');\n    console.log(worker.performance.eventLoopUtilization());\n  }, 100).unref();\n} else {\n  parentPort.on('message', () => console.log('msg')).unref();\n  (function r(n) {\n    if (--n &#x3C; 0) return;\n    const t = Date.now();\n    while (Date.now() - t &#x3C; 300);\n    setImmediate(r, n);\n  })(10);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst { Worker, isMainThread, parentPort } = require('node:worker_threads');\n\nif (isMainThread) {\n  const worker = new Worker(__filename);\n  setInterval(() => {\n    worker.postMessage('hi');\n    console.log(worker.performance.eventLoopUtilization());\n  }, 100).unref();\n} else {\n  parentPort.on('message', () => console.log('msg')).unref();\n  (function r(n) {\n    if (--n &#x3C; 0) return;\n    const t = Date.now();\n    while (Date.now() - t &#x3C; 300);\n    setImmediate(r, n);\n  })(10);\n}\n</code></pre>\n<p>worker 的事件循环利用率仅在 [<code>'online'</code> 事件][] 发出后可用，如果在此之前或 [<code>'exit'</code> 事件][] 之后调用，则所有属性的值都为 <code>0</code>。</p>"
+                }
+              ]
+            },
+            {
+              "textRaw": "`resourceLimits` 类型: {Object}",
+              "type": "Object",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v13.2.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "options": [
+                {
+                  "textRaw": "`maxYoungGenerationSizeMb` {number}",
+                  "name": "maxYoungGenerationSizeMb",
+                  "type": "number"
+                },
+                {
+                  "textRaw": "`maxOldGenerationSizeMb` {number}",
+                  "name": "maxOldGenerationSizeMb",
+                  "type": "number"
+                },
+                {
+                  "textRaw": "`codeRangeSizeMb` {number}",
+                  "name": "codeRangeSizeMb",
+                  "type": "number"
+                },
+                {
+                  "textRaw": "`stackSizeMb` {number}",
+                  "name": "stackSizeMb",
+                  "type": "number"
+                }
+              ],
+              "desc": "<p>提供此 Worker 线程的 JS 引擎资源约束集。如果 <code>resourceLimits</code> 选项传递给了 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数，则与此匹配其值。</p>\n<p>如果 worker 已停止，则返回值是一个空对象。</p>"
+            },
+            {
+              "textRaw": "`stderr` 类型: {stream.Readable}",
+              "type": "stream.Readable",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>这是一个可读流，其中包含在工作线程内部写入 <a href=\"process.html#processstderr\"><code>process.stderr</code></a> 的数据。如果未将 <code>stderr: true</code> 传递给 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数，则数据将通过管道传输到父线程的 <a href=\"process.html#processstderr\"><code>process.stderr</code></a> 流。</p>"
+            },
+            {
+              "textRaw": "`stdin` 类型: {null|stream.Writable}",
+              "type": "null|stream.Writable",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果 <code>stdin: true</code> 传递给了 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数，则这是一个可写流。写入此流的数据将在工作线程内作为 <a href=\"process.html#processstdin\"><code>process.stdin</code></a> 可用。</p>"
+            },
+            {
+              "textRaw": "`stdout` 类型: {stream.Readable}",
+              "type": "stream.Readable",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>这是一个可读流，其中包含在工作线程内部写入 <a href=\"process.html#processstdout\"><code>process.stdout</code></a> 的数据。如果未将 <code>stdout: true</code> 传递给 <a href=\"#class-worker\"><code>Worker</code></a> 构造函数，则数据将通过管道传输到父线程的 <a href=\"process.html#processstdout\"><code>process.stdout</code></a> 流。</p>"
+            },
+            {
+              "textRaw": "`threadId` 类型: {integer}",
+              "type": "integer",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v10.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>被引用线程的整数标识符。在工作线程内部，它可作为 <a href=\"#workerthreadid\"><code>require('node:worker_threads').threadId</code></a> 使用。此值在单个进程内的每个 <code>Worker</code> 实例中是唯一的。</p>"
+            },
+            {
+              "textRaw": "`threadName` {string|null}",
+              "type": "string|null",
+              "name": "threadName",
+              "meta": {
+                "added": [
+                  "v24.6.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>被引用线程的字符串标识符，如果线程未运行则为 null。在工作线程内部，它可作为 <a href=\"#workerthreadname\"><code>require('node:worker_threads').threadName</code></a> 使用。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`Worker`"
+        },
+        {
+          "textRaw": "注意事项",
+          "name": "注意事项",
+          "modules": [
+            {
+              "textRaw": "stdio 的同步阻塞",
+              "name": "stdio_的同步阻塞",
+              "desc": "<p><code>Worker</code> 利用通过 <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a> 的消息传递来实现与 <code>stdio</code> 的交互。这意味着源自 <code>Worker</code> 的 <code>stdio</code> 输出可能会被接收端阻塞 Node.js 事件循环的同步代码阻塞。</p>\n<pre><code class=\"language-mjs\">import {\n  Worker,\n  isMainThread,\n} from 'node:worker_threads';\n\nif (isMainThread) {\n  new Worker(new URL(import.meta.url));\n  for (let n = 0; n &#x3C; 1e10; n++) {\n    // 循环以模拟工作。\n  }\n} else {\n  // 此输出将被主线程中的 for 循环阻塞。\n  console.log('foo');\n}\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\n\nconst {\n  Worker,\n  isMainThread,\n} = require('node:worker_threads');\n\nif (isMainThread) {\n  new Worker(__filename);\n  for (let n = 0; n &#x3C; 1e10; n++) {\n    // 循环以模拟工作。\n  }\n} else {\n  // 此输出将被主线程中的 for 循环阻塞。\n  console.log('foo');\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "stdio 的同步阻塞"
+            },
+            {
+              "textRaw": "从预加载脚本启动工作线程",
+              "name": "从预加载脚本启动工作线程",
+              "desc": "<p>从预加载脚本（使用 <code>-r</code> 命令行标志加载和运行的脚本）启动工作线程时要小心。除非显式设置了 <code>execArgv</code> 选项，否则新的 Worker 线程会自动从正在运行的进程继承命令行标志，并会预加载与主线程相同的预加载脚本。如果预加载脚本无条件地启动工作线程，每个生成的线程都会启动另一个线程，直到应用程序崩溃。</p>",
+              "type": "module",
+              "displayName": "从预加载脚本启动工作线程"
+            }
+          ],
+          "type": "module",
+          "displayName": "注意事项"
+        }
+      ],
+      "type": "module",
+      "displayName": "Worker threads"
+    }
+  ]
+}

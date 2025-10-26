@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>OS | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/os.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:462px){.with-30-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-os">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os active">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="os" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#os">OS</a></span>
+<ul>
+<li><a href="#oseol"><code>os.EOL</code></a></li>
+<li><a href="#osavailableparallelism"><code>os.availableParallelism()</code></a></li>
+<li><a href="#osarch"><code>os.arch()</code></a></li>
+<li><a href="#osconstants"><code>os.constants</code></a></li>
+<li><a href="#oscpus"><code>os.cpus()</code></a></li>
+<li><a href="#osdevnull"><code>os.devNull</code></a></li>
+<li><a href="#osendianness"><code>os.endianness()</code></a></li>
+<li><a href="#osfreemem"><code>os.freemem()</code></a></li>
+<li><a href="#osgetprioritypid"><code>os.getPriority([pid])</code></a></li>
+<li><a href="#oshomedir"><code>os.homedir()</code></a></li>
+<li><a href="#oshostname"><code>os.hostname()</code></a></li>
+<li><a href="#osloadavg"><code>os.loadavg()</code></a></li>
+<li><a href="#osmachine"><code>os.machine()</code></a></li>
+<li><a href="#osnetworkinterfaces"><code>os.networkInterfaces()</code></a></li>
+<li><a href="#osplatform"><code>os.platform()</code></a></li>
+<li><a href="#osrelease"><code>os.release()</code></a></li>
+<li><a href="#ossetprioritypid-priority"><code>os.setPriority([pid, ]priority)</code></a></li>
+<li><a href="#ostmpdir"><code>os.tmpdir()</code></a></li>
+<li><a href="#ostotalmem"><code>os.totalmem()</code></a></li>
+<li><a href="#ostype"><code>os.type()</code></a></li>
+<li><a href="#osuptime"><code>os.uptime()</code></a></li>
+<li><a href="#osuserinfooptions"><code>os.userInfo([options])</code></a></li>
+<li><a href="#osversion"><code>os.version()</code></a></li>
+<li><a href="#os-">OS 常量</a>
+<ul>
+<li><a href="#">信号常量</a></li>
+<li><a href="#_1">错误常量</a>
+<ul>
+<li><a href="#posix-">POSIX 错误常量</a></li>
+<li><a href="#windows-">Windows 特定错误常量</a></li>
+</ul>
+</li>
+<li><a href="#dlopen-">dlopen 常量</a></li>
+<li><a href="#_2">优先级常量</a></li>
+<li><a href="#libuv-">libuv 常量</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os active">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/os.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/os.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/os.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/os.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/os.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/os.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/os.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/os.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/os.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/os.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/os.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/os.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/os.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/os.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/os.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/os.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/os.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/os.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/os.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/os.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/os.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/os.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/os.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/os.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="os.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/os.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#os">OS</a></span>
+<ul>
+<li><a href="#oseol"><code>os.EOL</code></a></li>
+<li><a href="#osavailableparallelism"><code>os.availableParallelism()</code></a></li>
+<li><a href="#osarch"><code>os.arch()</code></a></li>
+<li><a href="#osconstants"><code>os.constants</code></a></li>
+<li><a href="#oscpus"><code>os.cpus()</code></a></li>
+<li><a href="#osdevnull"><code>os.devNull</code></a></li>
+<li><a href="#osendianness"><code>os.endianness()</code></a></li>
+<li><a href="#osfreemem"><code>os.freemem()</code></a></li>
+<li><a href="#osgetprioritypid"><code>os.getPriority([pid])</code></a></li>
+<li><a href="#oshomedir"><code>os.homedir()</code></a></li>
+<li><a href="#oshostname"><code>os.hostname()</code></a></li>
+<li><a href="#osloadavg"><code>os.loadavg()</code></a></li>
+<li><a href="#osmachine"><code>os.machine()</code></a></li>
+<li><a href="#osnetworkinterfaces"><code>os.networkInterfaces()</code></a></li>
+<li><a href="#osplatform"><code>os.platform()</code></a></li>
+<li><a href="#osrelease"><code>os.release()</code></a></li>
+<li><a href="#ossetprioritypid-priority"><code>os.setPriority([pid, ]priority)</code></a></li>
+<li><a href="#ostmpdir"><code>os.tmpdir()</code></a></li>
+<li><a href="#ostotalmem"><code>os.totalmem()</code></a></li>
+<li><a href="#ostype"><code>os.type()</code></a></li>
+<li><a href="#osuptime"><code>os.uptime()</code></a></li>
+<li><a href="#osuserinfooptions"><code>os.userInfo([options])</code></a></li>
+<li><a href="#osversion"><code>os.version()</code></a></li>
+<li><a href="#os-">OS 常量</a>
+<ul>
+<li><a href="#">信号常量</a></li>
+<li><a href="#_1">错误常量</a>
+<ul>
+<li><a href="#posix-">POSIX 错误常量</a></li>
+<li><a href="#windows-">Windows 特定错误常量</a></li>
+</ul>
+</li>
+<li><a href="#dlopen-">dlopen 常量</a></li>
+<li><a href="#_2">优先级常量</a></li>
+<li><a href="#libuv-">libuv 常量</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>OS<span><a class="mark" href="#os" id="os">#</a></span><a aria-hidden="true" class="legacy" id="os_os"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/os.js">lib/os.js</a></p>
+<p><code>node:os</code> 模块提供了与操作系统相关的实用方法和属性。可以通过以下方式访问：</p>
+
+<pre class="with-30-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> os <span class="hljs-keyword">from</span> <span class="hljs-string">'node:os'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:os'</span>);</code><button class="copy-button">copy</button></pre>
+<section><h3><code>os.EOL</code><span><a class="mark" href="#oseol" id="oseol">#</a></span><a aria-hidden="true" class="legacy" id="os_os_eol"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.8</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>特定于操作系统的行结束标记。</p>
+<ul>
+<li>在 POSIX 系统上是 <code>\n</code></li>
+<li>在 Windows 系统上是 <code>\r\n</code></li>
+</ul>
+</section><section><h3><code>os.availableParallelism()</code><span><a class="mark" href="#osavailableparallelism" id="osavailableparallelism">#</a></span><a aria-hidden="true" class="legacy" id="os_os_availableparallelism"></a></h3>
+<div class="api_metadata">
+<span>Added in: v19.4.0, v18.14.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>返回程序应使用的默认并行度估计值。始终返回一个大于零的值。</p>
+<p>此函数是 libuv 的 <a href="https://docs.libuv.org/en/v1.x/misc.html#c.uv_available_parallelism"><code>uv_available_parallelism()</code></a> 的一个小包装。</p>
+</section><section><h3><code>os.arch()</code><span><a class="mark" href="#osarch" id="osarch">#</a></span><a aria-hidden="true" class="legacy" id="os_os_arch"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.5.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回为其编译 Node.js 二进制文件的操作系统 CPU 架构。可能的值有 <code>'arm'</code>、<code>'arm64'</code>、<code>'ia32'</code>、<code>'loong64'</code>、<code>'mips'</code>、<code>'mipsel'</code>、<code>'ppc64'</code>、<code>'riscv64'</code>、<code>'s390x'</code> 和 <code>'x64'</code>。</p>
+<p>返回值等同于 <a href="process.html#processarch"><code>process.arch</code></a>。</p>
+</section><section><h3><code>os.constants</code><span><a class="mark" href="#osconstants" id="osconstants">#</a></span><a aria-hidden="true" class="legacy" id="os_os_constants"></a></h3>
+<div class="api_metadata">
+<span>Added in: v6.3.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>包含常用的操作系统特定常量，例如错误代码、进程信号等。定义的特定常量在 <a href="#os-constants">OS 常量</a> 中描述。</p>
+</section><section><h3><code>os.cpus()</code><span><a class="mark" href="#oscpus" id="oscpus">#</a></span><a aria-hidden="true" class="legacy" id="os_os_cpus"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a></li>
+</ul>
+<p>返回一个包含有关每个逻辑 CPU 核心信息的对象数组。如果无法获取 CPU 信息（例如 <code>/proc</code> 文件系统不可用），则该数组将为空。</p>
+<p>每个对象包含的属性包括：</p>
+<ul>
+<li><code>model</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>speed</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> (单位 MHz)</li>
+<li><code>times</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>user</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> CPU 在用户模式下花费的毫秒数。</li>
+<li><code>nice</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> CPU 在 nice 模式下花费的毫秒数。</li>
+<li><code>sys</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> CPU 在系统模式下花费的毫秒数。</li>
+<li><code>idle</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> CPU 在空闲模式下花费的毫秒数。</li>
+<li><code>irq</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> CPU 在中断请求模式下花费的毫秒数。</li>
+</ul>
+</li>
+</ul>
+<!-- eslint-disable @stylistic/js/semi -->
+<pre><code class="language-js">[
+  {
+    <span class="hljs-attr">model</span>: <span class="hljs-string">'Intel(R) Core(TM) i7 CPU         860  @ 2.80GHz'</span>,
+    <span class="hljs-attr">speed</span>: <span class="hljs-number">2926</span>,
+    <span class="hljs-attr">times</span>: {
+      <span class="hljs-attr">user</span>: <span class="hljs-number">252020</span>,
+      <span class="hljs-attr">nice</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">sys</span>: <span class="hljs-number">30340</span>,
+      <span class="hljs-attr">idle</span>: <span class="hljs-number">1070356870</span>,
+      <span class="hljs-attr">irq</span>: <span class="hljs-number">0</span>,
+    },
+  },
+  {
+    <span class="hljs-attr">model</span>: <span class="hljs-string">'Intel(R) Core(TM) i7 CPU         860  @ 2.80GHz'</span>,
+    <span class="hljs-attr">speed</span>: <span class="hljs-number">2926</span>,
+    <span class="hljs-attr">times</span>: {
+      <span class="hljs-attr">user</span>: <span class="hljs-number">306960</span>,
+      <span class="hljs-attr">nice</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">sys</span>: <span class="hljs-number">26980</span>,
+      <span class="hljs-attr">idle</span>: <span class="hljs-number">1071569080</span>,
+      <span class="hljs-attr">irq</span>: <span class="hljs-number">0</span>,
+    },
+  },
+  {
+    <span class="hljs-attr">model</span>: <span class="hljs-string">'Intel(R) Core(TM) i7 CPU         860  @ 2.80GHz'</span>,
+    <span class="hljs-attr">speed</span>: <span class="hljs-number">2926</span>,
+    <span class="hljs-attr">times</span>: {
+      <span class="hljs-attr">user</span>: <span class="hljs-number">248450</span>,
+      <span class="hljs-attr">nice</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">sys</span>: <span class="hljs-number">21750</span>,
+      <span class="hljs-attr">idle</span>: <span class="hljs-number">1070919370</span>,
+      <span class="hljs-attr">irq</span>: <span class="hljs-number">0</span>,
+    },
+  },
+  {
+    <span class="hljs-attr">model</span>: <span class="hljs-string">'Intel(R) Core(TM) i7 CPU         860  @ 2.80GHz'</span>,
+    <span class="hljs-attr">speed</span>: <span class="hljs-number">2926</span>,
+    <span class="hljs-attr">times</span>: {
+      <span class="hljs-attr">user</span>: <span class="hljs-number">256880</span>,
+      <span class="hljs-attr">nice</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">sys</span>: <span class="hljs-number">19430</span>,
+      <span class="hljs-attr">idle</span>: <span class="hljs-number">1070905480</span>,
+      <span class="hljs-attr">irq</span>: <span class="hljs-number">20</span>,
+    },
+  },
+];</code> <button class="copy-button">copy</button></pre>
+<p><code>nice</code> 值仅在 POSIX 系统上有效。在 Windows 上，所有处理器的 <code>nice</code> 值始终为 0。</p>
+<p>不应使用 <code>os.cpus().length</code> 来计算应用程序可用的并行量。请使用 <a href="#osavailableparallelism"><code>os.availableParallelism()</code></a> 来实现此目的。</p>
+</section><section><h3><code>os.devNull</code><span><a class="mark" href="#osdevnull" id="osdevnull">#</a></span><a aria-hidden="true" class="legacy" id="os_os_devnull"></a></h3>
+<div class="api_metadata">
+<span>Added in: v16.3.0, v14.18.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>空设备的平台特定文件路径。</p>
+<ul>
+<li>在 Windows 上是 <code>\\.\nul</code></li>
+<li>在 POSIX 系统上是 <code>/dev/null</code></li>
+</ul>
+</section><section><h3><code>os.endianness()</code><span><a class="mark" href="#osendianness" id="osendianness">#</a></span><a aria-hidden="true" class="legacy" id="os_os_endianness"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.9.4</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回一个字符串，标识为其编译 Node.js 二进制文件的 CPU 的字节序。</p>
+<p>可能的值是 <code>'BE'</code> 表示大端序，<code>'LE'</code> 表示小端序。</p>
+</section><section><h3><code>os.freemem()</code><span><a class="mark" href="#osfreemem" id="osfreemem">#</a></span><a aria-hidden="true" class="legacy" id="os_os_freemem"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>以整数形式返回系统空闲内存的字节数。</p>
+</section><section><h3><code>os.getPriority([pid])</code><span><a class="mark" href="#osgetprioritypid" id="osgetprioritypid">#</a></span><a aria-hidden="true" class="legacy" id="os_os_getpriority_pid"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.10.0</span>
+</div>
+<ul>
+<li><code>pid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 要获取调度优先级的进程 ID。<strong>默认值:</strong> <code>0</code>。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>返回由 <code>pid</code> 指定的进程的调度优先级。如果未提供 <code>pid</code> 或 <code>pid</code> 为 <code>0</code>，则返回当前进程的优先级。</p>
+</section><section><h3><code>os.homedir()</code><span><a class="mark" href="#oshomedir" id="oshomedir">#</a></span><a aria-hidden="true" class="legacy" id="os_os_homedir"></a></h3>
+<div class="api_metadata">
+<span>Added in: v2.3.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回当前用户的主目录的字符串路径。</p>
+<p>在 POSIX 系统上，如果定义了 <code>$HOME</code> 环境变量则使用它。否则，它使用 <a href="https://en.wikipedia.org/wiki/User_identifier#Effective_user_ID">有效 UID</a> 来查找用户的主目录。</p>
+<p>在 Windows 上，如果定义了 <code>USERPROFILE</code> 环境变量则使用它。否则，它使用当前用户的配置文件目录的路径。</p>
+</section><section><h3><code>os.hostname()</code><span><a class="mark" href="#oshostname" id="oshostname">#</a></span><a aria-hidden="true" class="legacy" id="os_os_hostname"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>以字符串形式返回操作系统的主机名。</p>
+</section><section><h3><code>os.loadavg()</code><span><a class="mark" href="#osloadavg" id="osloadavg">#</a></span><a aria-hidden="true" class="legacy" id="os_os_loadavg"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number[]></a></li>
+</ul>
+<p>返回一个包含 1、5 和 15 分钟平均负载的数组。</p>
+<p>平均负载是操作系统计算出的系统活动量度，以小数表示。</p>
+<p>平均负载是 Unix 特有的概念。在 Windows 上，返回值始终为 <code>[0, 0, 0]</code>。</p>
+</section><section><h3><code>os.machine()</code><span><a class="mark" href="#osmachine" id="osmachine">#</a></span><a aria-hidden="true" class="legacy" id="os_os_machine"></a></h3>
+<div class="api_metadata">
+<span>Added in: v18.9.0, v16.18.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>以字符串形式返回机器类型，例如 <code>arm</code>、<code>arm64</code>、<code>aarch64</code>、<code>mips</code>、<code>mips64</code>、<code>ppc64</code>、<code>ppc64le</code>、<code>s390x</code>、<code>i386</code>、<code>i686</code>、<code>x86_64</code>。</p>
+<p>在 POSIX 系统上，机器类型通过调用 <a href="https://linux.die.net/man/3/uname"><code>uname(3)</code></a> 确定。在 Windows 上，使用 <code>RtlGetVersion()</code>，如果不可用，则使用 <code>GetVersionExW()</code>。更多信息请参见 <a href="https://en.wikipedia.org/wiki/Uname#Examples">https://en.wikipedia.org/wiki/Uname#Examples</a>。</p>
+</section><section><h3><code>os.networkInterfaces()</code><span><a class="mark" href="#osnetworkinterfaces" id="osnetworkinterfaces">#</a></span><a aria-hidden="true" class="legacy" id="os_os_networkinterfaces"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.4.0</td>
+<td><p>The <code>family</code> property now returns a string instead of a number.</p></td></tr>
+<tr><td>v18.0.0</td>
+<td><p>The <code>family</code> property now returns a number instead of a string.</p></td></tr>
+<tr><td>v0.6.0</td>
+<td><p><span>Added in: v0.6.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>返回一个包含已分配网络地址的网络接口的对象。</p>
+<p>返回对象上的每个键标识一个网络接口。关联的值是一个对象数组，每个对象描述一个已分配的网络地址。</p>
+<p>已分配网络地址对象上可用的属性包括：</p>
+<ul>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 分配的 IPv4 或 IPv6 地址</li>
+<li><code>netmask</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> IPv4 或 IPv6 网络掩码</li>
+<li><code>family</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <code>IPv4</code> 或 <code>IPv6</code></li>
+<li><code>mac</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 网络接口的 MAC 地址</li>
+<li><code>internal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果网络接口是环回或类似不可远程访问的接口，则为 <code>true</code>；否则为 <code>false</code></li>
+<li><code>scopeid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 数字 IPv6 作用域 ID（仅在 <code>family</code> 为 <code>IPv6</code> 时指定）</li>
+<li><code>cidr</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 带有 CIDR 表示法中路由前缀的已分配 IPv4 或 IPv6 地址。如果 <code>netmask</code> 无效，则此属性设置为 <code>null</code>。</li>
+</ul>
+<!-- eslint-skip -->
+<pre><code class="language-js">{
+  <span class="hljs-attr">lo</span>: [
+    {
+      <span class="hljs-attr">address</span>: <span class="hljs-string">'127.0.0.1'</span>,
+      <span class="hljs-attr">netmask</span>: <span class="hljs-string">'255.0.0.0'</span>,
+      <span class="hljs-attr">family</span>: <span class="hljs-string">'IPv4'</span>,
+      <span class="hljs-attr">mac</span>: <span class="hljs-string">'00:00:00:00:00:00'</span>,
+      <span class="hljs-attr">internal</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">cidr</span>: <span class="hljs-string">'127.0.0.1/8'</span>
+    },
+    {
+      <span class="hljs-attr">address</span>: <span class="hljs-string">'::1'</span>,
+      <span class="hljs-attr">netmask</span>: <span class="hljs-string">'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'</span>,
+      <span class="hljs-attr">family</span>: <span class="hljs-string">'IPv6'</span>,
+      <span class="hljs-attr">mac</span>: <span class="hljs-string">'00:00:00:00:00:00'</span>,
+      <span class="hljs-attr">scopeid</span>: <span class="hljs-number">0</span>,
+      <span class="hljs-attr">internal</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">cidr</span>: <span class="hljs-string">'::1/128'</span>
+    }
+  ],
+  <span class="hljs-attr">eth0</span>: [
+    {
+      <span class="hljs-attr">address</span>: <span class="hljs-string">'192.168.1.108'</span>,
+      <span class="hljs-attr">netmask</span>: <span class="hljs-string">'255.255.255.0'</span>,
+      <span class="hljs-attr">family</span>: <span class="hljs-string">'IPv4'</span>,
+      <span class="hljs-attr">mac</span>: <span class="hljs-string">'01:02:03:0a:0b:0c'</span>,
+      <span class="hljs-attr">internal</span>: <span class="hljs-literal">false</span>,
+      <span class="hljs-attr">cidr</span>: <span class="hljs-string">'192.168.1.108/24'</span>
+    },
+    {
+      <span class="hljs-attr">address</span>: <span class="hljs-string">'fe80::a00:27ff:fe4e:66a1'</span>,
+      <span class="hljs-attr">netmask</span>: <span class="hljs-string">'ffff:ffff:ffff:ffff::'</span>,
+      <span class="hljs-attr">family</span>: <span class="hljs-string">'IPv6'</span>,
+      <span class="hljs-attr">mac</span>: <span class="hljs-string">'01:02:03:0a:0b:0c'</span>,
+      <span class="hljs-attr">scopeid</span>: <span class="hljs-number">1</span>,
+      <span class="hljs-attr">internal</span>: <span class="hljs-literal">false</span>,
+      <span class="hljs-attr">cidr</span>: <span class="hljs-string">'fe80::a00:27ff:fe4e:66a1/64'</span>
+    }
+  ]
+}</code> <button class="copy-button">copy</button></pre>
+</section><section><h3><code>os.platform()</code><span><a class="mark" href="#osplatform" id="osplatform">#</a></span><a aria-hidden="true" class="legacy" id="os_os_platform"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.5.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回一个字符串，标识为其编译 Node.js 二进制文件的操作系统平台。该值在编译时设置。可能的值有 <code>'aix'</code>、<code>'darwin'</code>、<code>'freebsd'</code>、<code>'linux'</code>、<code>'openbsd'</code>、<code>'sunos'</code> 和 <code>'win32'</code>。</p>
+<p>返回值等同于 <a href="process.html#processplatform"><code>process.platform</code></a>。</p>
+<p>如果 Node.js 是在 Android 操作系统上构建的，也可能返回 <code>'android'</code>。<a href="https://github.com/nodejs/node/blob/HEAD/BUILDING.md#android">Android 支持是实验性的</a>。</p>
+</section><section><h3><code>os.release()</code><span><a class="mark" href="#osrelease" id="osrelease">#</a></span><a aria-hidden="true" class="legacy" id="os_os_release"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>以字符串形式返回操作系统版本。</p>
+<p>在 POSIX 系统上，操作系统版本通过调用 <a href="https://linux.die.net/man/3/uname"><code>uname(3)</code></a> 确定。在 Windows 上，使用 <code>GetVersionExW()</code>。更多信息请参见 <a href="https://en.wikipedia.org/wiki/Uname#Examples">https://en.wikipedia.org/wiki/Uname#Examples</a>。</p>
+</section><section><h3><code>os.setPriority([pid, ]priority)</code><span><a class="mark" href="#ossetprioritypid-priority" id="ossetprioritypid-priority">#</a></span><a aria-hidden="true" class="legacy" id="os_os_setpriority_pid_priority"></a></h3>
+<div class="api_metadata">
+<span>Added in: v10.10.0</span>
+</div>
+<ul>
+<li><code>pid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 要设置调度优先级的进程 ID。<strong>默认值:</strong> <code>0</code>。</li>
+<li><code>priority</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 要分配给进程的调度优先级。</li>
+</ul>
+<p>尝试设置由 <code>pid</code> 指定的进程的调度优先级。如果未提供 <code>pid</code> 或 <code>pid</code> 为 <code>0</code>，则使用当前进程的进程 ID。</p>
+<p><code>priority</code> 输入必须是一个介于 <code>-20</code>（高优先级）和 <code>19</code>（低优先级）之间的整数。由于 Unix 优先级级别和 Windows 优先级类之间的差异，<code>priority</code> 被映射到 <code>os.constants.priority</code> 中的六个优先级常量之一。在检索进程优先级级别时，此范围映射可能导致返回值在 Windows 上略有不同。为避免混淆，请将 <code>priority</code> 设置为优先级常量之一。</p>
+<p>在 Windows 上，将优先级设置为 <code>PRIORITY_HIGHEST</code> 需要提升的用户权限。否则，设置的优先级将被静默降低为 <code>PRIORITY_HIGH</code>。</p>
+</section><section><h3><code>os.tmpdir()</code><span><a class="mark" href="#ostmpdir" id="ostmpdir">#</a></span><a aria-hidden="true" class="legacy" id="os_os_tmpdir"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v2.0.0</td>
+<td><p>此函数现在是跨平台一致的，并且不再在任何平台上返回带有尾随斜杠的路径。</p></td></tr>
+<tr><td>v0.9.9</td>
+<td><p><span>Added in: v0.9.9</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>以字符串形式返回操作系统的默认临时文件目录。</p>
+<p>在 Windows 上，结果可以被 <code>TEMP</code> 和 <code>TMP</code> 环境变量覆盖，并且 <code>TEMP</code> 优先于 <code>TMP</code>。如果两者都未设置，则默认为 <code>%SystemRoot%\temp</code> 或 <code>%windir%\temp</code>。</p>
+<p>在非 Windows 平台上，将检查 <code>TMPDIR</code>、<code>TMP</code> 和 <code>TEMP</code> 环境变量以覆盖此方法的结果，按描述的顺序。如果均未设置，则默认为 <code>/tmp</code>。</p>
+<p>某些操作系统发行版会默认配置 <code>TMPDIR</code>（非 Windows）或 <code>TEMP</code> 和 <code>TMP</code>（Windows），而无需系统管理员进行额外配置。<code>os.tmpdir()</code> 的结果通常反映系统偏好，除非用户显式覆盖。</p>
+</section><section><h3><code>os.totalmem()</code><span><a class="mark" href="#ostotalmem" id="ostotalmem">#</a></span><a aria-hidden="true" class="legacy" id="os_os_totalmem"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>以整数形式返回系统内存总量的字节数。</p>
+</section><section><h3><code>os.type()</code><span><a class="mark" href="#ostype" id="ostype">#</a></span><a aria-hidden="true" class="legacy" id="os_os_type"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回由 <a href="https://linux.die.net/man/3/uname"><code>uname(3)</code></a> 返回的操作系统名称。例如，在 Linux 上返回 <code>'Linux'</code>，在 macOS 上返回 <code>'Darwin'</code>，在 Windows 上返回 <code>'Windows_NT'</code>。</p>
+<p>有关在各种操作系统上运行 <a href="https://linux.die.net/man/3/uname"><code>uname(3)</code></a> 的输出的更多信息，请参见 <a href="https://en.wikipedia.org/wiki/Uname#Examples">https://en.wikipedia.org/wiki/Uname#Examples</a>。</p>
+</section><section><h3><code>os.uptime()</code><span><a class="mark" href="#osuptime" id="osuptime">#</a></span><a aria-hidden="true" class="legacy" id="os_os_uptime"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v10.0.0</td>
+<td><p>此函数的结果在 Windows 上不再包含小数部分。</p></td></tr>
+<tr><td>v0.3.3</td>
+<td><p><span>Added in: v0.3.3</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>返回系统运行时间的秒数。</p>
+</section><section><h3><code>os.userInfo([options])</code><span><a class="mark" href="#osuserinfooptions" id="osuserinfooptions">#</a></span><a aria-hidden="true" class="legacy" id="os_os_userinfo_options"></a></h3>
+<div class="api_metadata">
+<span>Added in: v6.0.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>encoding</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 用于解释结果字符串的字符编码。如果 <code>encoding</code> 设置为 <code>'buffer'</code>，则 <code>username</code>、<code>shell</code> 和 <code>homedir</code> 值将是 <code>Buffer</code> 实例。<strong>默认值:</strong> <code>'utf8'</code>。</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>返回有关当前有效用户的信息。在 POSIX 平台上，这通常是密码文件的子集。返回的对象包括 <code>username</code>、<code>uid</code>、<code>gid</code>、<code>shell</code> 和 <code>homedir</code>。在 Windows 上，<code>uid</code> 和 <code>gid</code> 字段为 <code>-1</code>，并且 <code>shell</code> 为 <code>null</code>。</p>
+<p><code>os.userInfo()</code> 返回的 <code>homedir</code> 值由操作系统提供。这与 <code>os.homedir()</code> 的结果不同，后者在回退到操作系统响应之前会查询环境变量以获取主目录。</p>
+<p>如果用户没有 <code>username</code> 或 <code>homedir</code>，则抛出 <a href="errors.html#class-systemerror"><code>SystemError</code></a>。</p>
+</section><section><h3><code>os.version()</code><span><a class="mark" href="#osversion" id="osversion">#</a></span><a aria-hidden="true" class="legacy" id="os_os_version"></a></h3>
+<div class="api_metadata">
+<span>Added in: v13.11.0, v12.17.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回一个标识内核版本的字符串。</p>
+<p>在 POSIX 系统上，操作系统版本通过调用 <a href="https://linux.die.net/man/3/uname"><code>uname(3)</code></a> 确定。在 Windows 上，使用 <code>RtlGetVersion()</code>，如果不可用，则使用 <code>GetVersionExW()</code>。更多信息请参见 <a href="https://en.wikipedia.org/wiki/Uname#Examples">https://en.wikipedia.org/wiki/Uname#Examples</a>。</p>
+</section><section><h3>OS 常量<span><a class="mark" href="#os-" id="os-">#</a></span><a aria-hidden="true" class="legacy" id="os_os_1"></a></h3>
+<p>以下常量由 <code>os.constants</code> 导出。</p>
+<p>并非所有常量在每个操作系统上都可用。</p>
+<div>
+<h4>信号常量<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="os"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v5.11.0</td>
+<td><p>添加了对 <code>SIGINFO</code> 的支持。</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>以下信号常量由 <code>os.constants.signals</code> 导出。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>SIGHUP</code></td>
+    <td>当控制终端关闭或父进程退出时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGINT</code></td>
+    <td>当用户希望中断进程时发送（<kbd>Ctrl</kbd>+<kbd>C</kbd>）。</td>
+  </tr>
+  <tr>
+    <td><code>SIGQUIT</code></td>
+    <td>当用户希望终止进程并执行核心转储时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGILL</code></td>
+    <td>发送给进程以通知其尝试执行非法、格式错误、未知或特权指令。</td>
+  </tr>
+  <tr>
+    <td><code>SIGTRAP</code></td>
+    <td>当进程发生异常时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGABRT</code></td>
+    <td>发送给进程以请求其中止。</td>
+  </tr>
+  <tr>
+    <td><code>SIGIOT</code></td>
+    <td><code>SIGABRT</code> 的同义词</td>
+  </tr>
+  <tr>
+    <td><code>SIGBUS</code></td>
+    <td>发送给进程以通知其引起了总线错误。</td>
+  </tr>
+  <tr>
+    <td><code>SIGFPE</code></td>
+    <td>发送给进程以通知其执行了非法的算术操作。</td>
+  </tr>
+  <tr>
+    <td><code>SIGKILL</code></td>
+    <td>发送给进程以立即终止它。</td>
+  </tr>
+  <tr>
+    <td><code>SIGUSR1</code> <code>SIGUSR2</code></td>
+    <td>发送给进程以标识用户定义的条件。</td>
+  </tr>
+  <tr>
+    <td><code>SIGSEGV</code></td>
+    <td>发送给进程以通知发生了分段错误。</td>
+  </tr>
+  <tr>
+    <td><code>SIGPIPE</code></td>
+    <td>当进程尝试写入已断开的管道时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGALRM</code></td>
+    <td>当系统计时器到期时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGTERM</code></td>
+    <td>发送给进程以请求终止。</td>
+  </tr>
+  <tr>
+    <td><code>SIGCHLD</code></td>
+    <td>当子进程终止时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGSTKFLT</code></td>
+    <td>发送给进程以指示协处理器上的堆栈故障。</td>
+  </tr>
+  <tr>
+    <td><code>SIGCONT</code></td>
+    <td>发送以指示操作系统继续已暂停的进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGSTOP</code></td>
+    <td>发送以指示操作系统停止进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGTSTP</code></td>
+    <td>发送给进程以请求其停止。</td>
+  </tr>
+  <tr>
+    <td><code>SIGBREAK</code></td>
+    <td>当用户希望中断进程时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGTTIN</code></td>
+    <td>当进程在后台从 TTY 读取时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGTTOU</code></td>
+    <td>当进程在后台写入 TTY 时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGURG</code></td>
+    <td>当套接字有紧急数据要读取时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGXCPU</code></td>
+    <td>当进程超出其 CPU 使用限制时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGXFSZ</code></td>
+    <td>当进程使文件增长超过允许的最大值时发送。</td>
+  </tr>
+  <tr>
+    <td><code>SIGVTALRM</code></td>
+    <td>当虚拟计时器到期时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGPROF</code></td>
+    <td>当系统计时器到期时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGWINCH</code></td>
+    <td>当控制终端改变大小时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGIO</code></td>
+    <td>当 I/O 可用时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGPOLL</code></td>
+    <td><code>SIGIO</code> 的同义词</td>
+  </tr>
+  <tr>
+    <td><code>SIGLOST</code></td>
+    <td>当文件锁丢失时发送给进程。</td>
+  </tr>
+  <tr>
+    <td><code>SIGPWR</code></td>
+    <td>发送给进程以通知电源故障。</td>
+  </tr>
+  <tr>
+    <td><code>SIGINFO</code></td>
+    <td><code>SIGPWR</code> 的同义词</td>
+  </tr>
+  <tr>
+    <td><code>SIGSYS</code></td>
+    <td>发送给进程以通知错误的参数。</td>
+  </tr>
+  <tr>
+    <td><code>SIGUNUSED</code></td>
+    <td><code>SIGSYS</code> 的同义词</td>
+  </tr>
+</tbody></table>
+</div><div>
+<h4>错误常量<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="os_1"></a></h4>
+<p>以下错误常量由 <code>os.constants.errno</code> 导出。</p>
+<div>
+<h5>POSIX 错误常量<span><a class="mark" href="#posix-" id="posix-">#</a></span><a aria-hidden="true" class="legacy" id="os_posix"></a></h5>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>E2BIG</code></td>
+    <td>表示参数列表比预期长。</td>
+  </tr>
+  <tr>
+    <td><code>EACCES</code></td>
+    <td>表示操作没有足够的权限。</td>
+  </tr>
+  <tr>
+    <td><code>EADDRINUSE</code></td>
+    <td>表示网络地址已被使用。</td>
+  </tr>
+  <tr>
+    <td><code>EADDRNOTAVAIL</code></td>
+    <td>表示网络地址当前不可用。</td>
+  </tr>
+  <tr>
+    <td><code>EAFNOSUPPORT</code></td>
+    <td>表示网络地址族不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>EAGAIN</code></td>
+    <td>表示没有可用数据，稍后重试操作。</td>
+  </tr>
+  <tr>
+    <td><code>EALREADY</code></td>
+    <td>表示套接字已有挂起的连接在进行中。</td>
+  </tr>
+  <tr>
+    <td><code>EBADF</code></td>
+    <td>表示文件描述符无效。</td>
+  </tr>
+  <tr>
+    <td><code>EBADMSG</code></td>
+    <td>表示无效的数据消息。</td>
+  </tr>
+  <tr>
+    <td><code>EBUSY</code></td>
+    <td>表示设备或资源繁忙。</td>
+  </tr>
+  <tr>
+    <td><code>ECANCELED</code></td>
+    <td>表示操作已被取消。</td>
+  </tr>
+  <tr>
+    <td><code>ECHILD</code></td>
+    <td>表示没有子进程。</td>
+  </tr>
+  <tr>
+    <td><code>ECONNABORTED</code></td>
+    <td>表示网络连接已中止。</td>
+  </tr>
+  <tr>
+    <td><code>ECONNREFUSED</code></td>
+    <td>表示网络连接被拒绝。</td>
+  </tr>
+  <tr>
+    <td><code>ECONNRESET</code></td>
+    <td>表示网络连接已重置。</td>
+  </tr>
+  <tr>
+    <td><code>EDEADLK</code></td>
+    <td>表示已避免资源死锁。</td>
+  </tr>
+  <tr>
+    <td><code>EDESTADDRREQ</code></td>
+    <td>表示需要目标地址。</td>
+  </tr>
+  <tr>
+    <td><code>EDOM</code></td>
+    <td>表示参数超出函数的域。</td>
+  </tr>
+  <tr>
+    <td><code>EDQUOT</code></td>
+    <td>表示超出磁盘配额。</td>
+  </tr>
+  <tr>
+    <td><code>EEXIST</code></td>
+    <td>表示文件已存在。</td>
+  </tr>
+  <tr>
+    <td><code>EFAULT</code></td>
+    <td>表示无效的指针地址。</td>
+  </tr>
+  <tr>
+    <td><code>EFBIG</code></td>
+    <td>表示文件太大。</td>
+  </tr>
+  <tr>
+    <td><code>EHOSTUNREACH</code></td>
+    <td>表示主机不可达。</td>
+  </tr>
+  <tr>
+    <td><code>EIDRM</code></td>
+    <td>表示标识符已被移除。</td>
+  </tr>
+  <tr>
+    <td><code>EILSEQ</code></td>
+    <td>表示非法的字节序列。</td>
+  </tr>
+  <tr>
+    <td><code>EINPROGRESS</code></td>
+    <td>表示操作已在进行中。</td>
+  </tr>
+  <tr>
+    <td><code>EINTR</code></td>
+    <td>表示函数调用被中断。</td>
+  </tr>
+  <tr>
+    <td><code>EINVAL</code></td>
+    <td>表示提供了无效参数。</td>
+  </tr>
+  <tr>
+    <td><code>EIO</code></td>
+    <td>表示未指定的 I/O 错误。</td>
+  </tr>
+  <tr>
+    <td><code>EISCONN</code></td>
+    <td>表示套接字已连接。</td>
+  </tr>
+  <tr>
+    <td><code>EISDIR</code></td>
+    <td>表示路径是目录。</td>
+  </tr>
+  <tr>
+    <td><code>ELOOP</code></td>
+    <td>表示路径中符号链接层级过多。</td>
+  </tr>
+  <tr>
+    <td><code>EMFILE</code></td>
+    <td>表示打开的文件过多。</td>
+  </tr>
+  <tr>
+    <td><code>EMLINK</code></td>
+    <td>表示文件的硬链接过多。</td>
+  </tr>
+  <tr>
+    <td><code>EMSGSIZE</code></td>
+    <td>表示提供的消息过长。</td>
+  </tr>
+  <tr>
+    <td><code>EMULTIHOP</code></td>
+    <td>表示尝试了多跳。</td>
+  </tr>
+  <tr>
+    <td><code>ENAMETOOLONG</code></td>
+    <td>表示文件名过长。</td>
+  </tr>
+  <tr>
+    <td><code>ENETDOWN</code></td>
+    <td>表示网络已关闭。</td>
+  </tr>
+  <tr>
+    <td><code>ENETRESET</code></td>
+    <td>表示连接已被网络中止。</td>
+  </tr>
+  <tr>
+    <td><code>ENETUNREACH</code></td>
+    <td>表示网络不可达。</td>
+  </tr>
+  <tr>
+    <td><code>ENFILE</code></td>
+    <td>表示系统中打开的文件过多。</td>
+  </tr>
+  <tr>
+    <td><code>ENOBUFS</code></td>
+    <td>表示没有可用的缓冲区空间。</td>
+  </tr>
+  <tr>
+    <td><code>ENODATA</code></td>
+    <td>表示流头读取队列中没有可用消息。</td>
+  </tr>
+  <tr>
+    <td><code>ENODEV</code></td>
+    <td>表示没有此类设备。</td>
+  </tr>
+  <tr>
+    <td><code>ENOENT</code></td>
+    <td>表示没有此类文件或目录。</td>
+  </tr>
+  <tr>
+    <td><code>ENOEXEC</code></td>
+    <td>表示 exec 格式错误。</td>
+  </tr>
+  <tr>
+    <td><code>ENOLCK</code></td>
+    <td>表示没有可用的锁。</td>
+  </tr>
+  <tr>
+    <td><code>ENOLINK</code></td>
+    <td>表示链接已被切断。</td>
+  </tr>
+  <tr>
+    <td><code>ENOMEM</code></td>
+    <td>表示空间不足。</td>
+  </tr>
+  <tr>
+    <td><code>ENOMSG</code></td>
+    <td>表示没有所需类型的消息。</td>
+  </tr>
+  <tr>
+    <td><code>ENOPROTOOPT</code></td>
+    <td>表示给定协议不可用。</td>
+  </tr>
+  <tr>
+    <td><code>ENOSPC</code></td>
+    <td>表示设备上没有可用空间。</td>
+  </tr>
+  <tr>
+    <td><code>ENOSR</code></td>
+    <td>表示没有可用的流资源。</td>
+  </tr>
+  <tr>
+    <td><code>ENOSTR</code></td>
+    <td>表示给定资源不是流。</td>
+  </tr>
+  <tr>
+    <td><code>ENOSYS</code></td>
+    <td>表示函数未实现。</td>
+  </tr>
+  <tr>
+    <td><code>ENOTCONN</code></td>
+    <td>表示套接字未连接。</td>
+  </tr>
+  <tr>
+    <td><code>ENOTDIR</code></td>
+    <td>表示路径不是目录。</td>
+  </tr>
+  <tr>
+    <td><code>ENOTEMPTY</code></td>
+    <td>表示目录不为空。</td>
+  </tr>
+  <tr>
+    <td><code>ENOTSOCK</code></td>
+    <td>表示给定项不是套接字。</td>
+  </tr>
+  <tr>
+    <td><code>ENOTSUP</code></td>
+    <td>表示给定操作不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>ENOTTY</code></td>
+    <td>表示不适当的 I/O 控制操作。</td>
+  </tr>
+  <tr>
+    <td><code>ENXIO</code></td>
+    <td>表示没有此类设备或地址。</td>
+  </tr>
+  <tr>
+    <td><code>EOPNOTSUPP</code></td>
+    <td>表示套接字上不支持该操作。（尽管 <code>ENOTSUP</code> 和 <code>EOPNOTSUPP</code> 在 Linux 上具有相同的值，但根据 POSIX.1，这些错误值应该是不同的。）</td>
+  </tr>
+  <tr>
+    <td><code>EOVERFLOW</code></td>
+    <td>表示值太大，无法存储在给定数据类型中。</td>
+  </tr>
+  <tr>
+    <td><code>EPERM</code></td>
+    <td>表示操作不被允许。</td>
+  </tr>
+  <tr>
+    <td><code>EPIPE</code></td>
+    <td>表示管道破裂。</td>
+  </tr>
+  <tr>
+    <td><code>EPROTO</code></td>
+    <td>表示协议错误。</td>
+  </tr>
+  <tr>
+    <td><code>EPROTONOSUPPORT</code></td>
+    <td>表示协议不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>EPROTOTYPE</code></td>
+    <td>表示套接字的协议类型错误。</td>
+  </tr>
+  <tr>
+    <td><code>ERANGE</code></td>
+    <td>表示结果太大。</td>
+  </tr>
+  <tr>
+    <td><code>EROFS</code></td>
+    <td>表示文件系统为只读。</td>
+  </tr>
+  <tr>
+    <td><code>ESPIPE</code></td>
+    <td>表示无效的查找操作。</td>
+  </tr>
+  <tr>
+    <td><code>ESRCH</code></td>
+    <td>表示没有此类进程。</td>
+  </tr>
+  <tr>
+    <td><code>ESTALE</code></td>
+    <td>表示文件句柄已过时。</td>
+  </tr>
+  <tr>
+    <td><code>ETIME</code></td>
+    <td>表示计时器已过期。</td>
+  </tr>
+  <tr>
+    <td><code>ETIMEDOUT</code></td>
+    <td>表示连接超时。</td>
+  </tr>
+  <tr>
+    <td><code>ETXTBSY</code></td>
+    <td>表示文本文件忙。</td>
+  </tr>
+  <tr>
+    <td><code>EWOULDBLOCK</code></td>
+    <td>表示操作会阻塞。</td>
+  </tr>
+  <tr>
+    <td><code>EXDEV</code></td>
+    <td>表示不当的链接。</td>
+  </tr>
+</tbody></table>
+</div><div>
+<h5>Windows 特定错误常量<span><a class="mark" href="#windows-" id="windows-">#</a></span><a aria-hidden="true" class="legacy" id="os_windows"></a></h5>
+<p>以下错误代码特定于 Windows 操作系统。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>WSAEINTR</code></td>
+    <td>表示中断的函数调用。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEBADF</code></td>
+    <td>表示无效的文件句柄。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEACCES</code></td>
+    <td>表示权限不足，无法完成操作。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEFAULT</code></td>
+    <td>表示无效的指针地址。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEINVAL</code></td>
+    <td>表示传递了无效参数。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEMFILE</code></td>
+    <td>表示打开的文件过多。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEWOULDBLOCK</code></td>
+    <td>表示资源暂时不可用。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEINPROGRESS</code></td>
+    <td>表示操作当前正在进行中。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEALREADY</code></td>
+    <td>表示操作已在进行中。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENOTSOCK</code></td>
+    <td>表示资源不是套接字。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEDESTADDRREQ</code></td>
+    <td>表示需要目标地址。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEMSGSIZE</code></td>
+    <td>表示消息过长。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEPROTOTYPE</code></td>
+    <td>表示套接字的协议类型错误。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENOPROTOOPT</code></td>
+    <td>表示错误的协议选项。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEPROTONOSUPPORT</code></td>
+    <td>表示协议不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>WSAESOCKTNOSUPPORT</code></td>
+    <td>表示套接字类型不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEOPNOTSUPP</code></td>
+    <td>表示操作不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEPFNOSUPPORT</code></td>
+    <td>表示协议族不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEAFNOSUPPORT</code></td>
+    <td>表示地址族不受支持。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEADDRINUSE</code></td>
+    <td>表示网络地址已被使用。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEADDRNOTAVAIL</code></td>
+    <td>表示网络地址不可用。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENETDOWN</code></td>
+    <td>表示网络已关闭。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENETUNREACH</code></td>
+    <td>表示网络不可达。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENETRESET</code></td>
+    <td>表示网络连接已重置。</td>
+  </tr>
+  <tr>
+    <td><code>WSAECONNABORTED</code></td>
+    <td>表示连接已中止。</td>
+  </tr>
+  <tr>
+    <td><code>WSAECONNRESET</code></td>
+    <td>表示连接被对等方重置。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENOBUFS</code></td>
+    <td>表示没有可用的缓冲区空间。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEISCONN</code></td>
+    <td>表示套接字已连接。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENOTCONN</code></td>
+    <td>表示套接字未连接。</td>
+  </tr>
+  <tr>
+    <td><code>WSAESHUTDOWN</code></td>
+    <td>表示套接字关闭后无法发送数据。</td>
+  </tr>
+  <tr>
+    <td><code>WSAETOOMANYREFS</code></td>
+    <td>表示引用过多。</td>
+  </tr>
+  <tr>
+    <td><code>WSAETIMEDOUT</code></td>
+    <td>表示连接超时。</td>
+  </tr>
+  <tr>
+    <td><code>WSAECONNREFUSED</code></td>
+    <td>表示连接被拒绝。</td>
+  </tr>
+  <tr>
+    <td><code>WSAELOOP</code></td>
+    <td>表示名称无法翻译。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENAMETOOLONG</code></td>
+    <td>表示名称过长。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEHOSTDOWN</code></td>
+    <td>表示网络主机已关闭。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEHOSTUNREACH</code></td>
+    <td>表示没有到网络主机的路由。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENOTEMPTY</code></td>
+    <td>表示目录不为空。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEPROCLIM</code></td>
+    <td>表示进程过多。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEUSERS</code></td>
+    <td>表示超出用户配额。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEDQUOT</code></td>
+    <td>表示超出磁盘配额。</td>
+  </tr>
+  <tr>
+    <td><code>WSAESTALE</code></td>
+    <td>表示过时的文件句柄引用。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEREMOTE</code></td>
+    <td>表示项是远程的。</td>
+  </tr>
+  <tr>
+    <td><code>WSASYSNOTREADY</code></td>
+    <td>表示网络子系统未就绪。</td>
+  </tr>
+  <tr>
+    <td><code>WSAVERNOTSUPPORTED</code></td>
+    <td>表示 <code>winsock.dll</code> 版本超出范围。</td>
+  </tr>
+  <tr>
+    <td><code>WSANOTINITIALISED</code></td>
+    <td>表示尚未成功执行 WSAStartup。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEDISCON</code></td>
+    <td>表示正在进行正常关闭。</td>
+  </tr>
+  <tr>
+    <td><code>WSAENOMORE</code></td>
+    <td>表示没有更多结果。</td>
+  </tr>
+  <tr>
+    <td><code>WSAECANCELLED</code></td>
+    <td>表示操作已被取消。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEINVALIDPROCTABLE</code></td>
+    <td>表示过程调用表无效。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEINVALIDPROVIDER</code></td>
+    <td>表示无效的服务提供程序。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEPROVIDERFAILEDINIT</code></td>
+    <td>表示服务提供程序初始化失败。</td>
+  </tr>
+  <tr>
+    <td><code>WSASYSCALLFAILURE</code></td>
+    <td>表示系统调用失败。</td>
+  </tr>
+  <tr>
+    <td><code>WSASERVICE_NOT_FOUND</code></td>
+    <td>表示未找到服务。</td>
+  </tr>
+  <tr>
+    <td><code>WSATYPE_NOT_FOUND</code></td>
+    <td>表示未找到类类型。</td>
+  </tr>
+  <tr>
+    <td><code>WSA_E_NO_MORE</code></td>
+    <td>表示没有更多结果。</td>
+  </tr>
+  <tr>
+    <td><code>WSA_E_CANCELLED</code></td>
+    <td>表示调用被取消。</td>
+  </tr>
+  <tr>
+    <td><code>WSAEREFUSED</code></td>
+    <td>表示数据库查询被拒绝。</td>
+  </tr>
+</tbody></table>
+</div></div><div>
+<h4>dlopen 常量<span><a class="mark" href="#dlopen-" id="dlopen-">#</a></span><a aria-hidden="true" class="legacy" id="os_dlopen"></a></h4>
+<p>如果在操作系统上可用，以下常量在 <code>os.constants.dlopen</code> 中导出。详细信息请参见 <a href="http://man7.org/linux/man-pages/man3/dlopen.3.html"><code>dlopen(3)</code></a>。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>RTLD_LAZY</code></td>
+    <td>执行延迟绑定。Node.js 默认设置此标志。</td>
+  </tr>
+  <tr>
+    <td><code>RTLD_NOW</code></td>
+    <td>在 dlopen(3) 返回之前解析库中所有未定义的符号。</td>
+  </tr>
+  <tr>
+    <td><code>RTLD_GLOBAL</code></td>
+    <td>库定义的符号将可用于后续加载库的符号解析。</td>
+  </tr>
+  <tr>
+    <td><code>RTLD_LOCAL</code></td>
+    <td><code>RTLD_GLOBAL</code> 的反义。如果未指定任何标志，这是默认行为。</td>
+  </tr>
+  <tr>
+    <td><code>RTLD_DEEPBIND</code></td>
+    <td>使自包含的库优先使用自己的符号，而不是之前加载的库中的符号。</td>
+  </tr>
+</tbody></table>
+</div><div>
+<h4>优先级常量<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="os_2"></a></h4>
+<div class="api_metadata">
+<span>Added in: v10.10.0</span>
+</div>
+<p>以下进程调度常量由 <code>os.constants.priority</code> 导出。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>PRIORITY_LOW</code></td>
+    <td>最低的进程调度优先级。这在 Windows 上对应于 <code>IDLE_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>19</code>。</td>
+  </tr>
+  <tr>
+    <td><code>PRIORITY_BELOW_NORMAL</code></td>
+    <td>高于 <code>PRIORITY_LOW</code> 但低于 <code>PRIORITY_NORMAL</code> 的进程调度优先级。这在 Windows 上对应于 <code>BELOW_NORMAL_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>10</code>。</td>
+  </tr>
+  <tr>
+    <td><code>PRIORITY_NORMAL</code></td>
+    <td>默认的进程调度优先级。这在 Windows 上对应于 <code>NORMAL_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>0</code>。</td>
+  </tr>
+  <tr>
+    <td><code>PRIORITY_ABOVE_NORMAL</code></td>
+    <td>高于 <code>PRIORITY_NORMAL</code> 但低于 <code>PRIORITY_HIGH</code> 的进程调度优先级。这在 Windows 上对应于 <code>ABOVE_NORMAL_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>-7</code>。</td>
+  </tr>
+  <tr>
+    <td><code>PRIORITY_HIGH</code></td>
+    <td>高于 <code>PRIORITY_ABOVE_NORMAL</code> 但低于 <code>PRIORITY_HIGHEST</code> 的进程调度优先级。这在 Windows 上对应于 <code>HIGH_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>-14</code>。</td>
+  </tr>
+  <tr>
+    <td><code>PRIORITY_HIGHEST</code></td>
+    <td>最高的进程调度优先级。这在 Windows 上对应于 <code>REALTIME_PRIORITY_CLASS</code>，在所有其他平台上对应于 nice 值 <code>-20</code>。</td>
+  </tr>
+</tbody></table>
+</div><div>
+<h4>libuv 常量<span><a class="mark" href="#libuv-" id="libuv-">#</a></span><a aria-hidden="true" class="legacy" id="os_libuv"></a></h4>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>UV_UDP_REUSEADDR</code></td>
+    <td></td>
+  </tr>
+</tbody></table></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

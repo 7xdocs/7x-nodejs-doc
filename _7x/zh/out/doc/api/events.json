@@ -1,0 +1,2024 @@
+{
+  "type": "module",
+  "source": "doc/api/events.md",
+  "modules": [
+    {
+      "textRaw": "Events",
+      "name": "Events",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "type": "module",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/events.js\">lib/events.js</a></p>\n<p>Node.js 核心 API 的大部分是围绕一个惯用的异步事件驱动架构构建的，在这种架构中，某些类型的对象（称为\"触发器\"）会触发命名事件，导致 <code>Function</code> 对象（\"监听器\"）被调用。</p>\n<p>例如：一个 <a href=\"net.html#class-netserver\"><code>net.Server</code></a> 对象在每次有对等体连接到它时触发一个事件；一个 <a href=\"fs.html#class-fsreadstream\"><code>fs.ReadStream</code></a> 在文件被打开时触发一个事件；一个 <a href=\"stream.html\">stream</a> 在数据可读时触发事件。</p>\n<p>所有触发事件的对象都是 <code>EventEmitter</code> 类的实例。这些对象暴露了一个 <code>eventEmitter.on()</code> 函数，允许一个或多个函数附加到对象触发的命名事件上。通常，事件名称是驼峰式字符串，但任何有效的 JavaScript 属性键都可以使用。</p>\n<p>当 <code>EventEmitter</code> 对象触发一个事件时，所有附加到该特定事件的函数都会被<em>同步地</em>调用。被调用的监听器返回的任何值都会被<em>忽略</em>并丢弃。</p>\n<p>以下示例展示了一个简单的 <code>EventEmitter</code> 实例，带有一个监听器。<code>eventEmitter.on()</code> 方法用于注册监听器，而 <code>eventEmitter.emit()</code> 方法用于触发事件。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', () => {\n  console.log('an event occurred!');\n});\nmyEmitter.emit('event');\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "向监听器传递参数和 `this`",
+          "name": "向监听器传递参数和_`this`",
+          "desc": "<p><code>eventEmitter.emit()</code> 方法允许将一组任意参数传递给监听器函数。请记住，当调用普通监听器函数时，标准 <code>this</code> 关键字被有意设置为引用监听器附加到的 <code>EventEmitter</code> 实例。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', function(a, b) {\n  console.log(a, b, this, this === myEmitter);\n  // 打印:\n  //   a b MyEmitter {\n  //     _events: [Object: null prototype] { event: [Function (anonymous)] },\n  //     _eventsCount: 1,\n  //     _maxListeners: undefined,\n  //     Symbol(shapeMode): false,\n  //     Symbol(kCapture): false\n  //   } true\n});\nmyEmitter.emit('event', 'a', 'b');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', function(a, b) {\n  console.log(a, b, this, this === myEmitter);\n  // 打印:\n  //   a b MyEmitter {\n  //     _events: [Object: null prototype] { event: [Function (anonymous)] },\n  //     _eventsCount: 1,\n  //     _maxListeners: undefined,\n  //     Symbol(shapeMode): false,\n  //     Symbol(kCapture): false\n  //   } true\n});\nmyEmitter.emit('event', 'a', 'b');\n</code></pre>\n<p>可以使用 ES6 箭头函数作为监听器，但是，这样做时，<code>this</code> 关键字将不再引用 <code>EventEmitter</code> 实例：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', (a, b) => {\n  console.log(a, b, this);\n  // 打印: a b undefined\n});\nmyEmitter.emit('event', 'a', 'b');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', (a, b) => {\n  console.log(a, b, this);\n  // 打印: a b {}\n});\nmyEmitter.emit('event', 'a', 'b');\n</code></pre>",
+          "type": "module",
+          "displayName": "向监听器传递参数和 `this`"
+        },
+        {
+          "textRaw": "异步与同步",
+          "name": "异步与同步",
+          "desc": "<p><code>EventEmitter</code> 按照监听器被注册的顺序同步调用所有监听器。这确保了事件的正确排序，并有助于避免竞态条件和逻辑错误。在适当的时候，监听器函数可以使用 <code>setImmediate()</code> 或 <code>process.nextTick()</code> 方法切换到异步操作模式：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', (a, b) => {\n  setImmediate(() => {\n    console.log('this happens asynchronously');\n  });\n});\nmyEmitter.emit('event', 'a', 'b');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('event', (a, b) => {\n  setImmediate(() => {\n    console.log('this happens asynchronously');\n  });\n});\nmyEmitter.emit('event', 'a', 'b');\n</code></pre>",
+          "type": "module",
+          "displayName": "异步与同步"
+        },
+        {
+          "textRaw": "仅处理事件一次",
+          "name": "仅处理事件一次",
+          "desc": "<p>当使用 <code>eventEmitter.on()</code> 方法注册监听器时，该监听器在每次触发命名事件时都会被调用。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nlet m = 0;\nmyEmitter.on('event', () => {\n  console.log(++m);\n});\nmyEmitter.emit('event');\n// 打印: 1\nmyEmitter.emit('event');\n// 打印: 2\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nlet m = 0;\nmyEmitter.on('event', () => {\n  console.log(++m);\n});\nmyEmitter.emit('event');\n// 打印: 1\nmyEmitter.emit('event');\n// 打印: 2\n</code></pre>\n<p>使用 <code>eventEmitter.once()</code> 方法，可以注册一个对于特定事件最多被调用一次的监听器。当事件被触发时，监听器会被注销，<em>然后</em>被调用。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nlet m = 0;\nmyEmitter.once('event', () => {\n  console.log(++m);\n});\nmyEmitter.emit('event');\n// 打印: 1\nmyEmitter.emit('event');\n// 忽略\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nlet m = 0;\nmyEmitter.once('event', () => {\n  console.log(++m);\n});\nmyEmitter.emit('event');\n// 打印: 1\nmyEmitter.emit('event');\n// 忽略\n</code></pre>",
+          "type": "module",
+          "displayName": "仅处理事件一次"
+        },
+        {
+          "textRaw": "错误事件",
+          "name": "错误事件",
+          "desc": "<p>当 <code>EventEmitter</code> 实例内部发生错误时，典型的操作是触发一个 <code>'error'</code> 事件。这些在 Node.js 中被视为特殊情况。</p>\n<p>如果一个 <code>EventEmitter</code> 没有为 <code>'error'</code> 事件注册至少一个监听器，并且触发了 <code>'error'</code> 事件，则会抛出错误，打印堆栈跟踪，并且 Node.js 进程会退出。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.emit('error', new Error('whoops!'));\n// 抛出错误并使 Node.js 崩溃\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.emit('error', new Error('whoops!'));\n// 抛出错误并使 Node.js 崩溃\n</code></pre>\n<p>为了防止 Node.js 进程崩溃，可以使用 <a href=\"domain.html\"><code>domain</code></a> 模块。（但请注意，<code>node:domain</code> 模块已被弃用。）</p>\n<p>作为最佳实践，应始终为 <code>'error'</code> 事件添加监听器。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('error', (err) => {\n  console.error('whoops! there was an error');\n});\nmyEmitter.emit('error', new Error('whoops!'));\n// 打印: whoops! there was an error\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\nmyEmitter.on('error', (err) => {\n  console.error('whoops! there was an error');\n});\nmyEmitter.emit('error', new Error('whoops!'));\n// 打印: whoops! there was an error\n</code></pre>\n<p>可以通过使用符号 <code>events.errorMonitor</code> 安装监听器来监视 <code>'error'</code> 事件，而不消耗触发的错误。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, errorMonitor } from 'node:events';\n\nconst myEmitter = new EventEmitter();\nmyEmitter.on(errorMonitor, (err) => {\n  MyMonitoringTool.log(err);\n});\nmyEmitter.emit('error', new Error('whoops!'));\n// 仍然抛出错误并使 Node.js 崩溃\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, errorMonitor } = require('node:events');\n\nconst myEmitter = new EventEmitter();\nmyEmitter.on(errorMonitor, (err) => {\n  MyMonitoringTool.log(err);\n});\nmyEmitter.emit('error', new Error('whoops!'));\n// 仍然抛出错误并使 Node.js 崩溃\n</code></pre>",
+          "type": "module",
+          "displayName": "错误事件"
+        },
+        {
+          "textRaw": "捕获 Promise 的拒绝",
+          "name": "捕获_promise_的拒绝",
+          "desc": "<p>在事件处理程序中使用 <code>async</code> 函数是有问题的，因为在抛出异常的情况下可能导致未处理的拒绝：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst ee = new EventEmitter();\nee.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst ee = new EventEmitter();\nee.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n</code></pre>\n<p><code>EventEmitter</code> 构造函数中的 <code>captureRejections</code> 选项或全局设置改变了这种行为，在 <code>Promise</code> 上安装了一个 <code>.then(undefined, handler)</code> 处理程序。该处理程序将异常异步地路由到 <a href=\"#emittersymbolfornodejsrejectionerr-eventname-args\"><code>Symbol.for('nodejs.rejection')</code></a> 方法（如果存在），或者路由到 <a href=\"#error-events\"><code>'error'</code></a> 事件处理程序（如果不存在）。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst ee1 = new EventEmitter({ captureRejections: true });\nee1.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n\nee1.on('error', console.log);\n\nconst ee2 = new EventEmitter({ captureRejections: true });\nee2.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n\nee2[Symbol.for('nodejs.rejection')] = console.log;\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst ee1 = new EventEmitter({ captureRejections: true });\nee1.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n\nee1.on('error', console.log);\n\nconst ee2 = new EventEmitter({ captureRejections: true });\nee2.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n\nee2[Symbol.for('nodejs.rejection')] = console.log;\n</code></pre>\n<p>设置 <code>events.captureRejections = true</code> 将更改所有新 <code>EventEmitter</code> 实例的默认值。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nEventEmitter.captureRejections = true;\nconst ee1 = new EventEmitter();\nee1.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n\nee1.on('error', console.log);\n</code></pre>\n<pre><code class=\"language-cjs\">const events = require('node:events');\nevents.captureRejections = true;\nconst ee1 = new events.EventEmitter();\nee1.on('something', async (value) => {\n  throw new Error('kaboom');\n});\n\nee1.on('error', console.log);\n</code></pre>\n<p>由 <code>captureRejections</code> 行为生成的 <code>'error'</code> 事件没有捕获处理程序以避免无限错误循环：建议<strong>不要使用 <code>async</code> 函数作为 <code>'error'</code> 事件处理程序</strong>。</p>",
+          "type": "module",
+          "displayName": "捕获 Promise 的拒绝"
+        },
+        {
+          "textRaw": "类：`EventEmitter`",
+          "name": "类：`eventemitter`",
+          "meta": {
+            "added": [
+              "v0.1.26"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v13.4.0",
+                  "v12.16.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/27867",
+                "description": "Added captureRejections option."
+              }
+            ]
+          },
+          "desc": "<p><code>EventEmitter</code> 类由 <code>node:events</code> 模块定义和暴露：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n</code></pre>\n<p>所有 <code>EventEmitter</code> 在添加新监听器时都会触发 <code>'newListener'</code> 事件，在移除现有监听器时都会触发 <code>'removeListener'</code> 事件。</p>\n<p>它支持以下选项：</p>\n<ul>\n<li><code>captureRejections</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 启用 <a href=\"#capture-rejections-of-promises\">自动捕获 promise 拒绝</a>。\n<strong>默认值:</strong> <code>false</code>.</li>\n</ul>",
+          "modules": [
+            {
+              "textRaw": "事件：`'newListener'`",
+              "name": "事件：`'newlistener'`",
+              "meta": {
+                "added": [
+                  "v0.1.26"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li><code>eventName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type\" class=\"type\">&lt;symbol&gt;</a> 正在被监听的事件名称</li>\n<li><code>listener</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 事件处理函数</li>\n</ul>\n<p><code>EventEmitter</code> 实例会在监听器被添加到其内部监听器数组<em>之前</em>触发自身的 <code>'newListener'</code> 事件。</p>\n<p>为 <code>'newListener'</code> 事件注册的监听器会传递事件名称和正在被添加的监听器的引用。</p>\n<p>在添加监听器之前触发事件这一事实有一个微妙但重要的副作用：在 <code>'newListener'</code> 回调中<em>内部</em>注册到相同 <code>name</code> 的任何<em>附加</em>监听器会被插入到<em>正在被添加的监听器之前</em>。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\n// 只做一次，以免无限循环\nmyEmitter.once('newListener', (event, listener) => {\n  if (event === 'event') {\n    // 在前面插入一个新的监听器\n    myEmitter.on('event', () => {\n      console.log('B');\n    });\n  }\n});\nmyEmitter.on('event', () => {\n  console.log('A');\n});\nmyEmitter.emit('event');\n// 打印:\n//   B\n//   A\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\n\nconst myEmitter = new MyEmitter();\n// 只做一次，以免无限循环\nmyEmitter.once('newListener', (event, listener) => {\n  if (event === 'event') {\n    // 在前面插入一个新的监听器\n    myEmitter.on('event', () => {\n      console.log('B');\n    });\n  }\n});\nmyEmitter.on('event', () => {\n  console.log('A');\n});\nmyEmitter.emit('event');\n// 打印:\n//   B\n//   A\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'newListener'`"
+            },
+            {
+              "textRaw": "事件：`'removeListener'`",
+              "name": "事件：`'removelistener'`",
+              "meta": {
+                "added": [
+                  "v0.9.3"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v6.1.0",
+                      "v4.7.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/6394",
+                    "description": "For listeners attached using `.once()`, the `listener` argument now yields the original listener function."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li><code>eventName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type\" class=\"type\">&lt;symbol&gt;</a> 事件名称</li>\n<li><code>listener</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 事件处理函数</li>\n</ul>\n<p><code>'removeListener'</code> 事件在 <code>listener</code> 被移除<em>之后</em>触发。</p>",
+              "type": "module",
+              "displayName": "事件：`'removeListener'`"
+            },
+            {
+              "textRaw": "`emitter[Symbol.for('nodejs.rejection')](err, eventName[, ...args])`",
+              "name": "`emitter[symbol.for('nodejs.rejection')](err,_eventname[,_...args])`",
+              "meta": {
+                "added": [
+                  "v13.4.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v17.4.0",
+                      "v16.14.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/41267",
+                    "description": "No longer experimental."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li><code>err</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error\" class=\"type\">&lt;Error&gt;</a></li>\n<li><code>eventName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Symbol_type\" class=\"type\">&lt;symbol&gt;</a></li>\n<li><code>...args</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n</ul>\n<p>当触发事件时发生 Promise 拒绝并且在该触发器上启用了 <a href=\"#capture-rejections-of-promises\"><code>captureRejections</code></a> 时，会调用 <code>Symbol.for('nodejs.rejection')</code> 方法。可以使用 <a href=\"#eventscapturerejectionsymbol\"><code>events.captureRejectionSymbol</code></a> 代替 <code>Symbol.for('nodejs.rejection')</code>。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, captureRejectionSymbol } from 'node:events';\n\nclass MyClass extends EventEmitter {\n  constructor() {\n    super({ captureRejections: true });\n  }\n\n  [captureRejectionSymbol](err, event, ...args) {\n    console.log('rejection happened for', event, 'with', err, ...args);\n    this.destroy(err);\n  }\n\n  destroy(err) {\n    // 在此处拆除资源。\n  }\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, captureRejectionSymbol } = require('node:events');\n\nclass MyClass extends EventEmitter {\n  constructor() {\n    super({ captureRejections: true });\n  }\n\n  [captureRejectionSymbol](err, event, ...args) {\n    console.log('rejection happened for', event, 'with', err, ...args);\n    this.destroy(err);\n  }\n\n  destroy(err) {\n    // 在此处拆除资源。\n  }\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "`emitter[Symbol.for('nodejs.rejection')](err, eventName[, ...args])`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`emitter.addListener(eventName, listener)`",
+              "type": "method",
+              "name": "addListener",
+              "meta": {
+                "added": [
+                  "v0.1.26"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "`listener` {Function}",
+                      "name": "listener",
+                      "type": "Function"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>emitter.on(eventName, listener)</code> 的别名。</p>"
+            },
+            {
+              "textRaw": "`emitter.emit(eventName[, ...args])`",
+              "type": "method",
+              "name": "emit",
+              "meta": {
+                "added": [
+                  "v0.1.26"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "`...args` {any}",
+                      "name": "...args",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>按照监听器被注册的顺序，同步调用为名为 <code>eventName</code> 的事件注册的每个监听器，并将提供的参数传递给每个监听器。</p>\n<p>如果事件有监听器，则返回 <code>true</code>，否则返回 <code>false</code>。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst myEmitter = new EventEmitter();\n\n// 第一个监听器\nmyEmitter.on('event', function firstListener() {\n  console.log('Helloooo! first listener');\n});\n// 第二个监听器\nmyEmitter.on('event', function secondListener(arg1, arg2) {\n  console.log(`event with parameters ${arg1}, ${arg2} in second listener`);\n});\n// 第三个监听器\nmyEmitter.on('event', function thirdListener(...args) {\n  const parameters = args.join(', ');\n  console.log(`event with parameters ${parameters} in third listener`);\n});\n\nconsole.log(myEmitter.listeners('event'));\n\nmyEmitter.emit('event', 1, 2, 3, 4, 5);\n\n// 打印:\n// [\n//   [Function: firstListener],\n//   [Function: secondListener],\n//   [Function: thirdListener]\n// ]\n// Helloooo! first listener\n// event with parameters 1, 2 in second listener\n// event with parameters 1, 2, 3, 4, 5 in third listener\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst myEmitter = new EventEmitter();\n\n// 第一个监听器\nmyEmitter.on('event', function firstListener() {\n  console.log('Helloooo! first listener');\n});\n// 第二个监听器\nmyEmitter.on('event', function secondListener(arg1, arg2) {\n  console.log(`event with parameters ${arg1}, ${arg2} in second listener`);\n});\n// 第三个监听器\nmyEmitter.on('event', function thirdListener(...args) {\n  const parameters = args.join(', ');\n  console.log(`event with parameters ${parameters} in third listener`);\n});\n\nconsole.log(myEmitter.listeners('event'));\n\nmyEmitter.emit('event', 1, 2, 3, 4, 5);\n\n// 打印:\n// [\n//   [Function: firstListener],\n//   [Function: secondListener],\n//   [Function: thirdListener]\n// ]\n// Helloooo! first listener\n// event with parameters 1, 2 in second listener\n// event with parameters 1, 2, 3, 4, 5 in third listener\n</code></pre>"
+            },
+            {
+              "textRaw": "`emitter.eventNames()`",
+              "type": "method",
+              "name": "eventNames",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {string\\[]|symbol\\[]}",
+                      "name": "返回",
+                      "type": "string\\[]|symbol\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个数组，列出触发器已注册监听器的事件。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\n\nconst myEE = new EventEmitter();\nmyEE.on('foo', () => {});\nmyEE.on('bar', () => {});\n\nconst sym = Symbol('symbol');\nmyEE.on(sym, () => {});\n\nconsole.log(myEE.eventNames());\n// 打印: [ 'foo', 'bar', Symbol(symbol) ]\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\n\nconst myEE = new EventEmitter();\nmyEE.on('foo', () => {});\nmyEE.on('bar', () => {});\n\nconst sym = Symbol('symbol');\nmyEE.on(sym, () => {});\n\nconsole.log(myEE.eventNames());\n// 打印: [ 'foo', 'bar', Symbol(symbol) ]\n</code></pre>"
+            },
+            {
+              "textRaw": "`emitter.getMaxListeners()`",
+              "type": "method",
+              "name": "getMaxListeners",
+              "meta": {
+                "added": [
+                  "v1.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {integer}",
+                      "name": "返回",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回当前 <code>EventEmitter</code> 的最大监听器值，该值由 <a href=\"#emittersetmaxlistenersn\"><code>emitter.setMaxListeners(n)</code></a> 设置或默认为 <a href=\"#eventsdefaultmaxlisteners\"><code>events.defaultMaxListeners</code></a>。</p>"
+            },
+            {
+              "textRaw": "`emitter.listenerCount(eventName[, listener])`",
+              "type": "method",
+              "name": "listenerCount",
+              "meta": {
+                "added": [
+                  "v3.2.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v19.8.0",
+                      "v18.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/46523",
+                    "description": "Added the `listener` argument."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol} 正在被监听的事件名称",
+                      "name": "eventName",
+                      "type": "string|symbol",
+                      "desc": "正在被监听的事件名称"
+                    },
+                    {
+                      "textRaw": "`listener` {Function} 事件处理函数",
+                      "name": "listener",
+                      "type": "Function",
+                      "desc": "事件处理函数"
+                    },
+                    {
+                      "textRaw": "返回: {integer}",
+                      "name": "返回",
+                      "type": "integer"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回监听名为 <code>eventName</code> 的事件的监听器数量。如果提供了 <code>listener</code>，它将返回该监听器在事件监听器列表中被找到的次数。</p>"
+            },
+            {
+              "textRaw": "`emitter.listeners(eventName)`",
+              "type": "method",
+              "name": "listeners",
+              "meta": {
+                "added": [
+                  "v0.1.26"
+                ],
+                "changes": [
+                  {
+                    "version": "v7.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/6881",
+                    "description": "For listeners attached using `.once()` this returns the original listeners instead of wrapper functions now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "返回: {Function\\[]}",
+                      "name": "返回",
+                      "type": "Function\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回名为 <code>eventName</code> 的事件的监听器数组的副本。</p>\n<pre><code class=\"language-js\">server.on('connection', (stream) => {\n  console.log('someone connected!');\n});\nconsole.log(util.inspect(server.listeners('connection')));\n// 打印: [ [Function] ]\n</code></pre>"
+            },
+            {
+              "textRaw": "`emitter.off(eventName, listener)`",
+              "type": "method",
+              "name": "off",
+              "meta": {
+                "added": [
+                  "v10.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "`listener` {Function}",
+                      "name": "listener",
+                      "type": "Function"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><a href=\"#emitterremovelistenereventname-listener\"><code>emitter.removeListener()</code></a> 的别名。</p>"
+            },
+            {
+              "textRaw": "`emitter.on(eventName, listener)`",
+              "type": "method",
+              "name": "on",
+              "meta": {
+                "added": [
+                  "v0.1.101"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol} 事件名称。",
+                      "name": "eventName",
+                      "type": "string|symbol",
+                      "desc": "事件名称。"
+                    },
+                    {
+                      "textRaw": "`listener` {Function} 回调函数",
+                      "name": "listener",
+                      "type": "Function",
+                      "desc": "回调函数"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 <code>listener</code> 函数添加到名为 <code>eventName</code> 的事件的监听器数组的末尾。不会检查 <code>listener</code> 是否已被添加。多次调用传递相同的 <code>eventName</code> 和 <code>listener</code> 组合将导致 <code>listener</code> 被多次添加和调用。</p>\n<pre><code class=\"language-js\">server.on('connection', (stream) => {\n  console.log('someone connected!');\n});\n</code></pre>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>\n<p>默认情况下，事件监听器按照其添加顺序调用。<code>emitter.prependListener()</code> 方法可以用作替代方案，将事件监听器添加到监听器数组的开头。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst myEE = new EventEmitter();\nmyEE.on('foo', () => console.log('a'));\nmyEE.prependListener('foo', () => console.log('b'));\nmyEE.emit('foo');\n// 打印:\n//   b\n//   a\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst myEE = new EventEmitter();\nmyEE.on('foo', () => console.log('a'));\nmyEE.prependListener('foo', () => console.log('b'));\nmyEE.emit('foo');\n// 打印:\n//   b\n//   a\n</code></pre>"
+            },
+            {
+              "textRaw": "`emitter.once(eventName, listener)`",
+              "type": "method",
+              "name": "once",
+              "meta": {
+                "added": [
+                  "v0.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol} 事件名称。",
+                      "name": "eventName",
+                      "type": "string|symbol",
+                      "desc": "事件名称。"
+                    },
+                    {
+                      "textRaw": "`listener` {Function} 回调函数",
+                      "name": "listener",
+                      "type": "Function",
+                      "desc": "回调函数"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>为名为 <code>eventName</code> 的事件添加一个<strong>一次性</strong>的 <code>listener</code> 函数。下次触发 <code>eventName</code> 时，此监听器会被移除，然后被调用。</p>\n<pre><code class=\"language-js\">server.once('connection', (stream) => {\n  console.log('Ah, we have our first user!');\n});\n</code></pre>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>\n<p>默认情况下，事件监听器按照其添加顺序调用。<code>emitter.prependOnceListener()</code> 方法可以用作替代方案，将事件监听器添加到监听器数组的开头。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst myEE = new EventEmitter();\nmyEE.once('foo', () => console.log('a'));\nmyEE.prependOnceListener('foo', () => console.log('b'));\nmyEE.emit('foo');\n// 打印:\n//   b\n//   a\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst myEE = new EventEmitter();\nmyEE.once('foo', () => console.log('a'));\nmyEE.prependOnceListener('foo', () => console.log('b'));\nmyEE.emit('foo');\n// 打印:\n//   b\n//   a\n</code></pre>"
+            },
+            {
+              "textRaw": "`emitter.prependListener(eventName, listener)`",
+              "type": "method",
+              "name": "prependListener",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol} 事件名称。",
+                      "name": "eventName",
+                      "type": "string|symbol",
+                      "desc": "事件名称。"
+                    },
+                    {
+                      "textRaw": "`listener` {Function} 回调函数",
+                      "name": "listener",
+                      "type": "Function",
+                      "desc": "回调函数"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 <code>listener</code> 函数添加到名为 <code>eventName</code> 的事件的监听器数组的<em>开头</em>。不会检查 <code>listener</code> 是否已被添加。多次调用传递相同的 <code>eventName</code> 和 <code>listener</code> 组合将导致 <code>listener</code> 被多次添加和调用。</p>\n<pre><code class=\"language-js\">server.prependListener('connection', (stream) => {\n  console.log('someone connected!');\n});\n</code></pre>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>"
+            },
+            {
+              "textRaw": "`emitter.prependOnceListener(eventName, listener)`",
+              "type": "method",
+              "name": "prependOnceListener",
+              "meta": {
+                "added": [
+                  "v6.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol} 事件名称。",
+                      "name": "eventName",
+                      "type": "string|symbol",
+                      "desc": "事件名称。"
+                    },
+                    {
+                      "textRaw": "`listener` {Function} 回调函数",
+                      "name": "listener",
+                      "type": "Function",
+                      "desc": "回调函数"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>为名为 <code>eventName</code> 的事件添加一个<strong>一次性</strong>的 <code>listener</code> 函数到监听器数组的<em>开头</em>。下次触发 <code>eventName</code> 时，此监听器会被移除，然后被调用。</p>\n<pre><code class=\"language-js\">server.prependOnceListener('connection', (stream) => {\n  console.log('Ah, we have our first user!');\n});\n</code></pre>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>"
+            },
+            {
+              "textRaw": "`emitter.removeAllListeners([eventName])`",
+              "type": "method",
+              "name": "removeAllListeners",
+              "meta": {
+                "added": [
+                  "v0.1.26"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>移除所有监听器，或指定 <code>eventName</code> 的监听器。</p>\n<p>移除在代码其他地方添加的监听器是一种不好的做法，特别是当 <code>EventEmitter</code> 实例是由其他组件或模块（例如套接字或文件流）创建时。</p>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>"
+            },
+            {
+              "textRaw": "`emitter.removeListener(eventName, listener)`",
+              "type": "method",
+              "name": "removeListener",
+              "meta": {
+                "added": [
+                  "v0.1.26"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "`listener` {Function}",
+                      "name": "listener",
+                      "type": "Function"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>从名为 <code>eventName</code> 的事件的监听器数组中移除指定的 <code>listener</code>。</p>\n<pre><code class=\"language-js\">const callback = (stream) => {\n  console.log('someone connected!');\n};\nserver.on('connection', callback);\n// ...\nserver.removeListener('connection', callback);\n</code></pre>\n<p><code>removeListener()</code> 最多从监听器数组中移除一个监听器实例。如果任何单个监听器为指定的 <code>eventName</code> 被多次添加到监听器数组中，则必须多次调用 <code>removeListener()</code> 以移除每个实例。</p>\n<p>一旦事件被触发，所有在触发时附加到该事件的监听器都会按顺序被调用。这意味着在触发<em>之后</em>且在最后一个监听器完成执行<em>之前</em>的任何 <code>removeListener()</code> 或 <code>removeAllListeners()</code> 调用都不会将它们从进行中的 <code>emit()</code> 移除。后续事件的行为符合预期。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\n\nconst callbackA = () => {\n  console.log('A');\n  myEmitter.removeListener('event', callbackB);\n};\n\nconst callbackB = () => {\n  console.log('B');\n};\n\nmyEmitter.on('event', callbackA);\n\nmyEmitter.on('event', callbackB);\n\n// callbackA 移除了监听器 callbackB，但它仍然会被调用。\n// 触发时的内部监听器数组 [callbackA, callbackB]\nmyEmitter.emit('event');\n// 打印:\n//   A\n//   B\n\n// callbackB 现在被移除了。\n// 内部监听器数组 [callbackA]\nmyEmitter.emit('event');\n// 打印:\n//   A\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nclass MyEmitter extends EventEmitter {}\nconst myEmitter = new MyEmitter();\n\nconst callbackA = () => {\n  console.log('A');\n  myEmitter.removeListener('event', callbackB);\n};\n\nconst callbackB = () => {\n  console.log('B');\n};\n\nmyEmitter.on('event', callbackA);\n\nmyEmitter.on('event', callbackB);\n\n// callbackA 移除了监听器 callbackB，但它仍然会被调用。\n// 触发时的内部监听器数组 [callbackA, callbackB]\nmyEmitter.emit('event');\n// 打印:\n//   A\n//   B\n\n// callbackB 现在被移除了。\n// 内部监听器数组 [callbackA]\nmyEmitter.emit('event');\n// 打印:\n//   A\n</code></pre>\n<p>由于监听器是使用内部数组管理的，因此调用此方法将更改在要移除的监听器<em>之后</em>注册的任何监听器的位置索引。这不会影响调用监听器的顺序，但意味着由 <code>emitter.listeners()</code> 方法返回的监听器数组的任何副本都需要重新创建。</p>\n<p>当单个函数作为处理程序为单个事件多次添加时（如下例所示），<code>removeListener()</code> 将移除最近添加的实例。在示例中，<code>once('ping')</code> 监听器被移除：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst ee = new EventEmitter();\n\nfunction pong() {\n  console.log('pong');\n}\n\nee.on('ping', pong);\nee.once('ping', pong);\nee.removeListener('ping', pong);\n\nee.emit('ping');\nee.emit('ping');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst ee = new EventEmitter();\n\nfunction pong() {\n  console.log('pong');\n}\n\nee.on('ping', pong);\nee.once('ping', pong);\nee.removeListener('ping', pong);\n\nee.emit('ping');\nee.emit('ping');\n</code></pre>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>"
+            },
+            {
+              "textRaw": "`emitter.setMaxListeners(n)`",
+              "type": "method",
+              "name": "setMaxListeners",
+              "meta": {
+                "added": [
+                  "v0.3.5"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`n` {integer}",
+                      "name": "n",
+                      "type": "integer"
+                    },
+                    {
+                      "textRaw": "返回: {EventEmitter}",
+                      "name": "返回",
+                      "type": "EventEmitter"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>默认情况下，如果为特定事件添加了超过 <code>10</code> 个监听器，<code>EventEmitter</code> 会打印警告。这是一个有助于发现内存泄漏的有用默认值。<code>emitter.setMaxListeners()</code> 方法允许修改此特定 <code>EventEmitter</code> 实例的限制。该值可以设置为 <code>Infinity</code>（或 <code>0</code>）以表示无限数量的监听器。</p>\n<p>返回对 <code>EventEmitter</code> 的引用，以便可以链式调用。</p>"
+            },
+            {
+              "textRaw": "`emitter.rawListeners(eventName)`",
+              "type": "method",
+              "name": "rawListeners",
+              "meta": {
+                "added": [
+                  "v9.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`eventName` {string|symbol}",
+                      "name": "eventName",
+                      "type": "string|symbol"
+                    },
+                    {
+                      "textRaw": "返回: {Function\\[]}",
+                      "name": "返回",
+                      "type": "Function\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回名为 <code>eventName</code> 的事件的监听器数组的副本，包括任何包装器（例如由 <code>.once()</code> 创建的包装器）。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst emitter = new EventEmitter();\nemitter.once('log', () => console.log('log once'));\n\n// 返回一个新的 Array，其中包含一个函数 `onceWrapper`，该函数有一个属性\n// `listener`，其中包含上面绑定的原始监听器\nconst listeners = emitter.rawListeners('log');\nconst logFnWrapper = listeners[0];\n\n// 打印 \"log once\" 到控制台，并且不解除 `once` 事件的绑定\nlogFnWrapper.listener();\n\n// 打印 \"log once\" 到控制台并移除监听器\nlogFnWrapper();\n\nemitter.on('log', () => console.log('log persistently'));\n// 将返回一个新的 Array，其中包含一个由上面 `.on()` 绑定的函数\nconst newListeners = emitter.rawListeners('log');\n\n// 打印 \"log persistently\" 两次\nnewListeners[0]();\nemitter.emit('log');\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst emitter = new EventEmitter();\nemitter.once('log', () => console.log('log once'));\n\n// 返回一个新的 Array，其中包含一个函数 `onceWrapper`，该函数有一个属性\n// `listener`，其中包含上面绑定的原始监听器\nconst listeners = emitter.rawListeners('log');\nconst logFnWrapper = listeners[0];\n\n// 打印 \"log once\" 到控制台，并且不解除 `once` 事件的绑定\nlogFnWrapper.listener();\n\n// 打印 \"log once\" 到控制台并移除监听器\nlogFnWrapper();\n\nemitter.on('log', () => console.log('log persistently'));\n// 将返回一个新的 Array，其中包含一个由上面 `.on()` 绑定的函数\nconst newListeners = emitter.rawListeners('log');\n\n// 打印 \"log persistently\" 两次\nnewListeners[0]();\nemitter.emit('log');\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`EventEmitter`"
+        },
+        {
+          "textRaw": "类：`events.EventEmitterAsyncResource extends EventEmitter`",
+          "name": "类：`events.eventemitterasyncresource_extends_eventemitter`",
+          "meta": {
+            "added": [
+              "v17.4.0",
+              "v16.14.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>将 <code>EventEmitter</code> 与 <a href=\"async_hooks.html#class-asyncresource\" class=\"type\">&lt;AsyncResource&gt;</a> 集成，用于需要手动异步跟踪的 <code>EventEmitter</code>。具体来说，由 <code>events.EventEmitterAsyncResource</code> 实例触发的所有事件都将在其 [异步上下文][] 中运行。</p>\n<pre><code class=\"language-mjs\">import { EventEmitterAsyncResource, EventEmitter } from 'node:events';\nimport { notStrictEqual, strictEqual } from 'node:assert';\nimport { executionAsyncId, triggerAsyncId } from 'node:async_hooks';\n\n// 异步跟踪工具将将其标识为 'Q'。\nconst ee1 = new EventEmitterAsyncResource({ name: 'Q' });\n\n// 'foo' 监听器将在 EventEmitter 的异步上下文中运行。\nee1.on('foo', () => {\n  strictEqual(executionAsyncId(), ee1.asyncId);\n  strictEqual(triggerAsyncId(), ee1.triggerAsyncId);\n});\n\nconst ee2 = new EventEmitter();\n\n// 然而，不跟踪异步上下文的普通 EventEmitter 上的 'foo' 监听器在与 emit() 相同的异步上下文中运行。\nee2.on('foo', () => {\n  notStrictEqual(executionAsyncId(), ee2.asyncId);\n  notStrictEqual(triggerAsyncId(), ee2.triggerAsyncId);\n});\n\nPromise.resolve().then(() => {\n  ee1.emit('foo');\n  ee2.emit('foo');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitterAsyncResource, EventEmitter } = require('node:events');\nconst { notStrictEqual, strictEqual } = require('node:assert');\nconst { executionAsyncId, triggerAsyncId } = require('node:async_hooks');\n\n// 异步跟踪工具将将其标识为 'Q'。\nconst ee1 = new EventEmitterAsyncResource({ name: 'Q' });\n\n// 'foo' 监听器将在 EventEmitter 的异步上下文中运行。\nee1.on('foo', () => {\n  strictEqual(executionAsyncId(), ee1.asyncId);\n  strictEqual(triggerAsyncId(), ee1.triggerAsyncId);\n});\n\nconst ee2 = new EventEmitter();\n\n// 然而，不跟踪异步上下文的普通 EventEmitter 上的 'foo' 监听器在与 emit() 相同的异步上下文中运行。\nee2.on('foo', () => {\n  notStrictEqual(executionAsyncId(), ee2.asyncId);\n  notStrictEqual(triggerAsyncId(), ee2.triggerAsyncId);\n});\n\nPromise.resolve().then(() => {\n  ee1.emit('foo');\n  ee2.emit('foo');\n});\n</code></pre>\n<p><code>EventEmitterAsyncResource</code> 类具有与 <code>EventEmitter</code> 和 <code>AsyncResource</code> 本身相同的方法并采用相同的选项。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new events.EventEmitterAsyncResource([options])`",
+              "type": "ctor",
+              "name": "events.EventEmitterAsyncResource",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`captureRejections` {boolean} 启用 [自动捕获 promise 拒绝][capturerejections]。 **默认值:** `false`.",
+                          "name": "captureRejections",
+                          "type": "boolean",
+                          "desc": "启用 [自动捕获 promise 拒绝][capturerejections]。 **默认值:** `false`."
+                        },
+                        {
+                          "textRaw": "`name` {string} 异步事件的类型。**默认值:** [`new.target.name`][].",
+                          "name": "name",
+                          "type": "string",
+                          "desc": "异步事件的类型。**默认值:** [`new.target.name`][]."
+                        },
+                        {
+                          "textRaw": "`triggerAsyncId` {number} 创建此异步事件的执行上下文的 ID。**默认值:** `executionAsyncId()`.",
+                          "name": "triggerAsyncId",
+                          "type": "number",
+                          "desc": "创建此异步事件的执行上下文的 ID。**默认值:** `executionAsyncId()`."
+                        },
+                        {
+                          "textRaw": "`requireManualDestroy` {boolean} 如果设置为 `true`，则在对象被垃圾回收时禁用 `emitDestroy`。这通常不需要设置（即使手动调用 `emitDestroy`），除非检索资源的 `asyncId` 并使用它调用敏感 API 的 `emitDestroy`。当设置为 `false` 时，仅当至少有一个活动的 `destroy` 钩子时，才会在垃圾回收时调用 `emitDestroy`。 **默认值:** `false`.",
+                          "name": "requireManualDestroy",
+                          "type": "boolean",
+                          "desc": "如果设置为 `true`，则在对象被垃圾回收时禁用 `emitDestroy`。这通常不需要设置（即使手动调用 `emitDestroy`），除非检索资源的 `asyncId` 并使用它调用敏感 API 的 `emitDestroy`。当设置为 `false` 时，仅当至少有一个活动的 `destroy` 钩子时，才会在垃圾回收时调用 `emitDestroy`。 **默认值:** `false`."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`asyncId` 类型: {number} 分配给资源的唯一 `asyncId`。",
+              "type": "number",
+              "name": "类型",
+              "desc": "分配给资源的唯一 `asyncId`。"
+            },
+            {
+              "textRaw": "`asyncResource` 类型: {AsyncResource} 底层的 {AsyncResource}。",
+              "type": "AsyncResource",
+              "name": "类型",
+              "desc": "<p>返回的 <code>AsyncResource</code> 对象有一个额外的 <code>eventEmitter</code> 属性，提供对此 <code>EventEmitterAsyncResource</code> 的引用。</p>",
+              "shortDesc": "底层的 {AsyncResource}。"
+            },
+            {
+              "textRaw": "`triggerAsyncId` 类型: {number} 传递给 `AsyncResource` 构造函数的相同 `triggerAsyncId`。",
+              "type": "number",
+              "name": "类型",
+              "desc": "<p><a id=\"event-target-and-event-api\"></a></p>",
+              "shortDesc": "传递给 `AsyncResource` 构造函数的相同 `triggerAsyncId`。"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`eventemitterasyncresource.emitDestroy()`",
+              "type": "method",
+              "name": "emitDestroy",
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>调用所有 <code>destroy</code> 钩子。这应该只被调用一次。如果被调用多次，将抛出错误。这<strong>必须</strong>手动调用。如果资源留给 GC 收集，则 <code>destroy</code> 钩子将永远不会被调用。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`events.EventEmitterAsyncResource extends EventEmitter`"
+        },
+        {
+          "textRaw": "`EventTarget` 和 `Event` API",
+          "name": "`eventtarget`_和_`event`_api",
+          "meta": {
+            "added": [
+              "v14.5.0"
+            ],
+            "changes": [
+              {
+                "version": "v16.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/37237",
+                "description": "changed EventTarget error handling."
+              },
+              {
+                "version": "v15.4.0",
+                "pr-url": "https://github.com/nodejs/node/pull/35949",
+                "description": "No longer experimental."
+              },
+              {
+                "version": "v15.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/35496",
+                "description": "The `EventTarget` and `Event` classes are now available as globals."
+              }
+            ]
+          },
+          "desc": "<p><code>EventTarget</code> 和 <code>Event</code> 对象是 <a href=\"https://dom.spec.whatwg.org/#eventtarget\"><code>EventTarget</code> Web API</a> 的 Node.js 特定实现，由一些 Node.js 核心 API 暴露。</p>\n<pre><code class=\"language-js\">const target = new EventTarget();\n\ntarget.addEventListener('foo', (event) => {\n  console.log('foo event happened!');\n});\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "Node.js `EventTarget` 与 DOM `EventTarget`",
+              "name": "node.js_`eventtarget`_与_dom_`eventtarget`",
+              "desc": "<p>Node.js <code>EventTarget</code> 和 <a href=\"https://dom.spec.whatwg.org/#eventtarget\"><code>EventTarget</code> Web API</a> 之间有两个关键区别：</p>\n<ol>\n<li>虽然 DOM <code>EventTarget</code> 实例<em>可能</em>是分层的，但 Node.js 中没有层次结构和事件传播的概念。也就是说，分派给 <code>EventTarget</code> 的事件不会通过嵌套目标对象的层次结构传播，每个目标对象可能都有自己的一组用于该事件的处理程序。</li>\n<li>在 Node.js <code>EventTarget</code> 中，如果事件监听器是异步函数或返回 <code>Promise</code>，并且返回的 <code>Promise</code> 被拒绝，则拒绝会自动捕获并以与同步抛出异常的监听器相同的方式处理（有关详细信息，请参阅 [<code>EventTarget</code> 错误处理][]）。</li>\n</ol>",
+              "type": "module",
+              "displayName": "Node.js `EventTarget` 与 DOM `EventTarget`"
+            },
+            {
+              "textRaw": "`NodeEventTarget` 与 `EventEmitter`",
+              "name": "`nodeeventtarget`_与_`eventemitter`",
+              "desc": "<p><code>NodeEventTarget</code> 对象实现了 <code>EventEmitter</code> API 的一个修改子集，允许它在某些情况下密切<em>模拟</em> <code>EventEmitter</code>。<code>NodeEventTarget</code> <em>不是</em> <code>EventEmitter</code> 的实例，并且在大多数情况下不能代替 <code>EventEmitter</code> 使用。</p>\n<ol>\n<li>与 <code>EventEmitter</code> 不同，任何给定的 <code>listener</code> 每个事件 <code>type</code> 最多只能注册一次。多次注册 <code>listener</code> 的尝试将被忽略。</li>\n<li><code>NodeEventTarget</code> 不模拟完整的 <code>EventEmitter</code> API。\n具体来说，不模拟 <code>prependListener()</code>、<code>prependOnceListener()</code>、<code>rawListeners()</code> 和 <code>errorMonitor</code> API。\n也不会触发 <code>'newListener'</code> 和 <code>'removeListener'</code> 事件。</li>\n<li><code>NodeEventTarget</code> 不会对类型为 <code>'error'</code> 的事件实现任何特殊的默认行为。</li>\n<li><code>NodeEventTarget</code> 支持 <code>EventListener</code> 对象以及函数作为所有事件类型的处理程序。</li>\n</ol>",
+              "type": "module",
+              "displayName": "`NodeEventTarget` 与 `EventEmitter`"
+            },
+            {
+              "textRaw": "事件监听器",
+              "name": "事件监听器",
+              "desc": "<p>为事件 <code>type</code> 注册的事件监听器可以是 JavaScript 函数，也可以是具有 <code>handleEvent</code> 属性（其值为函数）的对象。</p>\n<p>在任何一种情况下，处理函数都会使用传递给 <code>eventTarget.dispatchEvent()</code> 函数的 <code>event</code> 参数调用。</p>\n<p>异步函数可以用作事件监听器。如果异步处理函数被拒绝，则拒绝会被捕获并按照 [<code>EventTarget</code> 错误处理][] 中的描述进行处理。</p>\n<p>一个处理函数抛出的错误不会阻止调用其他处理函数。</p>\n<p>处理函数的返回值被忽略。</p>\n<p>处理程序总是按照它们被添加的顺序调用。</p>\n<p>处理函数可以改变 <code>event</code> 对象。</p>\n<pre><code class=\"language-js\">function handler1(event) {\n  console.log(event.type);  // 打印 'foo'\n  event.a = 1;\n}\n\nasync function handler2(event) {\n  console.log(event.type);  // 打印 'foo'\n  console.log(event.a);  // 打印 1\n}\n\nconst handler3 = {\n  handleEvent(event) {\n    console.log(event.type);  // 打印 'foo'\n  },\n};\n\nconst handler4 = {\n  async handleEvent(event) {\n    console.log(event.type);  // 打印 'foo'\n  },\n};\n\nconst target = new EventTarget();\n\ntarget.addEventListener('foo', handler1);\ntarget.addEventListener('foo', handler2);\ntarget.addEventListener('foo', handler3);\ntarget.addEventListener('foo', handler4, { once: true });\n</code></pre>",
+              "type": "module",
+              "displayName": "事件监听器"
+            },
+            {
+              "textRaw": "`EventTarget` 错误处理",
+              "name": "`eventtarget`_错误处理",
+              "desc": "<p>当注册的事件监听器抛出（或返回被拒绝的 Promise）时，默认情况下错误会在 <code>process.nextTick()</code> 上被视为未捕获的异常。这意味着 <code>EventTarget</code> 中的未捕获异常默认会终止 Node.js 进程。</p>\n<p>在事件监听器中抛出<em>不会</em>停止调用其他已注册的处理程序。</p>\n<p><code>EventTarget</code> 不会对 <code>'error'</code> 类型的事件实现任何特殊的默认处理，就像 <code>EventEmitter</code> 那样。</p>\n<p>目前，错误首先转发到 <code>process.on('error')</code> 事件，然后到达 <code>process.on('uncaughtException')</code>。此行为已弃用，并将在未来的版本中更改，以使 <code>EventTarget</code> 与其他 Node.js API 保持一致。任何依赖于 <code>process.on('error')</code> 事件的代码都应与新行为保持一致。</p>",
+              "type": "module",
+              "displayName": "`EventTarget` 错误处理"
+            },
+            {
+              "textRaw": "类：`Event`",
+              "name": "类：`event`",
+              "meta": {
+                "added": [
+                  "v14.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v15.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/35496",
+                    "description": "The `Event` class is now available through the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>Event</code> 对象是对 <a href=\"https://dom.spec.whatwg.org/#event\"><code>Event</code> Web API</a> 的适配。实例由 Node.js 内部创建。</p>",
+              "properties": [
+                {
+                  "textRaw": "`bubbles` 类型: {boolean} 始终返回 `false`。",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>这在 Node.js 中未使用，仅为完整性而提供。</p>",
+                  "shortDesc": "始终返回 `false`。"
+                },
+                {
+                  "textRaw": "`cancelBubble` 类型: {boolean}",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 3,
+                  "stabilityText": "Legacy: Use [`event.stopPropagation()`][] instead.",
+                  "desc": "<p>如果设置为 <code>true</code>，则为 <code>event.stopPropagation()</code> 的别名。这在 Node.js 中未使用，仅为完整性而提供。</p>"
+                },
+                {
+                  "textRaw": "`cancelable` 类型: {boolean} 如果事件是使用 `cancelable` 选项创建的，则为 true。",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "如果事件是使用 `cancelable` 选项创建的，则为 true。"
+                },
+                {
+                  "textRaw": "`composed` 类型: {boolean} 始终返回 `false`。",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>这在 Node.js 中未使用，仅为完整性而提供。</p>",
+                  "shortDesc": "始终返回 `false`。"
+                },
+                {
+                  "textRaw": "`currentTarget` 类型: {EventTarget} 分派事件的 `EventTarget`。",
+                  "type": "EventTarget",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p><code>event.target</code> 的别名。</p>",
+                  "shortDesc": "分派事件的 `EventTarget`。"
+                },
+                {
+                  "textRaw": "`defaultPrevented` 类型: {boolean}",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>如果 <code>cancelable</code> 为 <code>true</code> 且已调用 <code>event.preventDefault()</code>，则为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`eventPhase` 类型: {number} 当事件未被分派时返回 `0`，当它被分派时返回 `2`。",
+                  "type": "number",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>这在 Node.js 中未使用，仅为完整性而提供。</p>",
+                  "shortDesc": "当事件未被分派时返回 `0`，当它被分派时返回 `2`。"
+                },
+                {
+                  "textRaw": "`isTrusted` 类型: {boolean}",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p><a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a> <code>\"abort\"</code> 事件触发时 <code>isTrusted</code> 设置为 <code>true</code>。在所有其他情况下，值为 <code>false</code>。</p>"
+                },
+                {
+                  "textRaw": "`returnValue` 类型: {boolean} 如果事件未被取消，则为 true。",
+                  "type": "boolean",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 3,
+                  "stabilityText": "Legacy: Use [`event.defaultPrevented`][] instead.",
+                  "desc": "<p><code>event.returnValue</code> 的值总是与 <code>event.defaultPrevented</code> 相反。这在 Node.js 中未使用，仅为完整性而提供。</p>",
+                  "shortDesc": "如果事件未被取消，则为 true。"
+                },
+                {
+                  "textRaw": "`srcElement` 类型: {EventTarget} 分派事件的 `EventTarget`。",
+                  "type": "EventTarget",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 3,
+                  "stabilityText": "Legacy: Use [`event.target`][] instead.",
+                  "desc": "<p><code>event.target</code> 的别名。</p>",
+                  "shortDesc": "分派事件的 `EventTarget`。"
+                },
+                {
+                  "textRaw": "`target` 类型: {EventTarget} 分派事件的 `EventTarget`。",
+                  "type": "EventTarget",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "分派事件的 `EventTarget`。"
+                },
+                {
+                  "textRaw": "`timeStamp` 类型: {number}",
+                  "type": "number",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>创建 <code>Event</code> 对象时的毫秒时间戳。</p>"
+                },
+                {
+                  "textRaw": "`type` 类型: {string}",
+                  "type": "string",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>事件类型标识符。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`event.composedPath()`",
+                  "type": "method",
+                  "name": "composedPath",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>返回一个数组，包含当前的 <code>EventTarget</code> 作为唯一条目，如果事件未被分派，则返回空数组。这在 Node.js 中未使用，仅为完整性而提供。</p>"
+                },
+                {
+                  "textRaw": "`event.initEvent(type[, bubbles[, cancelable]])`",
+                  "type": "method",
+                  "name": "initEvent",
+                  "meta": {
+                    "added": [
+                      "v19.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 3,
+                  "stabilityText": "Legacy: The WHATWG spec considers it deprecated and users shouldn't use it at all.",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`bubbles` {boolean}",
+                          "name": "bubbles",
+                          "type": "boolean"
+                        },
+                        {
+                          "textRaw": "`cancelable` {boolean}",
+                          "name": "cancelable",
+                          "type": "boolean"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>与事件构造函数冗余且无法设置 <code>composed</code>。这在 Node.js 中未使用，仅为完整性而提供。</p>"
+                },
+                {
+                  "textRaw": "`event.preventDefault()`",
+                  "type": "method",
+                  "name": "preventDefault",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>如果 <code>cancelable</code> 为 <code>true</code>，则将 <code>defaultPrevented</code> 属性设置为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`event.stopImmediatePropagation()`",
+                  "type": "method",
+                  "name": "stopImmediatePropagation",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>在当前监听器完成后停止调用事件监听器。</p>"
+                },
+                {
+                  "textRaw": "`event.stopPropagation()`",
+                  "type": "method",
+                  "name": "stopPropagation",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>这在 Node.js 中未使用，仅为完整性而提供。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`Event`"
+            },
+            {
+              "textRaw": "类：`EventTarget`",
+              "name": "类：`eventtarget`",
+              "meta": {
+                "added": [
+                  "v14.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v15.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/35496",
+                    "description": "The `EventTarget` class is now available through the global object."
+                  }
+                ]
+              },
+              "methods": [
+                {
+                  "textRaw": "`eventTarget.addEventListener(type, listener[, options])`",
+                  "type": "method",
+                  "name": "addEventListener",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v15.4.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/36258",
+                        "description": "add support for `signal` option."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`once` {boolean} 当为 `true` 时，监听器在第一次调用时自动移除。 **默认值:** `false`.",
+                              "name": "once",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，监听器在第一次调用时自动移除。 **默认值:** `false`."
+                            },
+                            {
+                              "textRaw": "`passive` {boolean} 当为 `true` 时，作为提示，监听器不会调用 `Event` 对象的 `preventDefault()` 方法。 **默认值:** `false`.",
+                              "name": "passive",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，作为提示，监听器不会调用 `Event` 对象的 `preventDefault()` 方法。 **默认值:** `false`."
+                            },
+                            {
+                              "textRaw": "`capture` {boolean} 不直接由 Node.js 使用。为 API 完整性而添加。 **默认值:** `false`.",
+                              "name": "capture",
+                              "type": "boolean",
+                              "desc": "不直接由 Node.js 使用。为 API 完整性而添加。 **默认值:** `false`."
+                            },
+                            {
+                              "textRaw": "`signal` {AbortSignal} 当给定的 AbortSignal 对象的 `abort()` 方法被调用时，监听器将被移除。",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "当给定的 AbortSignal 对象的 `abort()` 方法被调用时，监听器将被移除。"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>为 <code>type</code> 事件添加一个新的处理程序。任何给定的 <code>listener</code> 每个 <code>type</code> 和每个 <code>capture</code> 选项值仅添加一次。</p>\n<p>如果 <code>once</code> 选项为 <code>true</code>，则在下次分派 <code>type</code> 事件后移除 <code>listener</code>。</p>\n<p><code>capture</code> 选项除了按照 <code>EventTarget</code> 规范跟踪注册的事件监听器外，不以任何功能方式被 Node.js 使用。具体来说，<code>capture</code> 选项在注册 <code>listener</code> 时用作键的一部分。任何单独的 <code>listener</code> 可以添加一次 <code>capture = false</code>，一次 <code>capture = true</code>。</p>\n<pre><code class=\"language-js\">function handler(event) {}\n\nconst target = new EventTarget();\ntarget.addEventListener('foo', handler, { capture: true });  // 第一个\ntarget.addEventListener('foo', handler, { capture: false }); // 第二个\n\n// 移除 handler 的第二个实例\ntarget.removeEventListener('foo', handler);\n\n// 移除 handler 的第一个实例\ntarget.removeEventListener('foo', handler, { capture: true });\n</code></pre>"
+                },
+                {
+                  "textRaw": "`eventTarget.dispatchEvent(event)`",
+                  "type": "method",
+                  "name": "dispatchEvent",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`event` {Event}",
+                          "name": "event",
+                          "type": "Event"
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 如果事件的 `cancelable` 属性值为 false 或其 `preventDefault()` 方法未被调用，则为 `true`，否则为 `false`。",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "如果事件的 `cancelable` 属性值为 false 或其 `preventDefault()` 方法未被调用，则为 `true`，否则为 `false`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将 <code>event</code> 分派给 <code>event.type</code> 的处理程序列表。</p>\n<p>注册的事件监听器按照它们被注册的顺序同步调用。</p>"
+                },
+                {
+                  "textRaw": "`eventTarget.removeEventListener(type, listener[, options])`",
+                  "type": "method",
+                  "name": "removeEventListener",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`capture` {boolean}",
+                              "name": "capture",
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>从事件 <code>type</code> 的处理程序列表中移除 <code>listener</code>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`EventTarget`"
+            },
+            {
+              "textRaw": "类：`CustomEvent`",
+              "name": "类：`customevent`",
+              "meta": {
+                "added": [
+                  "v18.7.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v23.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/52723",
+                    "description": "No longer experimental."
+                  },
+                  {
+                    "version": [
+                      "v22.1.0",
+                      "v20.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/52618",
+                    "description": "CustomEvent is now stable."
+                  },
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44860",
+                    "description": "No longer behind `--experimental-global-customevent` CLI flag."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li>扩展: <a href=\"events.html#class-event\" class=\"type\">&lt;Event&gt;</a></li>\n</ul>\n<p><code>CustomEvent</code> 对象是对 <a href=\"https://dom.spec.whatwg.org/#customevent\"><code>CustomEvent</code> Web API</a> 的适配。实例由 Node.js 内部创建。</p>",
+              "properties": [
+                {
+                  "textRaw": "`detail` 类型: {any} 返回初始化时传递的自定义数据。",
+                  "type": "any",
+                  "name": "类型",
+                  "meta": {
+                    "added": [
+                      "v18.7.0",
+                      "v16.17.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": [
+                          "v22.1.0",
+                          "v20.13.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/52618",
+                        "description": "CustomEvent is now stable."
+                      }
+                    ]
+                  },
+                  "desc": "<p>只读。</p>",
+                  "shortDesc": "返回初始化时传递的自定义数据。"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`CustomEvent`"
+            },
+            {
+              "textRaw": "类：`NodeEventTarget`",
+              "name": "类：`nodeeventtarget`",
+              "meta": {
+                "added": [
+                  "v14.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li>扩展: <a href=\"events.html#class-eventtarget\" class=\"type\">&lt;EventTarget&gt;</a></li>\n</ul>\n<p><code>NodeEventTarget</code> 是 <code>EventTarget</code> 的 Node.js 特定扩展，它模拟了 <code>EventEmitter</code> API 的一个子集。</p>",
+              "methods": [
+                {
+                  "textRaw": "`nodeEventTarget.addListener(type, listener)`",
+                  "type": "method",
+                  "name": "addListener",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "返回: {EventTarget} this",
+                          "name": "返回",
+                          "type": "EventTarget",
+                          "desc": "this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，模拟等效的 <code>EventEmitter</code> API。<code>addListener()</code> 和 <code>addEventListener()</code> 之间的唯一区别是 <code>addListener()</code> 将返回对 <code>EventTarget</code> 的引用。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.emit(type, arg)`",
+                  "type": "method",
+                  "name": "emit",
+                  "meta": {
+                    "added": [
+                      "v15.2.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`arg` {any}",
+                          "name": "arg",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回: {boolean} 如果存在为 `type` 注册的事件监听器，则为 `true`，否则为 `false`。",
+                          "name": "返回",
+                          "type": "boolean",
+                          "desc": "如果存在为 `type` 注册的事件监听器，则为 `true`，否则为 `false`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，将 <code>arg</code> 分派给 <code>type</code> 的处理程序列表。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.eventNames()`",
+                  "type": "method",
+                  "name": "eventNames",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回: {string\\[]}",
+                          "name": "返回",
+                          "type": "string\\[]"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，返回已注册事件监听器的事件 <code>type</code> 名称数组。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.listenerCount(type)`",
+                  "type": "method",
+                  "name": "listenerCount",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "返回: {number}",
+                          "name": "返回",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，返回为 <code>type</code> 注册的事件监听器数量。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.setMaxListeners(n)`",
+                  "type": "method",
+                  "name": "setMaxListeners",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`n` {number}",
+                          "name": "n",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，将最大事件监听器数量设置为 <code>n</code>。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.getMaxListeners()`",
+                  "type": "method",
+                  "name": "getMaxListeners",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回: {number}",
+                          "name": "返回",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，返回最大事件监听器数量。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.off(type, listener[, options])`",
+                  "type": "method",
+                  "name": "off",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`capture` {boolean}",
+                              "name": "capture",
+                              "type": "boolean"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回: {EventTarget} this",
+                          "name": "返回",
+                          "type": "EventTarget",
+                          "desc": "this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>eventTarget.removeEventListener()</code> 的 Node.js 特定别名。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.on(type, listener)`",
+                  "type": "method",
+                  "name": "on",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "返回: {EventTarget} this",
+                          "name": "返回",
+                          "type": "EventTarget",
+                          "desc": "this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>eventTarget.addEventListener()</code> 的 Node.js 特定别名。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.once(type, listener)`",
+                  "type": "method",
+                  "name": "once",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "返回: {EventTarget} this",
+                          "name": "返回",
+                          "type": "EventTarget",
+                          "desc": "this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，为给定事件 <code>type</code> 添加一个 <code>once</code> 监听器。这等效于调用 <code>on</code> 并将 <code>once</code> 选项设置为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.removeAllListeners([type])`",
+                  "type": "method",
+                  "name": "removeAllListeners",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "返回: {EventTarget} this",
+                          "name": "返回",
+                          "type": "EventTarget",
+                          "desc": "this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展。如果指定了 <code>type</code>，则移除 <code>type</code> 的所有已注册监听器，否则移除所有已注册监听器。</p>"
+                },
+                {
+                  "textRaw": "`nodeEventTarget.removeListener(type, listener[, options])`",
+                  "type": "method",
+                  "name": "removeListener",
+                  "meta": {
+                    "added": [
+                      "v14.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`type` {string}",
+                          "name": "type",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`listener` {Function|EventListener}",
+                          "name": "listener",
+                          "type": "Function|EventListener"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`capture` {boolean}",
+                              "name": "capture",
+                              "type": "boolean"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回: {EventTarget} this",
+                          "name": "返回",
+                          "type": "EventTarget",
+                          "desc": "this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>EventTarget</code> 类的 Node.js 特定扩展，移除给定 <code>type</code> 的 <code>listener</code>。<code>removeListener()</code> 和 <code>removeEventListener()</code> 之间的唯一区别是 <code>removeListener()</code> 将返回对 <code>EventTarget</code> 的引用。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`NodeEventTarget`"
+            }
+          ],
+          "type": "module",
+          "displayName": "`EventTarget` 和 `Event` API"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`events.defaultMaxListeners`",
+          "name": "defaultMaxListeners",
+          "meta": {
+            "added": [
+              "v0.11.2"
+            ],
+            "changes": []
+          },
+          "desc": "<p>默认情况下，任何单个事件最多可以注册 <code>10</code> 个监听器。可以使用 <a href=\"#emittersetmaxlistenersn\"><code>emitter.setMaxListeners(n)</code></a> 方法更改单个 <code>EventEmitter</code> 实例的限制。要更改<em>所有</em> <code>EventEmitter</code> 实例的默认值，可以使用 <code>events.defaultMaxListeners</code> 属性。如果此值不是正数，则会抛出 <code>RangeError</code>。</p>\n<p>设置 <code>events.defaultMaxListeners</code> 时要小心，因为更改会影响<em>所有</em> <code>EventEmitter</code> 实例，包括在更改之前创建的实例。但是，调用 <a href=\"#emittersetmaxlistenersn\"><code>emitter.setMaxListeners(n)</code></a> 仍然优先于 <code>events.defaultMaxListeners</code>。</p>\n<p>这不是一个硬性限制。<code>EventEmitter</code> 实例允许添加更多监听器，但会向 stderr 输出跟踪警告，表明已检测到“可能的 EventEmitter 内存泄漏”。对于任何单个 <code>EventEmitter</code>，可以使用 <code>emitter.getMaxListeners()</code> 和 <code>emitter.setMaxListeners()</code> 方法来暂时避免此警告：</p>\n<p><code>defaultMaxListeners</code> 对 <code>AbortSignal</code> 实例没有影响。虽然仍然可以使用 <a href=\"#emittersetmaxlistenersn\"><code>emitter.setMaxListeners(n)</code></a> 为单个 <code>AbortSignal</code> 实例设置警告限制，但默认情况下 <code>AbortSignal</code> 实例不会发出警告。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter } from 'node:events';\nconst emitter = new EventEmitter();\nemitter.setMaxListeners(emitter.getMaxListeners() + 1);\nemitter.once('event', () => {\n  // 做些事情\n  emitter.setMaxListeners(Math.max(emitter.getMaxListeners() - 1, 0));\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const EventEmitter = require('node:events');\nconst emitter = new EventEmitter();\nemitter.setMaxListeners(emitter.getMaxListeners() + 1);\nemitter.once('event', () => {\n  // 做些事情\n  emitter.setMaxListeners(Math.max(emitter.getMaxListeners() - 1, 0));\n});\n</code></pre>\n<p><a href=\"cli.html#--trace-warnings\"><code>--trace-warnings</code></a> 命令行标志可用于显示此类警告的堆栈跟踪。</p>\n<p>发出的警告可以通过 <a href=\"process.html#event-warning\"><code>process.on('warning')</code></a> 进行检查，并且将具有额外的 <code>emitter</code>、<code>type</code> 和 <code>count</code> 属性，分别引用事件触发器实例、事件名称和附加的监听器数量。其 <code>name</code> 属性设置为 <code>'MaxListenersExceededWarning'</code>。</p>"
+        },
+        {
+          "textRaw": "`events.errorMonitor`",
+          "name": "errorMonitor",
+          "meta": {
+            "added": [
+              "v13.6.0",
+              "v12.17.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>此符号应用于仅监视 <code>'error'</code> 事件的监听器。使用此符号安装的监听器在常规 <code>'error'</code> 监听器被调用之前被调用。</p>\n<p>使用此符号安装监听器不会改变一旦发出 <code>'error'</code> 事件时的行为。因此，如果未安装常规 <code>'error'</code> 监听器，进程仍将崩溃。</p>"
+        },
+        {
+          "textRaw": "`captureRejections` 类型: {boolean}",
+          "type": "boolean",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v13.4.0",
+              "v12.16.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/41267",
+                "description": "No longer experimental."
+              }
+            ]
+          },
+          "desc": "<p>更改所有新 <code>EventEmitter</code> 对象上的默认 <code>captureRejections</code> 选项。</p>"
+        },
+        {
+          "textRaw": "`captureRejectionSymbol` 类型: {symbol} `Symbol.for('nodejs.rejection')`",
+          "type": "symbol",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v13.4.0",
+              "v12.16.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/41267",
+                "description": "No longer experimental."
+              }
+            ]
+          },
+          "desc": "<p>请参阅如何编写自定义 <a href=\"#emittersymbolfornodejsrejectionerr-eventname-args\">拒绝处理程序</a>。</p>",
+          "shortDesc": "`Symbol.for('nodejs.rejection')`"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`events.getEventListeners(emitterOrTarget, eventName)`",
+          "type": "method",
+          "name": "getEventListeners",
+          "meta": {
+            "added": [
+              "v15.2.0",
+              "v14.17.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`emitterOrTarget` {EventEmitter|EventTarget}",
+                  "name": "emitterOrTarget",
+                  "type": "EventEmitter|EventTarget"
+                },
+                {
+                  "textRaw": "`eventName` {string|symbol}",
+                  "name": "eventName",
+                  "type": "string|symbol"
+                },
+                {
+                  "textRaw": "返回: {Function\\[]}",
+                  "name": "返回",
+                  "type": "Function\\[]"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回名为 <code>eventName</code> 的事件的监听器数组的副本。</p>\n<p>对于 <code>EventEmitter</code>，这与在触发器上调用 <code>.listeners</code> 的行为完全相同。</p>\n<p>对于 <code>EventTarget</code>，这是获取事件目标的事件监听器的唯一方法。这对于调试和诊断目的很有用。</p>\n<pre><code class=\"language-mjs\">import { getEventListeners, EventEmitter } from 'node:events';\n\n{\n  const ee = new EventEmitter();\n  const listener = () => console.log('Events are fun');\n  ee.on('foo', listener);\n  console.log(getEventListeners(ee, 'foo')); // [ [Function: listener] ]\n}\n{\n  const et = new EventTarget();\n  const listener = () => console.log('Events are fun');\n  et.addEventListener('foo', listener);\n  console.log(getEventListeners(et, 'foo')); // [ [Function: listener] ]\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { getEventListeners, EventEmitter } = require('node:events');\n\n{\n  const ee = new EventEmitter();\n  const listener = () => console.log('Events are fun');\n  ee.on('foo', listener);\n  console.log(getEventListeners(ee, 'foo')); // [ [Function: listener] ]\n}\n{\n  const et = new EventTarget();\n  const listener = () => console.log('Events are fun');\n  et.addEventListener('foo', listener);\n  console.log(getEventListeners(et, 'foo')); // [ [Function: listener] ]\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`events.getMaxListeners(emitterOrTarget)`",
+          "type": "method",
+          "name": "getMaxListeners",
+          "meta": {
+            "added": [
+              "v19.9.0",
+              "v18.17.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`emitterOrTarget` {EventEmitter|EventTarget}",
+                  "name": "emitterOrTarget",
+                  "type": "EventEmitter|EventTarget"
+                },
+                {
+                  "textRaw": "返回: {number}",
+                  "name": "返回",
+                  "type": "number"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回当前设置的最大监听器数量。</p>\n<p>对于 <code>EventEmitter</code>，这与在触发器上调用 <code>.getMaxListeners</code> 的行为完全相同。</p>\n<p>对于 <code>EventTarget</code>，这是获取事件目标的最大事件监听器数量的唯一方法。如果单个 EventTarget 上的事件处理程序数量超过设置的最大值，EventTarget 将打印警告。</p>\n<pre><code class=\"language-mjs\">import { getMaxListeners, setMaxListeners, EventEmitter } from 'node:events';\n\n{\n  const ee = new EventEmitter();\n  console.log(getMaxListeners(ee)); // 10\n  setMaxListeners(11, ee);\n  console.log(getMaxListeners(ee)); // 11\n}\n{\n  const et = new EventTarget();\n  console.log(getMaxListeners(et)); // 10\n  setMaxListeners(11, et);\n  console.log(getMaxListeners(et)); // 11\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { getMaxListeners, setMaxListeners, EventEmitter } = require('node:events');\n\n{\n  const ee = new EventEmitter();\n  console.log(getMaxListeners(ee)); // 10\n  setMaxListeners(11, ee);\n  console.log(getMaxListeners(ee)); // 11\n}\n{\n  const et = new EventTarget();\n  console.log(getMaxListeners(et)); // 10\n  setMaxListeners(11, et);\n  console.log(getMaxListeners(et)); // 11\n}\n</code></pre>"
+        },
+        {
+          "textRaw": "`events.once(emitter, name[, options])`",
+          "type": "method",
+          "name": "once",
+          "meta": {
+            "added": [
+              "v11.13.0",
+              "v10.16.0"
+            ],
+            "changes": [
+              {
+                "version": "v15.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/34912",
+                "description": "The `signal` option is supported now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`emitter` {EventEmitter}",
+                  "name": "emitter",
+                  "type": "EventEmitter"
+                },
+                {
+                  "textRaw": "`name` {string|symbol}",
+                  "name": "name",
+                  "type": "string|symbol"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`signal` {AbortSignal} 可用于取消等待事件。",
+                      "name": "signal",
+                      "type": "AbortSignal",
+                      "desc": "可用于取消等待事件。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {Promise}",
+                  "name": "返回",
+                  "type": "Promise"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>创建一个 <code>Promise</code>，当 <code>EventEmitter</code> 触发给定事件时，该 Promise 会被履行，或者如果 <code>EventEmitter</code> 在等待时触发 <code>'error'</code>，则会被拒绝。该 <code>Promise</code> 将使用触发给定事件时发出的所有参数的数组进行解析。</p>\n<p>此方法有意设计为通用方法，并与 Web 平台 <a href=\"https://dom.spec.whatwg.org/#interface-eventtarget\">EventTarget</a> 接口配合使用，该接口没有特殊的 <code>'error'</code> 事件语义，也不监听 <code>'error'</code> 事件。</p>\n<pre><code class=\"language-mjs\">import { once, EventEmitter } from 'node:events';\nimport process from 'node:process';\n\nconst ee = new EventEmitter();\n\nprocess.nextTick(() => {\n  ee.emit('myevent', 42);\n});\n\nconst [value] = await once(ee, 'myevent');\nconsole.log(value);\n\nconst err = new Error('kaboom');\nprocess.nextTick(() => {\n  ee.emit('error', err);\n});\n\ntry {\n  await once(ee, 'myevent');\n} catch (err) {\n  console.error('error happened', err);\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const { once, EventEmitter } = require('node:events');\n\nasync function run() {\n  const ee = new EventEmitter();\n\n  process.nextTick(() => {\n    ee.emit('myevent', 42);\n  });\n\n  const [value] = await once(ee, 'myevent');\n  console.log(value);\n\n  const err = new Error('kaboom');\n  process.nextTick(() => {\n    ee.emit('error', err);\n  });\n\n  try {\n    await once(ee, 'myevent');\n  } catch (err) {\n    console.error('error happened', err);\n  }\n}\n\nrun();\n</code></pre>\n<p>仅当使用 <code>events.once()</code> 等待另一个事件时，才会使用 <code>'error'</code> 事件的特殊处理。如果 <code>events.once()</code> 用于等待 '<code>error'</code> 事件本身，则它将被视为没有任何特殊处理的任何其他类型的事件：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, once } from 'node:events';\n\nconst ee = new EventEmitter();\n\nonce(ee, 'error')\n  .then(([err]) => console.log('ok', err.message))\n  .catch((err) => console.error('error', err.message));\n\nee.emit('error', new Error('boom'));\n\n// 打印: ok boom\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, once } = require('node:events');\n\nconst ee = new EventEmitter();\n\nonce(ee, 'error')\n  .then(([err]) => console.log('ok', err.message))\n  .catch((err) => console.error('error', err.message));\n\nee.emit('error', new Error('boom'));\n\n// 打印: ok boom\n</code></pre>\n<p>可以使用 <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a> 来取消等待事件：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, once } from 'node:events';\n\nconst ee = new EventEmitter();\nconst ac = new AbortController();\n\nasync function foo(emitter, event, signal) {\n  try {\n    await once(emitter, event, { signal });\n    console.log('event emitted!');\n  } catch (error) {\n    if (error.name === 'AbortError') {\n      console.error('Waiting for the event was canceled!');\n    } else {\n      console.error('There was an error', error.message);\n    }\n  }\n}\n\nfoo(ee, 'foo', ac.signal);\nac.abort(); // 打印: Waiting for the event was canceled!\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, once } = require('node:events');\n\nconst ee = new EventEmitter();\nconst ac = new AbortController();\n\nasync function foo(emitter, event, signal) {\n  try {\n    await once(emitter, event, { signal });\n    console.log('event emitted!');\n  } catch (error) {\n    if (error.name === 'AbortError') {\n      console.error('Waiting for the event was canceled!');\n    } else {\n      console.error('There was an error', error.message);\n    }\n  }\n}\n\nfoo(ee, 'foo', ac.signal);\nac.abort(); // 打印: Waiting for the event was canceled!\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "等待在 `process.nextTick()` 上触发的多个事件",
+              "name": "等待在_`process.nexttick()`_上触发的多个事件",
+              "desc": "<p>当使用 <code>events.once()</code> 函数等待在同一批 <code>process.nextTick()</code> 操作中触发的多个事件，或者每当多个事件同步触发时，有一个边缘情况值得注意。具体来说，因为 <code>process.nextTick()</code> 队列在 <code>Promise</code> 微任务队列之前被清空，并且因为 <code>EventEmitter</code> 同步触发所有事件，所以 <code>events.once()</code> 有可能错过事件。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, once } from 'node:events';\nimport process from 'node:process';\n\nconst myEE = new EventEmitter();\n\nasync function foo() {\n  await once(myEE, 'bar');\n  console.log('bar');\n\n  // 这个 Promise 永远不会解析，因为 'foo' 事件将在 Promise 创建之前就已经触发。\n  await once(myEE, 'foo');\n  console.log('foo');\n}\n\nprocess.nextTick(() => {\n  myEE.emit('bar');\n  myEE.emit('foo');\n});\n\nfoo().then(() => console.log('done'));\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, once } = require('node:events');\n\nconst myEE = new EventEmitter();\n\nasync function foo() {\n  await once(myEE, 'bar');\n  console.log('bar');\n\n  // 这个 Promise 永远不会解析，因为 'foo' 事件将在 Promise 创建之前就已经触发。\n  await once(myEE, 'foo');\n  console.log('foo');\n}\n\nprocess.nextTick(() => {\n  myEE.emit('bar');\n  myEE.emit('foo');\n});\n\nfoo().then(() => console.log('done'));\n</code></pre>\n<p>要捕获两个事件，请在等待任一事件<em>之前</em>创建每个 Promise，然后就可以使用 <code>Promise.all()</code>、<code>Promise.race()</code> 或 <code>Promise.allSettled()</code>：</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, once } from 'node:events';\nimport process from 'node:process';\n\nconst myEE = new EventEmitter();\n\nasync function foo() {\n  await Promise.all([once(myEE, 'bar'), once(myEE, 'foo')]);\n  console.log('foo', 'bar');\n}\n\nprocess.nextTick(() => {\n  myEE.emit('bar');\n  myEE.emit('foo');\n});\n\nfoo().then(() => console.log('done'));\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, once } = require('node:events');\n\nconst myEE = new EventEmitter();\n\nasync function foo() {\n  await Promise.all([once(myEE, 'bar'), once(myEE, 'foo')]);\n  console.log('foo', 'bar');\n}\n\nprocess.nextTick(() => {\n  myEE.emit('bar');\n  myEE.emit('foo');\n});\n\nfoo().then(() => console.log('done'));\n</code></pre>",
+              "type": "module",
+              "displayName": "等待在 `process.nextTick()` 上触发的多个事件"
+            }
+          ]
+        },
+        {
+          "textRaw": "`events.listenerCount(emitter, eventName)`",
+          "type": "method",
+          "name": "listenerCount",
+          "meta": {
+            "added": [
+              "v0.9.12"
+            ],
+            "deprecated": [
+              "v3.2.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated: Use [`emitter.listenerCount()`][] instead.",
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`emitter` {EventEmitter} 要查询的触发器",
+                  "name": "emitter",
+                  "type": "EventEmitter",
+                  "desc": "要查询的触发器"
+                },
+                {
+                  "textRaw": "`eventName` {string|symbol} 事件名称",
+                  "name": "eventName",
+                  "type": "string|symbol",
+                  "desc": "事件名称"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>一个类方法，返回在给定 <code>emitter</code> 上为给定 <code>eventName</code> 注册的监听器数量。</p>\n<pre><code class=\"language-mjs\">import { EventEmitter, listenerCount } from 'node:events';\n\nconst myEmitter = new EventEmitter();\nmyEmitter.on('event', () => {});\nmyEmitter.on('event', () => {});\nconsole.log(listenerCount(myEmitter, 'event'));\n// 打印: 2\n</code></pre>\n<pre><code class=\"language-cjs\">const { EventEmitter, listenerCount } = require('node:events');\n\nconst myEmitter = new EventEmitter();\nmyEmitter.on('event', () => {});\nmyEmitter.on('event', () => {});\nconsole.log(listenerCount(myEmitter, 'event'));\n// 打印: 2\n</code></pre>"
+        },
+        {
+          "textRaw": "`events.on(emitter, eventName[, options])`",
+          "type": "method",
+          "name": "on",
+          "meta": {
+            "added": [
+              "v13.6.0",
+              "v12.16.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v22.0.0",
+                  "v20.13.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/52080",
+                "description": "Support `highWaterMark` and `lowWaterMark` options, For consistency. Old options are still supported."
+              },
+              {
+                "version": [
+                  "v20.0.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/41276",
+                "description": "The `close`, `highWatermark`, and `lowWatermark` options are supported now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`emitter` {EventEmitter}",
+                  "name": "emitter",
+                  "type": "EventEmitter"
+                },
+                {
+                  "textRaw": "`eventName` {string|symbol} 正在被监听的事件名称",
+                  "name": "eventName",
+                  "type": "string|symbol",
+                  "desc": "正在被监听的事件名称"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`signal` {AbortSignal} 可用于取消等待事件。",
+                      "name": "signal",
+                      "type": "AbortSignal",
+                      "desc": "可用于取消等待事件。"
+                    },
+                    {
+                      "textRaw": "`close` {string\\[]} 将结束迭代的事件名称。",
+                      "name": "close",
+                      "type": "string\\[]",
+                      "desc": "将结束迭代的事件名称。"
+                    },
+                    {
+                      "textRaw": "`highWaterMark` {integer} **默认值:** `Number.MAX_SAFE_INTEGER` 高水位标记。每当被缓冲的事件大小高于它时，触发器就会暂停。仅在实现了 `pause()` 和 `resume()` 方法的触发器上支持。",
+                      "name": "highWaterMark",
+                      "type": "integer",
+                      "desc": "**默认值:** `Number.MAX_SAFE_INTEGER` 高水位标记。每当被缓冲的事件大小高于它时，触发器就会暂停。仅在实现了 `pause()` 和 `resume()` 方法的触发器上支持。"
+                    },
+                    {
+                      "textRaw": "`lowWaterMark` {integer} **默认值:** `1` 低水位标记。每当被缓冲的事件大小低于它时，触发器就会恢复。仅在实现了 `pause()` 和 `resume()` 方法的触发器上支持。",
+                      "name": "lowWaterMark",
+                      "type": "integer",
+                      "desc": "**默认值:** `1` 低水位标记。每当被缓冲的事件大小低于它时，触发器就会恢复。仅在实现了 `pause()` 和 `resume()` 方法的触发器上支持。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {AsyncIterator} 迭代 `emitter` 触发的 `eventName` 事件",
+                  "name": "返回",
+                  "type": "AsyncIterator",
+                  "desc": "迭代 `emitter` 触发的 `eventName` 事件"
+                }
+              ]
+            }
+          ],
+          "desc": "<pre><code class=\"language-mjs\">import { on, EventEmitter } from 'node:events';\nimport process from 'node:process';\n\nconst ee = new EventEmitter();\n\n// 稍后触发\nprocess.nextTick(() => {\n  ee.emit('foo', 'bar');\n  ee.emit('foo', 42);\n});\n\nfor await (const event of on(ee, 'foo')) {\n  // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。\n  // 如果需要并发执行，请不要使用。\n  console.log(event); // 打印 ['bar'] [42]\n}\n// 此处不可达\n</code></pre>\n<pre><code class=\"language-cjs\">const { on, EventEmitter } = require('node:events');\n\n(async () => {\n  const ee = new EventEmitter();\n\n  // 稍后触发\n  process.nextTick(() => {\n    ee.emit('foo', 'bar');\n  });\n  ee.emit('foo', 42);\n\n  for await (const event of on(ee, 'foo')) {\n    // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。\n    // 如果需要并发执行，请不要使用。\n    console.log(event); // 打印 ['bar'] [42]\n  }\n  // 此处不可达\n})();\n</code></pre>\n<p>返回一个迭代 <code>eventName</code> 事件的 <code>AsyncIterator</code>。如果 <code>EventEmitter</code> 触发 <code>'error'</code>，它将抛出错误。在退出循环时，它会移除所有监听器。每次迭代返回的 <code>value</code> 是由触发的事件参数组成的数组。</p>\n<p>可以使用 <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a> 来取消等待事件：</p>\n<pre><code class=\"language-mjs\">import { on, EventEmitter } from 'node:events';\nimport process from 'node:process';\n\nconst ac = new AbortController();\n\n(async () => {\n  const ee = new EventEmitter();\n\n  // 稍后触发\n  process.nextTick(() => {\n    ee.emit('foo', 'bar');\n    ee.emit('foo', 42);\n  });\n\n  for await (const event of on(ee, 'foo', { signal: ac.signal })) {\n    // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。\n    // 如果需要并发执行，请不要使用。\n    console.log(event); // 打印 ['bar'] [42]\n  }\n  // 此处不可达\n})();\n\nprocess.nextTick(() => ac.abort());\n</code></pre>\n<pre><code class=\"language-cjs\">const { on, EventEmitter } = require('node:events');\n\nconst ac = new AbortController();\n\n(async () => {\n  const ee = new EventEmitter();\n\n  // 稍后触发\n  process.nextTick(() => {\n    ee.emit('foo', 'bar');\n    ee.emit('foo', 42);\n  });\n\n  for await (const event of on(ee, 'foo', { signal: ac.signal })) {\n    // 此内部块的执行是同步的，并且它一次处理一个事件（即使有 await）。\n    // 如果需要并发执行，请不要使用。\n    console.log(event); // 打印 ['bar'] [42]\n  }\n  // 此处不可达\n})();\n\nprocess.nextTick(() => ac.abort());\n</code></pre>"
+        },
+        {
+          "textRaw": "`events.setMaxListeners(n[, ...eventTargets])`",
+          "type": "method",
+          "name": "setMaxListeners",
+          "meta": {
+            "added": [
+              "v15.4.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`n` {number} 一个非负数。每个 `EventTarget` 事件的最大监听器数量。",
+                  "name": "n",
+                  "type": "number",
+                  "desc": "一个非负数。每个 `EventTarget` 事件的最大监听器数量。"
+                },
+                {
+                  "textRaw": "`...eventsTargets` {EventTarget\\[]|EventEmitter\\[]} 零个或多个 {EventTarget} 或 {EventEmitter} 实例。如果未指定任何实例，则 `n` 被设置为所有新创建的 {EventTarget} 和 {EventEmitter} 对象的默认最大值。",
+                  "name": "...eventsTargets",
+                  "type": "EventTarget\\[]|EventEmitter\\[]",
+                  "desc": "零个或多个 {EventTarget} 或 {EventEmitter} 实例。如果未指定任何实例，则 `n` 被设置为所有新创建的 {EventTarget} 和 {EventEmitter} 对象的默认最大值。"
+                }
+              ]
+            }
+          ],
+          "desc": "<pre><code class=\"language-mjs\">import { setMaxListeners, EventEmitter } from 'node:events';\n\nconst target = new EventTarget();\nconst emitter = new EventEmitter();\n\nsetMaxListeners(5, target, emitter);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  setMaxListeners,\n  EventEmitter,\n} = require('node:events');\n\nconst target = new EventTarget();\nconst emitter = new EventEmitter();\n\nsetMaxListeners(5, target, emitter);\n</code></pre>"
+        },
+        {
+          "textRaw": "`events.addAbortListener(signal, listener)`",
+          "type": "method",
+          "name": "addAbortListener",
+          "meta": {
+            "added": [
+              "v20.5.0",
+              "v18.18.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57765",
+                "description": "Change stability index for this feature from Experimental to Stable."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`signal` {AbortSignal}",
+                  "name": "signal",
+                  "type": "AbortSignal"
+                },
+                {
+                  "textRaw": "`listener` {Function|EventListener}",
+                  "name": "listener",
+                  "type": "Function|EventListener"
+                },
+                {
+                  "textRaw": "返回: {Disposable} 一个用于移除 `abort` 监听器的 Disposable。",
+                  "name": "返回",
+                  "type": "Disposable",
+                  "desc": "一个用于移除 `abort` 监听器的 Disposable。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>监听一次提供的 <code>signal</code> 上的 <code>abort</code> 事件。</p>\n<p>监听中止信号上的 <code>abort</code> 事件是不安全的，并且可能导致资源泄漏，因为拥有信号的第三方可以调用 <a href=\"#eventstopimmediatepropagation\"><code>e.stopImmediatePropagation()</code></a>。不幸的是，Node.js 无法更改这一点，因为这会违反 Web 标准。此外，原始 API 很容易忘记移除监听器。</p>\n<p>此 API 通过监听事件使得 <code>stopImmediatePropagation</code> 不会阻止监听器运行，从而允许在 Node.js API 中安全地使用 <code>AbortSignal</code>。</p>\n<p>返回一个 disposable，以便可以更轻松地取消订阅。</p>\n<pre><code class=\"language-cjs\">const { addAbortListener } = require('node:events');\n\nfunction example(signal) {\n  let disposable;\n  try {\n    signal.addEventListener('abort', (e) => e.stopImmediatePropagation());\n    disposable = addAbortListener(signal, (e) => {\n      // 当信号中止时做些事情。\n    });\n  } finally {\n    disposable?.[Symbol.dispose]();\n  }\n}\n</code></pre>\n<pre><code class=\"language-mjs\">import { addAbortListener } from 'node:events';\n\nfunction example(signal) {\n  let disposable;\n  try {\n    signal.addEventListener('abort', (e) => e.stopImmediatePropagation());\n    disposable = addAbortListener(signal, (e) => {\n      // 当信号中止时做些事情。\n    });\n  } finally {\n    disposable?.[Symbol.dispose]();\n  }\n}\n</code></pre>"
+        }
+      ]
+    }
+  ]
+}

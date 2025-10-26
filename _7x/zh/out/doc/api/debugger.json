@@ -1,0 +1,85 @@
+{
+  "type": "module",
+  "source": "doc/api/debugger.md",
+  "introduced_in": "v0.9.12",
+  "stability": 2,
+  "stabilityText": "Stable",
+  "miscs": [
+    {
+      "textRaw": "Debugger",
+      "name": "Debugger",
+      "introduced_in": "v0.9.12",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "type": "misc",
+      "desc": "<p>Node.js 包含了一个命令行调试工具。Node.js 调试器客户端并非一个功能全面的调试器，但支持简单的单步执行和检查。</p>\n<p>要使用它，请使用 <code>inspect</code> 参数启动 Node.js，后面跟上要调试的脚本的路径。</p>\n<pre><code class=\"language-console\">$ node inspect myscript.js\n&#x3C; Debugger listening on ws://127.0.0.1:9229/621111f9-ffcb-4e82-b718-48a145fa5db8\n&#x3C; For help, see: https://nodejs.org/en/docs/inspector\n&#x3C;\nconnecting to 127.0.0.1:9229 ... ok\n&#x3C; Debugger attached.\n&#x3C;\n ok\nBreak on start in myscript.js:2\n  1 // myscript.js\n> 2 global.x = 5;\n  3 setTimeout(() => {\n  4   debugger;\ndebug>\n</code></pre>\n<p>调试器会在第一个可执行行自动中断。若要改为运行直到第一个断点（由 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger\"><code>debugger</code></a> 语句指定），请将 <code>NODE_INSPECT_RESUME_ON_START</code> 环境变量设置为 <code>1</code>。</p>\n<pre><code class=\"language-console\">$ cat myscript.js\n// myscript.js\nglobal.x = 5;\nsetTimeout(() => {\n  debugger;\n  console.log('world');\n}, 1000);\nconsole.log('hello');\n$ NODE_INSPECT_RESUME_ON_START=1 node inspect myscript.js\n&#x3C; Debugger listening on ws://127.0.0.1:9229/f1ed133e-7876-495b-83ae-c32c6fc319c2\n&#x3C; For help, see: https://nodejs.org/en/docs/inspector\n&#x3C;\nconnecting to 127.0.0.1:9229 ... ok\n&#x3C; Debugger attached.\n&#x3C;\n&#x3C; hello\n&#x3C;\nbreak in myscript.js:4\n  2 global.x = 5;\n  3 setTimeout(() => {\n> 4   debugger;\n  5   console.log('world');\n  6 }, 1000);\ndebug> next\nbreak in myscript.js:5\n  3 setTimeout(() => {\n  4   debugger;\n> 5   console.log('world');\n  6 }, 1000);\n  7 console.log('hello');\ndebug> repl\nPress Ctrl+C to leave debug repl\n> x\n5\n> 2 + 2\n4\ndebug> next\n&#x3C; world\n&#x3C;\nbreak in myscript.js:6\n  4   debugger;\n  5   console.log('world');\n> 6 }, 1000);\n  7 console.log('hello');\n  8\ndebug> .exit\n$\n</code></pre>\n<p><code>repl</code> 命令允许远程执行代码。<code>next</code> 命令用于单步执行到下一行。输入 <code>help</code> 可以查看其他可用的命令。</p>\n<p>直接按 <code>enter</code> 键而不输入任何命令，将会重复执行上一个调试器命令。</p>",
+      "miscs": [
+        {
+          "textRaw": "监视器",
+          "name": "监视器",
+          "desc": "<p>在调试过程中，可以监视表达式和变量值。在每个断点处，监视器列表中的每个表达式都会在当前上下文中求值，并立即在断点的源代码列表之前显示。</p>\n<p>开始监视一个表达式，请输入 <code>watch('my_expression')</code>。<code>watchers</code> 命令会打印出活动的监视器。要移除一个监视器，请输入 <code>unwatch('my_expression')</code>。</p>",
+          "type": "misc",
+          "displayName": "监视器"
+        },
+        {
+          "textRaw": "命令参考",
+          "name": "命令参考",
+          "modules": [
+            {
+              "textRaw": "单步执行",
+              "name": "单步执行",
+              "desc": "<ul>\n<li><code>cont</code>, <code>c</code>: 继续执行</li>\n<li><code>next</code>, <code>n</code>: 下一步</li>\n<li><code>step</code>, <code>s</code>: 步入</li>\n<li><code>out</code>, <code>o</code>: 步出</li>\n<li><code>pause</code>: 暂停运行中的代码（类似于开发者工具中的暂停按钮）</li>\n</ul>",
+              "type": "module",
+              "displayName": "单步执行"
+            },
+            {
+              "textRaw": "断点",
+              "name": "断点",
+              "desc": "<ul>\n<li><code>setBreakpoint()</code>, <code>sb()</code>: 在当前行设置断点</li>\n<li><code>setBreakpoint(line)</code>, <code>sb(line)</code>: 在指定行设置断点</li>\n<li><code>setBreakpoint('fn()')</code>, <code>sb(...)</code>: 在函数体内的第一个语句处设置断点</li>\n<li><code>setBreakpoint('script.js', 1)</code>, <code>sb(...)</code>: 在 <code>script.js</code> 的第一行设置断点</li>\n<li><code>setBreakpoint('script.js', 1, 'num &#x3C; 4')</code>, <code>sb(...)</code>: 在 <code>script.js</code> 的第一行设置条件断点，仅当 <code>num &#x3C; 4</code> 求值为 <code>true</code> 时中断</li>\n<li><code>clearBreakpoint('script.js', 1)</code>, <code>cb(...)</code>: 清除 <code>script.js</code> 中第 1 行的断点</li>\n</ul>\n<p>也可以在尚未加载的文件（模块）中设置断点：</p>\n<pre><code class=\"language-console\">$ node inspect main.js\n&#x3C; Debugger listening on ws://127.0.0.1:9229/48a5b28a-550c-471b-b5e1-d13dd7165df9\n&#x3C; For help, see: https://nodejs.org/en/docs/inspector\n&#x3C;\nconnecting to 127.0.0.1:9229 ... ok\n&#x3C; Debugger attached.\n&#x3C;\nBreak on start in main.js:1\n> 1 const mod = require('./mod.js');\n  2 mod.hello();\n  3 mod.hello();\ndebug> setBreakpoint('mod.js', 22)\nWarning: script 'mod.js' was not loaded yet.\ndebug> c\nbreak in mod.js:22\n 20 // USE OR OTHER DEALINGS IN THE SOFTWARE.\n 21\n>22 exports.hello = function() {\n 23   return 'hello from module';\n 24 };\ndebug>\n</code></pre>\n<p>也可以设置一个条件断点，仅当给定表达式求值为 <code>true</code> 时才中断：</p>\n<pre><code class=\"language-console\">$ node inspect main.js\n&#x3C; Debugger listening on ws://127.0.0.1:9229/ce24daa8-3816-44d4-b8ab-8273c8a66d35\n&#x3C; For help, see: https://nodejs.org/en/docs/inspector\n&#x3C;\nconnecting to 127.0.0.1:9229 ... ok\n&#x3C; Debugger attached.\nBreak on start in main.js:7\n  5 }\n  6\n> 7 addOne(10);\n  8 addOne(-1);\n  9\ndebug> setBreakpoint('main.js', 4, 'num &#x3C; 0')\n  1 'use strict';\n  2\n  3 function addOne(num) {\n> 4   return num + 1;\n  5 }\n  6\n  7 addOne(10);\n  8 addOne(-1);\n  9\ndebug> cont\nbreak in main.js:4\n  2\n  3 function addOne(num) {\n> 4   return num + 1;\n  5 }\n  6\ndebug> exec('num')\n-1\ndebug>\n</code></pre>",
+              "type": "module",
+              "displayName": "断点"
+            },
+            {
+              "textRaw": "信息",
+              "name": "信息",
+              "desc": "<ul>\n<li><code>backtrace</code>, <code>bt</code>: 打印当前执行帧的回溯</li>\n<li><code>list(5)</code>: 列出脚本源代码，附带 5 行的上下文（前后各 5 行）</li>\n<li><code>watch(expr)</code>: 向监视列表添加表达式</li>\n<li><code>unwatch(expr)</code>: 从监视列表移除表达式</li>\n<li><code>unwatch(index)</code>: 从监视列表移除指定索引处的表达式</li>\n<li><code>watchers</code>: 列出所有监视器及其值（在每个断点处自动列出）</li>\n<li><code>repl</code>: 打开调试器的 repl，以便在调试脚本的上下文中求值</li>\n<li><code>exec expr</code>, <code>p expr</code>: 在调试脚本的上下文中执行表达式并打印其值</li>\n<li><code>profile</code>: 开始 CPU 分析会话</li>\n<li><code>profileEnd</code>: 停止当前的 CPU 分析会话</li>\n<li><code>profiles</code>: 列出所有已完成的 CPU 分析会话</li>\n<li><code>profiles[n].save(filepath = 'node.cpuprofile')</code>: 将 CPU 分析会话以 JSON 格式保存到磁盘</li>\n<li><code>takeHeapSnapshot(filepath = 'node.heapsnapshot')</code>: 获取堆快照并以 JSON 格式保存到磁盘</li>\n</ul>",
+              "type": "module",
+              "displayName": "信息"
+            },
+            {
+              "textRaw": "执行控制",
+              "name": "执行控制",
+              "desc": "<ul>\n<li><code>run</code>: 运行脚本（在调试器启动时自动运行）</li>\n<li><code>restart</code>: 重新启动脚本</li>\n<li><code>kill</code>: 终止脚本</li>\n</ul>",
+              "type": "module",
+              "displayName": "执行控制"
+            },
+            {
+              "textRaw": "其他",
+              "name": "其他",
+              "desc": "<ul>\n<li><code>scripts</code>: 列出所有已加载的脚本</li>\n<li><code>version</code>: 显示 V8 的版本</li>\n</ul>",
+              "type": "module",
+              "displayName": "其他"
+            }
+          ],
+          "type": "misc",
+          "displayName": "命令参考"
+        },
+        {
+          "textRaw": "高级用法",
+          "name": "高级用法",
+          "modules": [
+            {
+              "textRaw": "用于 Node.js 的 V8 检查器集成",
+              "name": "用于_node.js_的_v8_检查器集成",
+              "desc": "<p>V8 检查器集成允许将 Chrome DevTools 附加到 Node.js 实例以进行调试和分析。它使用 <a href=\"https://chromedevtools.github.io/devtools-protocol/\">Chrome DevTools 协议</a>。</p>\n<p>在启动 Node.js 应用程序时，通过传递 <code>--inspect</code> 标志可以启用 V8 检查器。也可以使用该标志提供自定义端口，例如 <code>--inspect=9222</code> 将在 9222 端口接受 DevTools 连接。</p>\n<p>使用 <code>--inspect</code> 标志会在调试器连接之前立即执行代码。这意味着代码将在你开始调试之前就开始运行，如果你想从一开始就进行调试，这可能不太理想。</p>\n<p>在这种情况下，你有两种选择：</p>\n<ol>\n<li><code>--inspect-wait</code> 标志：此标志会等待调试器附加后再执行代码。这允许你从执行一开始就进行调试。</li>\n<li><code>--inspect-brk</code> 标志：与 <code>--inspect</code> 不同，此标志会在调试器附加后立即在代码的第一行中断。这对于你想从最开始逐步调试代码，而不希望在调试之前执行任何代码的情况非常有用。</li>\n</ol>\n<p>因此，在决定使用 <code>--inspect</code>、<code>--inspect-wait</code> 还是 <code>--inspect-brk</code> 时，请考虑你是希望代码立即开始执行、等待调试器附加后再执行，还是在第一行中断以进行逐步调试。</p>\n<pre><code class=\"language-console\">$ node --inspect index.js\nDebugger listening on ws://127.0.0.1:9229/dc9010dd-f8b8-4ac5-a510-c1a114ec7d29\nFor help, see: https://nodejs.org/en/docs/inspector\n</code></pre>\n<p>（在上面的示例中，URL 末尾的 UUID dc9010dd-f8b8-4ac5-a510-c1a114ec7d29 是动态生成的，在不同的调试会话中会有所不同。）</p>\n<p>如果 Chrome 浏览器版本早于 66.0.3345.0，请在上述 URL 中使用 <code>inspector.html</code> 而不是 <code>js_app.html</code>。</p>\n<p>Chrome DevTools 尚不支持调试 <a href=\"worker_threads.html\">工作线程</a>。可以使用 <a href=\"https://github.com/GoogleChromeLabs/ndb/\">ndb</a> 来调试它们。</p>",
+              "type": "module",
+              "displayName": "用于 Node.js 的 V8 检查器集成"
+            }
+          ],
+          "type": "misc",
+          "displayName": "高级用法"
+        }
+      ]
+    }
+  ]
+}

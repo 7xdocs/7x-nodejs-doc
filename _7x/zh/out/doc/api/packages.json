@@ -1,0 +1,532 @@
+{
+  "type": "module",
+  "source": "doc/api/packages.md",
+  "introduced_in": "v12.20.0",
+  "meta": {
+    "changes": [
+      {
+        "version": [
+          "v14.13.0",
+          "v12.20.0"
+        ],
+        "pr-url": "https://github.com/nodejs/node/pull/34718",
+        "description": "Add support for `\"exports\"` patterns."
+      },
+      {
+        "version": [
+          "v14.6.0",
+          "v12.19.0"
+        ],
+        "pr-url": "https://github.com/nodejs/node/pull/34117",
+        "description": "Add package `\"imports\"` field."
+      },
+      {
+        "version": [
+          "v13.7.0",
+          "v12.17.0"
+        ],
+        "pr-url": "https://github.com/nodejs/node/pull/29866",
+        "description": "Unflag conditional exports."
+      },
+      {
+        "version": [
+          "v13.7.0",
+          "v12.16.0"
+        ],
+        "pr-url": "https://github.com/nodejs/node/pull/31001",
+        "description": "Remove the `--experimental-conditional-exports` option. In 12.16.0, conditional exports are still behind `--experimental-modules`."
+      },
+      {
+        "version": [
+          "v13.6.0",
+          "v12.16.0"
+        ],
+        "pr-url": "https://github.com/nodejs/node/pull/31002",
+        "description": "Unflag self-referencing a package using its name."
+      },
+      {
+        "version": "v12.7.0",
+        "pr-url": "https://github.com/nodejs/node/pull/28568",
+        "description": "Introduce `\"exports\"` `package.json` field as a more powerful alternative to the classic `\"main\"` field."
+      },
+      {
+        "version": "v12.0.0",
+        "pr-url": "https://github.com/nodejs/node/pull/26745",
+        "description": "Add support for ES modules using `.js` file extension via `package.json` `\"type\"` field."
+      }
+    ]
+  },
+  "miscs": [
+    {
+      "textRaw": "Modules: Packages",
+      "name": "Modules: Packages",
+      "introduced_in": "v12.20.0",
+      "type": "misc",
+      "meta": {
+        "changes": [
+          {
+            "version": [
+              "v14.13.0",
+              "v12.20.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/34718",
+            "description": "Add support for `\"exports\"` patterns."
+          },
+          {
+            "version": [
+              "v14.6.0",
+              "v12.19.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/34117",
+            "description": "Add package `\"imports\"` field."
+          },
+          {
+            "version": [
+              "v13.7.0",
+              "v12.17.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/29866",
+            "description": "Unflag conditional exports."
+          },
+          {
+            "version": [
+              "v13.7.0",
+              "v12.16.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/31001",
+            "description": "Remove the `--experimental-conditional-exports` option. In 12.16.0, conditional exports are still behind `--experimental-modules`."
+          },
+          {
+            "version": [
+              "v13.6.0",
+              "v12.16.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/31002",
+            "description": "Unflag self-referencing a package using its name."
+          },
+          {
+            "version": "v12.7.0",
+            "pr-url": "https://github.com/nodejs/node/pull/28568",
+            "description": "Introduce `\"exports\"` `package.json` field as a more powerful alternative to the classic `\"main\"` field."
+          },
+          {
+            "version": "v12.0.0",
+            "pr-url": "https://github.com/nodejs/node/pull/26745",
+            "description": "Add support for ES modules using `.js` file extension via `package.json` `\"type\"` field."
+          }
+        ]
+      },
+      "miscs": [
+        {
+          "textRaw": "简介",
+          "name": "简介",
+          "desc": "<p>一个包是由 <code>package.json</code> 文件描述的文件夹树。包由包含 <code>package.json</code> 文件的文件夹及其所有子文件夹组成，直到下一个包含另一个 <code>package.json</code> 文件的文件夹，或者一个名为 <code>node_modules</code> 的文件夹。</p>\n<p>本页为编写 <code>package.json</code> 文件的包作者提供指导，并作为 Node.js 定义的 <a href=\"#nodejs-packagejson-field-definitions\"><code>package.json</code></a> 字段的参考。</p>",
+          "type": "misc",
+          "displayName": "简介"
+        },
+        {
+          "textRaw": "确定模块系统",
+          "name": "确定模块系统",
+          "modules": [
+            {
+              "textRaw": "简介",
+              "name": "简介",
+              "desc": "<p>当以下情况被传递给 <code>node</code> 作为初始输入，或被 <code>import</code> 语句或 <code>import()</code> 表达式引用时，Node.js 会将它们视为 <a href=\"esm.html\">ES 模块</a>：</p>\n<ul>\n<li>\n<p>具有 <code>.mjs</code> 扩展名的文件。</p>\n</li>\n<li>\n<p>当最近的父级 <code>package.json</code> 文件包含顶级 <a href=\"#type\"><code>\"type\"</code></a> 字段且值为 <code>\"module\"</code> 时，具有 <code>.js</code> 扩展名的文件。</p>\n</li>\n<li>\n<p>通过 <code>--eval</code> 参数传递的字符串，或通过 <code>STDIN</code> 管道传输给 <code>node</code> 的字符串，且带有 <code>--input-type=module</code> 标志。</p>\n</li>\n<li>\n<p>包含只能作为 <a href=\"esm.html\">ES 模块</a> 成功解析的语法的代码，例如 <code>import</code> 或 <code>export</code> 语句或 <code>import.meta</code>，但没有明确的标记说明应如何解释。明确的标记包括 <code>.mjs</code> 或 <code>.cjs</code> 扩展名、<code>package.json</code> <code>\"type\"</code> 字段（值为 <code>\"module\"</code> 或 <code>\"commonjs\"</code>）或 <code>--input-type</code> 标志。动态 <code>import()</code> 表达式在 CommonJS 或 ES 模块中都受支持，不会强制文件被视为 ES 模块。参见 <a href=\"#syntax-detection\">语法检测</a>。</p>\n</li>\n</ul>\n<p>当以下情况被传递给 <code>node</code> 作为初始输入，或被 <code>import</code> 语句或 <code>import()</code> 表达式引用时，Node.js 会将它们视为 <a href=\"modules.html\">CommonJS</a>：</p>\n<ul>\n<li>\n<p>具有 <code>.cjs</code> 扩展名的文件。</p>\n</li>\n<li>\n<p>当最近的父级 <code>package.json</code> 文件包含顶级字段 <a href=\"#type\"><code>\"type\"</code></a> 且值为 <code>\"commonjs\"</code> 时，具有 <code>.js</code> 扩展名的文件。</p>\n</li>\n<li>\n<p>通过 <code>--eval</code> 或 <code>--print</code> 参数传递的字符串，或通过 <code>STDIN</code> 管道传输给 <code>node</code> 的字符串，且带有 <code>--input-type=commonjs</code> 标志。</p>\n</li>\n<li>\n<p>没有父级 <code>package.json</code> 文件，或者最近的父级 <code>package.json</code> 文件缺少 <code>type</code> 字段，并且代码可以作为 CommonJS 成功求值的 <code>.js</code> 扩展名文件。换句话说，Node.js 会首先尝试将这些“模糊”文件作为 CommonJS 运行，如果作为 CommonJS 求值失败（因为解析器找到了 ES 模块语法），则会重新尝试将它们作为 ES 模块求值。</p>\n</li>\n</ul>\n<p>在“模糊”文件中编写 ES 模块语法会产生性能成本，因此鼓励作者尽可能明确。特别是，包作者应始终在其 <code>package.json</code> 文件中包含 <a href=\"#type\"><code>\"type\"</code></a> 字段，即使包中的所有源代码都是 CommonJS。明确指定包的 <code>type</code> 将使包在未来 Node.js 的默认类型发生变化时具有前瞻性，并且也会使构建工具和加载器更容易确定应如何解释包中的文件。</p>",
+              "type": "module",
+              "displayName": "简介"
+            },
+            {
+              "textRaw": "语法检测",
+              "name": "语法检测",
+              "meta": {
+                "added": [
+                  "v21.1.0",
+                  "v20.10.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v22.7.0",
+                      "v20.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/53619",
+                    "description": "Syntax detection is enabled by default."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".2 - Release candidate",
+              "desc": "<p>Node.js 将检查模糊输入的源代码，以确定其是否包含 ES 模块语法；如果检测到此类语法，输入将被视为 ES 模块。</p>\n<p>模糊输入定义为：</p>\n<ul>\n<li>具有 <code>.js</code> 扩展名或无扩展名的文件；并且没有控制性 <code>package.json</code> 文件或缺少 <code>type</code> 字段的控制性 <code>package.json</code> 文件。</li>\n<li>未指定 <code>--input-type</code> 时的字符串输入（<code>--eval</code> 或 <code>STDIN</code>）。</li>\n</ul>\n<p>ES 模块语法定义为在作为 CommonJS 求值时会抛出错误的语法。这包括以下内容：</p>\n<ul>\n<li><code>import</code> 语句（但 <em>不是</em> <code>import()</code> 表达式，它们在 CommonJS 中有效）。</li>\n<li><code>export</code> 语句。</li>\n<li><code>import.meta</code> 引用。</li>\n<li>模块顶层的 <code>await</code>。</li>\n<li>CommonJS 包装器变量（<code>require</code>、<code>module</code>、<code>exports</code>、<code>__dirname</code>、<code>__filename</code>）的词法重新声明。</li>\n</ul>",
+              "type": "module",
+              "displayName": "语法检测"
+            },
+            {
+              "textRaw": "模块加载器",
+              "name": "模块加载器",
+              "desc": "<p>Node.js 有两个系统用于解析说明符和加载模块。</p>\n<p>CommonJS 模块加载器：</p>\n<ul>\n<li>它是完全同步的。</li>\n<li>负责处理 <code>require()</code> 调用。</li>\n<li>它是可猴子补丁的。</li>\n<li>支持 <a href=\"modules.html#folders-as-modules\">文件夹作为模块</a>。</li>\n<li>解析说明符时，如果没有找到精确匹配，它会尝试添加扩展名（<code>.js</code>、<code>.json</code>，最后是 <code>.node</code>），然后尝试解析 <a href=\"modules.html#folders-as-modules\">文件夹作为模块</a>。</li>\n<li>它将 <code>.json</code> 视为 JSON 文本文件。</li>\n<li><code>.node</code> 文件被解释为使用 <code>process.dlopen()</code> 加载的编译插件模块。</li>\n<li>它将所有缺少 <code>.json</code> 或 <code>.node</code> 扩展名的文件视为 JavaScript 文本文件。</li>\n<li>如果模块图是同步的（即不包含顶级 <code>await</code>），它只能用于 <a href=\"modules.html#loading-ecmascript-modules-using-require\">从 CommonJS 模块加载 ECMAScript 模块</a>。当用于加载不是 ECMAScript 模块的 JavaScript 文本文件时，该文件将作为 CommonJS 模块加载。</li>\n</ul>\n<p>ECMAScript 模块加载器：</p>\n<ul>\n<li>它是异步的，除非用于为 <code>require()</code> 加载模块。</li>\n<li>负责处理 <code>import</code> 语句和 <code>import()</code> 表达式。</li>\n<li>不可猴子补丁，可以使用 <a href=\"esm.html#loaders\">加载器钩子</a> 进行自定义。</li>\n<li>不支持文件夹作为模块，必须完全指定目录索引（例如 <code>'./startup/index.js'</code>）。</li>\n<li>不进行扩展名搜索。当说明符是相对或绝对文件 URL 时，必须提供文件扩展名。</li>\n<li>可以加载 JSON 模块，但需要导入类型属性。</li>\n<li>对于 JavaScript 文本文件，只接受 <code>.js</code>、<code>.mjs</code> 和 <code>.cjs</code> 扩展名。</li>\n<li>可用于加载 JavaScript CommonJS 模块。此类模块通过 <code>cjs-module-lexer</code> 传递，以尝试识别命名导出（如果可以通过静态分析确定）。导入的 CommonJS 模块的 URL 会转换为绝对路径，然后通过 CommonJS 模块加载器加载。</li>\n</ul>",
+              "type": "module",
+              "displayName": "模块加载器"
+            },
+            {
+              "textRaw": "`package.json` 和文件扩展名",
+              "name": "`package.json`_和文件扩展名",
+              "desc": "<p>在包内，<a href=\"#nodejs-packagejson-field-definitions\"><code>package.json</code></a> 的 <a href=\"#type\"><code>\"type\"</code></a> 字段定义了 Node.js 应如何解释 <code>.js</code> 文件。如果 <code>package.json</code> 文件没有 <code>\"type\"</code> 字段，则 <code>.js</code> 文件被视为 <a href=\"modules.html\">CommonJS</a>。</p>\n<p><code>package.json</code> 的 <code>\"type\"</code> 值为 <code>\"module\"</code> 告诉 Node.js 将该包内的 <code>.js</code> 文件解释为使用 <a href=\"esm.html\">ES 模块</a> 语法。</p>\n<p><code>\"type\"</code> 字段不仅适用于初始入口点（<code>node my-app.js</code>），也适用于 <code>import</code> 语句和 <code>import()</code> 表达式引用的文件。</p>\n<pre><code class=\"language-js\">// my-app.js，被视为 ES 模块，因为同一文件夹中有一个 package.json\n// 文件，其中包含 \"type\": \"module\"。\n\nimport './startup/init.js';\n// 作为 ES 模块加载，因为 ./startup 不包含 package.json 文件，\n// 因此继承上一级的 \"type\" 值。\n\nimport 'commonjs-package';\n// 作为 CommonJS 加载，因为 ./node_modules/commonjs-package/package.json\n// 缺少 \"type\" 字段或包含 \"type\": \"commonjs\"。\n\nimport './node_modules/commonjs-package/index.js';\n// 作为 CommonJS 加载，因为 ./node_modules/commonjs-package/package.json\n// 缺少 \"type\" 字段或包含 \"type\": \"commonjs\"。\n</code></pre>\n<p>以 <code>.mjs</code> 结尾的文件总是作为 <a href=\"esm.html\">ES 模块</a> 加载，无论最近的父级 <code>package.json</code> 如何。</p>\n<p>以 <code>.cjs</code> 结尾的文件总是作为 <a href=\"modules.html\">CommonJS</a> 加载，无论最近的父级 <code>package.json</code> 如何。</p>\n<pre><code class=\"language-js\">import './legacy-file.cjs';\n// 作为 CommonJS 加载，因为 .cjs 总是作为 CommonJS 加载。\n\nimport 'commonjs-package/src/index.mjs';\n// 作为 ES 模块加载，因为 .mjs 总是作为 ES 模块加载。\n</code></pre>\n<p><code>.mjs</code> 和 <code>.cjs</code> 扩展名可用于在同一包中混合类型：</p>\n<ul>\n<li>\n<p>在 <code>\"type\": \"module\"</code> 包中，可以通过使用 <code>.cjs</code> 扩展名命名特定文件来指示 Node.js 将其解释为 <a href=\"modules.html\">CommonJS</a>（因为在此类包中，<code>.js</code> 和 <code>.mjs</code> 文件都被视为 ES 模块）。</p>\n</li>\n<li>\n<p>在 <code>\"type\": \"commonjs\"</code> 包中，可以通过使用 <code>.mjs</code> 扩展名命名特定文件来指示 Node.js 将其解释为 <a href=\"esm.html\">ES 模块</a>（因为在此类包中，<code>.js</code> 和 <code>.cjs</code> 文件都被视为 CommonJS）。</p>\n</li>\n</ul>",
+              "type": "module",
+              "displayName": "`package.json` 和文件扩展名"
+            },
+            {
+              "textRaw": "`--input-type` 标志",
+              "name": "`--input-type`_标志",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当设置 <code>--input-type=module</code> 标志时，通过 <code>--eval</code>（或 <code>-e</code>）参数传递的字符串，或通过 <code>STDIN</code> 管道传输给 <code>node</code> 的字符串，将被视为 <a href=\"esm.html\">ES 模块</a>。</p>\n<pre><code class=\"language-bash\">node --input-type=module --eval \"import { sep } from 'node:path'; console.log(sep);\"\n\necho \"import { sep } from 'node:path'; console.log(sep);\" | node --input-type=module\n</code></pre>\n<p>为了完整性，还有 <code>--input-type=commonjs</code>，用于明确将字符串输入作为 CommonJS 运行。如果未指定 <code>--input-type</code>，这是默认行为。</p>",
+              "type": "module",
+              "displayName": "`--input-type` 标志"
+            }
+          ],
+          "type": "misc",
+          "displayName": "确定模块系统"
+        },
+        {
+          "textRaw": "包入口点",
+          "name": "包入口点",
+          "desc": "<p>在包的 <code>package.json</code> 文件中，有两个字段可以定义包的入口点：<a href=\"#main\"><code>\"main\"</code></a> 和 <a href=\"#exports\"><code>\"exports\"</code></a>。这两个字段都适用于 ES 模块和 CommonJS 模块入口点。</p>\n<p><a href=\"#main\"><code>\"main\"</code></a> 字段在 Node.js 的所有版本中都受支持，但其功能有限：它只定义包的主入口点。</p>\n<p><a href=\"#exports\"><code>\"exports\"</code></a> 提供了 <a href=\"#main\"><code>\"main\"</code></a> 的现代替代方案，允许定义多个入口点，支持环境之间的条件入口解析，并 <strong>防止使用 <a href=\"#exports\"><code>\"exports\"</code></a> 中定义的入口点之外的任何其他入口点</strong>。这种封装使模块作者能够明确定义其包的公共接口。</p>\n<p>对于针对当前支持的 Node.js 版本的新包，推荐使用 <a href=\"#exports\"><code>\"exports\"</code></a> 字段。对于支持 Node.js 10 及以下版本的包，<a href=\"#main\"><code>\"main\"</code></a> 字段是必需的。如果同时定义了 <a href=\"#exports\"><code>\"exports\"</code></a> 和 <a href=\"#main\"><code>\"main\"</code></a>，在受支持的 Node.js 版本中，<a href=\"#exports\"><code>\"exports\"</code></a> 字段优先于 <a href=\"#main\"><code>\"main\"</code></a>。</p>\n<p><a href=\"#conditional-exports\">条件导出</a> 可以在 <a href=\"#exports\"><code>\"exports\"</code></a> 中使用，以根据环境定义不同的包入口点，包括包是通过 <code>require</code> 还是通过 <code>import</code> 引用。有关在单个包中同时支持 CommonJS 和 ES 模块的更多信息，请参阅 <a href=\"#dual-commonjses-module-packages\">双 CommonJS/ES 模块包部分</a>。</p>\n<p>现有包引入 <a href=\"#exports\"><code>\"exports\"</code></a> 字段将阻止包的消费者使用任何未定义的入口点，包括 <a href=\"#nodejs-packagejson-field-definitions\"><code>package.json</code></a>（例如 <code>require('your-package/package.json')</code>）。<strong>这很可能是一个破坏性变更。</strong></p>\n<p>为了使 <a href=\"#exports\"><code>\"exports\"</code></a> 的引入非破坏性，请确保导出每个先前受支持的入口点。最好明确指定入口点，以便明确定义包的公共 API。例如，一个先前导出 <code>main</code>、<code>lib</code>、<code>feature</code> 和 <code>package.json</code> 的项目可以使用以下 <code>package.exports</code>：</p>\n<pre><code class=\"language-json\">{\n  \"name\": \"my-package\",\n  \"exports\": {\n    \".\": \"./lib/index.js\",\n    \"./lib\": \"./lib/index.js\",\n    \"./lib/index\": \"./lib/index.js\",\n    \"./lib/index.js\": \"./lib/index.js\",\n    \"./feature\": \"./feature/index.js\",\n    \"./feature/index\": \"./feature/index.js\",\n    \"./feature/index.js\": \"./feature/index.js\",\n    \"./package.json\": \"./package.json\"\n  }\n}\n</code></pre>\n<p>或者，项目可以选择使用导出模式导出整个文件夹，包括带扩展名和不带扩展名的子路径：</p>\n<pre><code class=\"language-json\">{\n  \"name\": \"my-package\",\n  \"exports\": {\n    \".\": \"./lib/index.js\",\n    \"./lib\": \"./lib/index.js\",\n    \"./lib/*\": \"./lib/*.js\",\n    \"./lib/*.js\": \"./lib/*.js\",\n    \"./feature\": \"./feature/index.js\",\n    \"./feature/*\": \"./feature/*.js\",\n    \"./feature/*.js\": \"./feature/*.js\",\n    \"./package.json\": \"./package.json\"\n  }\n}\n</code></pre>\n<p>通过以上方式为任何次要包版本提供向后兼容性，包的下一个主要变更可以适当地将导出限制为仅暴露的特定功能导出：</p>\n<pre><code class=\"language-json\">{\n  \"name\": \"my-package\",\n  \"exports\": {\n    \".\": \"./lib/index.js\",\n    \"./feature/*.js\": \"./feature/*.js\",\n    \"./feature/internal/*\": null\n  }\n}\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "主入口点导出",
+              "name": "主入口点导出",
+              "desc": "<p>编写新包时，建议使用 <a href=\"#exports\"><code>\"exports\"</code></a> 字段：</p>\n<pre><code class=\"language-json\">{\n  \"exports\": \"./index.js\"\n}\n</code></pre>\n<p>当定义了 <a href=\"#exports\"><code>\"exports\"</code></a> 字段时，包的所有子路径都被封装，导入器不再可用。例如，<code>require('pkg/subpath.js')</code> 会抛出 <a href=\"errors.html#err_package_path_not_exported\"><code>ERR_PACKAGE_PATH_NOT_EXPORTED</code></a> 错误。</p>\n<p>这种导出的封装为工具和处理包的 semver 升级提供了更可靠的包接口保证。它不是强封装，因为直接 require 包的任何绝对子路径，例如 <code>require('/path/to/node_modules/pkg/subpath.js')</code>，仍然会加载 <code>subpath.js</code>。</p>\n<p>所有当前支持的 Node.js 版本和现代构建工具都支持 <code>\"exports\"</code> 字段。对于使用旧版本 Node.js 或相关构建工具的项目，可以通过同时包含指向同一模块的 <code>\"main\"</code> 字段和 <code>\"exports\"</code> 来实现兼容性：</p>\n<pre><code class=\"language-json\">{\n  \"main\": \"./index.js\",\n  \"exports\": \"./index.js\"\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "主入口点导出"
+            },
+            {
+              "textRaw": "子路径导出",
+              "name": "子路径导出",
+              "meta": {
+                "added": [
+                  "v12.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>使用 <a href=\"#exports\"><code>\"exports\"</code></a> 字段时，可以通过将主入口点视为 <code>\".\"</code> 子路径来定义自定义子路径以及主入口点：</p>\n<pre><code class=\"language-json\">{\n  \"exports\": {\n    \".\": \"./index.js\",\n    \"./submodule.js\": \"./src/submodule.js\"\n  }\n}\n</code></pre>\n<p>现在，只有 <a href=\"#exports\"><code>\"exports\"</code></a> 中定义的子路径可以被消费者导入：</p>\n<pre><code class=\"language-js\">import submodule from 'es-module-package/submodule.js';\n// 加载 ./node_modules/es-module-package/src/submodule.js\n</code></pre>\n<p>而其他子路径将报错：</p>\n<pre><code class=\"language-js\">import submodule from 'es-module-package/private-module.js';\n// 抛出 ERR_PACKAGE_PATH_NOT_EXPORTED\n</code></pre>",
+              "modules": [
+                {
+                  "textRaw": "子路径中的扩展名",
+                  "name": "子路径中的扩展名",
+                  "desc": "<p>包作者应在其导出中提供带扩展名（<code>import 'pkg/subpath.js'</code>）或不带扩展名（<code>import 'pkg/subpath'</code>）的子路径。这确保了每个导出模块只有一个子路径，以便所有依赖项导入相同一致的说明符，保持包契约对消费者清晰，并简化包子路径补全。</p>\n<p>传统上，包倾向于使用无扩展名风格，其优点是可读性和隐藏包内文件的真实路径。</p>\n<p>随着 <a href=\"https://github.com/WICG/import-maps\">导入映射</a> 现在为浏览器和其他 JavaScript 运行时中的包解析提供了标准，使用无扩展名风格可能导致导入映射定义臃肿。显式文件扩展名可以通过使导入映射能够利用 <a href=\"https://github.com/WICG/import-maps#packages-via-trailing-slashes\">包文件夹映射</a> 来映射多个子路径（如果可能），而不是每个包子路径导出都有一个单独的映射条目，从而避免此问题。这也反映了在相对和绝对导入说明符中使用 <a href=\"esm.html#mandatory-file-extensions\">完整说明符路径</a> 的要求。</p>",
+                  "type": "module",
+                  "displayName": "子路径中的扩展名"
+                },
+                {
+                  "textRaw": "导出目标的路径规则和验证",
+                  "name": "导出目标的路径规则和验证",
+                  "desc": "<p>在 <a href=\"#exports\"><code>\"exports\"</code></a> 字段中定义路径作为目标时，Node.js 强制执行若干规则以确保安全性、可预测性和适当的封装。理解这些规则对于发布包的作者至关重要。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "目标必须是相对 URL",
+                      "name": "目标必须是相对_url",
+                      "desc": "<p><a href=\"#exports\"><code>\"exports\"</code></a> 映射中的所有目标路径（与导出键关联的值）必须是以 <code>./</code> 开头的相对 URL 字符串。</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"name\": \"my-package\",\n  \"exports\": {\n    \".\": \"./dist/main.js\",          // 正确\n    \"./feature\": \"./lib/feature.js\", // 正确\n    // \"./origin-relative\": \"/dist/main.js\", // 错误：必须以 ./ 开头\n    // \"./absolute\": \"file:///dev/null\", // 错误：必须以 ./ 开头\n    // \"./outside\": \"../common/util.js\" // 错误：必须以 ./ 开头\n  }\n}\n</code></pre>\n<p>此行为的原因包括：</p>\n<ul>\n<li><strong>安全性：</strong> 防止从包自身目录外部导出任意文件。</li>\n<li><strong>封装：</strong> 确保所有导出路径都相对于包根目录解析，使包自包含。</li>\n</ul>",
+                      "type": "module",
+                      "displayName": "目标必须是相对 URL"
+                    },
+                    {
+                      "textRaw": "不允许路径遍历或无效段",
+                      "name": "不允许路径遍历或无效段",
+                      "desc": "<p>导出目标不得解析到包根目录之外的位置。此外，在初始 <code>./</code> 之后的 <code>target</code> 字符串中以及替换到目标模式中的任何 <code>subpath</code> 部分中，通常不允许使用路径段，如 <code>.</code>（单点）、<code>..</code>（双点）或 <code>node_modules</code>（及其 URL 编码等效项）。</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"name\": \"my-package\",\n  \"exports\": {\n    // \".\": \"./dist/../../elsewhere/file.js\", // 无效：路径遍历\n    // \".\": \"././dist/main.js\",             // 无效：包含 \".\" 段\n    // \".\": \"./dist/../dist/main.js\",       // 无效：包含 \"..\" 段\n    // \"./utils/./helper.js\": \"./utils/helper.js\" // 键包含无效段\n  }\n}\n</code></pre>",
+                      "type": "module",
+                      "displayName": "不允许路径遍历或无效段"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "导出目标的路径规则和验证"
+                }
+              ],
+              "type": "module",
+              "displayName": "子路径导出"
+            },
+            {
+              "textRaw": "导出语法糖",
+              "name": "导出语法糖",
+              "meta": {
+                "added": [
+                  "v12.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>如果 <code>\".\"</code> 导出是唯一的导出，<a href=\"#exports\"><code>\"exports\"</code></a> 字段为此情况提供了语法糖，即直接的 <a href=\"#exports\"><code>\"exports\"</code></a> 字段值。</p>\n<pre><code class=\"language-json\">{\n  \"exports\": {\n    \".\": \"./index.js\"\n  }\n}\n</code></pre>\n<p>可以写成：</p>\n<pre><code class=\"language-json\">{\n  \"exports\": \"./index.js\"\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "导出语法糖"
+            },
+            {
+              "textRaw": "子路径导入",
+              "name": "子路径导入",
+              "meta": {
+                "added": [
+                  "v14.6.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>除了 <a href=\"#exports\"><code>\"exports\"</code></a> 字段，还有一个包 <code>\"imports\"</code> 字段用于创建私有映射，这些映射仅适用于从包本身内部的导入说明符。</p>\n<p><code>\"imports\"</code> 字段中的条目必须始终以 <code>#</code> 开头，以确保它们与外部包说明符区分开。</p>\n<p>例如，导入字段可用于为内部模块获得条件导出的好处：</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"imports\": {\n    \"#dep\": {\n      \"node\": \"dep-node-native\",\n      \"default\": \"./dep-polyfill.js\"\n    }\n  },\n  \"dependencies\": {\n    \"dep-node-native\": \"^1.0.0\"\n  }\n}\n</code></pre>\n<p>其中 <code>import '#dep'</code> 不会获取外部包 <code>dep-node-native</code> 的解析（包括其导出），而是在其他环境中获取相对于包的本地文件 <code>./dep-polyfill.js</code>。</p>\n<p>与 <code>\"exports\"</code> 字段不同，<code>\"imports\"</code> 字段允许映射到外部包。</p>\n<p>导入字段的解析规则在其他方面与导出字段类似。</p>",
+              "type": "module",
+              "displayName": "子路径导入"
+            },
+            {
+              "textRaw": "子路径模式",
+              "name": "子路径模式",
+              "meta": {
+                "added": [
+                  "v14.13.0",
+                  "v12.20.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v16.10.0",
+                      "v14.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/40041",
+                    "description": "Support pattern trailers in \"imports\" field."
+                  },
+                  {
+                    "version": [
+                      "v16.9.0",
+                      "v14.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/39635",
+                    "description": "Support pattern trailers."
+                  }
+                ]
+              },
+              "desc": "<p>对于具有少量导出或导入的包，我们建议显式列出每个导出的子路径条目。但对于具有大量子路径的包，这可能导致 <code>package.json</code> 臃肿和维护问题。</p>\n<p>对于这些用例，可以使用子路径导出模式：</p>\n<pre><code class=\"language-json\">// ./node_modules/es-module-package/package.json\n{\n  \"exports\": {\n    \"./features/*.js\": \"./src/features/*.js\"\n  },\n  \"imports\": {\n    \"#internal/*.js\": \"./src/internal/*.js\"\n  }\n}\n</code></pre>\n<p><strong><code>*</code> 映射公开嵌套子路径，因为它只是一种字符串替换语法。</strong></p>\n<p>右侧的所有 <code>*</code> 实例将被替换为此值，包括它包含任何 <code>/</code> 分隔符。</p>\n<pre><code class=\"language-js\">import featureX from 'es-module-package/features/x.js';\n// 加载 ./node_modules/es-module-package/src/features/x.js\n\nimport featureY from 'es-module-package/features/y/y.js';\n// 加载 ./node_modules/es-module-package/src/features/y/y.js\n\nimport internalZ from '#internal/z.js';\n// 加载 ./node_modules/es-module-package/src/internal/z.js\n</code></pre>\n<p>这是一种直接的静态匹配和替换，没有对文件扩展名进行特殊处理。在映射两侧包含 <code>\"*.js\"</code> 将包的公开导出限制为仅 JS 文件。</p>\n<p>导出的静态可枚举属性通过导出模式得以维护，因为可以通过将右侧目标模式视为针对包内文件列表的 <code>**</code>  glob 来确定包的单个导出。由于 <code>node_modules</code> 路径在导出目标中被禁止，此扩展仅依赖于包自身的文件。</p>\n<p>要从模式中排除私有子文件夹，可以使用 <code>null</code> 目标：</p>\n<pre><code class=\"language-json\">// ./node_modules/es-module-package/package.json\n{\n  \"exports\": {\n    \"./features/*.js\": \"./src/features/*.js\",\n    \"./features/private-internal/*\": null\n  }\n}\n</code></pre>\n<pre><code class=\"language-js\">import featureInternal from 'es-module-package/features/private-internal/m.js';\n// 抛出：ERR_PACKAGE_PATH_NOT_EXPORTED\n\nimport featureX from 'es-module-package/features/x.js';\n// 加载 ./node_modules/es-module-package/src/features/x.js\n</code></pre>",
+              "type": "module",
+              "displayName": "子路径模式"
+            },
+            {
+              "textRaw": "条件导出",
+              "name": "条件导出",
+              "meta": {
+                "added": [
+                  "v13.2.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.7.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/31001",
+                    "description": "Unflag conditional exports."
+                  }
+                ]
+              },
+              "desc": "<p>条件导出提供了一种根据某些条件映射到不同路径的方法。它们同时支持 CommonJS 和 ES 模块导入。</p>\n<p>例如，一个想要为 <code>require()</code> 和 <code>import</code> 提供不同 ES 模块导出的包可以这样写：</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"exports\": {\n    \"import\": \"./index-module.js\",\n    \"require\": \"./index-require.cjs\"\n  },\n  \"type\": \"module\"\n}\n</code></pre>\n<p>Node.js 实现了以下条件，按从最具体到最不具体的顺序列出，因为条件应按此顺序定义：</p>\n<ul>\n<li><code>\"node-addons\"</code> - 类似于 <code>\"node\"</code>，匹配任何 Node.js 环境。此条件可用于提供使用本地 C++ 插件的入口点，而不是更通用且不依赖本地插件的入口点。此条件可以通过 <a href=\"cli.html#--no-addons\"><code>--no-addons</code> 标志</a> 禁用。</li>\n<li><code>\"node\"</code> - 匹配任何 Node.js 环境。可以是 CommonJS 或 ES 模块文件。<em>在大多数情况下，明确指明 Node.js 平台是不必要的。</em></li>\n<li><code>\"import\"</code> - 当包通过 <code>import</code> 或 <code>import()</code> 加载，或通过 ECMAScript 模块加载器的任何顶级导入或解析操作时匹配。无论目标文件的模块格式如何，都适用。<em>始终与 <code>\"require\"</code> 互斥。</em></li>\n<li><code>\"require\"</code> - 当包通过 <code>require()</code> 加载时匹配。引用的文件应该可以使用 <code>require()</code> 加载，尽管无论目标文件的模块格式如何，条件都会匹配。预期格式包括 CommonJS、JSON、本地插件和 ES 模块。<em>始终与 <code>\"import\"</code> 互斥。</em></li>\n<li><code>\"module-sync\"</code> - 无论包是通过 <code>import</code>、<code>import()</code> 还是 <code>require()</code> 加载，都匹配。格式预期是不在其模块图中包含顶级 await 的 ES 模块 - 如果包含，当模块被 <code>require()</code> 时，将抛出 <code>ERR_REQUIRE_ASYNC_MODULE</code>。</li>\n<li><code>\"default\"</code> - 始终匹配的通用回退。可以是 CommonJS 或 ES 模块文件。<em>此条件应始终放在最后。</em></li>\n</ul>\n<p>在 <a href=\"#exports\"><code>\"exports\"</code></a> 对象中，键的顺序很重要。在条件匹配期间，较早的条目具有更高的优先级，并优先于较晚的条目。<em>一般规则是条件在对象顺序中应从最具体到最不具体</em>。</p>\n<p>使用 <code>\"import\"</code> 和 <code>\"require\"</code> 条件可能导致一些隐患，这些隐患在 <a href=\"#dual-commonjses-module-packages\">双 CommonJS/ES 模块包部分</a> 中有进一步解释。</p>\n<p><code>\"node-addons\"</code> 条件可用于提供使用本地 C++ 插件的入口点。但是，此条件可以通过 <a href=\"cli.html#--no-addons\"><code>--no-addons</code> 标志</a> 禁用。使用 <code>\"node-addons\"</code> 时，建议将 <code>\"default\"</code> 视为提供更通用入口点的增强功能，例如使用 WebAssembly 而不是本地插件。</p>\n<p>条件导出也可以扩展到导出子路径，例如：</p>\n<pre><code class=\"language-json\">{\n  \"exports\": {\n    \".\": \"./index.js\",\n    \"./feature.js\": {\n      \"node\": \"./feature-node.js\",\n      \"default\": \"./feature.js\"\n    }\n  }\n}\n</code></pre>\n<p>定义了一个包，其中 <code>require('pkg/feature.js')</code> 和 <code>import 'pkg/feature.js'</code> 可以在 Node.js 和其他 JS 环境之间提供不同的实现。</p>\n<p>使用环境分支时，始终尽可能包含 <code>\"default\"</code> 条件。提供 <code>\"default\"</code> 条件确保任何未知的 JS 环境都能够使用此通用实现，这有助于避免这些 JS 环境为了支持具有条件导出的包而必须伪装成现有环境。因此，使用 <code>\"node\"</code> 和 <code>\"default\"</code> 条件分支通常优于使用 <code>\"node\"</code> 和 <code>\"browser\"</code> 条件分支。</p>",
+              "type": "module",
+              "displayName": "条件导出"
+            },
+            {
+              "textRaw": "嵌套条件",
+              "name": "嵌套条件",
+              "desc": "<p>除了直接映射，Node.js 还支持嵌套条件对象。</p>\n<p>例如，定义一个仅在 Node.js 中具有双模式入口点但不适用于浏览器的包：</p>\n<pre><code class=\"language-json\">{\n  \"exports\": {\n    \"node\": {\n      \"import\": \"./feature-node.mjs\",\n      \"require\": \"./feature-node.cjs\"\n    },\n    \"default\": \"./feature.mjs\"\n  }\n}\n</code></pre>\n<p>条件的匹配顺序与平面条件相同。如果嵌套条件没有任何映射，它将继续检查父条件的剩余条件。通过这种方式，嵌套条件的行为类似于嵌套的 JavaScript <code>if</code> 语句。</p>",
+              "type": "module",
+              "displayName": "嵌套条件"
+            },
+            {
+              "textRaw": "解析用户条件",
+              "name": "解析用户条件",
+              "meta": {
+                "added": [
+                  "v14.9.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>运行 Node.js 时，可以使用 <code>--conditions</code> 标志添加自定义用户条件：</p>\n<pre><code class=\"language-bash\">node --conditions=development index.js\n</code></pre>\n<p>然后将在包导入和导出中解析 <code>\"development\"</code> 条件，同时根据需要解析现有的 <code>\"node\"</code>、<code>\"node-addons\"</code>、<code>\"default\"</code>、<code>\"import\"</code> 和 <code>\"require\"</code> 条件。</p>\n<p>可以使用重复标志设置任意数量的自定义条件。</p>\n<p>典型条件应仅包含字母数字字符，必要时使用 \":\"、\"-\" 或 \"=\" 作为分隔符。其他任何内容可能在 node 之外遇到兼容性问题。</p>\n<p>在 node 中，条件限制很少，但具体包括：</p>\n<ol>\n<li>它们必须包含至少一个字符。</li>\n<li>它们不能以 \".\" 开头，因为它们可能出现在也允许相对路径的位置。</li>\n<li>它们不能包含 \",\"，因为它们可能被某些 CLI 工具解析为逗号分隔列表。</li>\n<li>它们不能是整数属性键，如 \"10\"，因为这可能对 JS 对象的属性键排序产生意外影响。</li>\n</ol>",
+              "type": "module",
+              "displayName": "解析用户条件"
+            },
+            {
+              "textRaw": "社区条件定义",
+              "name": "社区条件定义",
+              "desc": "<p>除了 Node.js 核心 <a href=\"#conditional-exports\">实现的</a> <code>\"import\"</code>、<code>\"require\"</code>、<code>\"node\"</code>、<code>\"module-sync\"</code>、<code>\"node-addons\"</code> 和 <code>\"default\"</code> 条件之外的条件字符串默认被忽略。</p>\n<p>其他平台可能实现其他条件，用户条件可以在 Node.js 中通过 <a href=\"#resolving-user-conditions\"><code>--conditions</code> / <code>-C</code> 标志</a> 启用。</p>\n<p>由于自定义包条件需要清晰的定义以确保正确使用，下面提供了一个常见已知包条件及其严格定义的列表，以协助生态系统协调。</p>\n<ul>\n<li><code>\"types\"</code> - 可以被类型系统用于解析给定导出的类型文件。<em>此条件应始终首先包含。</em></li>\n<li><code>\"browser\"</code> - 任何 Web 浏览器环境。</li>\n<li><code>\"development\"</code> - 可用于定义仅开发环境的入口点，例如在开发模式下运行时提供额外的调试上下文，如更好的错误消息。<em>必须始终与 <code>\"production\"</code> 互斥。</em></li>\n<li><code>\"production\"</code> - 可用于定义生产环境入口点。<em>必须始终与 <code>\"development\"</code> 互斥。</em></li>\n</ul>\n<p>对于其他运行时，平台特定的条件键定义由 <a href=\"https://wintercg.org/\">WinterCG</a> 在 <a href=\"https://runtime-keys.proposal.wintercg.org/\">运行时键</a> 提案规范中维护。</p>\n<p>新的条件定义可以通过为此 <a href=\"https://github.com/nodejs/node/blob/HEAD/doc/api/packages.md#conditions-definitions\">Node.js 文档部分</a> 创建拉取请求添加到本列表。在此列出新条件定义的要求是：</p>\n<ul>\n<li>定义应对所有实现者清晰明确。</li>\n<li>应明确说明需要此条件的原因。</li>\n<li>应有足够的现有实现使用。</li>\n<li>条件名称不应与另一个条件定义或广泛使用的条件冲突。</li>\n<li>条件定义的列表应提供生态系统其他方式无法实现的协调好处。例如，对于公司特定或应用程序特定的条件，情况可能不一定如此。</li>\n<li>条件应使 Node.js 用户期望它在 Node.js 核心文档中。<code>\"types\"</code> 条件是一个很好的例子：它并不真正属于 <a href=\"https://runtime-keys.proposal.wintercg.org/\">运行时键</a> 提案，但很适合放在 Node.js 文档中。</li>\n</ul>\n<p>上述定义可能会在适当的时候移至专用的条件注册表。</p>",
+              "type": "module",
+              "displayName": "社区条件定义"
+            },
+            {
+              "textRaw": "使用名称自引用包",
+              "name": "使用名称自引用包",
+              "meta": {
+                "added": [
+                  "v13.1.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.6.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/31002",
+                    "description": "Unflag self-referencing a package using its name."
+                  }
+                ]
+              },
+              "desc": "<p>在包内，包 <code>package.json</code> 中定义的 <a href=\"#exports\"><code>\"exports\"</code></a> 字段的值可以通过包的名称引用。例如，假设 <code>package.json</code> 是：</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"name\": \"a-package\",\n  \"exports\": {\n    \".\": \"./index.mjs\",\n    \"./foo.js\": \"./foo.js\"\n  }\n}\n</code></pre>\n<p>然后 <em>该包中</em> 的任何模块都可以引用包本身的导出：</p>\n<pre><code class=\"language-js\">// ./a-module.mjs\nimport { something } from 'a-package'; // 从 ./index.mjs 导入 \"something\"。\n</code></pre>\n<p>仅当 <code>package.json</code> 具有 <a href=\"#exports\"><code>\"exports\"</code></a> 时，自引用才可用，并且将仅允许导入该 <a href=\"#exports\"><code>\"exports\"</code></a>（在 <code>package.json</code> 中）允许的内容。因此，给定先前的包，下面的代码将生成运行时错误：</p>\n<pre><code class=\"language-js\">// ./another-module.mjs\n\n// 从 ./m.mjs 导入 \"another\"。失败，因为\n// \"package.json\" \"exports\" 字段\n// 未提供名为 \"./m.mjs\" 的导出。\nimport { another } from 'a-package/m.mjs';\n</code></pre>\n<p>自引用在 ES 模块和 CommonJS 模块中使用 <code>require</code> 时也可用。例如，此代码也将工作：</p>\n<pre><code class=\"language-cjs\">// ./a-module.js\nconst { something } = require('a-package/foo.js'); // 从 ./foo.js 加载。\n</code></pre>\n<p>最后，自引用也适用于作用域包。例如，此代码也将工作：</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"name\": \"@my/package\",\n  \"exports\": \"./index.js\"\n}\n</code></pre>\n<pre><code class=\"language-cjs\">// ./index.js\nmodule.exports = 42;\n</code></pre>\n<pre><code class=\"language-cjs\">// ./other.js\nconsole.log(require('@my/package'));\n</code></pre>\n<pre><code class=\"language-console\">$ node other.js\n42\n</code></pre>",
+              "type": "module",
+              "displayName": "使用名称自引用包"
+            }
+          ],
+          "type": "misc",
+          "displayName": "包入口点"
+        },
+        {
+          "textRaw": "双 CommonJS/ES 模块包",
+          "name": "双_commonjs/es_模块包",
+          "desc": "<p>有关详细信息，请参阅 <a href=\"https://github.com/nodejs/package-examples\">包示例仓库</a>。</p>",
+          "type": "misc",
+          "displayName": "双 CommonJS/ES 模块包"
+        },
+        {
+          "textRaw": "Node.js `package.json` 字段定义",
+          "name": "node.js_`package.json`_字段定义",
+          "desc": "<p>本节描述了 Node.js 运行时使用的字段。其他工具（如 <a href=\"https://docs.npmjs.com/cli/v8/configuring-npm/package-json\">npm</a>）使用其他字段，这些字段被 Node.js 忽略且未在此记录。</p>\n<p><code>package.json</code> 文件中以下字段在 Node.js 中使用：</p>\n<ul>\n<li><a href=\"#name\"><code>\"name\"</code></a> - 在包内使用命名导入时相关。也被包管理器用作包的名称。</li>\n<li><a href=\"#main\"><code>\"main\"</code></a> - 如果未指定 exports，则在加载包时的默认模块，以及在引入 exports 之前的 Node.js 版本中。</li>\n<li><a href=\"#type\"><code>\"type\"</code></a> - 包类型，确定是将 <code>.js</code> 文件加载为 CommonJS 还是 ES 模块。</li>\n<li><a href=\"#exports\"><code>\"exports\"</code></a> - 包导出和条件导出。存在时，限制可以从包内加载哪些子模块。</li>\n<li><a href=\"#imports\"><code>\"imports\"</code></a> - 包导入，供包本身内的模块使用。</li>\n</ul>",
+          "modules": [
+            {
+              "textRaw": "`\"name\"`",
+              "name": "`\"name\"`",
+              "meta": {
+                "added": [
+                  "v13.1.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.6.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/31002",
+                    "description": "Remove the `--experimental-resolve-self` option."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<pre><code class=\"language-json\">{\n  \"name\": \"package-name\"\n}\n</code></pre>\n<p><code>\"name\"</code> 字段定义了包的名称。发布到 <em>npm</em> 注册表需要一个满足 <a href=\"https://docs.npmjs.com/files/package.json#name\">特定要求</a> 的名称。</p>\n<p><code>\"name\"</code> 字段可以与 <a href=\"#exports\"><code>\"exports\"</code></a> 字段一起使用，以 <a href=\"#self-referencing-a-package-using-its-name\">自引用</a> 包使用其名称。</p>",
+              "type": "module",
+              "displayName": "`\"name\"`"
+            },
+            {
+              "textRaw": "`\"main\"`",
+              "name": "`\"main\"`",
+              "meta": {
+                "added": [
+                  "v0.4.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<pre><code class=\"language-json\">{\n  \"main\": \"./index.js\"\n}\n</code></pre>\n<p><code>\"main\"</code> 字段定义了通过 <code>node_modules</code> 查找按名称导入包时的入口点。其值是一个路径。</p>\n<p>当包具有 <a href=\"#exports\"><code>\"exports\"</code></a> 字段时，在按名称导入包时，此字段将优先于 <code>\"main\"</code> 字段。</p>\n<p>它还定义了当 <a href=\"modules.html#folders-as-modules\">通过 <code>require()</code> 加载包目录</a> 时使用的脚本。</p>\n<pre><code class=\"language-cjs\">// 这将解析为 ./path/to/directory/index.js。\nrequire('./path/to/directory');\n</code></pre>",
+              "type": "module",
+              "displayName": "`\"main\"`"
+            },
+            {
+              "textRaw": "`\"type\"`",
+              "name": "`\"type\"`",
+              "meta": {
+                "added": [
+                  "v12.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v13.2.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/29866",
+                    "description": "Unflag `--experimental-modules`."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<p><code>\"type\"</code> 字段定义了 Node.js 用于所有 <code>.js</code> 文件的模块格式，这些文件以该 <code>package.json</code> 文件作为其最近的父级。</p>\n<p>当最近的父级 <code>package.json</code> 文件包含顶级字段 <code>\"type\"</code> 且值为 <code>\"module\"</code> 时，以 <code>.js</code> 结尾的文件将作为 ES 模块加载。</p>\n<p>最近的父级 <code>package.json</code> 定义为在当前文件夹、该文件夹的父级等中搜索时找到的第一个 <code>package.json</code>，直到到达 node_modules 文件夹或卷根目录。</p>\n<pre><code class=\"language-json\">// package.json\n{\n  \"type\": \"module\"\n}\n</code></pre>\n<pre><code class=\"language-bash\"># 在与前述 package.json 相同的文件夹中\nnode my-app.js # 作为 ES 模块运行\n</code></pre>\n<p>如果最近的父级 <code>package.json</code> 缺少 <code>\"type\"</code> 字段，或包含 <code>\"type\": \"commonjs\"</code>，则 <code>.js</code> 文件被视为 <a href=\"modules.html\">CommonJS</a>。如果到达卷根目录且未找到 <code>package.json</code>，则 <code>.js</code> 文件被视为 <a href=\"modules.html\">CommonJS</a>。</p>\n<p>如果最近的父级 <code>package.json</code> 包含 <code>\"type\": \"module\"</code>，则 <code>.js</code> 文件的 <code>import</code> 语句被视为 ES 模块。</p>\n<pre><code class=\"language-js\">// my-app.js，与上述示例相同的一部分\nimport './startup.js'; // 由于 package.json 作为 ES 模块加载\n</code></pre>\n<p>无论 <code>\"type\"</code> 字段的值如何，<code>.mjs</code> 文件始终被视为 ES 模块，<code>.cjs</code> 文件始终被视为 CommonJS。</p>",
+              "type": "module",
+              "displayName": "`\"type\"`"
+            },
+            {
+              "textRaw": "`\"exports\"`",
+              "name": "`\"exports\"`",
+              "meta": {
+                "added": [
+                  "v12.7.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v14.13.0",
+                      "v12.20.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/34718",
+                    "description": "Add support for `\"exports\"` patterns."
+                  },
+                  {
+                    "version": [
+                      "v13.7.0",
+                      "v12.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/29866",
+                    "description": "Unflag conditional exports."
+                  },
+                  {
+                    "version": [
+                      "v13.7.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/31008",
+                    "description": "Implement logical conditional exports ordering."
+                  },
+                  {
+                    "version": [
+                      "v13.7.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/31001",
+                    "description": "Remove the `--experimental-conditional-exports` option. In 12.16.0, conditional exports are still behind `--experimental-modules`."
+                  },
+                  {
+                    "version": [
+                      "v13.2.0",
+                      "v12.16.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/29978",
+                    "description": "Implement conditional exports."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a></li>\n</ul>\n<pre><code class=\"language-json\">{\n  \"exports\": \"./index.js\"\n}\n</code></pre>\n<p><code>\"exports\"</code> 字段允许定义包的 <a href=\"#package-entry-points\">入口点</a>，当通过 <code>node_modules</code> 查找或通过 <a href=\"#self-referencing-a-package-using-its-name\">自引用</a> 其自身名称加载时。它在 Node.js 12+ 中受支持，作为 <a href=\"#main\"><code>\"main\"</code></a> 的替代方案，可以支持定义 <a href=\"#subpath-exports\">子路径导出</a> 和 <a href=\"#conditional-exports\">条件导出</a>，同时封装内部未导出模块。</p>\n<p><a href=\"#conditional-exports\">条件导出</a> 也可以在 <code>\"exports\"</code> 中使用，以根据环境定义不同的包入口点，包括包是通过 <code>require</code> 还是通过 <code>import</code> 引用。</p>\n<p><code>\"exports\"</code> 中定义的所有路径必须是以 <code>./</code> 开头的相对文件 URL。</p>",
+              "type": "module",
+              "displayName": "`\"exports\"`"
+            },
+            {
+              "textRaw": "`\"imports\"`",
+              "name": "`\"imports\"`",
+              "meta": {
+                "added": [
+                  "v14.6.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<pre><code class=\"language-json\">// package.json\n{\n  \"imports\": {\n    \"#dep\": {\n      \"node\": \"dep-node-native\",\n      \"default\": \"./dep-polyfill.js\"\n    }\n  },\n  \"dependencies\": {\n    \"dep-node-native\": \"^1.0.0\"\n  }\n}\n</code></pre>\n<p>导入字段中的条目必须是以 <code>#</code> 开头的字符串。</p>\n<p>包导入允许映射到外部包。</p>\n<p>此字段定义了当前包的 <a href=\"#subpath-imports\">子路径导入</a>。</p>",
+              "type": "module",
+              "displayName": "`\"imports\"`"
+            }
+          ],
+          "type": "misc",
+          "displayName": "Node.js `package.json` 字段定义"
+        }
+      ]
+    }
+  ]
+}

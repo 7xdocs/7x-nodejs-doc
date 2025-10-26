@@ -1,0 +1,578 @@
+{
+  "type": "module",
+  "source": "doc/api/repl.md",
+  "modules": [
+    {
+      "textRaw": "REPL",
+      "name": "repl",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/repl.js\">lib/repl.js</a></p>\n<p><code>node:repl</code> 模块提供了一个 Read-Eval-Print-Loop (REPL) 实现，它既可以作为独立程序使用，也可以被包含在其他应用程序中。可以通过以下方式访问：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "设计和特性",
+          "name": "设计和特性",
+          "desc": "<p><code>node:repl</code> 模块导出了 <a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 类。在运行时，<a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 的实例会接受用户输入的单行内容，根据用户定义的评估函数对其进行求值，然后输出结果。输入和输出可以分别来自 <code>stdin</code> 和 <code>stdout</code>，也可以连接到任何 Node.js <a href=\"stream.html\">流</a>。</p>\n<p><a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 的实例支持输入自动补全、补全预览、简单的 Emacs 风格行编辑、多行输入、<a href=\"https://en.wikipedia.org/wiki/Z_shell\">ZSH</a> 风格的反向搜索、<a href=\"https://en.wikipedia.org/wiki/Z_shell\">ZSH</a> 风格的基于子串的历史记录搜索、ANSI 风格的输出、保存和恢复当前 REPL 会话状态、错误恢复以及可定制的评估函数。不支持 ANSI 样式和 Emacs 风格行编辑的终端会自动回退到有限的功能集。</p>",
+          "modules": [
+            {
+              "textRaw": "命令和特殊按键",
+              "name": "命令和特殊按键",
+              "desc": "<p>所有 REPL 实例都支持以下特殊命令：</p>\n<ul>\n<li><code>.break</code>: 在输入多行表达式的过程中，输入 <code>.break</code> 命令（或按下 <kbd>Ctrl</kbd>+<kbd>C</kbd>）可以中止该表达式的进一步输入或处理。</li>\n<li><code>.clear</code>: 将 REPL 的 <code>context</code> 重置为空对象，并清除正在输入的任何多行表达式。</li>\n<li><code>.exit</code>: 关闭 I/O 流，导致 REPL 退出。</li>\n<li><code>.help</code>: 显示此特殊命令列表。</li>\n<li><code>.save</code>: 将当前 REPL 会话保存到文件：<code>> .save ./file/to/save.js</code></li>\n<li><code>.load</code>: 将文件加载到当前 REPL 会话中：<code>> .load ./file/to/load.js</code></li>\n<li><code>.editor</code>: 进入编辑器模式（<kbd>Ctrl</kbd>+<kbd>D</kbd> 完成，<kbd>Ctrl</kbd>+<kbd>C</kbd> 取消）。</li>\n</ul>\n<pre><code class=\"language-console\">> .editor\n// 进入编辑器模式 (^D 完成, ^C 取消)\nfunction welcome(name) {\n  return `Hello ${name}!`;\n}\n\nwelcome('Node.js User');\n\n// ^D\n'Hello Node.js User!'\n>\n</code></pre>\n<p>在 REPL 中，以下按键组合具有特殊效果：</p>\n<ul>\n<li><kbd>Ctrl</kbd>+<kbd>C</kbd>: 按一次时，效果与 <code>.break</code> 命令相同。在空行上按两次时，效果与 <code>.exit</code> 命令相同。</li>\n<li><kbd>Ctrl</kbd>+<kbd>D</kbd>: 效果与 <code>.exit</code> 命令相同。</li>\n<li><kbd>Tab</kbd>: 在空行上按下时，显示全局和局部（作用域）变量。在输入其他内容时按下，显示相关的自动补全选项。</li>\n</ul>\n<p>关于反向搜索的按键绑定，请参阅 <a href=\"#reverse-i-search\"><code>reverse-i-search</code></a>。所有其他按键绑定，请参阅 <a href=\"readline.html#tty-keybindings\">TTY 按键绑定</a>。</p>",
+              "type": "module",
+              "displayName": "命令和特殊按键"
+            },
+            {
+              "textRaw": "默认评估",
+              "name": "默认评估",
+              "desc": "<p>默认情况下，所有 <a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 实例都使用一个评估函数来评估 JavaScript 表达式并提供对 Node.js 内置模块的访问。在创建 <a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 实例时，可以通过传入替代的评估函数来覆盖此默认行为。</p>",
+              "modules": [
+                {
+                  "textRaw": "JavaScript 表达式",
+                  "name": "javascript_表达式",
+                  "desc": "<p>默认评估器支持直接评估 JavaScript 表达式：</p>\n<pre><code class=\"language-console\">> 1 + 1\n2\n> const m = 2\nundefined\n> m + 1\n3\n</code></pre>\n<p>除非在块或函数内部有其它作用域限制，否则无论是隐式声明还是使用 <code>const</code>、<code>let</code> 或 <code>var</code> 关键字声明的变量，都是在全局作用域声明的。</p>",
+                  "type": "module",
+                  "displayName": "JavaScript 表达式"
+                },
+                {
+                  "textRaw": "全局和局部作用域",
+                  "name": "全局和局部作用域",
+                  "desc": "<p>默认评估器提供对全局作用域中存在的任何变量的访问。可以通过将变量赋值给与每个 <code>REPLServer</code> 关联的 <code>context</code> 对象来显式地将变量暴露给 REPL：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\nconst msg = 'message';\n\nrepl.start('> ').context.m = msg;\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\nconst msg = 'message';\n\nrepl.start('> ').context.m = msg;\n</code></pre>\n<p><code>context</code> 对象中的属性在 REPL 内显示为局部变量：</p>\n<pre><code class=\"language-console\">$ node repl_test.js\n> m\n'message'\n</code></pre>\n<p>默认情况下，上下文属性不是只读的。要指定只读的全局变量，必须使用 <code>Object.defineProperty()</code> 定义上下文属性：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\nconst msg = 'message';\n\nconst r = repl.start('> ');\nObject.defineProperty(r.context, 'm', {\n  configurable: false,\n  enumerable: true,\n  value: msg,\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\nconst msg = 'message';\n\nconst r = repl.start('> ');\nObject.defineProperty(r.context, 'm', {\n  configurable: false,\n  enumerable: true,\n  value: msg,\n});\n</code></pre>",
+                  "type": "module",
+                  "displayName": "全局和局部作用域"
+                },
+                {
+                  "textRaw": "访问核心 Node.js 模块",
+                  "name": "访问核心_node.js_模块",
+                  "desc": "<p>默认评估器会在使用时自动将 Node.js 核心模块加载到 REPL 环境中。例如，除非被声明为全局变量或作用域变量，否则输入 <code>fs</code> 将按需评估为 <code>global.fs = require('node:fs')</code>。</p>\n<pre><code class=\"language-console\">> fs.createReadStream('./some/file');\n</code></pre>",
+                  "type": "module",
+                  "displayName": "访问核心 Node.js 模块"
+                },
+                {
+                  "textRaw": "全局未捕获异常",
+                  "name": "全局未捕获异常",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": "v12.3.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/27151",
+                        "description": "The `'uncaughtException'` event is from now on triggered if the repl is used as standalone program."
+                      }
+                    ]
+                  },
+                  "desc": "<p>REPL 使用 <a href=\"domain.html\"><code>domain</code></a> 模块来捕获该 REPL 会话的所有未捕获异常。</p>\n<p>在 REPL 中使用 <a href=\"domain.html\"><code>domain</code></a> 模块会产生以下副作用：</p>\n<ul>\n<li>\n<p>未捕获异常仅在独立 REPL 中触发 <a href=\"process.html#event-uncaughtexception\"><code>'uncaughtException'</code></a> 事件。在另一个 Node.js 程序中的 REPL 内为此事件添加监听器会导致 <a href=\"errors.html#err_invalid_repl_input\"><code>ERR_INVALID_REPL_INPUT</code></a>。</p>\n<pre><code class=\"language-js\">const r = repl.start();\n\nr.write('process.on(\"uncaughtException\", () => console.log(\"Foobar\"));\\n');\n// 输出流包括：\n//   TypeError [ERR_INVALID_REPL_INPUT]: Listeners for `uncaughtException`\n//   cannot be used in the REPL\n\nr.close();\n</code></pre>\n</li>\n<li>\n<p>尝试使用 <a href=\"process.html#processsetuncaughtexceptioncapturecallbackfn\"><code>process.setUncaughtExceptionCaptureCallback()</code></a> 会抛出 <a href=\"errors.html#err_domain_cannot_set_uncaught_exception_capture\"><code>ERR_DOMAIN_CANNOT_SET_UNCAUGHT_EXCEPTION_CAPTURE</code></a> 错误。</p>\n</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "全局未捕获异常"
+                },
+                {
+                  "textRaw": "`_`（下划线）变量的赋值",
+                  "name": "`_`（下划线）变量的赋值",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": "v9.8.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/18919",
+                        "description": "Added `_error` support."
+                      }
+                    ]
+                  },
+                  "desc": "<p>默认评估器默认会将最近评估的表达式的结果赋值给特殊变量 <code>_</code>（下划线）。显式地将 <code>_</code> 设置为一个值将禁用此行为。</p>\n<pre><code class=\"language-console\">> [ 'a', 'b', 'c' ]\n[ 'a', 'b', 'c' ]\n> _.length\n3\n> _ += 1\nExpression assignment to _ now disabled.\n4\n> 1 + 1\n2\n> _\n4\n</code></pre>\n<p>类似地，<code>_error</code> 将引用最后看到的错误（如果有）。显式地将 <code>_error</code> 设置为一个值将禁用此行为。</p>\n<pre><code class=\"language-console\">> throw new Error('foo');\nUncaught Error: foo\n> _error.message\n'foo'\n</code></pre>",
+                  "type": "module",
+                  "displayName": "`_`（下划线）变量的赋值"
+                },
+                {
+                  "textRaw": "`await` 关键字",
+                  "name": "`await`_关键字",
+                  "desc": "<p>在顶层启用了对 <code>await</code> 关键字的支持。</p>\n<pre><code class=\"language-console\">> await Promise.resolve(123)\n123\n> await Promise.reject(new Error('REPL await'))\nUncaught Error: REPL await\n    at REPL2:1:54\n> const timeout = util.promisify(setTimeout);\nundefined\n> const old = Date.now(); await timeout(1000); console.log(Date.now() - old);\n1002\nundefined\n</code></pre>\n<p>在 REPL 中使用 <code>await</code> 关键字的一个已知限制是，它会使 <code>const</code> 关键字的词法作用域失效。</p>\n<p>例如：</p>\n<pre><code class=\"language-console\">> const m = await Promise.resolve(123)\nundefined\n> m\n123\n> m = await Promise.resolve(234)\n234\n// 重新声明常量确实会报错\n> const m = await Promise.resolve(345)\nUncaught SyntaxError: Identifier 'm' has already been declared\n</code></pre>\n<p><a href=\"cli.html#--no-experimental-repl-await\"><code>--no-experimental-repl-await</code></a> 应禁用 REPL 中的顶层 await。</p>",
+                  "type": "module",
+                  "displayName": "`await` 关键字"
+                }
+              ],
+              "type": "module",
+              "displayName": "默认评估"
+            },
+            {
+              "textRaw": "反向搜索",
+              "name": "反向搜索",
+              "meta": {
+                "added": [
+                  "v13.6.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>REPL 支持类似于 <a href=\"https://en.wikipedia.org/wiki/Z_shell\">ZSH</a> 的双向反向搜索。通过 <kbd>Ctrl</kbd>+<kbd>R</kbd> 触发向后搜索，通过 <kbd>Ctrl</kbd>+<kbd>S</kbd> 触发向前搜索。</p>\n<p>重复的历史条目将被跳过。</p>\n<p>按下任何与反向搜索不对应的键时，条目将被接受。按 <kbd>Esc</kbd> 或 <kbd>Ctrl</kbd>+<kbd>C</kbd> 可以取消。</p>\n<p>立即改变方向会从当前位置开始沿预期方向搜索下一个条目。</p>",
+              "type": "module",
+              "displayName": "反向搜索"
+            },
+            {
+              "textRaw": "自定义评估函数",
+              "name": "自定义评估函数",
+              "desc": "<p>当创建新的 <a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 时，可以提供一个自定义评估函数。例如，这可用于实现完全定制的 REPL 应用程序。</p>\n<p>评估函数接受以下四个参数：</p>\n<ul>\n<li><code>code</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 要执行的代码（例如 <code>1 + 1</code>）。</li>\n<li><code>context</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 执行代码的上下文。根据 <code>useGlobal</code> 选项，这可以是 JavaScript 的 <code>global</code> 上下文，也可以是 REPL 实例特定的上下文。</li>\n<li><code>replResourceName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 与当前代码评估关联的 REPL 资源的标识符。这对于调试目的可能很有用。</li>\n<li><code>callback</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 代码评估完成后要调用的函数。回调函数接受两个参数：\n<ul>\n<li>如果在评估过程中发生错误，则提供一个错误对象，否则为 <code>null</code>/<code>undefined</code>。</li>\n<li>代码评估的结果（如果提供了错误，则此参数无关）。</li>\n</ul>\n</li>\n</ul>\n<p>以下示例展示了一个 REPL，它对给定的数字进行平方，如果提供的输入实际上不是数字，则打印错误：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n\nfunction byThePowerOfTwo(number) {\n  return number * number;\n}\n\nfunction myEval(code, context, replResourceName, callback) {\n  if (isNaN(code)) {\n    callback(new Error(`${code.trim()} is not a number`));\n  } else {\n    callback(null, byThePowerOfTwo(code));\n  }\n}\n\nrepl.start({ prompt: 'Enter a number: ', eval: myEval });\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n\nfunction byThePowerOfTwo(number) {\n  return number * number;\n}\n\nfunction myEval(code, context, replResourceName, callback) {\n  if (isNaN(code)) {\n    callback(new Error(`${code.trim()} is not a number`));\n  } else {\n    callback(null, byThePowerOfTwo(code));\n  }\n}\n\nrepl.start({ prompt: 'Enter a number: ', eval: myEval });\n</code></pre>",
+              "modules": [
+                {
+                  "textRaw": "可恢复的错误",
+                  "name": "可恢复的错误",
+                  "desc": "<p>在 REPL 提示符下，按 <kbd>Enter</kbd> 会将当前输入行发送到 <code>eval</code> 函数。为了支持多行输入，<code>eval</code> 函数可以向提供的回调函数返回一个 <code>repl.Recoverable</code> 实例：</p>\n<pre><code class=\"language-js\">function myEval(cmd, context, filename, callback) {\n  let result;\n  try {\n    result = vm.runInThisContext(cmd);\n  } catch (e) {\n    if (isRecoverableError(e)) {\n      return callback(new repl.Recoverable(e));\n    }\n  }\n  callback(null, result);\n}\n\nfunction isRecoverableError(error) {\n  if (error.name === 'SyntaxError') {\n    return /^(Unexpected end of input|Unexpected token)/.test(error.message);\n  }\n  return false;\n}\n</code></pre>",
+                  "type": "module",
+                  "displayName": "可恢复的错误"
+                }
+              ],
+              "type": "module",
+              "displayName": "自定义评估函数"
+            },
+            {
+              "textRaw": "自定义 REPL 输出",
+              "name": "自定义_repl_输出",
+              "desc": "<p>默认情况下，<a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 实例在将输出写入提供的 <code>Writable</code> 流（默认为 <code>process.stdout</code>）之前，使用 <a href=\"util.html#utilinspectobject-options\"><code>util.inspect()</code></a> 方法格式化输出。<code>showProxy</code> 检查选项默认设置为 true，<code>colors</code> 选项根据 REPL 的 <code>useColors</code> 选项设置为 true。</p>\n<p>可以在构造时指定 <code>useColors</code> 布尔选项，以指示默认写入器使用 ANSI 样式代码为来自 <code>util.inspect()</code> 方法的输出着色。</p>\n<p>如果 REPL 作为独立程序运行，也可以通过使用 <code>inspect.replDefaults</code> 属性（它镜像了 <a href=\"util.html#utilinspectobject-options\"><code>util.inspect()</code></a> 的 <code>defaultOptions</code>）从 REPL 内部更改 REPL 的<a href=\"util.html#utilinspectobject-options\">检查默认值</a>。</p>\n<pre><code class=\"language-console\">> util.inspect.replDefaults.compact = false;\nfalse\n> [1]\n[\n  1\n]\n>\n</code></pre>\n<p>要完全自定义 <a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 实例的输出，请在构造时为 <code>writer</code> 选项传入一个新函数。例如，以下示例简单地将任何输入文本转换为大写：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n\nconst r = repl.start({ prompt: '> ', eval: myEval, writer: myWriter });\n\nfunction myEval(cmd, context, filename, callback) {\n  callback(null, cmd);\n}\n\nfunction myWriter(output) {\n  return output.toUpperCase();\n}\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n\nconst r = repl.start({ prompt: '> ', eval: myEval, writer: myWriter });\n\nfunction myEval(cmd, context, filename, callback) {\n  callback(null, cmd);\n}\n\nfunction myWriter(output) {\n  return output.toUpperCase();\n}\n</code></pre>",
+              "type": "module",
+              "displayName": "自定义 REPL 输出"
+            }
+          ],
+          "type": "module",
+          "displayName": "设计和特性"
+        },
+        {
+          "textRaw": "类：`REPLServer`",
+          "name": "类：`replserver`",
+          "meta": {
+            "added": [
+              "v0.1.91"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 参见 <a href=\"#replstartoptions\"><code>repl.start()</code></a></li>\n<li>继承自: <a href=\"readline.html#class-readlineinterface\" class=\"type\">&lt;readline.Interface&gt;</a></li>\n</ul>\n<p><code>repl.REPLServer</code> 的实例是使用 <a href=\"#replstartoptions\"><code>repl.start()</code></a> 方法或直接使用 JavaScript <code>new</code> 关键字创建的。</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n\nconst options = { useColors: true };\n\nconst firstInstance = repl.start(options);\nconst secondInstance = new repl.REPLServer(options);\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n\nconst options = { useColors: true };\n\nconst firstInstance = repl.start(options);\nconst secondInstance = new repl.REPLServer(options);\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "事件：`'exit'`",
+              "name": "事件：`'exit'`",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当 REPL 退出时，会触发 <code>'exit'</code> 事件，原因可能是接收到 <code>.exit</code> 命令作为输入、用户按两次 <kbd>Ctrl</kbd>+<kbd>C</kbd> 发出 <code>SIGINT</code> 信号，或者按 <kbd>Ctrl</kbd>+<kbd>D</kbd> 在输入流上发出 <code>'end'</code> 信号。监听器回调被调用时不带任何参数。</p>\n<pre><code class=\"language-js\">replServer.on('exit', () => {\n  console.log('Received \"exit\" event from repl!');\n  process.exit();\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'exit'`"
+            },
+            {
+              "textRaw": "事件：`'reset'`",
+              "name": "事件：`'reset'`",
+              "meta": {
+                "added": [
+                  "v0.11.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当 REPL 的上下文被重置时，会触发 <code>'reset'</code> 事件。每当接收到 <code>.clear</code> 命令作为输入时都会发生这种情况，<em>除非</em> REPL 使用默认评估器且 <code>repl.REPLServer</code> 实例创建时 <code>useGlobal</code> 选项设置为 <code>true</code>。监听器回调将以对 <code>context</code> 对象的引用作为唯一参数被调用。</p>\n<p>这主要可用于将 REPL 上下文重新初始化为某些预定义状态：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n\nfunction initializeContext(context) {\n  context.m = 'test';\n}\n\nconst r = repl.start({ prompt: '> ' });\ninitializeContext(r.context);\n\nr.on('reset', initializeContext);\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n\nfunction initializeContext(context) {\n  context.m = 'test';\n}\n\nconst r = repl.start({ prompt: '> ' });\ninitializeContext(r.context);\n\nr.on('reset', initializeContext);\n</code></pre>\n<p>当执行此代码时，可以修改全局 <code>'m'</code> 变量，但然后使用 <code>.clear</code> 命令将其重置为其初始值：</p>\n<pre><code class=\"language-console\">$ ./node example.js\n> m\n'test'\n> m = 1\n1\n> m\n1\n> .clear\nClearing context...\n> m\n'test'\n>\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'reset'`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`replServer.defineCommand(keyword, cmd)`",
+              "type": "method",
+              "name": "defineCommand",
+              "meta": {
+                "added": [
+                  "v0.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`keyword` {string} 命令关键字（_不带_前导 `.` 字符）。",
+                      "name": "keyword",
+                      "type": "string",
+                      "desc": "命令关键字（_不带_前导 `.` 字符）。"
+                    },
+                    {
+                      "textRaw": "`cmd` {Object|Function} 处理命令时要调用的函数。",
+                      "name": "cmd",
+                      "type": "Object|Function",
+                      "desc": "处理命令时要调用的函数。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>replServer.defineCommand()</code> 方法用于向 REPL 实例添加新的以 <code>.</code> 为前缀的命令。此类命令通过键入一个 <code>.</code> 后跟 <code>keyword</code> 来调用。<code>cmd</code> 可以是一个 <code>Function</code>，也可以是一个具有以下属性的 <code>Object</code>：</p>\n<ul>\n<li><code>help</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 输入 <code>.help</code> 时显示的帮助文本（可选）。</li>\n<li><code>action</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 要执行的函数，可以选择接受单个字符串参数。</li>\n</ul>\n<p>以下示例显示了添加到 REPL 实例的两个新命令：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n\nconst replServer = repl.start({ prompt: '> ' });\nreplServer.defineCommand('sayhello', {\n  help: 'Say hello',\n  action(name) {\n    this.clearBufferedCommand();\n    console.log(`Hello, ${name}!`);\n    this.displayPrompt();\n  },\n});\nreplServer.defineCommand('saybye', function saybye() {\n  console.log('Goodbye!');\n  this.close();\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n\nconst replServer = repl.start({ prompt: '> ' });\nreplServer.defineCommand('sayhello', {\n  help: 'Say hello',\n  action(name) {\n    this.clearBufferedCommand();\n    console.log(`Hello, ${name}!`);\n    this.displayPrompt();\n  },\n});\nreplServer.defineCommand('saybye', function saybye() {\n  console.log('Goodbye!');\n  this.close();\n});\n</code></pre>\n<p>然后可以在 REPL 实例中使用新命令：</p>\n<pre><code class=\"language-console\">> .sayhello Node.js User\nHello, Node.js User!\n> .saybye\nGoodbye!\n</code></pre>"
+            },
+            {
+              "textRaw": "`replServer.displayPrompt([preserveCursor])`",
+              "type": "method",
+              "name": "displayPrompt",
+              "meta": {
+                "added": [
+                  "v0.1.91"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`preserveCursor` {boolean}",
+                      "name": "preserveCursor",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>replServer.displayPrompt()</code> 方法使 REPL 实例准备接受用户输入，将配置的 <code>prompt</code> 打印到 <code>output</code> 中的新行，并恢复 <code>input</code> 以接受新输入。</p>\n<p>当正在输入多行输入时，会打印一个竖线 <code>'|'</code> 而不是 'prompt'。</p>\n<p>当 <code>preserveCursor</code> 为 <code>true</code> 时，光标位置不会重置为 <code>0</code>。</p>\n<p><code>replServer.displayPrompt</code> 方法主要旨在从使用 <code>replServer.defineCommand()</code> 方法注册的命令的 action 函数内部调用。</p>"
+            },
+            {
+              "textRaw": "`replServer.clearBufferedCommand()`",
+              "type": "method",
+              "name": "clearBufferedCommand",
+              "meta": {
+                "added": [
+                  "v9.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><code>replServer.clearBufferedCommand()</code> 方法清除任何已缓冲但尚未执行的命令。此方法主要旨在从使用 <code>replServer.defineCommand()</code> 方法注册的命令的 action 函数内部调用。</p>"
+            },
+            {
+              "textRaw": "`replServer.setupHistory(historyConfig, callback)`",
+              "type": "method",
+              "name": "setupHistory",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58225",
+                    "description": "Updated the `historyConfig` parameter to accept an object with `filePath`, `size`, `removeHistoryDuplicates` and `onHistoryFileLoaded` properties."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`historyConfig` {Object|string} 历史记录文件的路径 如果它是字符串，则是历史记录文件的路径。 如果它是一个对象，它可以具有以下属性：",
+                      "name": "historyConfig",
+                      "type": "Object|string",
+                      "desc": "历史记录文件的路径 如果它是字符串，则是历史记录文件的路径。 如果它是一个对象，它可以具有以下属性：",
+                      "options": [
+                        {
+                          "textRaw": "`filePath` {string} 历史记录文件的路径",
+                          "name": "filePath",
+                          "type": "string",
+                          "desc": "历史记录文件的路径"
+                        },
+                        {
+                          "textRaw": "`size` {number} 保留的历史记录行的最大数量。要禁用历史记录，请将此值设置为 `0`。仅当 `terminal` 被用户或内部 `output` 检查设置为 `true` 时，此选项才有意义，否则历史记录缓存机制根本不会初始化。**默认值:** `30`。",
+                          "name": "size",
+                          "type": "number",
+                          "desc": "保留的历史记录行的最大数量。要禁用历史记录，请将此值设置为 `0`。仅当 `terminal` 被用户或内部 `output` 检查设置为 `true` 时，此选项才有意义，否则历史记录缓存机制根本不会初始化。**默认值:** `30`。"
+                        },
+                        {
+                          "textRaw": "`removeHistoryDuplicates` {boolean} 如果为 `true`，当添加到历史记录列表的新输入行与旧行重复时，这会从列表中移除旧行。**默认值:** `false`。",
+                          "name": "removeHistoryDuplicates",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，当添加到历史记录列表的新输入行与旧行重复时，这会从列表中移除旧行。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`onHistoryFileLoaded` {Function} 当历史记录写入准备就绪或出错时调用",
+                          "name": "onHistoryFileLoaded",
+                          "type": "Function",
+                          "desc": "当历史记录写入准备就绪或出错时调用",
+                          "options": [
+                            {
+                              "textRaw": "`err` {Error}",
+                              "name": "err",
+                              "type": "Error"
+                            },
+                            {
+                              "textRaw": "`repl` {repl.REPLServer}",
+                              "name": "repl",
+                              "type": "repl.REPLServer"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 当历史记录写入准备就绪或出错时调用（如果在 `historyConfig` 中提供了 `onHistoryFileLoaded`，则为可选）",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "当历史记录写入准备就绪或出错时调用（如果在 `historyConfig` 中提供了 `onHistoryFileLoaded`，则为可选）",
+                      "options": [
+                        {
+                          "textRaw": "`err` {Error}",
+                          "name": "err",
+                          "type": "Error"
+                        },
+                        {
+                          "textRaw": "`repl` {repl.REPLServer}",
+                          "name": "repl",
+                          "type": "repl.REPLServer"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>为 REPL 实例初始化历史记录日志文件。当执行 Node.js 二进制文件并使用命令行 REPL 时，默认会初始化历史记录文件。但是，在以编程方式创建 REPL 时，情况并非如此。在以编程方式处理 REPL 实例时，使用此方法初始化历史记录日志文件。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`REPLServer`"
+        },
+        {
+          "textRaw": "Node.js REPL",
+          "name": "node.js_repl",
+          "desc": "<p>Node.js 本身使用 <code>node:repl</code> 模块来提供其自己的用于执行 JavaScript 的交互式接口。这可以通过执行 Node.js 二进制文件而不传递任何参数（或通过传递 <code>-i</code> 参数）来使用：</p>\n<pre><code class=\"language-console\">$ node\n> const a = [1, 2, 3];\nundefined\n> a\n[ 1, 2, 3 ]\n> a.forEach((v) => {\n...   console.log(v);\n...   });\n1\n2\n3\n</code></pre>",
+          "modules": [
+            {
+              "textRaw": "环境变量选项",
+              "name": "环境变量选项",
+              "desc": "<p>可以使用以下环境变量自定义 Node.js REPL 的各种行为：</p>\n<ul>\n<li><code>NODE_REPL_HISTORY</code>: 当给定有效路径时，持久的 REPL 历史记录将保存到指定文件，而不是用户主目录中的 <code>.node_repl_history</code>。将此值设置为 <code>''</code>（空字符串）将禁用持久 REPL 历史记录。将从值中修剪空白。在 Windows 平台上，具有空值的环境变量无效，因此将此变量设置为一个或多个空格以禁用持久 REPL 历史记录。</li>\n<li><code>NODE_REPL_HISTORY_SIZE</code>: 控制如果历史记录可用，将保留多少行历史记录。必须是一个正数。<strong>默认:</strong> <code>1000</code>。</li>\n<li><code>NODE_REPL_MODE</code>: 可以是 <code>'sloppy'</code> 或 <code>'strict'</code>。<strong>默认:</strong> <code>'sloppy'</code>，这将允许运行非严格模式代码。</li>\n</ul>",
+              "type": "module",
+              "displayName": "环境变量选项"
+            },
+            {
+              "textRaw": "持久历史记录",
+              "name": "持久历史记录",
+              "desc": "<p>默认情况下，Node.js REPL 通过将输入保存到用户主目录中的 <code>.node_repl_history</code> 文件来在 <code>node</code> REPL 会话之间保持历史记录。可以通过设置环境变量 <code>NODE_REPL_HISTORY=''</code> 来禁用此功能。</p>",
+              "type": "module",
+              "displayName": "持久历史记录"
+            },
+            {
+              "textRaw": "将 Node.js REPL 与高级行编辑器一起使用",
+              "name": "将_node.js_repl_与高级行编辑器一起使用",
+              "desc": "<p>对于高级行编辑器，使用环境变量 <code>NODE_NO_READLINE=1</code> 启动 Node.js。这将在规范终端设置中启动主调试器 REPL，从而允许与 <code>rlwrap</code> 一起使用。</p>\n<p>例如，可以将以下内容添加到 <code>.bashrc</code> 文件中：</p>\n<pre><code class=\"language-bash\">alias node=\"env NODE_NO_READLINE=1 rlwrap node\"\n</code></pre>",
+              "type": "module",
+              "displayName": "将 Node.js REPL 与高级行编辑器一起使用"
+            },
+            {
+              "textRaw": "在同一进程中启动多个 REPL 实例",
+              "name": "在同一进程中启动多个_repl_实例",
+              "desc": "<p>可以针对单个运行的 Node.js 实例创建和运行多个 REPL 实例，这些实例共享一个 <code>global</code> 对象（通过将 <code>useGlobal</code> 选项设置为 <code>true</code>），但具有独立的 I/O 接口。</p>\n<p>例如，以下示例在 <code>stdin</code>、Unix 套接字和 TCP 套接字上提供独立的 REPL，所有 REPL 共享同一个 <code>global</code> 对象：</p>\n<pre><code class=\"language-mjs\">import net from 'node:net';\nimport repl from 'node:repl';\nimport process from 'node:process';\nimport fs from 'node:fs';\n\nlet connections = 0;\n\nrepl.start({\n  prompt: 'Node.js via stdin> ',\n  useGlobal: true,\n  input: process.stdin,\n  output: process.stdout,\n});\n\nconst unixSocketPath = '/tmp/node-repl-sock';\n\n// 如果套接字文件已存在，让我们移除它\nfs.rmSync(unixSocketPath, { force: true });\n\nnet.createServer((socket) => {\n  connections += 1;\n  repl.start({\n    prompt: 'Node.js via Unix socket> ',\n    useGlobal: true,\n    input: socket,\n    output: socket,\n  }).on('exit', () => {\n    socket.end();\n  });\n}).listen(unixSocketPath);\n\nnet.createServer((socket) => {\n  connections += 1;\n  repl.start({\n    prompt: 'Node.js via TCP socket> ',\n    useGlobal: true,\n    input: socket,\n    output: socket,\n  }).on('exit', () => {\n    socket.end();\n  });\n}).listen(5001);\n</code></pre>\n<pre><code class=\"language-cjs\">const net = require('node:net');\nconst repl = require('node:repl');\nconst fs = require('node:fs');\n\nlet connections = 0;\n\nrepl.start({\n  prompt: 'Node.js via stdin> ',\n  useGlobal: true,\n  input: process.stdin,\n  output: process.stdout,\n});\n\nconst unixSocketPath = '/tmp/node-repl-sock';\n\n// 如果套接字文件已存在，让我们移除它\nfs.rmSync(unixSocketPath, { force: true });\n\nnet.createServer((socket) => {\n  connections += 1;\n  repl.start({\n    prompt: 'Node.js via Unix socket> ',\n    useGlobal: true,\n    input: socket,\n    output: socket,\n  }).on('exit', () => {\n    socket.end();\n  });\n}).listen(unixSocketPath);\n\nnet.createServer((socket) => {\n  connections += 1;\n  repl.start({\n    prompt: 'Node.js via TCP socket> ',\n    useGlobal: true,\n    input: socket,\n    output: socket,\n  }).on('exit', () => {\n    socket.end();\n  });\n}).listen(5001);\n</code></pre>\n<p>从命令行运行此应用程序将在 stdin 上启动一个 REPL。其他 REPL 客户端可以通过 Unix 套接字或 TCP 套接字连接。例如，<code>telnet</code> 对于连接到 TCP 套接字很有用，而 <code>socat</code> 可用于连接到 Unix 和 TCP 套接字。</p>\n<p>通过从基于 Unix 套接字的服务器而不是 stdin 启动 REPL，可以连接到长时间运行的 Node.js 进程而无需重新启动它。</p>",
+              "type": "module",
+              "displayName": "在同一进程中启动多个 REPL 实例"
+            },
+            {
+              "textRaw": "示例",
+              "name": "示例",
+              "modules": [
+                {
+                  "textRaw": "基于 `net.Server` 和 `net.Socket` 的全功能“终端”REPL",
+                  "name": "基于_`net.server`_和_`net.socket`_的全功能“终端”repl",
+                  "desc": "<p>这是一个如何使用 <a href=\"net.html#class-netserver\"><code>net.Server</code></a> 和 <a href=\"net.html#class-netsocket\"><code>net.Socket</code></a> 运行“全功能”（终端）REPL 的示例。</p>\n<p>以下脚本在端口 <code>1337</code> 上启动一个 HTTP 服务器，允许客户端建立到其 REPL 实例的套接字连接。</p>\n<pre><code class=\"language-mjs\">// repl-server.js\nimport repl from 'node:repl';\nimport net from 'node:net';\n\nnet\n  .createServer((socket) => {\n    const r = repl.start({\n      prompt: `socket ${socket.remoteAddress}:${socket.remotePort}> `,\n      input: socket,\n      output: socket,\n      terminal: true,\n      useGlobal: false,\n    });\n    r.on('exit', () => {\n      socket.end();\n    });\n    r.context.socket = socket;\n  })\n  .listen(1337);\n</code></pre>\n<pre><code class=\"language-cjs\">// repl-server.js\nconst repl = require('node:repl');\nconst net = require('node:net');\n\nnet\n  .createServer((socket) => {\n    const r = repl.start({\n      prompt: `socket ${socket.remoteAddress}:${socket.remotePort}> `,\n      input: socket,\n      output: socket,\n      terminal: true,\n      useGlobal: false,\n    });\n    r.on('exit', () => {\n      socket.end();\n    });\n    r.context.socket = socket;\n  })\n  .listen(1337);\n</code></pre>\n<p>而以下实现了一个客户端，可以通过端口 <code>1337</code> 与上述定义的服务器建立套接字连接。</p>\n<pre><code class=\"language-mjs\">// repl-client.js\nimport net from 'node:net';\nimport process from 'node:process';\n\nconst sock = net.connect(1337);\n\nprocess.stdin.pipe(sock);\nsock.pipe(process.stdout);\n\nsock.on('connect', () => {\n  process.stdin.resume();\n  process.stdin.setRawMode(true);\n});\n\nsock.on('close', () => {\n  process.stdin.setRawMode(false);\n  process.stdin.pause();\n  sock.removeListener('close', done);\n});\n\nprocess.stdin.on('end', () => {\n  sock.destroy();\n  console.log();\n});\n\nprocess.stdin.on('data', (b) => {\n  if (b.length === 1 &#x26;&#x26; b[0] === 4) {\n    process.stdin.emit('end');\n  }\n});\n</code></pre>\n<pre><code class=\"language-cjs\">// repl-client.js\nconst net = require('node:net');\n\nconst sock = net.connect(1337);\n\nprocess.stdin.pipe(sock);\nsock.pipe(process.stdout);\n\nsock.on('connect', () => {\n  process.stdin.resume();\n  process.stdin.setRawMode(true);\n});\n\nsock.on('close', () => {\n  process.stdin.setRawMode(false);\n  process.stdin.pause();\n  sock.removeListener('close', done);\n});\n\nprocess.stdin.on('end', () => {\n  sock.destroy();\n  console.log();\n});\n\nprocess.stdin.on('data', (b) => {\n  if (b.length === 1 &#x26;&#x26; b[0] === 4) {\n    process.stdin.emit('end');\n  }\n});\n</code></pre>\n<p>要运行该示例，请在您的机器上打开两个不同的终端，在一个终端中使用 <code>node repl-server.js</code> 启动服务器，在另一个终端上使用 <code>node repl-client.js</code>。</p>\n<p>原始代码来自 <a href=\"https://gist.github.com/TooTallNate/2209310\">https://gist.github.com/TooTallNate/2209310</a>。</p>",
+                  "type": "module",
+                  "displayName": "基于 `net.Server` 和 `net.Socket` 的全功能“终端”REPL"
+                },
+                {
+                  "textRaw": "基于 `curl` 的 REPL",
+                  "name": "基于_`curl`_的_repl",
+                  "desc": "<p>这是一个如何通过 <a href=\"https://curl.haxx.se/docs/manpage.html\"><code>curl()</code></a> 运行 REPL 实例的示例。</p>\n<p>以下脚本在端口 <code>8000</code> 上启动一个 HTTP 服务器，该服务器可以接受通过 <a href=\"https://curl.haxx.se/docs/manpage.html\"><code>curl()</code></a> 建立的连接。</p>\n<pre><code class=\"language-mjs\">import http from 'node:http';\nimport repl from 'node:repl';\n\nconst server = http.createServer((req, res) => {\n  res.setHeader('content-type', 'multipart/octet-stream');\n\n  repl.start({\n    prompt: 'curl repl> ',\n    input: req,\n    output: res,\n    terminal: false,\n    useColors: true,\n    useGlobal: false,\n  });\n});\n\nserver.listen(8000);\n</code></pre>\n<pre><code class=\"language-cjs\">const http = require('node:http');\nconst repl = require('node:repl');\n\nconst server = http.createServer((req, res) => {\n  res.setHeader('content-type', 'multipart/octet-stream');\n\n  repl.start({\n    prompt: 'curl repl> ',\n    input: req,\n    output: res,\n    terminal: false,\n    useColors: true,\n    useGlobal: false,\n  });\n});\n\nserver.listen(8000);\n</code></pre>\n<p>当上述脚本运行时，您可以使用 <a href=\"https://curl.haxx.se/docs/manpage.html\"><code>curl()</code></a> 连接到服务器并通过运行 <code>curl --no-progress-meter -sSNT. localhost:8000</code> 连接到其 REPL 实例。</p>\n<p><strong>警告</strong> 此示例纯粹用于教育目的，以演示如何使用不同的 I/O 流启动 Node.js REPL。\n在没有额外保护措施的情况下，<strong>不应</strong>在生产环境或任何涉及安全性的上下文中使用。\n如果您需要在真实世界的应用程序中实现 REPL，请考虑采用替代方法来降低这些风险，例如使用安全的输入机制和避免开放的网络接口。</p>\n<p>原始代码来自 <a href=\"https://gist.github.com/TooTallNate/2053342\">https://gist.github.com/TooTallNate/2053342</a>。</p>",
+                  "type": "module",
+                  "displayName": "基于 `curl` 的 REPL"
+                }
+              ],
+              "type": "module",
+              "displayName": "示例"
+            }
+          ],
+          "type": "module",
+          "displayName": "Node.js REPL"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`builtinModules` 类型: {string\\[]}",
+          "type": "string\\[]",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v14.5.0"
+            ],
+            "deprecated": [
+              "v24.0.0"
+            ],
+            "changes": []
+          },
+          "stability": 0,
+          "stabilityText": "Deprecated. 改用 [`module.builtinModules`][]。",
+          "desc": "<p>一些 Node.js 模块名称的列表，例如 <code>'http'</code>。</p>"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`repl.start([options])`",
+          "type": "method",
+          "name": "start",
+          "meta": {
+            "added": [
+              "v0.1.91"
+            ],
+            "changes": [
+              {
+                "version": "v24.1.0",
+                "pr-url": "https://github.com/nodejs/node/pull/58003",
+                "description": "Added the possibility to add/edit/remove multilines while adding a multiline command."
+              },
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57400",
+                "description": "The multi-line indicator is now \"|\" instead of \"...\". Added support for multi-line history. It is now possible to \"fix\" multi-line commands with syntax errors by visiting the history and editing the command. When visiting the multiline history from an old node version, the multiline structure is not preserved."
+              },
+              {
+                "version": [
+                  "v13.4.0",
+                  "v12.17.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/30811",
+                "description": "The `preview` option is now available."
+              },
+              {
+                "version": "v12.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/26518",
+                "description": "The `terminal` option now follows the default description in all cases and `useColors` checks `hasColors()` if available."
+              },
+              {
+                "version": "v10.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/19187",
+                "description": "The `REPL_MAGIC_MODE` `replMode` was removed."
+              },
+              {
+                "version": "v6.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/6635",
+                "description": "The `breakEvalOnSigint` option is supported now."
+              },
+              {
+                "version": "v5.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/5388",
+                "description": "The `options` parameter is optional now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object|string}",
+                  "name": "options",
+                  "type": "Object|string",
+                  "options": [
+                    {
+                      "textRaw": "`prompt` {string} 要显示的输入提示。**默认:** `'> '`（带尾随空格）。",
+                      "name": "prompt",
+                      "type": "string",
+                      "desc": "要显示的输入提示。**默认:** `'> '`（带尾随空格）。"
+                    },
+                    {
+                      "textRaw": "`input` {stream.Readable} 将从中读取 REPL 输入的 `Readable` 流。**默认:** `process.stdin`。",
+                      "name": "input",
+                      "type": "stream.Readable",
+                      "desc": "将从中读取 REPL 输入的 `Readable` 流。**默认:** `process.stdin`。"
+                    },
+                    {
+                      "textRaw": "`output` {stream.Writable} REPL 输出将写入到的 `Writable` 流。**默认:** `process.stdout`。",
+                      "name": "output",
+                      "type": "stream.Writable",
+                      "desc": "REPL 输出将写入到的 `Writable` 流。**默认:** `process.stdout`。"
+                    },
+                    {
+                      "textRaw": "`terminal` {boolean} 如果为 `true`，指定应将 `output` 视为 TTY 终端。 **默认:** 在实例化时检查 `output` 流上的 `isTTY` 属性值。",
+                      "name": "terminal",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，指定应将 `output` 视为 TTY 终端。 **默认:** 在实例化时检查 `output` 流上的 `isTTY` 属性值。"
+                    },
+                    {
+                      "textRaw": "`eval` {Function} 用于评估每个给定输入行的函数。**默认:** JavaScript `eval()` 函数的异步包装器。`eval` 函数可以通过 `repl.Recoverable` 报错，以指示输入不完整并提示输入更多行。有关更多详细信息，请参阅[自定义评估函数][]部分。",
+                      "name": "eval",
+                      "type": "Function",
+                      "desc": "用于评估每个给定输入行的函数。**默认:** JavaScript `eval()` 函数的异步包装器。`eval` 函数可以通过 `repl.Recoverable` 报错，以指示输入不完整并提示输入更多行。有关更多详细信息，请参阅[自定义评估函数][]部分。"
+                    },
+                    {
+                      "textRaw": "`useColors` {boolean} 如果为 `true`，指定默认的 `writer` 函数应包含对 REPL 输出的 ANSI 颜色样式。如果提供了自定义 `writer` 函数，则此选项无效。**默认:** 如果 REPL 实例的 `terminal` 值为 `true`，则检查 `output` 流上的颜色支持。",
+                      "name": "useColors",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，指定默认的 `writer` 函数应包含对 REPL 输出的 ANSI 颜色样式。如果提供了自定义 `writer` 函数，则此选项无效。**默认:** 如果 REPL 实例的 `terminal` 值为 `true`，则检查 `output` 流上的颜色支持。"
+                    },
+                    {
+                      "textRaw": "`useGlobal` {boolean} 如果为 `true`，指定默认评估函数将使用 JavaScript `global` 作为上下文，而不是为 REPL 实例创建新的独立上下文。node CLI REPL 将此值设置为 `true`。**默认:** `false`。",
+                      "name": "useGlobal",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，指定默认评估函数将使用 JavaScript `global` 作为上下文，而不是为 REPL 实例创建新的独立上下文。node CLI REPL 将此值设置为 `true`。**默认:** `false`。"
+                    },
+                    {
+                      "textRaw": "`ignoreUndefined` {boolean} 如果为 `true`，指定如果命令的返回值评估为 `undefined`，默认写入器将不输出它。**默认:** `false`。",
+                      "name": "ignoreUndefined",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，指定如果命令的返回值评估为 `undefined`，默认写入器将不输出它。**默认:** `false`。"
+                    },
+                    {
+                      "textRaw": "`writer` {Function} 在将每个命令的输出写入 `output` 之前，用于格式化该输出的函数。**默认:** [`util.inspect()`][]。",
+                      "name": "writer",
+                      "type": "Function",
+                      "desc": "在将每个命令的输出写入 `output` 之前，用于格式化该输出的函数。**默认:** [`util.inspect()`][]。"
+                    },
+                    {
+                      "textRaw": "`completer` {Function} 用于自定义 Tab 自动补全的可选函数。示例参见 [`readline.InterfaceCompleter`][]。",
+                      "name": "completer",
+                      "type": "Function",
+                      "desc": "用于自定义 Tab 自动补全的可选函数。示例参见 [`readline.InterfaceCompleter`][]。"
+                    },
+                    {
+                      "textRaw": "`replMode` {symbol} 一个标志，指定默认评估器是在严格模式还是默认（宽松）模式下执行所有 JavaScript 命令。可接受的值有：",
+                      "name": "replMode",
+                      "type": "symbol",
+                      "desc": "一个标志，指定默认评估器是在严格模式还是默认（宽松）模式下执行所有 JavaScript 命令。可接受的值有：",
+                      "options": [
+                        {
+                          "textRaw": "`repl.REPL_MODE_SLOPPY` 在宽松模式下评估表达式。",
+                          "name": "repl.REPL_MODE_SLOPPY",
+                          "desc": "在宽松模式下评估表达式。"
+                        },
+                        {
+                          "textRaw": "`repl.REPL_MODE_STRICT` 在严格模式下评估表达式。这相当于在每个 repl 语句前加上 `'use strict'`。",
+                          "name": "repl.REPL_MODE_STRICT",
+                          "desc": "在严格模式下评估表达式。这相当于在每个 repl 语句前加上 `'use strict'`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`breakEvalOnSigint` {boolean} 当接收到 `SIGINT`（例如按下 <kbd>Ctrl</kbd>+<kbd>C</kbd>）时，停止评估当前代码段。 不能与自定义 `eval` 函数一起使用。**默认:** `false`。",
+                      "name": "breakEvalOnSigint",
+                      "type": "boolean",
+                      "desc": "当接收到 `SIGINT`（例如按下 <kbd>Ctrl</kbd>+<kbd>C</kbd>）时，停止评估当前代码段。 不能与自定义 `eval` 函数一起使用。**默认:** `false`。"
+                    },
+                    {
+                      "textRaw": "`preview` {boolean} 定义 repl 是否打印自动补全和输出预览。**默认:** 使用默认 eval 函数时为 `true`，如果使用自定义 eval 函数则为 `false`。如果 `terminal` 为假值，则没有预览，`preview` 的值没有影响。",
+                      "name": "preview",
+                      "type": "boolean",
+                      "desc": "定义 repl 是否打印自动补全和输出预览。**默认:** 使用默认 eval 函数时为 `true`，如果使用自定义 eval 函数则为 `false`。如果 `terminal` 为假值，则没有预览，`preview` 的值没有影响。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {repl.REPLServer}",
+                  "name": "返回",
+                  "type": "repl.REPLServer"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>repl.start()</code> 方法创建并启动一个 <a href=\"#class-replserver\"><code>repl.REPLServer</code></a> 实例。</p>\n<p>如果 <code>options</code> 是字符串，则它指定输入提示：</p>\n<pre><code class=\"language-mjs\">import repl from 'node:repl';\n\n// 一个 Unix 风格提示符\nrepl.start('$ ');\n</code></pre>\n<pre><code class=\"language-cjs\">const repl = require('node:repl');\n\n// 一个 Unix 风格提示符\nrepl.start('$ ');\n</code></pre>"
+        }
+      ],
+      "type": "module",
+      "displayName": "REPL"
+    }
+  ]
+}

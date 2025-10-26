@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Modules: Packages | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/packages.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  
+</head>
+<body class="alt apidoc" id="api-section-packages">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages active">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="packages" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><a href="#modules-packages">Modules: Packages</a>
+<ul>
+<li><a href="#">简介</a></li>
+<li><a href="#_1">确定模块系统</a>
+<ul>
+<li><a href="#_2">简介</a></li>
+<li><span class="stability_1.2"><a href="#_3">语法检测</a></span></li>
+<li><a href="#_4">模块加载器</a></li>
+<li><a href="#packagejson-"><code>package.json</code> 和文件扩展名</a></li>
+<li><a href="#--input-type-"><code>--input-type</code> 标志</a></li>
+</ul>
+</li>
+<li><a href="#_5">包入口点</a>
+<ul>
+<li><a href="#_6">主入口点导出</a></li>
+<li><a href="#_7">子路径导出</a>
+<ul>
+<li><a href="#_8">子路径中的扩展名</a></li>
+<li><a href="#_9">导出目标的路径规则和验证</a>
+<ul>
+<li><a href="#-url">目标必须是相对 URL</a></li>
+<li><a href="#_10">不允许路径遍历或无效段</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_11">导出语法糖</a></li>
+<li><a href="#_12">子路径导入</a></li>
+<li><a href="#_13">子路径模式</a></li>
+<li><a href="#_14">条件导出</a></li>
+<li><a href="#_15">嵌套条件</a></li>
+<li><a href="#_16">解析用户条件</a></li>
+<li><a href="#_17">社区条件定义</a></li>
+<li><a href="#_18">使用名称自引用包</a></li>
+</ul>
+</li>
+<li><a href="#-commonjses-">双 CommonJS/ES 模块包</a></li>
+<li><a href="#nodejs-packagejson-">Node.js <code>package.json</code> 字段定义</a>
+<ul>
+<li><a href="#name"><code>"name"</code></a></li>
+<li><a href="#main"><code>"main"</code></a></li>
+<li><a href="#type"><code>"type"</code></a></li>
+<li><a href="#exports"><code>"exports"</code></a></li>
+<li><a href="#imports"><code>"imports"</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages active">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/packages.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/packages.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/packages.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/packages.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/packages.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/packages.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/packages.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/packages.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/packages.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/packages.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/packages.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/packages.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/packages.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/packages.html">12.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="packages.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/packages.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><a href="#modules-packages">Modules: Packages</a>
+<ul>
+<li><a href="#">简介</a></li>
+<li><a href="#_1">确定模块系统</a>
+<ul>
+<li><a href="#_2">简介</a></li>
+<li><span class="stability_1.2"><a href="#_3">语法检测</a></span></li>
+<li><a href="#_4">模块加载器</a></li>
+<li><a href="#packagejson-"><code>package.json</code> 和文件扩展名</a></li>
+<li><a href="#--input-type-"><code>--input-type</code> 标志</a></li>
+</ul>
+</li>
+<li><a href="#_5">包入口点</a>
+<ul>
+<li><a href="#_6">主入口点导出</a></li>
+<li><a href="#_7">子路径导出</a>
+<ul>
+<li><a href="#_8">子路径中的扩展名</a></li>
+<li><a href="#_9">导出目标的路径规则和验证</a>
+<ul>
+<li><a href="#-url">目标必须是相对 URL</a></li>
+<li><a href="#_10">不允许路径遍历或无效段</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_11">导出语法糖</a></li>
+<li><a href="#_12">子路径导入</a></li>
+<li><a href="#_13">子路径模式</a></li>
+<li><a href="#_14">条件导出</a></li>
+<li><a href="#_15">嵌套条件</a></li>
+<li><a href="#_16">解析用户条件</a></li>
+<li><a href="#_17">社区条件定义</a></li>
+<li><a href="#_18">使用名称自引用包</a></li>
+</ul>
+</li>
+<li><a href="#-commonjses-">双 CommonJS/ES 模块包</a></li>
+<li><a href="#nodejs-packagejson-">Node.js <code>package.json</code> 字段定义</a>
+<ul>
+<li><a href="#name"><code>"name"</code></a></li>
+<li><a href="#main"><code>"main"</code></a></li>
+<li><a href="#type"><code>"type"</code></a></li>
+<li><a href="#exports"><code>"exports"</code></a></li>
+<li><a href="#imports"><code>"imports"</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Modules: Packages<span><a class="mark" href="#modules-packages" id="modules-packages">#</a></span><a aria-hidden="true" class="legacy" id="packages_modules_packages"></a></h2>
+
+
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v14.13.0, v12.20.0</td>
+<td><p>Add support for <code>"exports"</code> patterns.</p></td></tr>
+<tr><td>v14.6.0, v12.19.0</td>
+<td><p>Add package <code>"imports"</code> field.</p></td></tr>
+<tr><td>v13.7.0, v12.17.0</td>
+<td><p>Unflag conditional exports.</p></td></tr>
+<tr><td>v13.7.0, v12.16.0</td>
+<td><p>Remove the <code>--experimental-conditional-exports</code> option. In 12.16.0, conditional exports are still behind <code>--experimental-modules</code>.</p></td></tr>
+<tr><td>v13.6.0, v12.16.0</td>
+<td><p>Unflag self-referencing a package using its name.</p></td></tr>
+<tr><td>v12.7.0</td>
+<td><p>Introduce <code>"exports"</code> <code>package.json</code> field as a more powerful alternative to the classic <code>"main"</code> field.</p></td></tr>
+<tr><td>v12.0.0</td>
+<td><p>Add support for ES modules using <code>.js</code> file extension via <code>package.json</code> <code>"type"</code> field.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<section><h3>简介<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="packages"></a></h3>
+<p>一个包是由 <code>package.json</code> 文件描述的文件夹树。包由包含 <code>package.json</code> 文件的文件夹及其所有子文件夹组成，直到下一个包含另一个 <code>package.json</code> 文件的文件夹，或者一个名为 <code>node_modules</code> 的文件夹。</p>
+<p>本页为编写 <code>package.json</code> 文件的包作者提供指导，并作为 Node.js 定义的 <a href="#nodejs-packagejson-field-definitions"><code>package.json</code></a> 字段的参考。</p>
+</section><section><h3>确定模块系统<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="packages_1"></a></h3>
+<div>
+<h4>简介<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="packages_2"></a></h4>
+<p>当以下情况被传递给 <code>node</code> 作为初始输入，或被 <code>import</code> 语句或 <code>import()</code> 表达式引用时，Node.js 会将它们视为 <a href="esm.html">ES 模块</a>：</p>
+<ul>
+<li>
+<p>具有 <code>.mjs</code> 扩展名的文件。</p>
+</li>
+<li>
+<p>当最近的父级 <code>package.json</code> 文件包含顶级 <a href="#type"><code>"type"</code></a> 字段且值为 <code>"module"</code> 时，具有 <code>.js</code> 扩展名的文件。</p>
+</li>
+<li>
+<p>通过 <code>--eval</code> 参数传递的字符串，或通过 <code>STDIN</code> 管道传输给 <code>node</code> 的字符串，且带有 <code>--input-type=module</code> 标志。</p>
+</li>
+<li>
+<p>包含只能作为 <a href="esm.html">ES 模块</a> 成功解析的语法的代码，例如 <code>import</code> 或 <code>export</code> 语句或 <code>import.meta</code>，但没有明确的标记说明应如何解释。明确的标记包括 <code>.mjs</code> 或 <code>.cjs</code> 扩展名、<code>package.json</code> <code>"type"</code> 字段（值为 <code>"module"</code> 或 <code>"commonjs"</code>）或 <code>--input-type</code> 标志。动态 <code>import()</code> 表达式在 CommonJS 或 ES 模块中都受支持，不会强制文件被视为 ES 模块。参见 <a href="#syntax-detection">语法检测</a>。</p>
+</li>
+</ul>
+<p>当以下情况被传递给 <code>node</code> 作为初始输入，或被 <code>import</code> 语句或 <code>import()</code> 表达式引用时，Node.js 会将它们视为 <a href="modules.html">CommonJS</a>：</p>
+<ul>
+<li>
+<p>具有 <code>.cjs</code> 扩展名的文件。</p>
+</li>
+<li>
+<p>当最近的父级 <code>package.json</code> 文件包含顶级字段 <a href="#type"><code>"type"</code></a> 且值为 <code>"commonjs"</code> 时，具有 <code>.js</code> 扩展名的文件。</p>
+</li>
+<li>
+<p>通过 <code>--eval</code> 或 <code>--print</code> 参数传递的字符串，或通过 <code>STDIN</code> 管道传输给 <code>node</code> 的字符串，且带有 <code>--input-type=commonjs</code> 标志。</p>
+</li>
+<li>
+<p>没有父级 <code>package.json</code> 文件，或者最近的父级 <code>package.json</code> 文件缺少 <code>type</code> 字段，并且代码可以作为 CommonJS 成功求值的 <code>.js</code> 扩展名文件。换句话说，Node.js 会首先尝试将这些“模糊”文件作为 CommonJS 运行，如果作为 CommonJS 求值失败（因为解析器找到了 ES 模块语法），则会重新尝试将它们作为 ES 模块求值。</p>
+</li>
+</ul>
+<p>在“模糊”文件中编写 ES 模块语法会产生性能成本，因此鼓励作者尽可能明确。特别是，包作者应始终在其 <code>package.json</code> 文件中包含 <a href="#type"><code>"type"</code></a> 字段，即使包中的所有源代码都是 CommonJS。明确指定包的 <code>type</code> 将使包在未来 Node.js 的默认类型发生变化时具有前瞻性，并且也会使构建工具和加载器更容易确定应如何解释包中的文件。</p>
+</div><div>
+<h4>语法检测<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="packages_3"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.7.0, v20.19.0</td>
+<td><p>Syntax detection is enabled by default.</p></td></tr>
+<tr><td>v21.1.0, v20.10.0</td>
+<td><p><span>Added in: v21.1.0, v20.10.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<p>Node.js 将检查模糊输入的源代码，以确定其是否包含 ES 模块语法；如果检测到此类语法，输入将被视为 ES 模块。</p>
+<p>模糊输入定义为：</p>
+<ul>
+<li>具有 <code>.js</code> 扩展名或无扩展名的文件；并且没有控制性 <code>package.json</code> 文件或缺少 <code>type</code> 字段的控制性 <code>package.json</code> 文件。</li>
+<li>未指定 <code>--input-type</code> 时的字符串输入（<code>--eval</code> 或 <code>STDIN</code>）。</li>
+</ul>
+<p>ES 模块语法定义为在作为 CommonJS 求值时会抛出错误的语法。这包括以下内容：</p>
+<ul>
+<li><code>import</code> 语句（但 <em>不是</em> <code>import()</code> 表达式，它们在 CommonJS 中有效）。</li>
+<li><code>export</code> 语句。</li>
+<li><code>import.meta</code> 引用。</li>
+<li>模块顶层的 <code>await</code>。</li>
+<li>CommonJS 包装器变量（<code>require</code>、<code>module</code>、<code>exports</code>、<code>__dirname</code>、<code>__filename</code>）的词法重新声明。</li>
+</ul>
+</div><div>
+<h4>模块加载器<span><a class="mark" href="#_4" id="_4">#</a></span><a aria-hidden="true" class="legacy" id="packages_4"></a></h4>
+<p>Node.js 有两个系统用于解析说明符和加载模块。</p>
+<p>CommonJS 模块加载器：</p>
+<ul>
+<li>它是完全同步的。</li>
+<li>负责处理 <code>require()</code> 调用。</li>
+<li>它是可猴子补丁的。</li>
+<li>支持 <a href="modules.html#folders-as-modules">文件夹作为模块</a>。</li>
+<li>解析说明符时，如果没有找到精确匹配，它会尝试添加扩展名（<code>.js</code>、<code>.json</code>，最后是 <code>.node</code>），然后尝试解析 <a href="modules.html#folders-as-modules">文件夹作为模块</a>。</li>
+<li>它将 <code>.json</code> 视为 JSON 文本文件。</li>
+<li><code>.node</code> 文件被解释为使用 <code>process.dlopen()</code> 加载的编译插件模块。</li>
+<li>它将所有缺少 <code>.json</code> 或 <code>.node</code> 扩展名的文件视为 JavaScript 文本文件。</li>
+<li>如果模块图是同步的（即不包含顶级 <code>await</code>），它只能用于 <a href="modules.html#loading-ecmascript-modules-using-require">从 CommonJS 模块加载 ECMAScript 模块</a>。当用于加载不是 ECMAScript 模块的 JavaScript 文本文件时，该文件将作为 CommonJS 模块加载。</li>
+</ul>
+<p>ECMAScript 模块加载器：</p>
+<ul>
+<li>它是异步的，除非用于为 <code>require()</code> 加载模块。</li>
+<li>负责处理 <code>import</code> 语句和 <code>import()</code> 表达式。</li>
+<li>不可猴子补丁，可以使用 <a href="esm.html#loaders">加载器钩子</a> 进行自定义。</li>
+<li>不支持文件夹作为模块，必须完全指定目录索引（例如 <code>'./startup/index.js'</code>）。</li>
+<li>不进行扩展名搜索。当说明符是相对或绝对文件 URL 时，必须提供文件扩展名。</li>
+<li>可以加载 JSON 模块，但需要导入类型属性。</li>
+<li>对于 JavaScript 文本文件，只接受 <code>.js</code>、<code>.mjs</code> 和 <code>.cjs</code> 扩展名。</li>
+<li>可用于加载 JavaScript CommonJS 模块。此类模块通过 <code>cjs-module-lexer</code> 传递，以尝试识别命名导出（如果可以通过静态分析确定）。导入的 CommonJS 模块的 URL 会转换为绝对路径，然后通过 CommonJS 模块加载器加载。</li>
+</ul>
+</div><div>
+<h4><code>package.json</code> 和文件扩展名<span><a class="mark" href="#packagejson-" id="packagejson-">#</a></span><a aria-hidden="true" class="legacy" id="packages_package_json"></a></h4>
+<p>在包内，<a href="#nodejs-packagejson-field-definitions"><code>package.json</code></a> 的 <a href="#type"><code>"type"</code></a> 字段定义了 Node.js 应如何解释 <code>.js</code> 文件。如果 <code>package.json</code> 文件没有 <code>"type"</code> 字段，则 <code>.js</code> 文件被视为 <a href="modules.html">CommonJS</a>。</p>
+<p><code>package.json</code> 的 <code>"type"</code> 值为 <code>"module"</code> 告诉 Node.js 将该包内的 <code>.js</code> 文件解释为使用 <a href="esm.html">ES 模块</a> 语法。</p>
+<p><code>"type"</code> 字段不仅适用于初始入口点（<code>node my-app.js</code>），也适用于 <code>import</code> 语句和 <code>import()</code> 表达式引用的文件。</p>
+<pre><code class="language-js"><span class="hljs-comment">// my-app.js，被视为 ES 模块，因为同一文件夹中有一个 package.json</span>
+<span class="hljs-comment">// 文件，其中包含 "type": "module"。</span>
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">'./startup/init.js'</span>;
+<span class="hljs-comment">// 作为 ES 模块加载，因为 ./startup 不包含 package.json 文件，</span>
+<span class="hljs-comment">// 因此继承上一级的 "type" 值。</span>
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">'commonjs-package'</span>;
+<span class="hljs-comment">// 作为 CommonJS 加载，因为 ./node_modules/commonjs-package/package.json</span>
+<span class="hljs-comment">// 缺少 "type" 字段或包含 "type": "commonjs"。</span>
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">'./node_modules/commonjs-package/index.js'</span>;
+<span class="hljs-comment">// 作为 CommonJS 加载，因为 ./node_modules/commonjs-package/package.json</span>
+<span class="hljs-comment">// 缺少 "type" 字段或包含 "type": "commonjs"。</span></code> <button class="copy-button">copy</button></pre>
+<p>以 <code>.mjs</code> 结尾的文件总是作为 <a href="esm.html">ES 模块</a> 加载，无论最近的父级 <code>package.json</code> 如何。</p>
+<p>以 <code>.cjs</code> 结尾的文件总是作为 <a href="modules.html">CommonJS</a> 加载，无论最近的父级 <code>package.json</code> 如何。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> <span class="hljs-string">'./legacy-file.cjs'</span>;
+<span class="hljs-comment">// 作为 CommonJS 加载，因为 .cjs 总是作为 CommonJS 加载。</span>
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">'commonjs-package/src/index.mjs'</span>;
+<span class="hljs-comment">// 作为 ES 模块加载，因为 .mjs 总是作为 ES 模块加载。</span></code> <button class="copy-button">copy</button></pre>
+<p><code>.mjs</code> 和 <code>.cjs</code> 扩展名可用于在同一包中混合类型：</p>
+<ul>
+<li>
+<p>在 <code>"type": "module"</code> 包中，可以通过使用 <code>.cjs</code> 扩展名命名特定文件来指示 Node.js 将其解释为 <a href="modules.html">CommonJS</a>（因为在此类包中，<code>.js</code> 和 <code>.mjs</code> 文件都被视为 ES 模块）。</p>
+</li>
+<li>
+<p>在 <code>"type": "commonjs"</code> 包中，可以通过使用 <code>.mjs</code> 扩展名命名特定文件来指示 Node.js 将其解释为 <a href="esm.html">ES 模块</a>（因为在此类包中，<code>.js</code> 和 <code>.cjs</code> 文件都被视为 CommonJS）。</p>
+</li>
+</ul>
+</div><div>
+<h4><code>--input-type</code> 标志<span><a class="mark" href="#--input-type-" id="--input-type-">#</a></span><a aria-hidden="true" class="legacy" id="packages_input_type"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.0.0</span>
+</div>
+<p>当设置 <code>--input-type=module</code> 标志时，通过 <code>--eval</code>（或 <code>-e</code>）参数传递的字符串，或通过 <code>STDIN</code> 管道传输给 <code>node</code> 的字符串，将被视为 <a href="esm.html">ES 模块</a>。</p>
+<pre><code class="language-bash">node --input-type=module --<span class="hljs-built_in">eval</span> <span class="hljs-string">"import { sep } from 'node:path'; console.log(sep);"</span>
+
+<span class="hljs-built_in">echo</span> <span class="hljs-string">"import { sep } from 'node:path'; console.log(sep);"</span> | node --input-type=module</code> <button class="copy-button">copy</button></pre>
+<p>为了完整性，还有 <code>--input-type=commonjs</code>，用于明确将字符串输入作为 CommonJS 运行。如果未指定 <code>--input-type</code>，这是默认行为。</p>
+</div>
+</section><section><h3>包入口点<span><a class="mark" href="#_5" id="_5">#</a></span><a aria-hidden="true" class="legacy" id="packages_5"></a></h3>
+<p>在包的 <code>package.json</code> 文件中，有两个字段可以定义包的入口点：<a href="#main"><code>"main"</code></a> 和 <a href="#exports"><code>"exports"</code></a>。这两个字段都适用于 ES 模块和 CommonJS 模块入口点。</p>
+<p><a href="#main"><code>"main"</code></a> 字段在 Node.js 的所有版本中都受支持，但其功能有限：它只定义包的主入口点。</p>
+<p><a href="#exports"><code>"exports"</code></a> 提供了 <a href="#main"><code>"main"</code></a> 的现代替代方案，允许定义多个入口点，支持环境之间的条件入口解析，并 <strong>防止使用 <a href="#exports"><code>"exports"</code></a> 中定义的入口点之外的任何其他入口点</strong>。这种封装使模块作者能够明确定义其包的公共接口。</p>
+<p>对于针对当前支持的 Node.js 版本的新包，推荐使用 <a href="#exports"><code>"exports"</code></a> 字段。对于支持 Node.js 10 及以下版本的包，<a href="#main"><code>"main"</code></a> 字段是必需的。如果同时定义了 <a href="#exports"><code>"exports"</code></a> 和 <a href="#main"><code>"main"</code></a>，在受支持的 Node.js 版本中，<a href="#exports"><code>"exports"</code></a> 字段优先于 <a href="#main"><code>"main"</code></a>。</p>
+<p><a href="#conditional-exports">条件导出</a> 可以在 <a href="#exports"><code>"exports"</code></a> 中使用，以根据环境定义不同的包入口点，包括包是通过 <code>require</code> 还是通过 <code>import</code> 引用。有关在单个包中同时支持 CommonJS 和 ES 模块的更多信息，请参阅 <a href="#dual-commonjses-module-packages">双 CommonJS/ES 模块包部分</a>。</p>
+<p>现有包引入 <a href="#exports"><code>"exports"</code></a> 字段将阻止包的消费者使用任何未定义的入口点，包括 <a href="#nodejs-packagejson-field-definitions"><code>package.json</code></a>（例如 <code>require('your-package/package.json')</code>）。<strong>这很可能是一个破坏性变更。</strong></p>
+<p>为了使 <a href="#exports"><code>"exports"</code></a> 的引入非破坏性，请确保导出每个先前受支持的入口点。最好明确指定入口点，以便明确定义包的公共 API。例如，一个先前导出 <code>main</code>、<code>lib</code>、<code>feature</code> 和 <code>package.json</code> 的项目可以使用以下 <code>package.exports</code>：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./lib"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./lib/index"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./lib/index.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature/index"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature/index.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./package.json"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./package.json"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>或者，项目可以选择使用导出模式导出整个文件夹，包括带扩展名和不带扩展名的子路径：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./lib"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./lib/*"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/*.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./lib/*.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/*.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature/*"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/*.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature/*.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/*.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./package.json"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./package.json"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>通过以上方式为任何次要包版本提供向后兼容性，包的下一个主要变更可以适当地将导出限制为仅暴露的特定功能导出：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature/*.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature/*.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature/internal/*"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<div>
+<h4>主入口点导出<span><a class="mark" href="#_6" id="_6">#</a></span><a aria-hidden="true" class="legacy" id="packages_6"></a></h4>
+<p>编写新包时，建议使用 <a href="#exports"><code>"exports"</code></a> 字段：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>当定义了 <a href="#exports"><code>"exports"</code></a> 字段时，包的所有子路径都被封装，导入器不再可用。例如，<code>require('pkg/subpath.js')</code> 会抛出 <a href="errors.html#err_package_path_not_exported"><code>ERR_PACKAGE_PATH_NOT_EXPORTED</code></a> 错误。</p>
+<p>这种导出的封装为工具和处理包的 semver 升级提供了更可靠的包接口保证。它不是强封装，因为直接 require 包的任何绝对子路径，例如 <code>require('/path/to/node_modules/pkg/subpath.js')</code>，仍然会加载 <code>subpath.js</code>。</p>
+<p>所有当前支持的 Node.js 版本和现代构建工具都支持 <code>"exports"</code> 字段。对于使用旧版本 Node.js 或相关构建工具的项目，可以通过同时包含指向同一模块的 <code>"main"</code> 字段和 <code>"exports"</code> 来实现兼容性：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>子路径导出<span><a class="mark" href="#_7" id="_7">#</a></span><a aria-hidden="true" class="legacy" id="packages_7"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.7.0</span>
+</div>
+<p>使用 <a href="#exports"><code>"exports"</code></a> 字段时，可以通过将主入口点视为 <code>"."</code> 子路径来定义自定义子路径以及主入口点：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./submodule.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./src/submodule.js"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>现在，只有 <a href="#exports"><code>"exports"</code></a> 中定义的子路径可以被消费者导入：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> submodule <span class="hljs-keyword">from</span> <span class="hljs-string">'es-module-package/submodule.js'</span>;
+<span class="hljs-comment">// 加载 ./node_modules/es-module-package/src/submodule.js</span></code> <button class="copy-button">copy</button></pre>
+<p>而其他子路径将报错：</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> submodule <span class="hljs-keyword">from</span> <span class="hljs-string">'es-module-package/private-module.js'</span>;
+<span class="hljs-comment">// 抛出 ERR_PACKAGE_PATH_NOT_EXPORTED</span></code> <button class="copy-button">copy</button></pre>
+<div>
+<h5>子路径中的扩展名<span><a class="mark" href="#_8" id="_8">#</a></span><a aria-hidden="true" class="legacy" id="packages_8"></a></h5>
+<p>包作者应在其导出中提供带扩展名（<code>import 'pkg/subpath.js'</code>）或不带扩展名（<code>import 'pkg/subpath'</code>）的子路径。这确保了每个导出模块只有一个子路径，以便所有依赖项导入相同一致的说明符，保持包契约对消费者清晰，并简化包子路径补全。</p>
+<p>传统上，包倾向于使用无扩展名风格，其优点是可读性和隐藏包内文件的真实路径。</p>
+<p>随着 <a href="https://github.com/WICG/import-maps">导入映射</a> 现在为浏览器和其他 JavaScript 运行时中的包解析提供了标准，使用无扩展名风格可能导致导入映射定义臃肿。显式文件扩展名可以通过使导入映射能够利用 <a href="https://github.com/WICG/import-maps#packages-via-trailing-slashes">包文件夹映射</a> 来映射多个子路径（如果可能），而不是每个包子路径导出都有一个单独的映射条目，从而避免此问题。这也反映了在相对和绝对导入说明符中使用 <a href="esm.html#mandatory-file-extensions">完整说明符路径</a> 的要求。</p>
+</div><div>
+<h5>导出目标的路径规则和验证<span><a class="mark" href="#_9" id="_9">#</a></span><a aria-hidden="true" class="legacy" id="packages_9"></a></h5>
+<p>在 <a href="#exports"><code>"exports"</code></a> 字段中定义路径作为目标时，Node.js 强制执行若干规则以确保安全性、可预测性和适当的封装。理解这些规则对于发布包的作者至关重要。</p>
+<div>
+<h6>目标必须是相对 URL<span><a class="mark" href="#-url" id="-url">#</a></span><a aria-hidden="true" class="legacy" id="packages_url"></a></h6>
+<p><a href="#exports"><code>"exports"</code></a> 映射中的所有目标路径（与导出键关联的值）必须是以 <code>./</code> 开头的相对 URL 字符串。</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./dist/main.js"</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// 正确</span>
+    <span class="hljs-attr">"./feature"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./lib/feature.js"</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// 正确</span>
+    <span class="hljs-comment">// "./origin-relative": "/dist/main.js", // 错误：必须以 ./ 开头</span>
+    <span class="hljs-comment">// "./absolute": "file:///dev/null", // 错误：必须以 ./ 开头</span>
+    <span class="hljs-comment">// "./outside": "../common/util.js" // 错误：必须以 ./ 开头</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>此行为的原因包括：</p>
+<ul>
+<li><strong>安全性：</strong> 防止从包自身目录外部导出任意文件。</li>
+<li><strong>封装：</strong> 确保所有导出路径都相对于包根目录解析，使包自包含。</li>
+</ul>
+</div><div>
+<h6>不允许路径遍历或无效段<span><a class="mark" href="#_10" id="_10">#</a></span><a aria-hidden="true" class="legacy" id="packages_10"></a></h6>
+<p>导出目标不得解析到包根目录之外的位置。此外，在初始 <code>./</code> 之后的 <code>target</code> 字符串中以及替换到目标模式中的任何 <code>subpath</code> 部分中，通常不允许使用路径段，如 <code>.</code>（单点）、<code>..</code>（双点）或 <code>node_modules</code>（及其 URL 编码等效项）。</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"my-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-comment">// ".": "./dist/../../elsewhere/file.js", // 无效：路径遍历</span>
+    <span class="hljs-comment">// ".": "././dist/main.js",             // 无效：包含 "." 段</span>
+    <span class="hljs-comment">// ".": "./dist/../dist/main.js",       // 无效：包含 ".." 段</span>
+    <span class="hljs-comment">// "./utils/./helper.js": "./utils/helper.js" // 键包含无效段</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+</div></div></div><div>
+<h4>导出语法糖<span><a class="mark" href="#_11" id="_11">#</a></span><a aria-hidden="true" class="legacy" id="packages_11"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.11.0</span>
+</div>
+<p>如果 <code>"."</code> 导出是唯一的导出，<a href="#exports"><code>"exports"</code></a> 字段为此情况提供了语法糖，即直接的 <a href="#exports"><code>"exports"</code></a> 字段值。</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>可以写成：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>子路径导入<span><a class="mark" href="#_12" id="_12">#</a></span><a aria-hidden="true" class="legacy" id="packages_12"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.6.0, v12.19.0</span>
+</div>
+<p>除了 <a href="#exports"><code>"exports"</code></a> 字段，还有一个包 <code>"imports"</code> 字段用于创建私有映射，这些映射仅适用于从包本身内部的导入说明符。</p>
+<p><code>"imports"</code> 字段中的条目必须始终以 <code>#</code> 开头，以确保它们与外部包说明符区分开。</p>
+<p>例如，导入字段可用于为内部模块获得条件导出的好处：</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"imports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"#dep"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"node"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"dep-node-native"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"default"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./dep-polyfill.js"</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"dependencies"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"dep-node-native"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"^1.0.0"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>其中 <code>import '#dep'</code> 不会获取外部包 <code>dep-node-native</code> 的解析（包括其导出），而是在其他环境中获取相对于包的本地文件 <code>./dep-polyfill.js</code>。</p>
+<p>与 <code>"exports"</code> 字段不同，<code>"imports"</code> 字段允许映射到外部包。</p>
+<p>导入字段的解析规则在其他方面与导出字段类似。</p>
+</div><div>
+<h4>子路径模式<span><a class="mark" href="#_13" id="_13">#</a></span><a aria-hidden="true" class="legacy" id="packages_13"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.10.0, v14.19.0</td>
+<td><p>Support pattern trailers in "imports" field.</p></td></tr>
+<tr><td>v16.9.0, v14.19.0</td>
+<td><p>Support pattern trailers.</p></td></tr>
+<tr><td>v14.13.0, v12.20.0</td>
+<td><p><span>Added in: v14.13.0, v12.20.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>对于具有少量导出或导入的包，我们建议显式列出每个导出的子路径条目。但对于具有大量子路径的包，这可能导致 <code>package.json</code> 臃肿和维护问题。</p>
+<p>对于这些用例，可以使用子路径导出模式：</p>
+<pre><code class="language-json"><span class="hljs-comment">// ./node_modules/es-module-package/package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"./features/*.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./src/features/*.js"</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"imports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"#internal/*.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./src/internal/*.js"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p><strong><code>*</code> 映射公开嵌套子路径，因为它只是一种字符串替换语法。</strong></p>
+<p>右侧的所有 <code>*</code> 实例将被替换为此值，包括它包含任何 <code>/</code> 分隔符。</p>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> featureX <span class="hljs-keyword">from</span> <span class="hljs-string">'es-module-package/features/x.js'</span>;
+<span class="hljs-comment">// 加载 ./node_modules/es-module-package/src/features/x.js</span>
+
+<span class="hljs-keyword">import</span> featureY <span class="hljs-keyword">from</span> <span class="hljs-string">'es-module-package/features/y/y.js'</span>;
+<span class="hljs-comment">// 加载 ./node_modules/es-module-package/src/features/y/y.js</span>
+
+<span class="hljs-keyword">import</span> internalZ <span class="hljs-keyword">from</span> <span class="hljs-string">'#internal/z.js'</span>;
+<span class="hljs-comment">// 加载 ./node_modules/es-module-package/src/internal/z.js</span></code> <button class="copy-button">copy</button></pre>
+<p>这是一种直接的静态匹配和替换，没有对文件扩展名进行特殊处理。在映射两侧包含 <code>"*.js"</code> 将包的公开导出限制为仅 JS 文件。</p>
+<p>导出的静态可枚举属性通过导出模式得以维护，因为可以通过将右侧目标模式视为针对包内文件列表的 <code>**</code>  glob 来确定包的单个导出。由于 <code>node_modules</code> 路径在导出目标中被禁止，此扩展仅依赖于包自身的文件。</p>
+<p>要从模式中排除私有子文件夹，可以使用 <code>null</code> 目标：</p>
+<pre><code class="language-json"><span class="hljs-comment">// ./node_modules/es-module-package/package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"./features/*.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./src/features/*.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./features/private-internal/*"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-keyword">import</span> featureInternal <span class="hljs-keyword">from</span> <span class="hljs-string">'es-module-package/features/private-internal/m.js'</span>;
+<span class="hljs-comment">// 抛出：ERR_PACKAGE_PATH_NOT_EXPORTED</span>
+
+<span class="hljs-keyword">import</span> featureX <span class="hljs-keyword">from</span> <span class="hljs-string">'es-module-package/features/x.js'</span>;
+<span class="hljs-comment">// 加载 ./node_modules/es-module-package/src/features/x.js</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>条件导出<span><a class="mark" href="#_14" id="_14">#</a></span><a aria-hidden="true" class="legacy" id="packages_14"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.7.0, v12.16.0</td>
+<td><p>Unflag conditional exports.</p></td></tr>
+<tr><td>v13.2.0, v12.16.0</td>
+<td><p><span>Added in: v13.2.0, v12.16.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>条件导出提供了一种根据某些条件映射到不同路径的方法。它们同时支持 CommonJS 和 ES 模块导入。</p>
+<p>例如，一个想要为 <code>require()</code> 和 <code>import</code> 提供不同 ES 模块导出的包可以这样写：</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"import"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index-module.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"require"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index-require.cjs"</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"module"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>Node.js 实现了以下条件，按从最具体到最不具体的顺序列出，因为条件应按此顺序定义：</p>
+<ul>
+<li><code>"node-addons"</code> - 类似于 <code>"node"</code>，匹配任何 Node.js 环境。此条件可用于提供使用本地 C++ 插件的入口点，而不是更通用且不依赖本地插件的入口点。此条件可以通过 <a href="cli.html#--no-addons"><code>--no-addons</code> 标志</a> 禁用。</li>
+<li><code>"node"</code> - 匹配任何 Node.js 环境。可以是 CommonJS 或 ES 模块文件。<em>在大多数情况下，明确指明 Node.js 平台是不必要的。</em></li>
+<li><code>"import"</code> - 当包通过 <code>import</code> 或 <code>import()</code> 加载，或通过 ECMAScript 模块加载器的任何顶级导入或解析操作时匹配。无论目标文件的模块格式如何，都适用。<em>始终与 <code>"require"</code> 互斥。</em></li>
+<li><code>"require"</code> - 当包通过 <code>require()</code> 加载时匹配。引用的文件应该可以使用 <code>require()</code> 加载，尽管无论目标文件的模块格式如何，条件都会匹配。预期格式包括 CommonJS、JSON、本地插件和 ES 模块。<em>始终与 <code>"import"</code> 互斥。</em></li>
+<li><code>"module-sync"</code> - 无论包是通过 <code>import</code>、<code>import()</code> 还是 <code>require()</code> 加载，都匹配。格式预期是不在其模块图中包含顶级 await 的 ES 模块 - 如果包含，当模块被 <code>require()</code> 时，将抛出 <code>ERR_REQUIRE_ASYNC_MODULE</code>。</li>
+<li><code>"default"</code> - 始终匹配的通用回退。可以是 CommonJS 或 ES 模块文件。<em>此条件应始终放在最后。</em></li>
+</ul>
+<p>在 <a href="#exports"><code>"exports"</code></a> 对象中，键的顺序很重要。在条件匹配期间，较早的条目具有更高的优先级，并优先于较晚的条目。<em>一般规则是条件在对象顺序中应从最具体到最不具体</em>。</p>
+<p>使用 <code>"import"</code> 和 <code>"require"</code> 条件可能导致一些隐患，这些隐患在 <a href="#dual-commonjses-module-packages">双 CommonJS/ES 模块包部分</a> 中有进一步解释。</p>
+<p><code>"node-addons"</code> 条件可用于提供使用本地 C++ 插件的入口点。但是，此条件可以通过 <a href="cli.html#--no-addons"><code>--no-addons</code> 标志</a> 禁用。使用 <code>"node-addons"</code> 时，建议将 <code>"default"</code> 视为提供更通用入口点的增强功能，例如使用 WebAssembly 而不是本地插件。</p>
+<p>条件导出也可以扩展到导出子路径，例如：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./feature.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"node"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature-node.js"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"default"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature.js"</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>定义了一个包，其中 <code>require('pkg/feature.js')</code> 和 <code>import 'pkg/feature.js'</code> 可以在 Node.js 和其他 JS 环境之间提供不同的实现。</p>
+<p>使用环境分支时，始终尽可能包含 <code>"default"</code> 条件。提供 <code>"default"</code> 条件确保任何未知的 JS 环境都能够使用此通用实现，这有助于避免这些 JS 环境为了支持具有条件导出的包而必须伪装成现有环境。因此，使用 <code>"node"</code> 和 <code>"default"</code> 条件分支通常优于使用 <code>"node"</code> 和 <code>"browser"</code> 条件分支。</p>
+</div><div>
+<h4>嵌套条件<span><a class="mark" href="#_15" id="_15">#</a></span><a aria-hidden="true" class="legacy" id="packages_15"></a></h4>
+<p>除了直接映射，Node.js 还支持嵌套条件对象。</p>
+<p>例如，定义一个仅在 Node.js 中具有双模式入口点但不适用于浏览器的包：</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"node"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"import"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature-node.mjs"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"require"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature-node.cjs"</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"default"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./feature.mjs"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>条件的匹配顺序与平面条件相同。如果嵌套条件没有任何映射，它将继续检查父条件的剩余条件。通过这种方式，嵌套条件的行为类似于嵌套的 JavaScript <code>if</code> 语句。</p>
+</div><div>
+<h4>解析用户条件<span><a class="mark" href="#_16" id="_16">#</a></span><a aria-hidden="true" class="legacy" id="packages_16"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.9.0, v12.19.0</span>
+</div>
+<p>运行 Node.js 时，可以使用 <code>--conditions</code> 标志添加自定义用户条件：</p>
+<pre><code class="language-bash">node --conditions=development index.js</code> <button class="copy-button">copy</button></pre>
+<p>然后将在包导入和导出中解析 <code>"development"</code> 条件，同时根据需要解析现有的 <code>"node"</code>、<code>"node-addons"</code>、<code>"default"</code>、<code>"import"</code> 和 <code>"require"</code> 条件。</p>
+<p>可以使用重复标志设置任意数量的自定义条件。</p>
+<p>典型条件应仅包含字母数字字符，必要时使用 ":"、"-" 或 "=" 作为分隔符。其他任何内容可能在 node 之外遇到兼容性问题。</p>
+<p>在 node 中，条件限制很少，但具体包括：</p>
+<ol>
+<li>它们必须包含至少一个字符。</li>
+<li>它们不能以 "." 开头，因为它们可能出现在也允许相对路径的位置。</li>
+<li>它们不能包含 ","，因为它们可能被某些 CLI 工具解析为逗号分隔列表。</li>
+<li>它们不能是整数属性键，如 "10"，因为这可能对 JS 对象的属性键排序产生意外影响。</li>
+</ol>
+</div><div>
+<h4>社区条件定义<span><a class="mark" href="#_17" id="_17">#</a></span><a aria-hidden="true" class="legacy" id="packages_17"></a></h4>
+<p>除了 Node.js 核心 <a href="#conditional-exports">实现的</a> <code>"import"</code>、<code>"require"</code>、<code>"node"</code>、<code>"module-sync"</code>、<code>"node-addons"</code> 和 <code>"default"</code> 条件之外的条件字符串默认被忽略。</p>
+<p>其他平台可能实现其他条件，用户条件可以在 Node.js 中通过 <a href="#resolving-user-conditions"><code>--conditions</code> / <code>-C</code> 标志</a> 启用。</p>
+<p>由于自定义包条件需要清晰的定义以确保正确使用，下面提供了一个常见已知包条件及其严格定义的列表，以协助生态系统协调。</p>
+<ul>
+<li><code>"types"</code> - 可以被类型系统用于解析给定导出的类型文件。<em>此条件应始终首先包含。</em></li>
+<li><code>"browser"</code> - 任何 Web 浏览器环境。</li>
+<li><code>"development"</code> - 可用于定义仅开发环境的入口点，例如在开发模式下运行时提供额外的调试上下文，如更好的错误消息。<em>必须始终与 <code>"production"</code> 互斥。</em></li>
+<li><code>"production"</code> - 可用于定义生产环境入口点。<em>必须始终与 <code>"development"</code> 互斥。</em></li>
+</ul>
+<p>对于其他运行时，平台特定的条件键定义由 <a href="https://wintercg.org/">WinterCG</a> 在 <a href="https://runtime-keys.proposal.wintercg.org/">运行时键</a> 提案规范中维护。</p>
+<p>新的条件定义可以通过为此 <a href="https://github.com/nodejs/node/blob/HEAD/doc/api/packages.md#conditions-definitions">Node.js 文档部分</a> 创建拉取请求添加到本列表。在此列出新条件定义的要求是：</p>
+<ul>
+<li>定义应对所有实现者清晰明确。</li>
+<li>应明确说明需要此条件的原因。</li>
+<li>应有足够的现有实现使用。</li>
+<li>条件名称不应与另一个条件定义或广泛使用的条件冲突。</li>
+<li>条件定义的列表应提供生态系统其他方式无法实现的协调好处。例如，对于公司特定或应用程序特定的条件，情况可能不一定如此。</li>
+<li>条件应使 Node.js 用户期望它在 Node.js 核心文档中。<code>"types"</code> 条件是一个很好的例子：它并不真正属于 <a href="https://runtime-keys.proposal.wintercg.org/">运行时键</a> 提案，但很适合放在 Node.js 文档中。</li>
+</ul>
+<p>上述定义可能会在适当的时候移至专用的条件注册表。</p>
+</div><div>
+<h4>使用名称自引用包<span><a class="mark" href="#_18" id="_18">#</a></span><a aria-hidden="true" class="legacy" id="packages_18"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.6.0, v12.16.0</td>
+<td><p>Unflag self-referencing a package using its name.</p></td></tr>
+<tr><td>v13.1.0, v12.16.0</td>
+<td><p><span>Added in: v13.1.0, v12.16.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>在包内，包 <code>package.json</code> 中定义的 <a href="#exports"><code>"exports"</code></a> 字段的值可以通过包的名称引用。例如，假设 <code>package.json</code> 是：</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"a-package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"."</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.mjs"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"./foo.js"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./foo.js"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>然后 <em>该包中</em> 的任何模块都可以引用包本身的导出：</p>
+<pre><code class="language-js"><span class="hljs-comment">// ./a-module.mjs</span>
+<span class="hljs-keyword">import</span> { something } <span class="hljs-keyword">from</span> <span class="hljs-string">'a-package'</span>; <span class="hljs-comment">// 从 ./index.mjs 导入 "something"。</span></code> <button class="copy-button">copy</button></pre>
+<p>仅当 <code>package.json</code> 具有 <a href="#exports"><code>"exports"</code></a> 时，自引用才可用，并且将仅允许导入该 <a href="#exports"><code>"exports"</code></a>（在 <code>package.json</code> 中）允许的内容。因此，给定先前的包，下面的代码将生成运行时错误：</p>
+<pre><code class="language-js"><span class="hljs-comment">// ./another-module.mjs</span>
+
+<span class="hljs-comment">// 从 ./m.mjs 导入 "another"。失败，因为</span>
+<span class="hljs-comment">// "package.json" "exports" 字段</span>
+<span class="hljs-comment">// 未提供名为 "./m.mjs" 的导出。</span>
+<span class="hljs-keyword">import</span> { another } <span class="hljs-keyword">from</span> <span class="hljs-string">'a-package/m.mjs'</span>;</code> <button class="copy-button">copy</button></pre>
+<p>自引用在 ES 模块和 CommonJS 模块中使用 <code>require</code> 时也可用。例如，此代码也将工作：</p>
+<pre><code class="language-js cjs"><span class="hljs-comment">// ./a-module.js</span>
+<span class="hljs-keyword">const</span> { something } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'a-package/foo.js'</span>); <span class="hljs-comment">// 从 ./foo.js 加载。</span></code> <button class="copy-button">copy</button></pre>
+<p>最后，自引用也适用于作用域包。例如，此代码也将工作：</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"@my/package"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js cjs"><span class="hljs-comment">// ./index.js</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-number">42</span>;</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js cjs"><span class="hljs-comment">// ./other.js</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-built_in">require</span>(<span class="hljs-string">'@my/package'</span>));</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node other.js</span>
+42</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>双 CommonJS/ES 模块包<span><a class="mark" href="#-commonjses-" id="-commonjses-">#</a></span><a aria-hidden="true" class="legacy" id="packages_commonjs_es"></a></h3>
+<p>有关详细信息，请参阅 <a href="https://github.com/nodejs/package-examples">包示例仓库</a>。</p>
+</section><section><h3>Node.js <code>package.json</code> 字段定义<span><a class="mark" href="#nodejs-packagejson-" id="nodejs-packagejson-">#</a></span><a aria-hidden="true" class="legacy" id="packages_node_js_package_json"></a></h3>
+<p>本节描述了 Node.js 运行时使用的字段。其他工具（如 <a href="https://docs.npmjs.com/cli/v8/configuring-npm/package-json">npm</a>）使用其他字段，这些字段被 Node.js 忽略且未在此记录。</p>
+<p><code>package.json</code> 文件中以下字段在 Node.js 中使用：</p>
+<ul>
+<li><a href="#name"><code>"name"</code></a> - 在包内使用命名导入时相关。也被包管理器用作包的名称。</li>
+<li><a href="#main"><code>"main"</code></a> - 如果未指定 exports，则在加载包时的默认模块，以及在引入 exports 之前的 Node.js 版本中。</li>
+<li><a href="#type"><code>"type"</code></a> - 包类型，确定是将 <code>.js</code> 文件加载为 CommonJS 还是 ES 模块。</li>
+<li><a href="#exports"><code>"exports"</code></a> - 包导出和条件导出。存在时，限制可以从包内加载哪些子模块。</li>
+<li><a href="#imports"><code>"imports"</code></a> - 包导入，供包本身内的模块使用。</li>
+</ul>
+<div>
+<h4><code>"name"</code><span><a class="mark" href="#name" id="name">#</a></span><a aria-hidden="true" class="legacy" id="packages_name"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.6.0, v12.16.0</td>
+<td><p>Remove the <code>--experimental-resolve-self</code> option.</p></td></tr>
+<tr><td>v13.1.0, v12.16.0</td>
+<td><p><span>Added in: v13.1.0, v12.16.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"package-name"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p><code>"name"</code> 字段定义了包的名称。发布到 <em>npm</em> 注册表需要一个满足 <a href="https://docs.npmjs.com/files/package.json#name">特定要求</a> 的名称。</p>
+<p><code>"name"</code> 字段可以与 <a href="#exports"><code>"exports"</code></a> 字段一起使用，以 <a href="#self-referencing-a-package-using-its-name">自引用</a> 包使用其名称。</p>
+</div><div>
+<h4><code>"main"</code><span><a class="mark" href="#main" id="main">#</a></span><a aria-hidden="true" class="legacy" id="packages_main"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.4.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"main"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p><code>"main"</code> 字段定义了通过 <code>node_modules</code> 查找按名称导入包时的入口点。其值是一个路径。</p>
+<p>当包具有 <a href="#exports"><code>"exports"</code></a> 字段时，在按名称导入包时，此字段将优先于 <code>"main"</code> 字段。</p>
+<p>它还定义了当 <a href="modules.html#folders-as-modules">通过 <code>require()</code> 加载包目录</a> 时使用的脚本。</p>
+<pre><code class="language-js cjs"><span class="hljs-comment">// 这将解析为 ./path/to/directory/index.js。</span>
+<span class="hljs-built_in">require</span>(<span class="hljs-string">'./path/to/directory'</span>);</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>"type"</code><span><a class="mark" href="#type" id="type">#</a></span><a aria-hidden="true" class="legacy" id="packages_type"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.2.0, v12.17.0</td>
+<td><p>Unflag <code>--experimental-modules</code>.</p></td></tr>
+<tr><td>v12.0.0</td>
+<td><p><span>Added in: v12.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p><code>"type"</code> 字段定义了 Node.js 用于所有 <code>.js</code> 文件的模块格式，这些文件以该 <code>package.json</code> 文件作为其最近的父级。</p>
+<p>当最近的父级 <code>package.json</code> 文件包含顶级字段 <code>"type"</code> 且值为 <code>"module"</code> 时，以 <code>.js</code> 结尾的文件将作为 ES 模块加载。</p>
+<p>最近的父级 <code>package.json</code> 定义为在当前文件夹、该文件夹的父级等中搜索时找到的第一个 <code>package.json</code>，直到到达 node_modules 文件夹或卷根目录。</p>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"module"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-bash"><span class="hljs-comment"># 在与前述 package.json 相同的文件夹中</span>
+node my-app.js <span class="hljs-comment"># 作为 ES 模块运行</span></code> <button class="copy-button">copy</button></pre>
+<p>如果最近的父级 <code>package.json</code> 缺少 <code>"type"</code> 字段，或包含 <code>"type": "commonjs"</code>，则 <code>.js</code> 文件被视为 <a href="modules.html">CommonJS</a>。如果到达卷根目录且未找到 <code>package.json</code>，则 <code>.js</code> 文件被视为 <a href="modules.html">CommonJS</a>。</p>
+<p>如果最近的父级 <code>package.json</code> 包含 <code>"type": "module"</code>，则 <code>.js</code> 文件的 <code>import</code> 语句被视为 ES 模块。</p>
+<pre><code class="language-js"><span class="hljs-comment">// my-app.js，与上述示例相同的一部分</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">'./startup.js'</span>; <span class="hljs-comment">// 由于 package.json 作为 ES 模块加载</span></code> <button class="copy-button">copy</button></pre>
+<p>无论 <code>"type"</code> 字段的值如何，<code>.mjs</code> 文件始终被视为 ES 模块，<code>.cjs</code> 文件始终被视为 CommonJS。</p>
+</div><div>
+<h4><code>"exports"</code><span><a class="mark" href="#exports" id="exports">#</a></span><a aria-hidden="true" class="legacy" id="packages_exports"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v14.13.0, v12.20.0</td>
+<td><p>Add support for <code>"exports"</code> patterns.</p></td></tr>
+<tr><td>v13.7.0, v12.17.0</td>
+<td><p>Unflag conditional exports.</p></td></tr>
+<tr><td>v13.7.0, v12.16.0</td>
+<td><p>Implement logical conditional exports ordering.</p></td></tr>
+<tr><td>v13.7.0, v12.16.0</td>
+<td><p>Remove the <code>--experimental-conditional-exports</code> option. In 12.16.0, conditional exports are still behind <code>--experimental-modules</code>.</p></td></tr>
+<tr><td>v13.2.0, v12.16.0</td>
+<td><p>Implement conditional exports.</p></td></tr>
+<tr><td>v12.7.0</td>
+<td><p><span>Added in: v12.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"exports"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./index.js"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p><code>"exports"</code> 字段允许定义包的 <a href="#package-entry-points">入口点</a>，当通过 <code>node_modules</code> 查找或通过 <a href="#self-referencing-a-package-using-its-name">自引用</a> 其自身名称加载时。它在 Node.js 12+ 中受支持，作为 <a href="#main"><code>"main"</code></a> 的替代方案，可以支持定义 <a href="#subpath-exports">子路径导出</a> 和 <a href="#conditional-exports">条件导出</a>，同时封装内部未导出模块。</p>
+<p><a href="#conditional-exports">条件导出</a> 也可以在 <code>"exports"</code> 中使用，以根据环境定义不同的包入口点，包括包是通过 <code>require</code> 还是通过 <code>import</code> 引用。</p>
+<p><code>"exports"</code> 中定义的所有路径必须是以 <code>./</code> 开头的相对文件 URL。</p>
+</div><div>
+<h4><code>"imports"</code><span><a class="mark" href="#imports" id="imports">#</a></span><a aria-hidden="true" class="legacy" id="packages_imports"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.6.0, v12.19.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<pre><code class="language-json"><span class="hljs-comment">// package.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"imports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"#dep"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">"node"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"dep-node-native"</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">"default"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./dep-polyfill.js"</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"dependencies"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"dep-node-native"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"^1.0.0"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>导入字段中的条目必须是以 <code>#</code> 开头的字符串。</p>
+<p>包导入允许映射到外部包。</p>
+<p>此字段定义了当前包的 <a href="#subpath-imports">子路径导入</a>。</p></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

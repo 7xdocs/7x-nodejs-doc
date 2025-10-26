@@ -1,0 +1,264 @@
+{
+  "type": "module",
+  "source": "doc/api/wasi.md",
+  "modules": [
+    {
+      "textRaw": "WebAssembly System Interface (WASI)",
+      "name": "webassembly_system_interface_(wasi)",
+      "introduced_in": "v12.16.0",
+      "stability": 1,
+      "stabilityText": "Experimental",
+      "desc": "<p><strong class=\"critical\"><code>node:wasi</code> 模块目前未提供某些 WASI 运行时提供的全面文件系统安全特性。对安全文件系统沙箱的完整支持可能在未来实现，也可能不会实现。在此期间，请不要依赖它来运行不受信任的代码。</strong></p>\n<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/wasi.js\">lib/wasi.js</a></p>\n<p>WASI API 提供了 <a href=\"https://wasi.dev/\">WebAssembly System Interface</a> 规范的实现。WASI 通过一系列类 POSIX 的函数，使 WebAssembly 应用程序能够访问底层操作系统。</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\nimport { WASI } from 'node:wasi';\nimport { argv, env } from 'node:process';\n\nconst wasi = new WASI({\n  version: 'preview1',\n  args: argv,\n  env,\n  preopens: {\n    '/local': '/some/real/path/that/wasm/can/access',\n  },\n});\n\nconst wasm = await WebAssembly.compile(\n  await readFile(new URL('./demo.wasm', import.meta.url)),\n);\nconst instance = await WebAssembly.instantiate(wasm, wasi.getImportObject());\n\nwasi.start(instance);\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { readFile } = require('node:fs/promises');\nconst { WASI } = require('node:wasi');\nconst { argv, env } = require('node:process');\nconst { join } = require('node:path');\n\nconst wasi = new WASI({\n  version: 'preview1',\n  args: argv,\n  env,\n  preopens: {\n    '/local': '/some/real/path/that/wasm/can/access',\n  },\n});\n\n(async () => {\n  const wasm = await WebAssembly.compile(\n    await readFile(join(__dirname, 'demo.wasm')),\n  );\n  const instance = await WebAssembly.instantiate(wasm, wasi.getImportObject());\n\n  wasi.start(instance);\n})();\n</code></pre>\n<p>要运行上面的示例，创建一个新的名为 <code>demo.wat</code> 的 WebAssembly 文本格式文件：</p>\n<pre><code class=\"language-text\">(module\n    ;; Import the required fd_write WASI function which will write the given io vectors to stdout\n    ;; The function signature for fd_write is:\n    ;; (File Descriptor, *iovs, iovs_len, nwritten) -> Returns number of bytes written\n    (import \"wasi_snapshot_preview1\" \"fd_write\" (func $fd_write (param i32 i32 i32 i32) (result i32)))\n\n    (memory 1)\n    (export \"memory\" (memory 0))\n\n    ;; Write 'hello world\\n' to memory at an offset of 8 bytes\n    ;; Note the trailing newline which is required for the text to appear\n    (data (i32.const 8) \"hello world\\n\")\n\n    (func $main (export \"_start\")\n        ;; Creating a new io vector within linear memory\n        (i32.store (i32.const 0) (i32.const 8))  ;; iov.iov_base - This is a pointer to the start of the 'hello world\\n' string\n        (i32.store (i32.const 4) (i32.const 12))  ;; iov.iov_len - The length of the 'hello world\\n' string\n\n        (call $fd_write\n            (i32.const 1) ;; file_descriptor - 1 for stdout\n            (i32.const 0) ;; *iovs - The pointer to the iov array, which is stored at memory location 0\n            (i32.const 1) ;; iovs_len - We're printing 1 string stored in an iov - so one.\n            (i32.const 20) ;; nwritten - A place in memory to store the number of bytes written\n        )\n        drop ;; Discard the number of bytes written from the top of the stack\n    )\n)\n</code></pre>\n<p>使用 <a href=\"https://github.com/WebAssembly/wabt\">wabt</a> 将 <code>.wat</code> 编译为 <code>.wasm</code></p>\n<pre><code class=\"language-bash\">wat2wasm demo.wat\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "安全性",
+          "name": "安全性",
+          "meta": {
+            "added": [
+              "v21.2.0",
+              "v20.11.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v21.2.0",
+                  "v20.11.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/50396",
+                "description": "Clarify WASI security properties."
+              }
+            ]
+          },
+          "desc": "<p>WASI 提供了一个基于能力的模型，通过该模型，应用程序被提供其自定义的 <code>env</code>、<code>preopens</code>、<code>stdin</code>、<code>stdout</code>、<code>stderr</code> 和 <code>exit</code> 能力。</p>\n<p><strong>当前的 Node.js 威胁模型并未提供某些 WASI 运行时中存在的安全沙箱功能。</strong></p>\n<p>虽然支持能力特性，但它们并未在 Node.js 中构成安全模型。例如，可以使用各种技术绕过文件系统沙箱。该项目正在探索是否可以在未来添加这些安全保证。</p>",
+          "type": "module",
+          "displayName": "安全性"
+        },
+        {
+          "textRaw": "类：`WASI`",
+          "name": "类：`wasi`",
+          "meta": {
+            "added": [
+              "v13.3.0",
+              "v12.16.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>WASI</code> 类提供了 WASI 系统调用 API 以及用于处理基于 WASI 的应用程序的额外便捷方法。每个 <code>WASI</code> 实例代表一个独立的环境。</p>",
+          "ctors": [
+            {
+              "textRaw": "`new WASI([options])`",
+              "type": "ctor",
+              "name": "WASI",
+              "meta": {
+                "added": [
+                  "v13.3.0",
+                  "v12.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v20.1.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/47390",
+                    "description": "default value of returnOnExit changed to true."
+                  },
+                  {
+                    "version": "v20.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/47391",
+                    "description": "The version option is now required and has no default value."
+                  },
+                  {
+                    "version": "v19.8.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/46469",
+                    "description": "version field added to options."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`args` {Array} 一个字符串数组，WebAssembly 应用程序会将其视为命令行参数。第一个参数是 WASI 命令本身的虚拟路径。**默认值:** `[]`。",
+                          "name": "args",
+                          "type": "Array",
+                          "desc": "一个字符串数组，WebAssembly 应用程序会将其视为命令行参数。第一个参数是 WASI 命令本身的虚拟路径。**默认值:** `[]`。"
+                        },
+                        {
+                          "textRaw": "`env` {Object} 一个类似于 `process.env` 的对象，WebAssembly 应用程序会将其视为其环境。**默认值:** `{}`。",
+                          "name": "env",
+                          "type": "Object",
+                          "desc": "一个类似于 `process.env` 的对象，WebAssembly 应用程序会将其视为其环境。**默认值:** `{}`。"
+                        },
+                        {
+                          "textRaw": "`preopens` {Object} 此对象表示 WebAssembly 应用程序的本地目录结构。`preopens` 的字符串键被视为文件系统中的目录。`preopens` 中对应的值是主机机器上这些目录的真实路径。",
+                          "name": "preopens",
+                          "type": "Object",
+                          "desc": "此对象表示 WebAssembly 应用程序的本地目录结构。`preopens` 的字符串键被视为文件系统中的目录。`preopens` 中对应的值是主机机器上这些目录的真实路径。"
+                        },
+                        {
+                          "textRaw": "`returnOnExit` {boolean} 默认情况下，当 WASI 应用程序调用 `__wasi_proc_exit()` 时，`wasi.start()` 将返回指定的退出码，而不是终止进程。将此选项设置为 `false` 将导致 Node.js 进程以指定的退出码退出。**默认值:** `true`。",
+                          "name": "returnOnExit",
+                          "type": "boolean",
+                          "desc": "默认情况下，当 WASI 应用程序调用 `__wasi_proc_exit()` 时，`wasi.start()` 将返回指定的退出码，而不是终止进程。将此选项设置为 `false` 将导致 Node.js 进程以指定的退出码退出。**默认值:** `true`。"
+                        },
+                        {
+                          "textRaw": "`stdin` {integer} 在 WebAssembly 应用程序中用作标准输入的文件描述符。**默认值:** `0`。",
+                          "name": "stdin",
+                          "type": "integer",
+                          "desc": "在 WebAssembly 应用程序中用作标准输入的文件描述符。**默认值:** `0`。"
+                        },
+                        {
+                          "textRaw": "`stdout` {integer} 在 WebAssembly 应用程序中用作标准输出的文件描述符。**默认值:** `1`。",
+                          "name": "stdout",
+                          "type": "integer",
+                          "desc": "在 WebAssembly 应用程序中用作标准输出的文件描述符。**默认值:** `1`。"
+                        },
+                        {
+                          "textRaw": "`stderr` {integer} 在 WebAssembly 应用程序中用作标准错误的文件描述符。**默认值:** `2`。",
+                          "name": "stderr",
+                          "type": "integer",
+                          "desc": "在 WebAssembly 应用程序中用作标准错误的文件描述符。**默认值:** `2`。"
+                        },
+                        {
+                          "textRaw": "`version` {string} 请求的 WASI 版本。当前唯一支持的版本是 `unstable` 和 `preview1`。此选项是强制性的。",
+                          "name": "version",
+                          "type": "string",
+                          "desc": "请求的 WASI 版本。当前唯一支持的版本是 `unstable` 和 `preview1`。此选项是强制性的。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`wasi.getImportObject()`",
+              "type": "method",
+              "name": "getImportObject",
+              "meta": {
+                "added": [
+                  "v19.8.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>返回一个导入对象，如果除了 WASI 提供的导入之外不需要其他 WASM 导入，可以将其传递给 <code>WebAssembly.instantiate()</code>。</p>\n<p>如果传入构造函数的版本是 <code>unstable</code>，它将返回：</p>\n<pre><code class=\"language-json\">{ wasi_unstable: wasi.wasiImport }\n</code></pre>\n<p>如果传入构造函数的版本是 <code>preview1</code> 或者未指定版本，它将返回：</p>\n<pre><code class=\"language-json\">{ wasi_snapshot_preview1: wasi.wasiImport }\n</code></pre>"
+            },
+            {
+              "textRaw": "`wasi.start(instance)`",
+              "type": "method",
+              "name": "start",
+              "meta": {
+                "added": [
+                  "v13.3.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`instance` {WebAssembly.Instance}",
+                      "name": "instance",
+                      "type": "WebAssembly.Instance"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>尝试通过调用其 <code>_start()</code> 导出，开始将 <code>instance</code> 作为 WASI 命令执行。如果 <code>instance</code> 不包含 <code>_start()</code> 导出，或者 <code>instance</code> 包含 <code>_initialize()</code> 导出，则将抛出异常。</p>\n<p><code>start()</code> 要求 <code>instance</code> 导出一个名为 <code>memory</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory\"><code>WebAssembly.Memory</code></a>。如果 <code>instance</code> 没有 <code>memory</code> 导出，将抛出异常。</p>\n<p>如果 <code>start()</code> 被多次调用，将抛出异常。</p>"
+            },
+            {
+              "textRaw": "`wasi.initialize(instance)`",
+              "type": "method",
+              "name": "initialize",
+              "meta": {
+                "added": [
+                  "v14.6.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`instance` {WebAssembly.Instance}",
+                      "name": "instance",
+                      "type": "WebAssembly.Instance"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果存在，尝试通过调用其 <code>_initialize()</code> 导出，将 <code>instance</code> 初始化为 WASI reactor。如果 <code>instance</code> 包含 <code>_start()</code> 导出，则将抛出异常。</p>\n<p><code>initialize()</code> 要求 <code>instance</code> 导出一个名为 <code>memory</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory\"><code>WebAssembly.Memory</code></a>。如果 <code>instance</code> 没有 <code>memory</code> 导出，将抛出异常。</p>\n<p>如果 <code>initialize()</code> 被多次调用，将抛出异常。</p>"
+            },
+            {
+              "textRaw": "`wasi.finalizeBindings(instance[, options])`",
+              "type": "method",
+              "name": "finalizeBindings",
+              "meta": {
+                "added": [
+                  "v24.4.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`instance` {WebAssembly.Instance}",
+                      "name": "instance",
+                      "type": "WebAssembly.Instance"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`memory` {WebAssembly.Memory} **默认值:** `instance.exports.memory`。",
+                          "name": "memory",
+                          "type": "WebAssembly.Memory",
+                          "desc": "**默认值:** `instance.exports.memory`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>设置 WASI 主机绑定到 <code>instance</code>，而不调用 <code>initialize()</code> 或 <code>start()</code>。当 WASI 模块在子线程中实例化以跨线程共享内存时，此方法很有用。</p>\n<p><code>finalizeBindings()</code> 要求 <code>instance</code> 导出一个名为 <code>memory</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory\"><code>WebAssembly.Memory</code></a>，或者用户在 <code>options.memory</code> 中指定一个 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Memory\"><code>WebAssembly.Memory</code></a> 对象。如果 <code>memory</code> 无效，将抛出异常。</p>\n<p><code>start()</code> 和 <code>initialize()</code> 将在内部调用 <code>finalizeBindings()</code>。如果 <code>finalizeBindings()</code> 被多次调用，将抛出异常。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`wasiImport` 类型: {Object}",
+              "type": "Object",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v13.3.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><code>wasiImport</code> 是一个实现了 WASI 系统调用 API 的对象。在实例化 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance\"><code>WebAssembly.Instance</code></a> 时，此对象应作为 <code>wasi_snapshot_preview1</code> 导入传入。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`WASI`"
+        }
+      ],
+      "type": "module",
+      "displayName": "WebAssembly System Interface (WASI)"
+    }
+  ]
+}

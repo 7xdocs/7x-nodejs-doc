@@ -1,0 +1,1215 @@
+{
+  "type": "module",
+  "source": "doc/api/module.md",
+  "modules": [
+    {
+      "textRaw": "Modules: `node:module` API",
+      "name": "modules:_`node:module`_api",
+      "introduced_in": "v12.20.0",
+      "meta": {
+        "added": [
+          "v0.3.7"
+        ],
+        "changes": []
+      },
+      "modules": [
+        {
+          "textRaw": "`Module` 对象",
+          "name": "`module`_对象",
+          "desc": "<ul>\n<li>类型: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a></li>\n</ul>\n<p>提供与 <code>Module</code> 实例（在 <a href=\"modules.html\">CommonJS</a> 模块中常见的 <a href=\"#the-module-object\"><code>module</code></a> 变量）交互时的通用工具方法。通过 <code>import 'node:module'</code> 或 <code>require('node:module')</code> 访问。</p>",
+          "properties": [
+            {
+              "textRaw": "`builtinModules` 类型: {string\\[]}",
+              "type": "string\\[]",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v9.3.0",
+                  "v8.10.0",
+                  "v6.13.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v23.5.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/56185",
+                    "description": "The list now also contains prefix-only modules."
+                  }
+                ]
+              },
+              "desc": "<p>Node.js 提供的所有模块名称的列表。可用于验证一个模块是否由第三方维护。</p>\n<p>此上下文中的 <code>module</code> 与 <a href=\"modules.html#the-module-wrapper\">模块包装器</a> 提供的对象不同。要访问它，需要引入 <code>Module</code> 模块：</p>\n<pre><code class=\"language-mjs\">// module.mjs\n// 在 ECMAScript 模块中\nimport { builtinModules as builtin } from 'node:module';\n</code></pre>\n<pre><code class=\"language-cjs\">// module.cjs\n// 在 CommonJS 模块中\nconst builtin = require('node:module').builtinModules;\n</code></pre>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`module.createRequire(filename)`",
+              "type": "method",
+              "name": "createRequire",
+              "meta": {
+                "added": [
+                  "v12.2.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`filename` {string|URL} 用于构造 require 函数的文件名。必须是 file URL 对象、file URL 字符串或绝对路径字符串。",
+                      "name": "filename",
+                      "type": "string|URL",
+                      "desc": "用于构造 require 函数的文件名。必须是 file URL 对象、file URL 字符串或绝对路径字符串。"
+                    },
+                    {
+                      "textRaw": "返回: {require} Require 函数",
+                      "name": "返回",
+                      "type": "require",
+                      "desc": "Require 函数"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<pre><code class=\"language-mjs\">import { createRequire } from 'node:module';\nconst require = createRequire(import.meta.url);\n\n// sibling-module.js 是一个 CommonJS 模块。\nconst siblingModule = require('./sibling-module');\n</code></pre>"
+            },
+            {
+              "textRaw": "`module.findPackageJSON(specifier[, base])`",
+              "type": "method",
+              "name": "findPackageJSON",
+              "meta": {
+                "added": [
+                  "v23.2.0",
+                  "v22.14.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`specifier` {string|URL} 要检索其 `package.json` 的模块的说明符。传递 _裸说明符_ 时，返回包根目录的 `package.json`。传递 _相对说明符_ 或 _绝对说明符_ 时，返回最近的父级 `package.json`。",
+                      "name": "specifier",
+                      "type": "string|URL",
+                      "desc": "要检索其 `package.json` 的模块的说明符。传递 _裸说明符_ 时，返回包根目录的 `package.json`。传递 _相对说明符_ 或 _绝对说明符_ 时，返回最近的父级 `package.json`。"
+                    },
+                    {
+                      "textRaw": "`base` {string|URL} 包含模块的绝对位置（`file:` URL 字符串或文件系统路径）。对于 CJS，使用 `__filename`（而不是 `__dirname`！）；对于 ESM，使用 `import.meta.url`。如果 `specifier` 是 _绝对说明符_，则无需传递此参数。",
+                      "name": "base",
+                      "type": "string|URL",
+                      "desc": "包含模块的绝对位置（`file:` URL 字符串或文件系统路径）。对于 CJS，使用 `__filename`（而不是 `__dirname`！）；对于 ESM，使用 `import.meta.url`。如果 `specifier` 是 _绝对说明符_，则无需传递此参数。"
+                    },
+                    {
+                      "textRaw": "返回: {string|undefined} 如果找到 `package.json` 则返回路径。当 `specifier` 是一个包时，返回包的根目录 `package.json`；当是相对或未解析的说明符时，返回最接近 `specifier` 的 `package.json`。",
+                      "name": "返回",
+                      "type": "string|undefined",
+                      "desc": "如果找到 `package.json` 则返回路径。当 `specifier` 是一个包时，返回包的根目录 `package.json`；当是相对或未解析的说明符时，返回最接近 `specifier` 的 `package.json`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<blockquote>\n<p><strong>注意</strong>：不要使用此功能来尝试确定模块格式。影响该确定的因素很多；package.json 的 <code>type</code> 字段是 <em>最不</em> 具有决定性的（例如，文件扩展名会覆盖它，而加载器钩子又会覆盖文件扩展名）。</p>\n</blockquote>\n<blockquote>\n<p><strong>注意</strong>：目前这仅利用了内置的默认解析器；如果注册了 <a href=\"#resolvespecifier-context-nextresolve\"><code>resolve</code> 自定义钩子</a>，它们将不会影响解析。这将来可能会改变。</p>\n</blockquote>\n<pre><code class=\"language-text\">/path/to/project\n  ├ packages/\n    ├ bar/\n      ├ bar.js\n      └ package.json // name = '@foo/bar'\n    └ qux/\n      ├ node_modules/\n        └ some-package/\n          └ package.json // name = 'some-package'\n      ├ qux.js\n      └ package.json // name = '@foo/qux'\n  ├ main.js\n  └ package.json // name = '@foo'\n</code></pre>\n<pre><code class=\"language-mjs\">// /path/to/project/packages/bar/bar.js\nimport { findPackageJSON } from 'node:module';\n\nfindPackageJSON('..', import.meta.url);\n// '/path/to/project/package.json'\n// 传递绝对说明符时结果相同：\nfindPackageJSON(new URL('../', import.meta.url));\nfindPackageJSON(import.meta.resolve('../'));\n\nfindPackageJSON('some-package', import.meta.url);\n// '/path/to/project/packages/bar/node_modules/some-package/package.json'\n// 当传递绝对说明符时，如果解析的模块位于具有嵌套 `package.json` 的子文件夹内，可能会得到不同的结果。\nfindPackageJSON(import.meta.resolve('some-package'));\n// '/path/to/project/packages/bar/node_modules/some-package/some-subfolder/package.json'\n\nfindPackageJSON('@foo/qux', import.meta.url);\n// '/path/to/project/packages/qux/package.json'\n</code></pre>\n<pre><code class=\"language-cjs\">// /path/to/project/packages/bar/bar.js\nconst { findPackageJSON } = require('node:module');\nconst { pathToFileURL } = require('node:url');\nconst path = require('node:path');\n\nfindPackageJSON('..', __filename);\n// '/path/to/project/package.json'\n// 传递绝对说明符时结果相同：\nfindPackageJSON(pathToFileURL(path.join(__dirname, '..')));\n\nfindPackageJSON('some-package', __filename);\n// '/path/to/project/packages/bar/node_modules/some-package/package.json'\n// 当传递绝对说明符时，如果解析的模块位于具有嵌套 `package.json` 的子文件夹内，可能会得到不同的结果。\nfindPackageJSON(pathToFileURL(require.resolve('some-package')));\n// '/path/to/project/packages/bar/node_modules/some-package/some-subfolder/package.json'\n\nfindPackageJSON('@foo/qux', __filename);\n// '/path/to/project/packages/qux/package.json'\n</code></pre>"
+            },
+            {
+              "textRaw": "`module.isBuiltin(moduleName)`",
+              "type": "method",
+              "name": "isBuiltin",
+              "meta": {
+                "added": [
+                  "v18.6.0",
+                  "v16.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`moduleName` {string} 模块名称",
+                      "name": "moduleName",
+                      "type": "string",
+                      "desc": "模块名称"
+                    },
+                    {
+                      "textRaw": "返回: {boolean} 如果模块是内置模块则返回 true，否则返回 false",
+                      "name": "返回",
+                      "type": "boolean",
+                      "desc": "如果模块是内置模块则返回 true，否则返回 false"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<pre><code class=\"language-mjs\">import { isBuiltin } from 'node:module';\nisBuiltin('node:fs'); // true\nisBuiltin('fs'); // true\nisBuiltin('wss'); // false\n</code></pre>"
+            },
+            {
+              "textRaw": "`module.register(specifier[, parentURL][, options])`",
+              "type": "method",
+              "name": "register",
+              "meta": {
+                "added": [
+                  "v20.6.0",
+                  "v18.19.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.6.1",
+                      "v22.13.1",
+                      "v20.18.2"
+                    ],
+                    "pr-url": "https://github.com/nodejs-private/node-private/pull/629",
+                    "description": "Using this feature with the permission model enabled requires passing `--allow-worker`."
+                  },
+                  {
+                    "version": [
+                      "v20.8.0",
+                      "v18.19.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/49655",
+                    "description": "Add support for WHATWG URL instances."
+                  }
+                ]
+              },
+              "stability": 1,
+              "stabilityText": ".2 - Release candidate",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`specifier` {string|URL} 要注册的自定义钩子；这应该是与传递给 `import()` 相同的字符串，但如果它是相对的，则相对于 `parentURL` 进行解析。",
+                      "name": "specifier",
+                      "type": "string|URL",
+                      "desc": "要注册的自定义钩子；这应该是与传递给 `import()` 相同的字符串，但如果它是相对的，则相对于 `parentURL` 进行解析。"
+                    },
+                    {
+                      "textRaw": "`parentURL` {string|URL} 如果你想相对于一个基础 URL（例如 `import.meta.url`）解析 `specifier`，可以在此处传递该 URL。**默认值:** `'data:'`",
+                      "name": "parentURL",
+                      "type": "string|URL",
+                      "desc": "如果你想相对于一个基础 URL（例如 `import.meta.url`）解析 `specifier`，可以在此处传递该 URL。**默认值:** `'data:'`"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`parentURL` {string|URL} 如果你想相对于一个基础 URL（例如 `import.meta.url`）解析 `specifier`，可以在此处传递该 URL。如果 `parentURL` 作为第二个参数提供，则忽略此属性。**默认值:** `'data:'`",
+                          "name": "parentURL",
+                          "type": "string|URL",
+                          "desc": "如果你想相对于一个基础 URL（例如 `import.meta.url`）解析 `specifier`，可以在此处传递该 URL。如果 `parentURL` 作为第二个参数提供，则忽略此属性。**默认值:** `'data:'`"
+                        },
+                        {
+                          "textRaw": "`data` {any} 传递给 [`initialize`][] 钩子的任意可克隆的 JavaScript 值。",
+                          "name": "data",
+                          "type": "any",
+                          "desc": "传递给 [`initialize`][] 钩子的任意可克隆的 JavaScript 值。"
+                        },
+                        {
+                          "textRaw": "`transferList` {Object\\[]} 传递给 `initialize` 钩子的 [可传输对象][]。",
+                          "name": "transferList",
+                          "type": "Object\\[]",
+                          "desc": "传递给 `initialize` 钩子的 [可传输对象][]。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>注册一个导出 <a href=\"#customization-hooks\">钩子</a> 的模块，这些钩子用于自定义 Node.js 模块的解析和加载行为。参见 <a href=\"#customization-hooks\">自定义钩子</a>。</p>\n<p>如果与 <a href=\"permissions.html#permission-model\">权限模型</a> 一起使用，此功能需要 <code>--allow-worker</code>。</p>"
+            },
+            {
+              "textRaw": "`module.registerHooks(options)`",
+              "type": "method",
+              "name": "registerHooks",
+              "meta": {
+                "added": [
+                  "v23.5.0",
+                  "v22.15.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active development",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`load` {Function|undefined} 参见 [load 钩子][]。**默认值:** `undefined`。",
+                          "name": "load",
+                          "type": "Function|undefined",
+                          "desc": "参见 [load 钩子][]。**默认值:** `undefined`。"
+                        },
+                        {
+                          "textRaw": "`resolve` {Function|undefined} 参见 [resolve 钩子][]。**默认值:** `undefined`。",
+                          "name": "resolve",
+                          "type": "Function|undefined",
+                          "desc": "参见 [resolve 钩子][]。**默认值:** `undefined`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>注册 <a href=\"#customization-hooks\">钩子</a>，这些钩子用于自定义 Node.js 模块的解析和加载行为。参见 <a href=\"#customization-hooks\">自定义钩子</a>。</p>"
+            },
+            {
+              "textRaw": "`module.stripTypeScriptTypes(code[, options])`",
+              "type": "method",
+              "name": "stripTypeScriptTypes",
+              "meta": {
+                "added": [
+                  "v23.2.0",
+                  "v22.13.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".2 - Release candidate",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`code` {string} 要从中剥离类型注解的代码。",
+                      "name": "code",
+                      "type": "string",
+                      "desc": "要从中剥离类型注解的代码。"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`mode` {string} **默认值:** `'strip'`。可能的值有：",
+                          "name": "mode",
+                          "type": "string",
+                          "desc": "**默认值:** `'strip'`。可能的值有：",
+                          "options": [
+                            {
+                              "textRaw": "`'strip'` 仅剥离类型注解，不执行 TypeScript 特性的转换。",
+                              "desc": "`'strip'` 仅剥离类型注解，不执行 TypeScript 特性的转换。"
+                            },
+                            {
+                              "textRaw": "`'transform'` 剥离类型注解并将 TypeScript 特性转换为 JavaScript。",
+                              "desc": "`'transform'` 剥离类型注解并将 TypeScript 特性转换为 JavaScript。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`sourceMap` {boolean} **默认值:** `false`。仅当 `mode` 为 `'transform'` 时，如果为 `true`，将为转换后的代码生成 source map。",
+                          "name": "sourceMap",
+                          "type": "boolean",
+                          "desc": "**默认值:** `false`。仅当 `mode` 为 `'transform'` 时，如果为 `true`，将为转换后的代码生成 source map。"
+                        },
+                        {
+                          "textRaw": "`sourceUrl` {string} 指定在 source map 中使用的源 URL。",
+                          "name": "sourceUrl",
+                          "type": "string",
+                          "desc": "指定在 source map 中使用的源 URL。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {string} 剥离了类型注解的代码。 `module.stripTypeScriptTypes()` 从 TypeScript 代码中移除类型注解。它可以在使用 `vm.runInContext()` 或 `vm.compileFunction()` 运行 TypeScript 代码之前，用于剥离类型注解。 默认情况下，如果代码包含需要转换的 TypeScript 特性（如 `Enums`），它将抛出一个错误，更多信息请参见 [类型剥离][]。 当模式为 `'transform'` 时，它还会将 TypeScript 特性转换为 JavaScript，更多信息请参见 [转换 TypeScript 特性][]。 当模式为 `'strip'` 时，不会生成 source map，因为位置信息被保留了。 如果提供了 `sourceMap` 而模式为 `'strip'`，将会抛出错误。",
+                      "name": "返回",
+                      "type": "string",
+                      "desc": "剥离了类型注解的代码。 `module.stripTypeScriptTypes()` 从 TypeScript 代码中移除类型注解。它可以在使用 `vm.runInContext()` 或 `vm.compileFunction()` 运行 TypeScript 代码之前，用于剥离类型注解。 默认情况下，如果代码包含需要转换的 TypeScript 特性（如 `Enums`），它将抛出一个错误，更多信息请参见 [类型剥离][]。 当模式为 `'transform'` 时，它还会将 TypeScript 特性转换为 JavaScript，更多信息请参见 [转换 TypeScript 特性][]。 当模式为 `'strip'` 时，不会生成 source map，因为位置信息被保留了。 如果提供了 `sourceMap` 而模式为 `'strip'`，将会抛出错误。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><em>警告</em>：由于 TypeScript 解析器的变化，此函数的输出在不同 Node.js 版本间不应被视为稳定。</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code);\nconsole.log(strippedCode);\n// 打印: const a         = 1;\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code);\nconsole.log(strippedCode);\n// 打印: const a         = 1;\n</code></pre>\n<p>如果提供了 <code>sourceUrl</code>，它将被附加在输出末尾作为注释：</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });\nconsole.log(strippedCode);\n// 打印: const a         = 1\\n\\n//# sourceURL=source.ts;\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = 'const a: number = 1;';\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'strip', sourceUrl: 'source.ts' });\nconsole.log(strippedCode);\n// 打印: const a         = 1\\n\\n//# sourceURL=source.ts;\n</code></pre>\n<p>当 <code>mode</code> 为 <code>'transform'</code> 时，代码被转换为 JavaScript：</p>\n<pre><code class=\"language-mjs\">import { stripTypeScriptTypes } from 'node:module';\nconst code = `\n  namespace MathUtil {\n    export const add = (a: number, b: number) => a + b;\n  }`;\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'transform', sourceMap: true });\nconsole.log(strippedCode);\n// 打印:\n// var MathUtil;\n// (function(MathUtil) {\n//     MathUtil.add = (a, b)=>a + b;\n// })(MathUtil || (MathUtil = {}));\n// # sourceMappingURL=data:application/json;base64, ...\n</code></pre>\n<pre><code class=\"language-cjs\">const { stripTypeScriptTypes } = require('node:module');\nconst code = `\n  namespace MathUtil {\n    export const add = (a: number, b: number) => a + b;\n  }`;\nconst strippedCode = stripTypeScriptTypes(code, { mode: 'transform', sourceMap: true });\nconsole.log(strippedCode);\n// 打印:\n// var MathUtil;\n// (function(MathUtil) {\n//     MathUtil.add = (a, b)=>a + b;\n// })(MathUtil || (MathUtil = {}));\n// # sourceMappingURL=data:application/json;base64, ...\n</code></pre>"
+            },
+            {
+              "textRaw": "`module.syncBuiltinESMExports()`",
+              "type": "method",
+              "name": "syncBuiltinESMExports",
+              "meta": {
+                "added": [
+                  "v12.12.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><code>module.syncBuiltinESMExports()</code> 方法更新所有内置 <a href=\"esm.html\">ES 模块</a> 的实时绑定，以匹配 <a href=\"modules.html\">CommonJS</a> 导出的属性。它不会从 <a href=\"esm.html\">ES 模块</a> 中添加或移除导出的名称。</p>\n<pre><code class=\"language-js\">const fs = require('node:fs');\nconst assert = require('node:assert');\nconst { syncBuiltinESMExports } = require('node:module');\n\nfs.readFile = newAPI;\n\ndelete fs.readFileSync;\n\nfunction newAPI() {\n  // ...\n}\n\nfs.newAPI = newAPI;\n\nsyncBuiltinESMExports();\n\nimport('node:fs').then((esmFS) => {\n  // 它将现有的 readFile 属性与新值同步\n  assert.strictEqual(esmFS.readFile, newAPI);\n  // readFileSync 已从所需的 fs 中删除\n  assert.strictEqual('readFileSync' in fs, false);\n  // syncBuiltinESMExports() 不会从 esmFS 中移除 readFileSync\n  assert.strictEqual('readFileSync' in esmFS, true);\n  // syncBuiltinESMExports() 不会添加名称\n  assert.strictEqual(esmFS.newAPI, undefined);\n});\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "`Module` 对象"
+        },
+        {
+          "textRaw": "模块编译缓存",
+          "name": "模块编译缓存",
+          "meta": {
+            "added": [
+              "v22.1.0"
+            ],
+            "changes": [
+              {
+                "version": "v22.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/54501",
+                "description": "add initial JavaScript APIs for runtime access."
+              }
+            ]
+          },
+          "desc": "<p>模块编译缓存可以通过使用 <a href=\"#moduleenablecompilecachecachedir\"><code>module.enableCompileCache()</code></a> 方法或 <a href=\"cli.html#node_compile_cachedir\"><code>NODE_COMPILE_CACHE=dir</code></a> 环境变量来启用。启用后，每当 Node.js 编译一个 CommonJS 或 ECMAScript 模块时，它将使用指定目录中持久化的磁盘 <a href=\"https://v8.dev/blog/code-caching-for-devs\">V8 代码缓存</a> 来加速编译。\n这可能会减慢模块图的首次加载速度，但如果模块的内容没有更改，后续加载同一模块图可能会获得显著的速度提升。</p>\n<p>要清理磁盘上生成的编译缓存，只需删除缓存目录。下次使用同一目录存储编译缓存时，将重新创建缓存目录。为了避免磁盘被陈旧的缓存填满，建议使用 <a href=\"os.html#ostmpdir\"><code>os.tmpdir()</code></a> 下的目录。如果通过调用 <a href=\"#moduleenablecompilecachecachedir\"><code>module.enableCompileCache()</code></a> 启用编译缓存而未指定目录，Node.js 将使用 <a href=\"cli.html#node_compile_cachedir\"><code>NODE_COMPILE_CACHE=dir</code></a> 环境变量（如果已设置），否则默认使用 <code>path.join(os.tmpdir(), 'node-compile-cache')</code>。要定位正在运行的 Node.js 实例使用的编译缓存目录，请使用 <a href=\"#modulegetcompilecachedir\"><code>module.getCompileCacheDir()</code></a>。</p>\n<p>目前，当使用编译缓存与 <a href=\"https://v8project.blogspot.com/2017/12/javascript-code-coverage.html\">V8 JavaScript 代码覆盖率</a> 时，V8 收集的覆盖率对于从代码缓存反序列化的函数可能不太精确。建议在运行测试以生成精确覆盖率时关闭此功能。</p>\n<p>可以通过 <a href=\"cli.html#node_disable_compile_cache1\"><code>NODE_DISABLE_COMPILE_CACHE=1</code></a> 环境变量禁用已启用的模块编译缓存。当编译缓存导致意外或不希望的行为（例如，测试覆盖率不精确）时，这可能很有用。</p>\n<p>由一个版本的 Node.js 生成的编译缓存不能被不同版本的 Node.js 重用。如果使用相同的基础目录来持久化缓存，不同版本的 Node.js 生成的缓存将分开存储，因此它们可以共存。</p>\n<p>目前，当启用编译缓存并且重新加载一个模块时，代码缓存会立即从编译后的代码生成，但仅在 Node.js 实例即将退出时才会写入磁盘。这一点可能会改变。<a href=\"#moduleflushcompilecache\"><code>module.flushCompileCache()</code></a> 方法可用于确保累积的代码缓存被刷新到磁盘，以防应用程序想要生成其他 Node.js 实例并让它们早在父进程退出之前就共享缓存。</p>",
+          "properties": [
+            {
+              "textRaw": "`module.constants.compileCacheStatus`",
+              "name": "compileCacheStatus",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>以下常量作为 <a href=\"#moduleenablecompilecachecachedir\"><code>module.enableCompileCache()</code></a> 返回的对象中的 <code>status</code> 字段返回，以指示启用 <a href=\"#module-compile-cache\">模块编译缓存</a> 尝试的结果。</p>\n<table>\n  <tr>\n    <th>常量</th>\n    <th>描述</th>\n  </tr>\n  <tr>\n    <td><code>ENABLED</code></td>\n    <td>\n      Node.js 已成功启用编译缓存。用于存储编译缓存的目录将在返回对象的 <code>directory</code> 字段中返回。\n    </td>\n  </tr>\n  <tr>\n    <td><code>ALREADY_ENABLED</code></td>\n    <td>\n      编译缓存之前已经启用，无论是通过先前调用 <code>module.enableCompileCache()</code>，还是通过 <code>NODE_COMPILE_CACHE=dir</code> 环境变量。用于存储编译缓存的目录将在返回对象的 <code>directory</code> 字段中返回。\n    </td>\n  </tr>\n  <tr>\n    <td><code>FAILED</code></td>\n    <td>\n      Node.js 未能启用编译缓存。这可能是由于缺少使用指定目录的权限，或各种文件系统错误。失败的详细信息将在返回对象的 <code>message</code> 字段中返回。\n    </td>\n  </tr>\n  <tr>\n    <td><code>DISABLED</code></td>\n    <td>\n      Node.js 无法启用编译缓存，因为环境变量 <code>NODE_DISABLE_COMPILE_CACHE=1</code> 已被设置。\n    </td>\n  </tr>\n</table>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`module.enableCompileCache([cacheDir])`",
+              "type": "method",
+              "name": "enableCompileCache",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`cacheDir` {string|undefined} 可选路径，指定存储/检索编译缓存的目录。",
+                      "name": "cacheDir",
+                      "type": "string|undefined",
+                      "desc": "可选路径，指定存储/检索编译缓存的目录。"
+                    },
+                    {
+                      "textRaw": "返回: {Object}",
+                      "name": "返回",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`status` {integer} [`module.constants.compileCacheStatus`][] 之一",
+                          "name": "status",
+                          "type": "integer",
+                          "desc": "[`module.constants.compileCacheStatus`][] 之一"
+                        },
+                        {
+                          "textRaw": "`message` {string|undefined} 如果 Node.js 无法启用编译缓存，此字段包含错误消息。仅当 `status` 为 `module.constants.compileCacheStatus.FAILED` 时设置。",
+                          "name": "message",
+                          "type": "string|undefined",
+                          "desc": "如果 Node.js 无法启用编译缓存，此字段包含错误消息。仅当 `status` 为 `module.constants.compileCacheStatus.FAILED` 时设置。"
+                        },
+                        {
+                          "textRaw": "`directory` {string|undefined} 如果编译缓存已启用，此字段包含存储编译缓存的目录。仅当 `status` 为 `module.constants.compileCacheStatus.ENABLED` 或 `module.constants.compileCacheStatus.ALREADY_ENABLED` 时设置。",
+                          "name": "directory",
+                          "type": "string|undefined",
+                          "desc": "如果编译缓存已启用，此字段包含存储编译缓存的目录。仅当 `status` 为 `module.constants.compileCacheStatus.ENABLED` 或 `module.constants.compileCacheStatus.ALREADY_ENABLED` 时设置。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在当前 Node.js 实例中启用 <a href=\"#module-compile-cache\">模块编译缓存</a>。</p>\n<p>如果未指定 <code>cacheDir</code>，Node.js 将使用 <a href=\"cli.html#node_compile_cachedir\"><code>NODE_COMPILE_CACHE=dir</code></a> 环境变量指定的目录（如果已设置），否则使用 <code>path.join(os.tmpdir(), 'node-compile-cache')</code>。对于一般用例，建议调用 <code>module.enableCompileCache()</code> 而不指定 <code>cacheDir</code>，以便在必要时可以通过 <code>NODE_COMPILE_CACHE</code> 环境变量覆盖目录。</p>\n<p>由于编译缓存应该是一种静默优化，不是应用程序功能所必需的，因此此方法设计为在无法启用编译缓存时不抛出任何异常。相反，它将返回一个包含 <code>message</code> 字段中错误信息的对象以辅助调试。\n如果编译缓存成功启用，返回对象中的 <code>directory</code> 字段包含存储编译缓存的目录路径。返回对象中的 <code>status</code> 字段将是 <code>module.constants.compileCacheStatus</code> 值之一，以指示启用 <a href=\"#module-compile-cache\">模块编译缓存</a> 尝试的结果。</p>\n<p>此方法仅影响当前 Node.js 实例。要在子工作线程中启用它，要么在子工作线程中也调用此方法，要么将 <code>process.env.NODE_COMPILE_CACHE</code> 值设置为编译缓存目录，以便行为可以继承到子工作线程中。目录可以从该方法返回的 <code>directory</code> 字段获取，或者使用 <a href=\"#modulegetcompilecachedir\"><code>module.getCompileCacheDir()</code></a>。</p>"
+            },
+            {
+              "textRaw": "`module.flushCompileCache()`",
+              "type": "method",
+              "name": "flushCompileCache",
+              "meta": {
+                "added": [
+                  "v23.0.0",
+                  "v22.10.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>将当前 Node.js 实例中已加载模块累积的 <a href=\"#module-compile-cache\">模块编译缓存</a> 刷新到磁盘。此方法在所有刷新文件系统操作结束（无论成功与否）后返回。如果有任何错误，此操作将静默失败，因为编译缓存未命中不应干扰应用程序的实际操作。</p>"
+            },
+            {
+              "textRaw": "`module.getCompileCacheDir()`",
+              "type": "method",
+              "name": "getCompileCacheDir",
+              "meta": {
+                "added": [
+                  "v22.8.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {string|undefined} 如果启用了 [模块编译缓存][]，则返回其目录路径，否则返回 `undefined`。",
+                      "name": "返回",
+                      "type": "string|undefined",
+                      "desc": "如果启用了 [模块编译缓存][]，则返回其目录路径，否则返回 `undefined`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><i id=\"module_customization_hooks\"></i></p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "模块编译缓存"
+        },
+        {
+          "textRaw": "Source Map 支持",
+          "name": "source_map_支持",
+          "meta": {
+            "added": [
+              "v13.7.0",
+              "v12.17.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "desc": "<p>Node.js 支持 TC39 ECMA-426 <a href=\"https://tc39.es/ecma426/\">Source Map</a> 格式（以前称为 Source map revision 3 格式）。</p>\n<p>本节中的 API 是与 source map 缓存交互的辅助工具。当启用 source map 解析并且在模块的页脚中找到 <a href=\"https://tc39.es/ecma426/#sec-linking-generated-code\">source map include directives</a> 时，将填充此缓存。</p>\n<p>要启用 source map 解析，必须使用标志 <a href=\"cli.html#--enable-source-maps\"><code>--enable-source-maps</code></a> 运行 Node.js，或者通过设置 <a href=\"cli.html#node_v8_coveragedir\"><code>NODE_V8_COVERAGE=dir</code></a> 启用代码覆盖，或者通过 <a href=\"#modulesetsourcemapssupportenabled-options\"><code>module.setSourceMapsSupport()</code></a> 以编程方式启用。</p>\n<pre><code class=\"language-mjs\">// module.mjs\n// 在 ECMAScript 模块中\nimport { findSourceMap, SourceMap } from 'node:module';\n</code></pre>\n<pre><code class=\"language-cjs\">// module.cjs\n// 在 CommonJS 模块中\nconst { findSourceMap, SourceMap } = require('node:module');\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`module.getSourceMapsSupport()`",
+              "type": "method",
+              "name": "getSourceMapsSupport",
+              "meta": {
+                "added": [
+                  "v23.7.0",
+                  "v22.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Object}",
+                      "name": "返回",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`enabled` {boolean} 是否启用了 source maps 支持",
+                          "name": "enabled",
+                          "type": "boolean",
+                          "desc": "是否启用了 source maps 支持"
+                        },
+                        {
+                          "textRaw": "`nodeModules` {boolean} 是否为 `node_modules` 中的文件启用了支持。",
+                          "name": "nodeModules",
+                          "type": "boolean",
+                          "desc": "是否为 `node_modules` 中的文件启用了支持。"
+                        },
+                        {
+                          "textRaw": "`generatedCode` {boolean} 是否为来自 `eval` 或 `new Function` 的生成代码启用了支持。",
+                          "name": "generatedCode",
+                          "type": "boolean",
+                          "desc": "是否为来自 `eval` 或 `new Function` 的生成代码启用了支持。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此方法返回是否启用于堆栈跟踪的 <a href=\"https://tc39.es/ecma426/\">Source Map v3</a> 支持。</p>\n<!-- Anchors to make sure old links find a target -->\n<p><a id=\"module_module_findsourcemap_path_error\"></a></p>"
+            },
+            {
+              "textRaw": "`module.findSourceMap(path)`",
+              "type": "method",
+              "name": "findSourceMap",
+              "meta": {
+                "added": [
+                  "v13.7.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`path` {string}",
+                      "name": "path",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回: {module.SourceMap|undefined} 如果找到 source map 则返回 `module.SourceMap`，否则返回 `undefined`。",
+                      "name": "返回",
+                      "type": "module.SourceMap|undefined",
+                      "desc": "如果找到 source map 则返回 `module.SourceMap`，否则返回 `undefined`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>path</code> 是应获取对应 source map 的文件的已解析路径。</p>"
+            },
+            {
+              "textRaw": "`module.setSourceMapsSupport(enabled[, options])`",
+              "type": "method",
+              "name": "setSourceMapsSupport",
+              "meta": {
+                "added": [
+                  "v23.7.0",
+                  "v22.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`enabled` {boolean} 启用 source map 支持。",
+                      "name": "enabled",
+                      "type": "boolean",
+                      "desc": "启用 source map 支持。"
+                    },
+                    {
+                      "textRaw": "`options` {Object} 可选",
+                      "name": "options",
+                      "type": "Object",
+                      "desc": "可选",
+                      "options": [
+                        {
+                          "textRaw": "`nodeModules` {boolean} 是否为 `node_modules` 中的文件启用支持。**默认值:** `false`。",
+                          "name": "nodeModules",
+                          "type": "boolean",
+                          "desc": "是否为 `node_modules` 中的文件启用支持。**默认值:** `false`。"
+                        },
+                        {
+                          "textRaw": "`generatedCode` {boolean} 是否为来自 `eval` 或 `new Function` 的生成代码启用支持。**默认值:** `false`。",
+                          "name": "generatedCode",
+                          "type": "boolean",
+                          "desc": "是否为来自 `eval` 或 `new Function` 的生成代码启用支持。**默认值:** `false`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此函数启用或禁用用于堆栈跟踪的 <a href=\"https://tc39.es/ecma426/\">Source Map v3</a> 支持。</p>\n<p>它提供了与使用命令行选项 <code>--enable-source-maps</code> 启动 Node.js 进程相同的功能，并附加了用于改变对 <code>node_modules</code> 中文件或生成代码的支持的选项。</p>\n<p>只有在启用 source maps 后加载的 JavaScript 文件中的 source maps 才会被解析和加载。最好使用命令行选项 <code>--enable-source-maps</code> 以避免丢失在此 API 调用之前加载的模块的 source maps。</p>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "类: `module.SourceMap`",
+              "name": "类:_`module.sourcemap`",
+              "meta": {
+                "added": [
+                  "v13.7.0",
+                  "v12.17.0"
+                ],
+                "changes": []
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new SourceMap(payload[, { lineLengths }])`",
+                  "type": "ctor",
+                  "name": "SourceMap",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": "v20.5.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/48461",
+                        "description": "Add support for `lineLengths`."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`payload` {Object}",
+                          "name": "payload",
+                          "type": "Object"
+                        },
+                        {
+                          "textRaw": "`lineLengths` {number\\[]}",
+                          "name": "lineLengths",
+                          "type": "number\\[]"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>sourceMap</code> 实例。</p>\n<p><code>payload</code> 是一个对象，其键与 <a href=\"https://tc39.es/ecma426/#sec-source-map-format\">Source map 格式</a> 匹配：</p>\n<ul>\n<li><code>file</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>version</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n<li><code>sources</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a></li>\n<li><code>sourcesContent</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a></li>\n<li><code>names</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a></li>\n<li><code>mappings</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>sourceRoot</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<p><code>lineLengths</code> 是一个可选数组，表示生成代码中每行的长度。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`payload` 返回: {Object}",
+                  "type": "Object",
+                  "name": "返回",
+                  "desc": "<p>获取用于构造 <a href=\"#class-modulesourcemap\"><code>SourceMap</code></a> 实例的有效负载。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`sourceMap.findEntry(lineOffset, columnOffset)`",
+                  "type": "method",
+                  "name": "findEntry",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`lineOffset` {number} 生成源文件中的从零开始的行号偏移量",
+                          "name": "lineOffset",
+                          "type": "number",
+                          "desc": "生成源文件中的从零开始的行号偏移量"
+                        },
+                        {
+                          "textRaw": "`columnOffset` {number} 生成源文件中的从零开始的列号偏移量",
+                          "name": "columnOffset",
+                          "type": "number",
+                          "desc": "生成源文件中的从零开始的列号偏移量"
+                        },
+                        {
+                          "textRaw": "返回: {Object}",
+                          "name": "返回",
+                          "type": "Object"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>给定生成源文件中的行偏移量和列偏移量，如果找到，则返回一个表示原始文件中 SourceMap 范围的对象，否则返回一个空对象。</p>\n<p>返回的对象包含以下键：</p>\n<ul>\n<li><code>generatedLine</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 生成源中范围开始的行偏移量</li>\n<li><code>generatedColumn</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 生成源中范围开始的列偏移量</li>\n<li><code>originalSource</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 原始源的文件名，如 SourceMap 中报告的那样</li>\n<li><code>originalLine</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 原始源中范围开始的行偏移量</li>\n<li><code>originalColumn</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 原始源中范围开始的列偏移量</li>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<p>返回值表示它在 SourceMap 中出现的原始范围，基于从零开始的偏移量，<em>而不是</em> 错误消息和 CallSite 对象中出现的从 1 开始的行号和列号。</p>\n<p>要从 Error 堆栈和 CallSite 对象报告的行号和列号获取对应的从 1 开始的行号和列号，请使用 <code>sourceMap.findOrigin(lineNumber, columnNumber)</code></p>"
+                },
+                {
+                  "textRaw": "`sourceMap.findOrigin(lineNumber, columnNumber)`",
+                  "type": "method",
+                  "name": "findOrigin",
+                  "meta": {
+                    "added": [
+                      "v20.4.0",
+                      "v18.18.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`lineNumber` {number} 生成源中调用点的从 1 开始的行号",
+                          "name": "lineNumber",
+                          "type": "number",
+                          "desc": "生成源中调用点的从 1 开始的行号"
+                        },
+                        {
+                          "textRaw": "`columnNumber` {number} 生成源中调用点的从 1 开始的列号",
+                          "name": "columnNumber",
+                          "type": "number",
+                          "desc": "生成源中调用点的从 1 开始的列号"
+                        },
+                        {
+                          "textRaw": "返回: {Object}",
+                          "name": "返回",
+                          "type": "Object"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>给定生成源中调用点的从 1 开始的 <code>lineNumber</code> 和 <code>columnNumber</code>，查找原始源中对应的调用点位置。</p>\n<p>如果提供的 <code>lineNumber</code> 和 <code>columnNumber</code> 在任何 source map 中都找不到，则返回一个空对象。否则，返回的对象包含以下键：</p>\n<ul>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a> source map 中范围的名称（如果提供了）</li>\n<li><code>fileName</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 原始源的文件名，如 SourceMap 中报告的那样</li>\n<li><code>lineNumber</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 原始源中对应调用点的从 1 开始的行号</li>\n<li><code>columnNumber</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 原始源中对应调用点的从 1 开始的列号</li>\n</ul>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类: `module.SourceMap`"
+            }
+          ],
+          "type": "module",
+          "displayName": "Source Map 支持"
+        }
+      ],
+      "stability": 1,
+      "stabilityText": ".2 - Release candidate (asynchronous version) Stability: 1.1 - Active development (synchronous version)",
+      "miscs": [
+        {
+          "textRaw": "自定义钩子",
+          "name": "自定义钩子",
+          "meta": {
+            "added": [
+              "v8.8.0"
+            ],
+            "changes": [
+              {
+                "version": [
+                  "v23.5.0",
+                  "v22.15.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/55698",
+                "description": "Add support for synchronous and in-thread hooks."
+              },
+              {
+                "version": [
+                  "v20.6.0",
+                  "v18.19.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/48842",
+                "description": "Added `initialize` hook to replace `globalPreload`."
+              },
+              {
+                "version": [
+                  "v18.6.0",
+                  "v16.17.0"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/42623",
+                "description": "Add support for chaining loaders."
+              },
+              {
+                "version": "v16.12.0",
+                "pr-url": "https://github.com/nodejs/node/pull/37468",
+                "description": "Removed `getFormat`, `getSource`, `transformSource`, and `globalPreload`; added `load` hook and `getGlobalPreload` hook."
+              }
+            ]
+          },
+          "type": "misc",
+          "stability": 1,
+          "stabilityText": ".2 - Release candidate (asynchronous version) Stability: 1.1 - Active development (synchronous version)",
+          "desc": "<p>目前支持两种类型的模块自定义钩子：</p>\n<ol>\n<li><code>module.register(specifier[, parentURL][, options])</code>，它接受一个导出异步钩子函数的模块。这些函数在单独的加载器线程上运行。</li>\n<li><code>module.registerHooks(options)</code>，它接受同步钩子函数，这些函数直接在加载模块的线程上运行。</li>\n</ol>\n<p><i id=\"enabling_module_customization_hooks\"></i></p>",
+          "miscs": [
+            {
+              "textRaw": "启用",
+              "name": "启用",
+              "desc": "<p>模块解析和加载可以通过以下方式自定义：</p>\n<ol>\n<li>使用 <code>node:module</code> 的 <a href=\"#moduleregisterspecifier-parenturl-options\"><code>register</code></a> 方法注册一个导出一组异步钩子函数的文件，</li>\n<li>使用 <code>node:module</code> 的 <a href=\"#moduleregisterhooksoptions\"><code>registerHooks</code></a> 方法注册一组同步钩子函数。</li>\n</ol>\n<p>可以使用 <a href=\"cli.html#--importmodule\"><code>--import</code></a> 或 <a href=\"cli.html#-r---require-module\"><code>--require</code></a> 标志在应用程序代码运行之前注册钩子：</p>\n<pre><code class=\"language-bash\">node --import ./register-hooks.js ./my-app.js\nnode --require ./register-hooks.js ./my-app.js\n</code></pre>\n<pre><code class=\"language-mjs\">// register-hooks.js\n// 如果此文件不包含顶级 await，则只能被 require()。\n// 使用 module.register() 在专用线程中注册异步钩子。\nimport { register } from 'node:module';\nregister('./hooks.mjs', import.meta.url);\n</code></pre>\n<pre><code class=\"language-cjs\">// register-hooks.js\nconst { register } = require('node:module');\nconst { pathToFileURL } = require('node:url');\n// 使用 module.register() 在专用线程中注册异步钩子。\nregister('./hooks.mjs', pathToFileURL(__filename));\n</code></pre>\n<pre><code class=\"language-mjs\">// 使用 module.registerHooks() 在主线程中注册同步钩子。\nimport { registerHooks } from 'node:module';\nregisterHooks({\n  resolve(specifier, context, nextResolve) { /* implementation */ },\n  load(url, context, nextLoad) { /* implementation */ },\n});\n</code></pre>\n<pre><code class=\"language-cjs\">// 使用 module.registerHooks() 在主线程中注册同步钩子。\nconst { registerHooks } = require('node:module');\nregisterHooks({\n  resolve(specifier, context, nextResolve) { /* implementation */ },\n  load(url, context, nextLoad) { /* implementation */ },\n});\n</code></pre>\n<p>传递给 <code>--import</code> 或 <code>--require</code> 的文件也可以是依赖项的导出：</p>\n<pre><code class=\"language-bash\">node --import some-package/register ./my-app.js\nnode --require some-package/register ./my-app.js\n</code></pre>\n<p>其中 <code>some-package</code> 有一个 <a href=\"packages.html#exports\"><code>\"exports\"</code></a> 字段定义了 <code>/register</code> 导出，映射到一个调用 <code>register()</code> 的文件，如下面的 <code>register-hooks.js</code> 示例。</p>\n<p>使用 <code>--import</code> 或 <code>--require</code> 可确保在任何应用程序文件（包括应用程序的入口点以及默认情况下的任何工作线程）被导入之前注册钩子。</p>\n<p>或者，可以从入口点调用 <code>register()</code> 和 <code>registerHooks()</code>，但对于任何应在钩子注册后运行的 ESM 代码，必须使用动态 <code>import()</code>。</p>\n<pre><code class=\"language-mjs\">import { register } from 'node:module';\n\nregister('http-to-https', import.meta.url);\n\n// 因为这是一个动态 `import()`，`http-to-https` 钩子将运行来处理 `./my-app.js` 及其导入或需要的任何其他文件。\nawait import('./my-app.js');\n</code></pre>\n<pre><code class=\"language-cjs\">const { register } = require('node:module');\nconst { pathToFileURL } = require('node:url');\n\nregister('http-to-https', pathToFileURL(__filename));\n\n// 因为这是一个动态 `import()`，`http-to-https` 钩子将运行来处理 `./my-app.js` 及其导入或需要的任何其他文件。\nimport('./my-app.js');\n</code></pre>\n<p>自定义钩子将对在注册之后加载的任何模块以及它们通过 <code>import</code> 和内置 <code>require</code> 引用的模块运行。\n用户使用 <code>module.createRequire()</code> 创建的 <code>require</code> 函数只能由同步钩子自定义。</p>\n<p>在此示例中，我们注册了 <code>http-to-https</code> 钩子，但它们仅对随后导入的模块可用——在本例中为 <code>my-app.js</code> 及其通过 <code>import</code> 或在 CommonJS 依赖项中通过内置 <code>require</code> 引用的任何内容。</p>\n<p>如果 <code>import('./my-app.js')</code> 是静态的 <code>import './my-app.js'</code>，那么应用程序将在 <code>http-to-https</code> 钩子注册之前 <em>已经</em> 被加载。这是由于 ES 模块规范，其中静态导入首先从树的叶子开始评估，然后回到主干。<code>my-app.js</code> 内部 <em>可能有</em> 静态导入，这些导入在 <code>my-app.js</code> 被动态导入之前不会被评估。</p>\n<p>如果使用同步钩子，则 <code>import</code>、<code>require</code> 和使用 <code>createRequire()</code> 创建的用户 <code>require</code> 都受支持。</p>\n<pre><code class=\"language-mjs\">import { registerHooks, createRequire } from 'node:module';\n\nregisterHooks({ /* 同步钩子的实现 */ });\n\nconst require = createRequire(import.meta.url);\n\n// 同步钩子影响 import、require() 以及通过 createRequire() 创建的用户 require() 函数。\nawait import('./my-app.js');\nrequire('./my-app-2.js');\n</code></pre>\n<pre><code class=\"language-cjs\">const { register, registerHooks } = require('node:module');\nconst { pathToFileURL } = require('node:url');\n\nregisterHooks({ /* 同步钩子的实现 */ });\n\nconst userRequire = createRequire(__filename);\n\n// 同步钩子影响 import、require() 以及通过 createRequire() 创建的用户 require() 函数。\nimport('./my-app.js');\nrequire('./my-app-2.js');\nuserRequire('./my-app-3.js');\n</code></pre>\n<p>最后，如果您只想在应用程序运行之前注册钩子，并且不想为此目的创建单独的文件，可以将 <code>data:</code> URL 传递给 <code>--import</code>：</p>\n<pre><code class=\"language-bash\">node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"http-to-https\", pathToFileURL(\"./\"));' ./my-app.js\n</code></pre>",
+              "type": "misc",
+              "displayName": "启用"
+            },
+            {
+              "textRaw": "链式调用",
+              "name": "链式调用",
+              "desc": "<p>可以多次调用 <code>register</code>：</p>\n<pre><code class=\"language-mjs\">// entrypoint.mjs\nimport { register } from 'node:module';\n\nregister('./foo.mjs', import.meta.url);\nregister('./bar.mjs', import.meta.url);\nawait import('./my-app.mjs');\n</code></pre>\n<pre><code class=\"language-cjs\">// entrypoint.cjs\nconst { register } = require('node:module');\nconst { pathToFileURL } = require('node:url');\n\nconst parentURL = pathToFileURL(__filename);\nregister('./foo.mjs', parentURL);\nregister('./bar.mjs', parentURL);\nimport('./my-app.mjs');\n</code></pre>\n<p>在此示例中，注册的钩子将形成链。这些链以后进先出（LIFO）的方式运行。如果 <code>foo.mjs</code> 和 <code>bar.mjs</code> 都定义了一个 <code>resolve</code> 钩子，它们将被这样调用（注意从右到左）：\nNode.js 默认 ← <code>./foo.mjs</code> ← <code>./bar.mjs</code>\n（从 <code>./bar.mjs</code> 开始，然后是 <code>./foo.mjs</code>，然后是 Node.js 默认值）。\n所有其他钩子也是如此。</p>\n<p>注册的钩子也会影响 <code>register</code> 本身。在此示例中，<code>bar.mjs</code> 将通过 <code>foo.mjs</code> 注册的钩子进行解析和加载（因为 <code>foo</code> 的钩子将已经被添加到链中）。这允许实现诸如用非 JavaScript 语言编写钩子等功能，只要先前注册的钩子能够将其转译为 JavaScript。</p>\n<p>不能在定义钩子的模块内部调用 <code>register</code> 方法。</p>\n<p><code>registerHooks</code> 的链式调用工作方式类似。如果混合使用同步和异步钩子，同步钩子总是在异步钩子开始运行之前首先运行，也就是说，在最后一个运行的同步钩子中，其下一个钩子包括异步钩子的调用。</p>\n<pre><code class=\"language-mjs\">// entrypoint.mjs\nimport { registerHooks } from 'node:module';\n\nconst hook1 = { /* 钩子的实现 */ };\nconst hook2 = { /* 钩子的实现 */ };\n// hook2 在 hook1 之前运行。\nregisterHooks(hook1);\nregisterHooks(hook2);\n</code></pre>\n<pre><code class=\"language-cjs\">// entrypoint.cjs\nconst { registerHooks } = require('node:module');\n\nconst hook1 = { /* 钩子的实现 */ };\nconst hook2 = { /* 钩子的实现 */ };\n// hook2 在 hook1 之前运行。\nregisterHooks(hook1);\nregisterHooks(hook2);\n</code></pre>",
+              "type": "misc",
+              "displayName": "链式调用"
+            },
+            {
+              "textRaw": "与模块自定义钩子的通信",
+              "name": "与模块自定义钩子的通信",
+              "desc": "<p>异步钩子在专用线程上运行，与运行应用程序代码的主线程分离。这意味着改变全局变量不会影响其他线程，并且必须使用消息通道在线程之间进行通信。</p>\n<p><code>register</code> 方法可用于将数据传递给 <a href=\"#initialize\"><code>initialize</code></a> 钩子。传递给钩子的数据可能包括可传输对象，如端口。</p>\n<pre><code class=\"language-mjs\">import { register } from 'node:module';\nimport { MessageChannel } from 'node:worker_threads';\n\n// 此示例演示了如何使用消息通道与钩子通信，通过将 `port2` 发送给钩子。\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (msg) => {\n  console.log(msg);\n});\nport1.unref();\n\nregister('./my-hooks.mjs', {\n  parentURL: import.meta.url,\n  data: { number: 1, port: port2 },\n  transferList: [port2],\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { register } = require('node:module');\nconst { pathToFileURL } = require('node:url');\nconst { MessageChannel } = require('node:worker_threads');\n\n// 此示例展示了如何使用消息通道与钩子通信，通过将 `port2` 发送给钩子。\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (msg) => {\n  console.log(msg);\n});\nport1.unref();\n\nregister('./my-hooks.mjs', {\n  parentURL: pathToFileURL(__filename),\n  data: { number: 1, port: port2 },\n  transferList: [port2],\n});\n</code></pre>\n<p>同步模块钩子在运行应用程序代码的同一线程上运行。它们可以直接改变主线程访问的上下文的全局变量。</p>",
+              "type": "misc",
+              "displayName": "与模块自定义钩子的通信"
+            },
+            {
+              "textRaw": "钩子",
+              "name": "钩子",
+              "modules": [
+                {
+                  "textRaw": "`module.register()` 接受的异步钩子",
+                  "name": "`module.register()`_接受的异步钩子",
+                  "desc": "<p><a href=\"#moduleregisterspecifier-parenturl-options\"><code>register</code></a> 方法可用于注册一个导出一组钩子的模块。这些钩子是 Node.js 为自定义模块解析和加载过程而调用的函数。导出的函数必须具有特定的名称和签名，并且必须作为命名导出。</p>\n<pre><code class=\"language-mjs\">export async function initialize({ number, port }) {\n  // 从 `register` 接收数据。\n}\n\nexport async function resolve(specifier, context, nextResolve) {\n  // 获取 `import` 或 `require` 说明符并将其解析为 URL。\n}\n\nexport async function load(url, context, nextLoad) {\n  // 获取已解析的 URL 并返回要评估的源代码。\n}\n</code></pre>\n<p>异步钩子在单独的线程中运行，与运行应用程序代码的主线程隔离。这意味着它是一个不同的 <a href=\"https://tc39.es/ecma262/#realm\">领域</a>。主线程可能随时终止钩子线程，因此不要依赖异步操作（如 <code>console.log</code>）完成。默认情况下，它们会被继承到子工作线程中。</p>",
+                  "type": "module",
+                  "displayName": "`module.register()` 接受的异步钩子"
+                },
+                {
+                  "textRaw": "`module.registerHooks()` 接受的同步钩子",
+                  "name": "`module.registerhooks()`_接受的同步钩子",
+                  "meta": {
+                    "added": [
+                      "v23.5.0",
+                      "v22.15.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": ".1 - Active development",
+                  "desc": "<p><code>module.registerHooks()</code> 方法接受同步钩子函数。\n不支持也不需要 <code>initialize()</code>，因为钩子实现者可以在调用 <code>module.registerHooks()</code> 之前直接运行初始化代码。</p>\n<pre><code class=\"language-mjs\">function resolve(specifier, context, nextResolve) {\n  // 获取 `import` 或 `require` 说明符并将其解析为 URL。\n}\n\nfunction load(url, context, nextLoad) {\n  // 获取已解析的 URL 并返回要评估的源代码。\n}\n</code></pre>\n<p>同步钩子在加载模块的同一线程和同一 <a href=\"https://tc39.es/ecma262/#realm\">领域</a> 中运行。与异步钩子不同，默认情况下它们不会被继承到子工作线程中，但如果钩子是使用 <a href=\"cli.html#--importmodule\"><code>--import</code></a> 或 <a href=\"cli.html#-r---require-module\"><code>--require</code></a> 预加载的文件注册的，子工作线程可以通过 <code>process.execArgv</code> 继承预加载的脚本。有关详细信息，请参见 <a href=\"worker_threads.html#new-workerfilename-options\"><code>Worker</code> 的文档</a>。</p>\n<p>在同步钩子中，用户可以期望 <code>console.log()</code> 以与模块代码中的 <code>console.log()</code> 相同的方式完成。</p>",
+                  "type": "module",
+                  "displayName": "`module.registerHooks()` 接受的同步钩子"
+                },
+                {
+                  "textRaw": "钩子的约定",
+                  "name": "钩子的约定",
+                  "desc": "<p>钩子是 <a href=\"#chaining\">链</a> 的一部分，即使该链仅包含一个自定义（用户提供）钩子和始终存在的默认钩子。钩子函数是嵌套的：每个函数必须始终返回一个普通对象，而链式调用是每个函数调用 <code>next&#x3C;hookName>()</code> 的结果，这是对后续加载器钩子（按 LIFO 顺序）的引用。</p>\n<p>返回缺少必需属性的值的钩子会触发异常。返回而不调用 <code>next&#x3C;hookName>()</code> <em>且</em> 不返回 <code>shortCircuit: true</code> 的钩子也会触发异常。这些错误是为了防止链无意中断开。从钩子返回 <code>shortCircuit: true</code> 以表示链有意在您的钩子处结束。</p>",
+                  "type": "module",
+                  "displayName": "钩子的约定"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`initialize()`",
+                  "type": "method",
+                  "name": "initialize",
+                  "meta": {
+                    "added": [
+                      "v20.6.0",
+                      "v18.19.0"
+                    ],
+                    "changes": []
+                  },
+                  "stability": 1,
+                  "stabilityText": ".2 - Release candidate",
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`data` {any} 来自 `register(loader, import.meta.url, { data })` 的数据。",
+                          "name": "data",
+                          "type": "any",
+                          "desc": "来自 `register(loader, import.meta.url, { data })` 的数据。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>initialize</code> 钩子仅被 <a href=\"#moduleregisterspecifier-parenturl-options\"><code>register</code></a> 接受。<code>registerHooks()</code> 不支持也不需要它，因为同步钩子的初始化可以在调用 <code>registerHooks()</code> 之前直接运行。</p>\n<p><code>initialize</code> 钩子提供了一种定义自定义函数的方法，该函数在钩子模块初始化时在钩子线程中运行。初始化发生在通过 <a href=\"#moduleregisterspecifier-parenturl-options\"><code>register</code></a> 注册钩子模块时。</p>\n<p>此钩子可以从 <a href=\"#moduleregisterspecifier-parenturl-options\"><code>register</code></a> 调用接收数据，包括端口和其他可传输对象。<code>initialize</code> 的返回值可以是 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a>，在这种情况下，主应用程序线程执行恢复之前将等待它。</p>\n<p>模块自定义代码：</p>\n<pre><code class=\"language-mjs\">// path-to-my-hooks.js\n\nexport async function initialize({ number, port }) {\n  port.postMessage(`increment: ${number + 1}`);\n}\n</code></pre>\n<p>调用者代码：</p>\n<pre><code class=\"language-mjs\">import assert from 'node:assert';\nimport { register } from 'node:module';\nimport { MessageChannel } from 'node:worker_threads';\n\n// 此示例展示了如何使用消息通道在主（应用程序）线程和运行在钩子线程上的钩子之间进行通信，通过将 `port2` 发送给 `initialize` 钩子。\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (msg) => {\n  assert.strictEqual(msg, 'increment: 2');\n});\nport1.unref();\n\nregister('./path-to-my-hooks.js', {\n  parentURL: import.meta.url,\n  data: { number: 1, port: port2 },\n  transferList: [port2],\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const assert = require('node:assert');\nconst { register } = require('node:module');\nconst { pathToFileURL } = require('node:url');\nconst { MessageChannel } = require('node:worker_threads');\n\n// 此示例展示了如何使用消息通道在主（应用程序）线程和运行在钩子线程上的钩子之间进行通信，通过将 `port2` 发送给 `initialize` 钩子。\nconst { port1, port2 } = new MessageChannel();\n\nport1.on('message', (msg) => {\n  assert.strictEqual(msg, 'increment: 2');\n});\nport1.unref();\n\nregister('./path-to-my-hooks.js', {\n  parentURL: pathToFileURL(__filename),\n  data: { number: 1, port: port2 },\n  transferList: [port2],\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`resolve(specifier, context, nextResolve)`",
+                  "type": "method",
+                  "name": "resolve",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": [
+                          "v23.5.0",
+                          "v22.15.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/55698",
+                        "description": "Add support for synchronous and in-thread hooks."
+                      },
+                      {
+                        "version": [
+                          "v21.0.0",
+                          "v20.10.0",
+                          "v18.19.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/50140",
+                        "description": "The property `context.importAssertions` is replaced with `context.importAttributes`. Using the old name is still supported and will emit an experimental warning."
+                      },
+                      {
+                        "version": [
+                          "v18.6.0",
+                          "v16.17.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/42623",
+                        "description": "Add support for chaining resolve hooks. Each hook must either call `nextResolve()` or include a `shortCircuit` property set to `true` in its return."
+                      },
+                      {
+                        "version": [
+                          "v17.1.0",
+                          "v16.14.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/40250",
+                        "description": "Add support for import assertions."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`specifier` {string}",
+                          "name": "specifier",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`context` {Object}",
+                          "name": "context",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`conditions` {string\\[]} 相关 `package.json` 的导出条件",
+                              "name": "conditions",
+                              "type": "string\\[]",
+                              "desc": "相关 `package.json` 的导出条件"
+                            },
+                            {
+                              "textRaw": "`importAttributes` {Object} 一个对象，其键值对表示要导入模块的属性",
+                              "name": "importAttributes",
+                              "type": "Object",
+                              "desc": "一个对象，其键值对表示要导入模块的属性"
+                            },
+                            {
+                              "textRaw": "`parentURL` {string|undefined} 导入此模块的模块，如果这是 Node.js 入口点，则为 undefined",
+                              "name": "parentURL",
+                              "type": "string|undefined",
+                              "desc": "导入此模块的模块，如果这是 Node.js 入口点，则为 undefined"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`nextResolve` {Function} 链中的下一个 `resolve` 钩子，或者是最后一个用户提供的 `resolve` 钩子之后的 Node.js 默认 `resolve` 钩子",
+                          "name": "nextResolve",
+                          "type": "Function",
+                          "desc": "链中的下一个 `resolve` 钩子，或者是最后一个用户提供的 `resolve` 钩子之后的 Node.js 默认 `resolve` 钩子",
+                          "options": [
+                            {
+                              "textRaw": "`specifier` {string}",
+                              "name": "specifier",
+                              "type": "string"
+                            },
+                            {
+                              "textRaw": "`context` {Object|undefined} 如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。",
+                              "name": "context",
+                              "type": "Object|undefined",
+                              "desc": "如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回: {Object|Promise} 异步版本接受包含以下属性的对象，或者将解析为此类对象的 `Promise`。同步版本仅接受同步返回的对象。",
+                          "name": "返回",
+                          "type": "Object|Promise",
+                          "desc": "异步版本接受包含以下属性的对象，或者将解析为此类对象的 `Promise`。同步版本仅接受同步返回的对象。",
+                          "options": [
+                            {
+                              "textRaw": "`format` {string|null|undefined} 给 `load` 钩子的提示（可能会被忽略）。它可以是模块格式（如 `'commonjs'` 或 `'module'`）或任意值，如 `'css'` 或 `'yaml'`。",
+                              "name": "format",
+                              "type": "string|null|undefined",
+                              "desc": "给 `load` 钩子的提示（可能会被忽略）。它可以是模块格式（如 `'commonjs'` 或 `'module'`）或任意值，如 `'css'` 或 `'yaml'`。"
+                            },
+                            {
+                              "textRaw": "`importAttributes` {Object|undefined} 缓存模块时要使用的导入属性（可选；如果省略，将使用输入值）",
+                              "name": "importAttributes",
+                              "type": "Object|undefined",
+                              "desc": "缓存模块时要使用的导入属性（可选；如果省略，将使用输入值）"
+                            },
+                            {
+                              "textRaw": "`shortCircuit` {undefined|boolean} 表示此钩子意图终止 `resolve` 钩子链的信号。**默认值:** `false`",
+                              "name": "shortCircuit",
+                              "type": "undefined|boolean",
+                              "desc": "表示此钩子意图终止 `resolve` 钩子链的信号。**默认值:** `false`"
+                            },
+                            {
+                              "textRaw": "`url` {string} 此输入解析到的绝对 URL",
+                              "name": "url",
+                              "type": "string",
+                              "desc": "此输入解析到的绝对 URL"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<blockquote>\n<p><strong>警告</strong> 对于异步版本，尽管支持返回 promise 和 async 函数，但调用 <code>resolve</code> 仍可能阻塞主线程，从而影响性能。</p>\n</blockquote>\n<p><code>resolve</code> 钩子链负责告诉 Node.js 在哪里找到以及如何缓存给定的 <code>import</code> 语句或表达式，或 <code>require</code> 调用。它可以可选地返回一个格式（如 <code>'module'</code>）作为给 <code>load</code> 钩子的提示。如果指定了格式，<code>load</code> 钩子最终负责提供最终的 <code>format</code> 值（并且可以自由忽略 <code>resolve</code> 提供的提示）；如果 <code>resolve</code> 提供了 <code>format</code>，则即使仅为了将值传递给 Node.js 默认 <code>load</code> 钩子，也需要自定义 <code>load</code> 钩子。</p>\n<p>导入类型属性是用于将已加载模块保存到内部模块缓存的缓存键的一部分。如果模块应使用与源代码中存在的属性不同的属性进行缓存，则 <code>resolve</code> 钩子负责返回一个 <code>importAttributes</code> 对象。</p>\n<p><code>context</code> 中的 <code>conditions</code> 属性是一个条件数组，将用于匹配此解析请求的 <a href=\"packages.html#conditional-exports\">包导出条件</a>。它们可用于在其他地方查找条件映射，或在调用默认解析逻辑时修改列表。</p>\n<p>当前的 <a href=\"packages.html#conditional-exports\">包导出条件</a> 始终在传递给钩子的 <code>context.conditions</code> 数组中。为了在调用 <code>defaultResolve</code> 时保证 <em>默认的 Node.js 模块说明符解析行为</em>，传递给它的 <code>context.conditions</code> 数组 <em>必须</em> 包含最初传递给 <code>resolve</code> 钩子的 <code>context.conditions</code> 数组的 <em>所有</em> 元素。</p>\n<!-- TODO(joyeecheung): Math.random() is a bit too contrived. At least do a\nfind-and-replace mangling on the URLs. -->\n<pre><code class=\"language-mjs\">// module.register() 接受的异步版本。\nexport async function resolve(specifier, context, nextResolve) {\n  const { parentURL = null } = context;\n\n  if (Math.random() > 0.5) { // 某个条件。\n    // 对于部分或所有说明符，执行一些自定义的解析逻辑。\n    // 始终返回 {url: &#x3C;string>} 形式的对象。\n    return {\n      shortCircuit: true,\n      url: parentURL ?\n        new URL(specifier, parentURL).href :\n        new URL(specifier).href,\n    };\n  }\n\n  if (Math.random() &#x3C; 0.5) { // 另一个条件。\n    // 当调用 `defaultResolve` 时，可以修改参数。在这种情况下，它添加了另一个用于匹配条件导出的值。\n    return nextResolve(specifier, {\n      ...context,\n      conditions: [...context.conditions, 'another-condition'],\n    });\n  }\n\n  // 推迟到链中的下一个钩子，如果这是最后一个用户指定的加载器，则将是 Node.js 默认解析钩子。\n  return nextResolve(specifier);\n}\n</code></pre>\n<pre><code class=\"language-mjs\">// module.registerHooks() 接受的同步版本。\nfunction resolve(specifier, context, nextResolve) {\n  // 类似于上面的异步 resolve()，因为该版本没有任何异步逻辑。\n}\n</code></pre>"
+                },
+                {
+                  "textRaw": "`load(url, context, nextLoad)`",
+                  "type": "method",
+                  "name": "load",
+                  "meta": {
+                    "changes": [
+                      {
+                        "version": [
+                          "v23.5.0",
+                          "v22.15.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/55698",
+                        "description": "Add support for synchronous and in-thread version."
+                      },
+                      {
+                        "version": "v22.6.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/56350",
+                        "description": "Add support for `source` with format `commonjs-typescript` and `module-typescript`."
+                      },
+                      {
+                        "version": "v20.6.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/47999",
+                        "description": "Add support for `source` with format `commonjs`."
+                      },
+                      {
+                        "version": [
+                          "v18.6.0",
+                          "v16.17.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/42623",
+                        "description": "Add support for chaining load hooks. Each hook must either call `nextLoad()` or include a `shortCircuit` property set to `true` in its return."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`url` {string} `resolve` 链返回的 URL",
+                          "name": "url",
+                          "type": "string",
+                          "desc": "`resolve` 链返回的 URL"
+                        },
+                        {
+                          "textRaw": "`context` {Object}",
+                          "name": "context",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`conditions` {string\\[]} 相关 `package.json` 的导出条件",
+                              "name": "conditions",
+                              "type": "string\\[]",
+                              "desc": "相关 `package.json` 的导出条件"
+                            },
+                            {
+                              "textRaw": "`format` {string|null|undefined} `resolve` 钩子链可选提供的格式。这可以是任何字符串值作为输入；输入值不需要符合下面描述的可接受返回值列表。",
+                              "name": "format",
+                              "type": "string|null|undefined",
+                              "desc": "`resolve` 钩子链可选提供的格式。这可以是任何字符串值作为输入；输入值不需要符合下面描述的可接受返回值列表。"
+                            },
+                            {
+                              "textRaw": "`importAttributes` {Object}",
+                              "name": "importAttributes",
+                              "type": "Object"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`nextLoad` {Function} 链中的下一个 `load` 钩子，或者是最后一个用户提供的 `load` 钩子之后的 Node.js 默认 `load` 钩子",
+                          "name": "nextLoad",
+                          "type": "Function",
+                          "desc": "链中的下一个 `load` 钩子，或者是最后一个用户提供的 `load` 钩子之后的 Node.js 默认 `load` 钩子",
+                          "options": [
+                            {
+                              "textRaw": "`url` {string}",
+                              "name": "url",
+                              "type": "string"
+                            },
+                            {
+                              "textRaw": "`context` {Object|undefined} 如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。在默认的 `nextLoad` 中，如果 `url` 指向的模块没有显式的模块类型信息，则 `context.format` 是强制性的。",
+                              "name": "context",
+                              "type": "Object|undefined",
+                              "desc": "如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。在默认的 `nextLoad` 中，如果 `url` 指向的模块没有显式的模块类型信息，则 `context.format` 是强制性的。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回: {Object|Promise} 异步版本接受包含以下属性的对象，或者将解析为此类对象的 `Promise`。同步版本仅接受同步返回的对象。",
+                          "name": "返回",
+                          "type": "Object|Promise",
+                          "desc": "异步版本接受包含以下属性的对象，或者将解析为此类对象的 `Promise`。同步版本仅接受同步返回的对象。",
+                          "options": [
+                            {
+                              "textRaw": "`format` {string}",
+                              "name": "format",
+                              "type": "string"
+                            },
+                            {
+                              "textRaw": "`shortCircuit` {undefined|boolean} 表示此钩子意图终止 `load` 钩子链的信号。**默认值:** `false`",
+                              "name": "shortCircuit",
+                              "type": "undefined|boolean",
+                              "desc": "表示此钩子意图终止 `load` 钩子链的信号。**默认值:** `false`"
+                            },
+                            {
+                              "textRaw": "`source` {string|ArrayBuffer|TypedArray} 供 Node.js 评估的源代码",
+                              "name": "source",
+                              "type": "string|ArrayBuffer|TypedArray",
+                              "desc": "供 Node.js 评估的源代码"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>load</code> 钩子提供了一种自定义方法来解释、检索和解析 URL。它还负责验证导入属性。</p>\n<p><code>format</code> 的最终值必须是以下之一：</p>\n<table>\n<thead>\n<tr>\n<th><code>format</code></th>\n<th>描述</th>\n<th><code>load</code> 返回的 <code>source</code> 可接受类型</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>'addon'</code></td>\n<td>加载 Node.js 插件</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a></td>\n</tr>\n<tr>\n<td><code>'builtin'</code></td>\n<td>加载 Node.js 内置模块</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a></td>\n</tr>\n<tr>\n<td><code>'commonjs-typescript'</code></td>\n<td>加载具有 TypeScript 语法的 Node.js CommonJS 模块</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a></td>\n</tr>\n<tr>\n<td><code>'commonjs'</code></td>\n<td>加载 Node.js CommonJS 模块</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type\" class=\"type\">&lt;null&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type\" class=\"type\">&lt;undefined&gt;</a></td>\n</tr>\n<tr>\n<td><code>'json'</code></td>\n<td>加载 JSON 文件</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a></td>\n</tr>\n<tr>\n<td><code>'module-typescript'</code></td>\n<td>加载具有 TypeScript 语法的 ES 模块</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a></td>\n</tr>\n<tr>\n<td><code>'module'</code></td>\n<td>加载 ES 模块</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a></td>\n</tr>\n<tr>\n<td><code>'wasm'</code></td>\n<td>加载 WebAssembly 模块</td>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a></td>\n</tr>\n</tbody>\n</table>\n<p>对于类型 <code>'builtin'</code>，<code>source</code> 的值被忽略，因为目前无法替换 Node.js 内置（核心）模块的值。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "异步 `load` 钩子的注意事项",
+                      "name": "异步_`load`_钩子的注意事项",
+                      "desc": "<p>当使用异步 <code>load</code> 钩子时，对于 <code>'commonjs'</code> 省略 <code>source</code> 与提供 <code>source</code> 有非常不同的效果：</p>\n<ul>\n<li>当提供了 <code>source</code> 时，此模块的所有 <code>require</code> 调用将由具有注册的 <code>resolve</code> 和 <code>load</code> 钩子的 ESM 加载器处理；此模块的所有 <code>require.resolve</code> 调用将由具有注册的 <code>resolve</code> 钩子的 ESM 加载器处理；只有一部分 CommonJS API 可用（例如，没有 <code>require.extensions</code>，没有 <code>require.cache</code>，没有 <code>require.resolve.paths</code>），并且对 CommonJS 模块加载器的猴子补丁将不适用。</li>\n<li>如果 <code>source</code> 是 undefined 或 <code>null</code>，它将由 CommonJS 模块加载器处理，并且 <code>require</code>/<code>require.resolve</code> 调用不会经过注册的钩子。对于空值 <code>source</code> 的此行为是临时的——将来，将不支持空值 <code>source</code>。</li>\n</ul>\n<p>这些注意事项不适用于同步 <code>load</code> 钩子，在这种情况下，自定义 CommonJS 模块可用的完整 CommonJS API 集，并且 <code>require</code>/<code>require.resolve</code> 总是经过注册的钩子。</p>\n<p>Node.js 内部的异步 <code>load</code> 实现（作为链中最后一个钩子的 <code>next</code> 的值）在 <code>format</code> 为 <code>'commonjs'</code> 时为了向后兼容性返回 <code>null</code> 作为 <code>source</code>。以下是一个钩子示例，它将选择使用非默认行为：</p>\n<pre><code class=\"language-mjs\">import { readFile } from 'node:fs/promises';\n\n// module.register() 接受的异步版本。对于 module.registerHooks() 接受的同步版本不需要此修复。\nexport async function load(url, context, nextLoad) {\n  const result = await nextLoad(url, context);\n  if (result.format === 'commonjs') {\n    result.source ??= await readFile(new URL(result.responseURL ?? url));\n  }\n  return result;\n}\n</code></pre>\n<p>这也不适用于同步 <code>load</code> 钩子，在这种情况下，返回的 <code>source</code> 包含下一个钩子加载的源代码，无论模块格式如何。</p>\n<blockquote>\n<p><strong>警告</strong>：异步 <code>load</code> 钩子和来自 CommonJS 模块的命名空间导出不兼容。尝试同时使用它们将导致导入返回空对象。这可能在将来得到解决。这不适用于同步 <code>load</code> 钩子，在这种情况下，可以正常使用导出。</p>\n</blockquote>\n<blockquote>\n<p>这些类型都对应于 ECMAScript 中定义的类。</p>\n</blockquote>\n<ul>\n<li>特定的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> 对象是 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer\" class=\"type\">&lt;SharedArrayBuffer&gt;</a>。</li>\n<li>特定的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> 对象是 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array\" class=\"type\">&lt;Uint8Array&gt;</a>。</li>\n</ul>\n<p>如果基于文本的格式（即 <code>'json'</code>、<code>'module'</code>）的源值不是字符串，则使用 <a href=\"util.html#class-utiltextdecoder\"><code>util.TextDecoder</code></a> 将其转换为字符串。</p>\n<p><code>load</code> 钩子提供了一种自定义检索已解析 URL 的源代码的方法。这将允许加载器潜在地避免从磁盘读取文件。它还可以用于将无法识别的格式映射到支持的格式，例如将 <code>yaml</code> 映射到 <code>module</code>。</p>\n<pre><code class=\"language-mjs\">// module.register() 接受的异步版本。\nexport async function load(url, context, nextLoad) {\n  const { format } = context;\n\n  if (Math.random() > 0.5) { // 某个条件\n    /*\n      对于部分或所有 URL，执行一些自定义的检索源代码的逻辑。\n      始终返回 {\n        format: &#x3C;string>,\n        source: &#x3C;string|buffer>,\n      } 形式的对象。\n    */\n    return {\n      format,\n      shortCircuit: true,\n      source: '...',\n    };\n  }\n\n  // 推迟到链中的下一个钩子。\n  return nextLoad(url);\n}\n</code></pre>\n<pre><code class=\"language-mjs\">// module.registerHooks() 接受的同步版本。\nfunction load(url, context, nextLoad) {\n  // 类似于上面的异步 load()，因为该版本没有任何异步逻辑。\n}\n</code></pre>\n<p>在更高级的场景中，这也可以用于将不支持的源转换为支持的源（参见下面的 <a href=\"#%E7%A4%BA%E4%BE%8B\">示例</a>）。</p>",
+                      "type": "module",
+                      "displayName": "异步 `load` 钩子的注意事项"
+                    }
+                  ]
+                }
+              ],
+              "type": "misc",
+              "displayName": "钩子"
+            },
+            {
+              "textRaw": "示例",
+              "name": "示例",
+              "desc": "<p>各种模块自定义钩子可以一起使用，以实现对 Node.js 代码加载和评估行为的广泛自定义。</p>",
+              "modules": [
+                {
+                  "textRaw": "从 HTTPS 导入",
+                  "name": "从_https_导入",
+                  "desc": "<p>下面的钩子注册了钩子以启用对此类说明符的基本支持。虽然这似乎是对 Node.js 核心功能的重大改进，但实际上使用这些钩子存在明显的缺点：性能比从磁盘加载文件慢得多，没有缓存，也没有安全性。</p>\n<pre><code class=\"language-mjs\">// https-hooks.mjs\nimport { get } from 'node:https';\n\nexport function load(url, context, nextLoad) {\n  // 对于要通过网络加载的 JavaScript，我们需要获取并返回它。\n  if (url.startsWith('https://')) {\n    return new Promise((resolve, reject) => {\n      get(url, (res) => {\n        let data = '';\n        res.setEncoding('utf8');\n        res.on('data', (chunk) => data += chunk);\n        res.on('end', () => resolve({\n          // 此示例假设所有网络提供的 JavaScript 都是 ES 模块代码。\n          format: 'module',\n          shortCircuit: true,\n          source: data,\n        }));\n      }).on('error', (err) => reject(err));\n    });\n  }\n\n  // 让 Node.js 处理所有其他 URL。\n  return nextLoad(url);\n}\n</code></pre>\n<pre><code class=\"language-mjs\">// main.mjs\nimport { VERSION } from 'https://coffeescript.org/browser-compiler-modern/coffeescript.js';\n\nconsole.log(VERSION);\n</code></pre>\n<p>使用前面的钩子模块，运行\n<code>node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(pathToFileURL(\"./https-hooks.mjs\"));' ./main.mjs</code>\n根据 <code>main.mjs</code> 中 URL 处的模块打印当前版本的 CoffeeScript。</p>\n<!-- TODO(joyeecheung): add an example on how to implement it with a fetchSync based on\nworkers and Atomics.wait() - or all these examples are too much to be put in the API\ndocumentation already and should be put into a repository instead? -->",
+                  "type": "module",
+                  "displayName": "从 HTTPS 导入"
+                },
+                {
+                  "textRaw": "转译",
+                  "name": "转译",
+                  "desc": "<p>Node.js 无法理解的格式的源代码可以使用 <a href=\"#loadurl-context-nextload\"><code>load</code> 钩子</a> 转换为 JavaScript。</p>\n<p>这比在运行 Node.js 之前转译源文件性能更低；转译器钩子应仅用于开发和测试目的。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "异步版本",
+                      "name": "异步版本",
+                      "desc": "<pre><code class=\"language-mjs\">// coffeescript-hooks.mjs\nimport { readFile } from 'node:fs/promises';\nimport { findPackageJSON } from 'node:module';\nimport coffeescript from 'coffeescript';\n\nconst extensionsRegex = /\\.(coffee|litcoffee|coffee\\.md)$/;\n\nexport async function load(url, context, nextLoad) {\n  if (extensionsRegex.test(url)) {\n    // CoffeeScript 文件可以是 CommonJS 或 ES 模块。使用自定义格式告诉 Node.js 不要检测其模块类型。\n    const { source: rawSource } = await nextLoad(url, { ...context, format: 'coffee' });\n    // 此钩子将所有导入的 CoffeeScript 文件的 CoffeeScript 源代码转换为 JavaScript 源代码。\n    const transformedSource = coffeescript.compile(rawSource.toString(), url);\n\n    // 为了确定 Node.js 将如何解释转译结果，请在文件系统中向上搜索最近的父 package.json 文件并读取其 \"type\" 字段。\n    return {\n      format: await getPackageType(url),\n      shortCircuit: true,\n      source: transformedSource,\n    };\n  }\n\n  // 让 Node.js 处理所有其他 URL。\n  return nextLoad(url, context);\n}\n\nasync function getPackageType(url) {\n  // `url` 仅在第一次迭代时是文件路径，当传递来自 load() 钩子的已解析 url 时\n  // 来自 load() 的实际文件路径将包含文件扩展名，因为规范要求如此\n  // 这个简单的检查 `url` 是否包含文件扩展名的真值检查对于大多数项目都有效，但不能涵盖一些边缘情况（例如无扩展名文件或以尾随空格结尾的 url）\n  const pJson = findPackageJSON(url);\n\n  return readFile(pJson, 'utf8')\n    .then(JSON.parse)\n    .then((json) => json?.type)\n    .catch(() => undefined);\n}\n</code></pre>",
+                      "type": "module",
+                      "displayName": "异步版本"
+                    },
+                    {
+                      "textRaw": "同步版本",
+                      "name": "同步版本",
+                      "desc": "<pre><code class=\"language-mjs\">// coffeescript-sync-hooks.mjs\nimport { readFileSync } from 'node:fs';\nimport { registerHooks, findPackageJSON } from 'node:module';\nimport coffeescript from 'coffeescript';\n\nconst extensionsRegex = /\\.(coffee|litcoffee|coffee\\.md)$/;\n\nfunction load(url, context, nextLoad) {\n  if (extensionsRegex.test(url)) {\n    const { source: rawSource } = nextLoad(url, { ...context, format: 'coffee' });\n    const transformedSource = coffeescript.compile(rawSource.toString(), url);\n\n    return {\n      format: getPackageType(url),\n      shortCircuit: true,\n      source: transformedSource,\n    };\n  }\n\n  return nextLoad(url, context);\n}\n\nfunction getPackageType(url) {\n  const pJson = findPackageJSON(url);\n  if (!pJson) {\n    return undefined;\n  }\n  try {\n    const file = readFileSync(pJson, 'utf-8');\n    return JSON.parse(file)?.type;\n  } catch {\n    return undefined;\n  }\n}\n\nregisterHooks({ load });\n</code></pre>",
+                      "type": "module",
+                      "displayName": "同步版本"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "转译"
+                },
+                {
+                  "textRaw": "运行钩子",
+                  "name": "运行钩子",
+                  "desc": "<pre><code class=\"language-coffee\"># main.coffee\nimport { scream } from './scream.coffee'\nconsole.log scream 'hello, world'\n\nimport { version } from 'node:process'\nconsole.log \"Brought to you by Node.js version #{version}\"\n</code></pre>\n<pre><code class=\"language-coffee\"># scream.coffee\nexport scream = (str) -> str.toUpperCase()\n</code></pre>\n<p>为了运行示例，添加一个包含 CoffeeScript 文件模块类型的 <code>package.json</code> 文件。</p>\n<pre><code class=\"language-json\">{\n  \"type\": \"module\"\n}\n</code></pre>\n<p>这仅用于运行示例。在真实的加载器中，即使在没有 <code>package.json</code> 中显式类型的情况下，<code>getPackageType()</code> 也必须能够返回 Node.js 已知的 <code>format</code>，否则 <code>nextLoad</code> 调用将抛出 <code>ERR_UNKNOWN_FILE_EXTENSION</code>（如果为 undefined）或 <code>ERR_UNKNOWN_MODULE_FORMAT</code>（如果它不是 [load 钩子][] 文档中列出的已知格式）。</p>\n<p>使用前面的钩子模块，运行\n<code>node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(pathToFileURL(\"./coffeescript-hooks.mjs\"));' ./main.coffee</code>\n或 <code>node --import ./coffeescript-sync-hooks.mjs ./main.coffee</code>\n会导致 <code>main.coffee</code> 在其源代码从磁盘加载后但在 Node.js 执行之前被转换为 JavaScript；对于任何通过任何加载文件的 <code>import</code> 语句引用的 <code>.coffee</code>、<code>.litcoffee</code> 或 <code>.coffee.md</code> 文件也是如此。</p>",
+                  "type": "module",
+                  "displayName": "运行钩子"
+                },
+                {
+                  "textRaw": "导入映射",
+                  "name": "导入映射",
+                  "desc": "<p>前两个示例定义了 <code>load</code> 钩子。这是一个 <code>resolve</code> 钩子的示例。此钩子模块读取一个 <code>import-map.json</code> 文件，该文件定义了哪些说明符应覆盖到其他 URL（这是 \"导入映射\" 规范的一小部分子集的非常简单的实现）。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "异步版本",
+                      "name": "异步版本",
+                      "desc": "<pre><code class=\"language-mjs\">// import-map-hooks.js\nimport fs from 'node:fs/promises';\n\nconst { imports } = JSON.parse(await fs.readFile('import-map.json'));\n\nexport async function resolve(specifier, context, nextResolve) {\n  if (Object.hasOwn(imports, specifier)) {\n    return nextResolve(imports[specifier], context);\n  }\n\n  return nextResolve(specifier, context);\n}\n</code></pre>",
+                      "type": "module",
+                      "displayName": "异步版本"
+                    },
+                    {
+                      "textRaw": "同步版本",
+                      "name": "同步版本",
+                      "desc": "<pre><code class=\"language-mjs\">// import-map-sync-hooks.js\nimport fs from 'node:fs/promises';\nimport module from 'node:module';\n\nconst { imports } = JSON.parse(fs.readFileSync('import-map.json', 'utf-8'));\n\nfunction resolve(specifier, context, nextResolve) {\n  if (Object.hasOwn(imports, specifier)) {\n    return nextResolve(imports[specifier], context);\n  }\n\n  return nextResolve(specifier, context);\n}\n\nmodule.registerHooks({ resolve });\n</code></pre>",
+                      "type": "module",
+                      "displayName": "同步版本"
+                    },
+                    {
+                      "textRaw": "使用钩子",
+                      "name": "使用钩子",
+                      "desc": "<p>使用这些文件：</p>\n<pre><code class=\"language-mjs\">// main.js\nimport 'a-module';\n</code></pre>\n<pre><code class=\"language-json\">// import-map.json\n{\n  \"imports\": {\n    \"a-module\": \"./some-module.js\"\n  }\n}\n</code></pre>\n<pre><code class=\"language-mjs\">// some-module.js\nconsole.log('some module!');\n</code></pre>\n<p>运行 <code>node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(pathToFileURL(\"./import-map-hooks.js\"));' main.js</code>\n或 <code>node --import ./import-map-sync-hooks.js main.js</code>\n应该打印 <code>some module!</code>。</p>",
+                      "type": "module",
+                      "displayName": "使用钩子"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "导入映射"
+                }
+              ],
+              "type": "misc",
+              "displayName": "示例"
+            }
+          ]
+        }
+      ],
+      "type": "module",
+      "displayName": "Modules: `node:module` API"
+    }
+  ]
+}

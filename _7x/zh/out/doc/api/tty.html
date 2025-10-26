@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>TTY | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/tty.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  
+</head>
+<body class="alt apidoc" id="api-section-tty">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty active">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="tty" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#tty">TTY</a></span>
+<ul>
+<li><a href="#ttyreadstream">类：<code>tty.ReadStream</code></a>
+<ul>
+<li><a href="#readstreamisraw"><code>readStream.isRaw</code></a></li>
+<li><a href="#readstreamistty"><code>readStream.isTTY</code></a></li>
+<li><a href="#readstreamsetrawmodemode"><code>readStream.setRawMode(mode)</code></a></li>
+</ul>
+</li>
+<li><a href="#ttywritestream">类：<code>tty.WriteStream</code></a>
+<ul>
+<li><a href="#new-ttyreadstreamfd-options"><code>new tty.ReadStream(fd[, options])</code></a></li>
+<li><a href="#new-ttywritestreamfd"><code>new tty.WriteStream(fd)</code></a></li>
+<li><a href="#resize">事件：<code>'resize'</code></a></li>
+<li><a href="#writestreamclearlinedir-callback"><code>writeStream.clearLine(dir[, callback])</code></a></li>
+<li><a href="#writestreamclearscreendowncallback"><code>writeStream.clearScreenDown([callback])</code></a></li>
+<li><a href="#writestreamcolumns"><code>writeStream.columns</code></a></li>
+<li><a href="#writestreamcursortox-y-callback"><code>writeStream.cursorTo(x[, y][, callback])</code></a></li>
+<li><a href="#writestreamgetcolordepthenv"><code>writeStream.getColorDepth([env])</code></a></li>
+<li><a href="#writestreamgetwindowsize"><code>writeStream.getWindowSize()</code></a></li>
+<li><a href="#writestreamhascolorscount-env"><code>writeStream.hasColors([count][, env])</code></a></li>
+<li><a href="#writestreamistty"><code>writeStream.isTTY</code></a></li>
+<li><a href="#writestreammovecursordx-dy-callback"><code>writeStream.moveCursor(dx, dy[, callback])</code></a></li>
+<li><a href="#writestreamrows"><code>writeStream.rows</code></a></li>
+</ul>
+</li>
+<li><a href="#ttyisattyfd"><code>tty.isatty(fd)</code></a></li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty active">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/tty.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/tty.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/tty.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/tty.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/tty.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/tty.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/tty.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/tty.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/tty.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/tty.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/tty.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/tty.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/tty.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/tty.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/tty.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/tty.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/tty.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/tty.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/tty.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/tty.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/tty.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/tty.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/tty.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/tty.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="tty.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/tty.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#tty">TTY</a></span>
+<ul>
+<li><a href="#ttyreadstream">类：<code>tty.ReadStream</code></a>
+<ul>
+<li><a href="#readstreamisraw"><code>readStream.isRaw</code></a></li>
+<li><a href="#readstreamistty"><code>readStream.isTTY</code></a></li>
+<li><a href="#readstreamsetrawmodemode"><code>readStream.setRawMode(mode)</code></a></li>
+</ul>
+</li>
+<li><a href="#ttywritestream">类：<code>tty.WriteStream</code></a>
+<ul>
+<li><a href="#new-ttyreadstreamfd-options"><code>new tty.ReadStream(fd[, options])</code></a></li>
+<li><a href="#new-ttywritestreamfd"><code>new tty.WriteStream(fd)</code></a></li>
+<li><a href="#resize">事件：<code>'resize'</code></a></li>
+<li><a href="#writestreamclearlinedir-callback"><code>writeStream.clearLine(dir[, callback])</code></a></li>
+<li><a href="#writestreamclearscreendowncallback"><code>writeStream.clearScreenDown([callback])</code></a></li>
+<li><a href="#writestreamcolumns"><code>writeStream.columns</code></a></li>
+<li><a href="#writestreamcursortox-y-callback"><code>writeStream.cursorTo(x[, y][, callback])</code></a></li>
+<li><a href="#writestreamgetcolordepthenv"><code>writeStream.getColorDepth([env])</code></a></li>
+<li><a href="#writestreamgetwindowsize"><code>writeStream.getWindowSize()</code></a></li>
+<li><a href="#writestreamhascolorscount-env"><code>writeStream.hasColors([count][, env])</code></a></li>
+<li><a href="#writestreamistty"><code>writeStream.isTTY</code></a></li>
+<li><a href="#writestreammovecursordx-dy-callback"><code>writeStream.moveCursor(dx, dy[, callback])</code></a></li>
+<li><a href="#writestreamrows"><code>writeStream.rows</code></a></li>
+</ul>
+</li>
+<li><a href="#ttyisattyfd"><code>tty.isatty(fd)</code></a></li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>TTY<span><a class="mark" href="#tty" id="tty">#</a></span><a aria-hidden="true" class="legacy" id="tty_tty"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/tty.js">lib/tty.js</a></p>
+<p><code>node:tty</code> 模块提供了 <code>tty.ReadStream</code> 和 <code>tty.WriteStream</code> 类。在大多数情况下，没有必要或可能直接使用此模块。但是，可以通过以下方式访问它：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> tty = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:tty'</span>);</code> <button class="copy-button">copy</button></pre>
+<p>当 Node.js 检测到它正在运行并附加了一个文本终端（"TTY"）时，默认情况下，<a href="process.html#processstdin"><code>process.stdin</code></a> 将被初始化为 <code>tty.ReadStream</code> 的实例，而 <a href="process.html#processstdout"><code>process.stdout</code></a> 和 <a href="process.html#processstderr"><code>process.stderr</code></a> 默认情况下将是 <code>tty.WriteStream</code> 的实例。判断 Node.js 是否在 TTY 上下文中运行的推荐方法是检查 <code>process.stdout.isTTY</code> 属性的值是否为 <code>true</code>：</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node -p -e <span class="hljs-string">"Boolean(process.stdout.isTTY)"</span></span>
+true
+<span class="hljs-meta prompt_">$ </span><span class="language-bash">node -p -e <span class="hljs-string">"Boolean(process.stdout.isTTY)"</span> | <span class="hljs-built_in">cat</span></span>
+false</code> <button class="copy-button">copy</button></pre>
+<p>在大多数情况下，应用程序应该几乎没有理由手动创建 <code>tty.ReadStream</code> 和 <code>tty.WriteStream</code> 类的实例。</p>
+<section><h3>类：<code>tty.ReadStream</code><span><a class="mark" href="#ttyreadstream" id="ttyreadstream">#</a></span><a aria-hidden="true" class="legacy" id="tty_tty_readstream"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.5.8</span>
+</div>
+<ul>
+<li>继承自：<a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a></li>
+</ul>
+<p>表示 TTY 的可读端。在正常情况下，<a href="process.html#processstdin"><code>process.stdin</code></a> 将是 Node.js 进程中唯一的 <code>tty.ReadStream</code> 实例，并且没有理由创建额外的实例。</p>
+<div>
+<h4><code>readStream.isRaw</code><span><a class="mark" href="#readstreamisraw" id="readstreamisraw">#</a></span><a aria-hidden="true" class="legacy" id="tty_readstream_israw"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<p>一个 <code>boolean</code>，如果 TTY 当前配置为作为原始设备运行，则为 <code>true</code>。</p>
+<p>当进程启动时，此标志始终为 <code>false</code>，即使终端以原始模式运行。其值将随着后续调用 <code>setRawMode</code> 而改变。</p>
+</div><div>
+<h4><code>readStream.isTTY</code><span><a class="mark" href="#readstreamistty" id="readstreamistty">#</a></span><a aria-hidden="true" class="legacy" id="tty_readstream_istty"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.5.8</span>
+</div>
+<p>一个 <code>boolean</code>，对于 <code>tty.ReadStream</code> 实例始终为 <code>true</code>。</p>
+</div><div>
+<h4><code>readStream.setRawMode(mode)</code><span><a class="mark" href="#readstreamsetrawmodemode" id="readstreamsetrawmodemode">#</a></span><a aria-hidden="true" class="legacy" id="tty_readstream_setrawmode_mode"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<ul>
+<li><code>mode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则将 <code>tty.ReadStream</code> 配置为作为原始设备运行。如果为 <code>false</code>，则将 <code>tty.ReadStream</code> 配置为其默认模式运行。<code>readStream.isRaw</code> 属性将被设置为结果模式。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" class="type">&#x3C;this></a> 读取流实例。</li>
+</ul>
+<p>允许配置 <code>tty.ReadStream</code>，使其作为原始设备运行。</p>
+<p>在原始模式下，输入总是按字符可用，不包括修饰符。此外，终端对所有字符的特殊处理都被禁用，包括回显输入字符。在此模式下，<kbd>Ctrl</kbd>+<kbd>C</kbd> 将不再导致 <code>SIGINT</code>。</p>
+</div>
+</section><section><h3>类：<code>tty.WriteStream</code><span><a class="mark" href="#ttywritestream" id="ttywritestream">#</a></span><a aria-hidden="true" class="legacy" id="tty_tty_writestream"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.5.8</span>
+</div>
+<ul>
+<li>继承自：<a href="net.html#class-netsocket" class="type">&#x3C;net.Socket></a></li>
+</ul>
+<p>表示 TTY 的可写端。在正常情况下，<a href="process.html#processstdout"><code>process.stdout</code></a> 和 <a href="process.html#processstderr"><code>process.stderr</code></a> 将是 Node.js 进程创建的唯二 <code>tty.WriteStream</code> 实例，并且没有理由创建额外的实例。</p>
+<div>
+<h4><code>new tty.ReadStream(fd[, options])</code><span><a class="mark" href="#new-ttyreadstreamfd-options" id="new-ttyreadstreamfd-options">#</a></span><a aria-hidden="true" class="legacy" id="tty_new_tty_readstream_fd_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v0.9.4</td>
+<td><p>The <code>options</code> argument is supported.</p></td></tr>
+<tr><td>v0.5.8</td>
+<td><p><span>Added in: v0.5.8</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>fd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 与 TTY 关联的文件描述符。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 传递给父类 <code>net.Socket</code> 的选项，参见 <a href="net.html#new-netsocketoptions"><code>net.Socket</code> 构造函数</a> 的 <code>options</code>。</li>
+<li>返回：<a href="tty.html#class-ttyreadstream" class="type">&#x3C;tty.ReadStream></a></li>
+</ul>
+<p>为与 TTY 关联的 <code>fd</code> 创建一个 <code>ReadStream</code>。</p>
+</div><div>
+<h4><code>new tty.WriteStream(fd)</code><span><a class="mark" href="#new-ttywritestreamfd" id="new-ttywritestreamfd">#</a></span><a aria-hidden="true" class="legacy" id="tty_new_tty_writestream_fd"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.5.8</span>
+</div>
+<ul>
+<li><code>fd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 与 TTY 关联的文件描述符。</li>
+<li>返回：<a href="tty.html#class-ttywritestream" class="type">&#x3C;tty.WriteStream></a></li>
+</ul>
+<p>为与 TTY 关联的 <code>fd</code> 创建一个 <code>WriteStream</code>。</p>
+</div><div>
+<h4>事件：<code>'resize'</code><span><a class="mark" href="#resize" id="resize">#</a></span><a aria-hidden="true" class="legacy" id="tty_resize"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<p>每当 <code>writeStream.columns</code> 或 <code>writeStream.rows</code> 属性发生变化时，就会触发 <code>'resize'</code> 事件。调用监听器回调时不传递任何参数。</p>
+<pre><code class="language-js">process.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'resize'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'screen size has changed!'</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${process.stdout.columns}</span>x<span class="hljs-subst">${process.stdout.rows}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>writeStream.clearLine(dir[, callback])</code><span><a class="mark" href="#writestreamclearlinedir-callback" id="writestreamclearlinedir-callback">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_clearline_dir_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>dir</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a>
+<ul>
+<li><code>-1</code>: 从光标向左</li>
+<li><code>1</code>: 从光标向右</li>
+<li><code>0</code>: 整行</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果流希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件被触发，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>writeStream.clearLine()</code> 按 <code>dir</code> 标识的方向清除此 <code>WriteStream</code> 的当前行。</p>
+</div><div>
+<h4><code>writeStream.clearScreenDown([callback])</code><span><a class="mark" href="#writestreamclearscreendowncallback" id="writestreamclearscreendowncallback">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_clearscreendown_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果流希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件被触发，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>writeStream.clearScreenDown()</code> 从此 <code>WriteStream</code> 的当前光标向下清除。</p>
+</div><div>
+<h4><code>writeStream.columns</code><span><a class="mark" href="#writestreamcolumns" id="writestreamcolumns">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_columns"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<p>一个 <code>number</code>，指定 TTY 当前具有的列数。每当触发 <code>'resize'</code> 事件时，此属性都会更新。</p>
+</div><div>
+<h4><code>writeStream.cursorTo(x[, y][, callback])</code><span><a class="mark" href="#writestreamcursortox-y-callback" id="writestreamcursortox-y-callback">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_cursorto_x_y_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>x</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>y</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果流希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件被触发，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>writeStream.cursorTo()</code> 将此 <code>WriteStream</code> 的光标移动到指定位置。</p>
+</div><div>
+<h4><code>writeStream.getColorDepth([env])</code><span><a class="mark" href="#writestreamgetcolordepthenv" id="writestreamgetcolordepthenv">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_getcolordepth_env"></a></h4>
+<div class="api_metadata">
+<span>Added in: v9.9.0</span>
+</div>
+<ul>
+<li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含要检查的环境变量的对象。这允许模拟特定终端的使用。<strong>默认值：</strong> <code>process.env</code>。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>返回：</p>
+<ul>
+<li><code>1</code> 表示 2 色，</li>
+<li><code>4</code> 表示 16 色，</li>
+<li><code>8</code> 表示 256 色，</li>
+<li><code>24</code> 表示 16,777,216 色支持。</li>
+</ul>
+<p>使用此方法来确定终端支持的颜色。由于终端中颜色的性质，可能会出现误报或漏报。这取决于进程信息和可能谎报所用终端的环境变量。
+可以传入一个 <code>env</code> 对象来模拟特定终端的使用。这对于检查特定环境设置的行为很有用。</p>
+<p>要强制特定的颜色支持，请使用以下环境设置之一。</p>
+<ul>
+<li>2 色：<code>FORCE_COLOR = 0</code>（禁用颜色）</li>
+<li>16 色：<code>FORCE_COLOR = 1</code></li>
+<li>256 色：<code>FORCE_COLOR = 2</code></li>
+<li>16,777,216 色：<code>FORCE_COLOR = 3</code></li>
+</ul>
+<p>使用 <code>NO_COLOR</code> 和 <code>NODE_DISABLE_COLORS</code> 环境变量也可以禁用颜色支持。</p>
+</div><div>
+<h4><code>writeStream.getWindowSize()</code><span><a class="mark" href="#writestreamgetwindowsize" id="writestreamgetwindowsize">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_getwindowsize"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number[]></a></li>
+</ul>
+<p><code>writeStream.getWindowSize()</code> 返回与此 <code>WriteStream</code> 对应的 TTY 的大小。数组类型为 <code>[numColumns, numRows]</code>，其中 <code>numColumns</code> 和 <code>numRows</code> 表示相应 TTY 中的列数和行数。</p>
+</div><div>
+<h4><code>writeStream.hasColors([count][, env])</code><span><a class="mark" href="#writestreamhascolorscount-env" id="writestreamhascolorscount-env">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_hascolors_count_env"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.13.0, v10.16.0</span>
+</div>
+<ul>
+<li><code>count</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 请求的颜色数量（至少为 2）。<strong>默认值：</strong> 16。</li>
+<li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 包含要检查的环境变量的对象。这允许模拟特定终端的使用。<strong>默认值：</strong> <code>process.env</code>。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果 <code>writeStream</code> 支持至少与 <code>count</code> 中提供的颜色数量一样多，则返回 <code>true</code>。最低支持为 2（黑色和白色）。</p>
+<p>这与 <a href="#writestreamgetcolordepthenv"><code>writeStream.getColorDepth()</code></a> 中描述的误报和漏报相同。</p>
+<pre><code class="language-js">process.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">hasColors</span>();
+<span class="hljs-comment">// 根据 `stdout` 是否支持至少 16 色返回 true 或 false。</span>
+process.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">hasColors</span>(<span class="hljs-number">256</span>);
+<span class="hljs-comment">// 根据 `stdout` 是否支持至少 256 色返回 true 或 false。</span>
+process.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">hasColors</span>({ <span class="hljs-attr">TMUX</span>: <span class="hljs-string">'1'</span> });
+<span class="hljs-comment">// 返回 true。</span>
+process.<span class="hljs-property">stdout</span>.<span class="hljs-title function_">hasColors</span>(<span class="hljs-number">2</span> ** <span class="hljs-number">24</span>, { <span class="hljs-attr">TMUX</span>: <span class="hljs-string">'1'</span> });
+<span class="hljs-comment">// 返回 false（环境设置假装支持 2 ** 8 色）。</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>writeStream.isTTY</code><span><a class="mark" href="#writestreamistty" id="writestreamistty">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_istty"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.5.8</span>
+</div>
+<p>一个 <code>boolean</code>，始终为 <code>true</code>。</p>
+</div><div>
+<h4><code>writeStream.moveCursor(dx, dy[, callback])</code><span><a class="mark" href="#writestreammovecursordx-dy-callback" id="writestreammovecursordx-dy-callback">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_movecursor_dx_dy_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>dx</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>dy</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果流希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件被触发，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>writeStream.moveCursor()</code> 相对于当前位置移动此 <code>WriteStream</code> 的光标。</p>
+</div><div>
+<h4><code>writeStream.rows</code><span><a class="mark" href="#writestreamrows" id="writestreamrows">#</a></span><a aria-hidden="true" class="legacy" id="tty_writestream_rows"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<p>一个 <code>number</code>，指定 TTY 当前具有的行数。每当触发 <code>'resize'</code> 事件时，此属性都会更新。</p>
+</div>
+</section><section><h3><code>tty.isatty(fd)</code><span><a class="mark" href="#ttyisattyfd" id="ttyisattyfd">#</a></span><a aria-hidden="true" class="legacy" id="tty_tty_isatty_fd"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.5.8</span>
+</div>
+<ul>
+<li><code>fd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 一个数字文件描述符</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果给定的 <code>fd</code> 与 TTY 关联，则 <code>tty.isatty()</code> 方法返回 <code>true</code>，否则返回 <code>false</code>，包括当 <code>fd</code> 不是非负整数时。</p></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

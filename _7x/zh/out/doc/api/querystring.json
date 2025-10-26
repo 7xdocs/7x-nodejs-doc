@@ -1,0 +1,220 @@
+{
+  "type": "module",
+  "source": "doc/api/querystring.md",
+  "modules": [
+    {
+      "textRaw": "Query string",
+      "name": "querystring",
+      "introduced_in": "v0.1.25",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/querystring.js\">lib/querystring.js</a></p>\n<p><code>node:querystring</code> 模块提供了用于解析和格式化 URL 查询字符串的实用工具。可以通过以下方式访问：</p>\n<pre><code class=\"language-js\">const querystring = require('node:querystring');\n</code></pre>\n<p><code>querystring</code> 比 <a href=\"url.html#class-urlsearchparams\" class=\"type\">&lt;URLSearchParams&gt;</a> 性能更高，但不是一个标准化的 API。在性能不关键或需要与浏览器代码兼容时，请使用 <a href=\"url.html#class-urlsearchparams\" class=\"type\">&lt;URLSearchParams&gt;</a>。</p>",
+      "methods": [
+        {
+          "textRaw": "`querystring.decode()`",
+          "type": "method",
+          "name": "decode",
+          "meta": {
+            "added": [
+              "v0.1.99"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>querystring.decode()</code> 函数是 <code>querystring.parse()</code> 的别名。</p>"
+        },
+        {
+          "textRaw": "`querystring.encode()`",
+          "type": "method",
+          "name": "encode",
+          "meta": {
+            "added": [
+              "v0.1.99"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": []
+            }
+          ],
+          "desc": "<p><code>querystring.encode()</code> 函数是 <code>querystring.stringify()</code> 的别名。</p>"
+        },
+        {
+          "textRaw": "`querystring.escape(str)`",
+          "type": "method",
+          "name": "escape",
+          "meta": {
+            "added": [
+              "v0.1.25"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`str` {string}",
+                  "name": "str",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>querystring.escape()</code> 方法对给定的 <code>str</code> 执行 URL 百分比编码，其方式针对 URL 查询字符串的特定要求进行了优化。</p>\n<p><code>querystring.escape()</code> 方法被 <code>querystring.stringify()</code> 使用，通常不期望直接使用。它被导出的主要目的是允许应用程序代码在必要时通过将 <code>querystring.escape</code> 分配给一个替代函数来提供替换的百分比编码实现。</p>"
+        },
+        {
+          "textRaw": "`querystring.parse(str[, sep[, eq[, options]]])`",
+          "type": "method",
+          "name": "parse",
+          "meta": {
+            "added": [
+              "v0.1.25"
+            ],
+            "changes": [
+              {
+                "version": "v8.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/10967",
+                "description": "Multiple empty entries are now parsed correctly (e.g. `&=&=`)."
+              },
+              {
+                "version": "v6.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/6055",
+                "description": "The returned object no longer inherits from `Object.prototype`."
+              },
+              {
+                "version": [
+                  "v6.0.0",
+                  "v4.2.4"
+                ],
+                "pr-url": "https://github.com/nodejs/node/pull/3807",
+                "description": "The `eq` parameter may now have a length of more than `1`."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`str` {string} 要解析的 URL 查询字符串",
+                  "name": "str",
+                  "type": "string",
+                  "desc": "要解析的 URL 查询字符串"
+                },
+                {
+                  "textRaw": "`sep` {string} 用于在查询字符串中分隔键和值对的子字符串。**默认值:** `'&'`。",
+                  "name": "sep",
+                  "type": "string",
+                  "desc": "用于在查询字符串中分隔键和值对的子字符串。**默认值:** `'&'`。"
+                },
+                {
+                  "textRaw": "`eq` {string}。 用于在查询字符串中分隔键和值的子字符串。**默认值:** `'='`。",
+                  "name": "eq",
+                  "type": "string",
+                  "desc": "。 用于在查询字符串中分隔键和值的子字符串。**默认值:** `'='`。"
+                },
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`decodeURIComponent` {Function} 在查询字符串中解码百分比编码字符时使用的函数。**默认值:** `querystring.unescape()`。",
+                      "name": "decodeURIComponent",
+                      "type": "Function",
+                      "desc": "在查询字符串中解码百分比编码字符时使用的函数。**默认值:** `querystring.unescape()`。"
+                    },
+                    {
+                      "textRaw": "`maxKeys` {number} 指定要解析的最大键数。指定 `0` 以移除键数限制。**默认值:** `1000`。",
+                      "name": "maxKeys",
+                      "type": "number",
+                      "desc": "指定要解析的最大键数。指定 `0` 以移除键数限制。**默认值:** `1000`。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>querystring.parse()</code> 方法将 URL 查询字符串（<code>str</code>）解析为一个键值对集合。</p>\n<p>例如，查询字符串 <code>'foo=bar&#x26;abc=xyz&#x26;abc=123'</code> 被解析为：</p>\n<pre><code class=\"language-json\">{\n  \"foo\": \"bar\",\n  \"abc\": [\"xyz\", \"123\"]\n}\n</code></pre>\n<p>由 <code>querystring.parse()</code> 方法返回的对象<em>不</em>从 JavaScript <code>Object</code> 原型继承。这意味着典型的 <code>Object</code> 方法，如 <code>obj.toString()</code>、<code>obj.hasOwnProperty()</code> 等，没有被定义并且<em>不起作用</em>。</p>\n<p>默认情况下，查询字符串中的百分比编码字符将假定使用 UTF-8 编码。如果使用了替代的字符编码，则需要指定替代的 <code>decodeURIComponent</code> 选项：</p>\n<pre><code class=\"language-js\">// 假设 gbkDecodeURIComponent 函数已存在...\n\nquerystring.parse('w=%D6%D0%CE%C4&#x26;foo=bar', null, null,\n                  { decodeURIComponent: gbkDecodeURIComponent });\n</code></pre>"
+        },
+        {
+          "textRaw": "`querystring.stringify(obj[, sep[, eq[, options]]])`",
+          "type": "method",
+          "name": "stringify",
+          "meta": {
+            "added": [
+              "v0.1.25"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`obj` {Object} 要序列化为 URL 查询字符串的对象",
+                  "name": "obj",
+                  "type": "Object",
+                  "desc": "要序列化为 URL 查询字符串的对象"
+                },
+                {
+                  "textRaw": "`sep` {string} 用于在查询字符串中分隔键和值对的子字符串。**默认值:** `'&'`。",
+                  "name": "sep",
+                  "type": "string",
+                  "desc": "用于在查询字符串中分隔键和值对的子字符串。**默认值:** `'&'`。"
+                },
+                {
+                  "textRaw": "`eq` {string}。 用于在查询字符串中分隔键和值的子字符串。**默认值:** `'='`。",
+                  "name": "eq",
+                  "type": "string",
+                  "desc": "。 用于在查询字符串中分隔键和值的子字符串。**默认值:** `'='`。"
+                },
+                {
+                  "textRaw": "`options`",
+                  "name": "options",
+                  "options": [
+                    {
+                      "textRaw": "`encodeURIComponent` {Function} 在查询字符串中将 URL 不安全字符转换为百分比编码时使用的函数。**默认值:** `querystring.escape()`。",
+                      "name": "encodeURIComponent",
+                      "type": "Function",
+                      "desc": "在查询字符串中将 URL 不安全字符转换为百分比编码时使用的函数。**默认值:** `querystring.escape()`。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>querystring.stringify()</code> 方法通过遍历对象的\"自身属性\"从给定的 <code>obj</code> 生成一个 URL 查询字符串。</p>\n<p>它序列化 <code>obj</code> 中传递的以下类型的值：\n<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt\" class=\"type\">&lt;bigint&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt\" class=\"type\">&lt;bigint[]&gt;</a> | <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean[]&gt;</a>\n数值必须是有限的。任何其他输入值将被强制转换为空字符串。</p>\n<pre><code class=\"language-js\">querystring.stringify({ foo: 'bar', baz: ['qux', 'quux'], corge: '' });\n// 返回 'foo=bar&#x26;baz=qux&#x26;baz=quux&#x26;corge='\n\nquerystring.stringify({ foo: 'bar', baz: 'qux' }, ';', ':');\n// 返回 'foo:bar;baz:qux'\n</code></pre>\n<p>默认情况下，查询字符串中需要百分比编码的字符将编码为 UTF-8。如果需要替代编码，则需要指定替代的 <code>encodeURIComponent</code> 选项：</p>\n<pre><code class=\"language-js\">// 假设 gbkEncodeURIComponent 函数已存在，\n\nquerystring.stringify({ w: '中文', foo: 'bar' }, null, null,\n                      { encodeURIComponent: gbkEncodeURIComponent });\n</code></pre>"
+        },
+        {
+          "textRaw": "`querystring.unescape(str)`",
+          "type": "method",
+          "name": "unescape",
+          "meta": {
+            "added": [
+              "v0.1.25"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`str` {string}",
+                  "name": "str",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>querystring.unescape()</code> 方法对给定的 <code>str</code> 执行 URL 百分比编码字符的解码。</p>\n<p><code>querystring.unescape()</code> 方法被 <code>querystring.parse()</code> 使用，通常不期望直接使用。它被导出的主要目的是允许应用程序代码在必要时通过将 <code>querystring.unescape</code> 分配给一个替代函数来提供替换的解码实现。</p>\n<p>默认情况下，<code>querystring.unescape()</code> 方法将尝试使用 JavaScript 内置的 <code>decodeURIComponent()</code> 方法进行解码。如果失败，将使用一个更安全的等效方法，该方法不会在格式错误的 URL 上抛出错误。</p>"
+        }
+      ],
+      "type": "module",
+      "displayName": "querystring"
+    }
+  ]
+}

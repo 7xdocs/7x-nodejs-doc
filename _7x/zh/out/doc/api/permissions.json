@@ -1,0 +1,98 @@
+{
+  "type": "module",
+  "source": "doc/api/permissions.md",
+  "modules": [
+    {
+      "textRaw": "Permissions",
+      "name": "permissions",
+      "introduced_in": "v20.0.0",
+      "desc": "<p>权限可用于控制 Node.js 进程可以访问哪些系统资源，或者进程可以使用这些资源执行哪些操作。</p>\n<ul>\n<li><a href=\"#process-based-permissions\">基于进程的权限</a> 控制 Node.js 进程对资源的访问。\n资源可以被完全允许或拒绝，或者可以控制与其相关的操作。例如，可以允许文件系统读取同时拒绝写入。\n此功能不能防范恶意代码。根据 Node.js <a href=\"https://github.com/nodejs/node/blob/main/SECURITY.md\">安全政策</a>，Node.js 信任任何要求其运行的代码。</li>\n</ul>\n<p>权限模型实现了\"安全带\"方法，防止受信任的代码无意中更改文件或使用未明确授予访问权限的资源。它在存在恶意代码的情况下不提供安全保证。恶意代码可以绕过权限模型，并在不受权限模型限制的情况下执行任意代码。</p>\n<p>如果您发现潜在的安全漏洞，请参考我们的<a href=\"https://github.com/nodejs/node/blob/main/SECURITY.md\">安全政策</a>。</p>",
+      "modules": [
+        {
+          "textRaw": "基于进程的权限",
+          "name": "基于进程的权限",
+          "modules": [
+            {
+              "textRaw": "权限模型",
+              "name": "权限模型",
+              "meta": {
+                "added": [
+                  "v20.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v23.5.0",
+                      "v22.13.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/56201",
+                    "description": "This feature is no longer experimental."
+                  }
+                ]
+              },
+              "stability": 2,
+              "stabilityText": "Stable",
+              "desc": "<p>Node.js 权限模型是一种在执行期间限制对特定资源访问的机制。\n该 API 存在于 <a href=\"cli.html#--permission\"><code>--permission</code></a> 标志之后，当启用该标志时，将限制对所有可用权限的访问。</p>\n<p>可用权限由 <a href=\"cli.html#--permission\"><code>--permission</code></a> 标志记录。</p>\n<p>当使用 <code>--permission</code> 启动 Node.js 时，通过 <code>fs</code> 模块访问文件系统、生成进程、使用 <code>node:worker_threads</code>、使用原生插件、使用 WASI 以及启用运行时调试器的能力将受到限制。</p>\n<pre><code class=\"language-console\">$ node --permission index.js\n\nError: Access to this API has been restricted\n    at node:internal/main/run_main_module:23:47 {\n  code: 'ERR_ACCESS_DENIED',\n  permission: 'FileSystemRead',\n  resource: '/home/user/index.js'\n}\n</code></pre>\n<p>允许生成进程和创建工作线程可以分别使用 <a href=\"cli.html#--allow-child-process\"><code>--allow-child-process</code></a> 和 <a href=\"cli.html#--allow-worker\"><code>--allow-worker</code></a>。</p>\n<p>在使用权限模型时允许原生插件，请使用 <a href=\"cli.html#--allow-addons\"><code>--allow-addons</code></a> 标志。对于 WASI，使用 <a href=\"cli.html#--allow-wasi\"><code>--allow-wasi</code></a> 标志。</p>",
+              "modules": [
+                {
+                  "textRaw": "运行时 API",
+                  "name": "运行时_api",
+                  "desc": "<p>当通过 <a href=\"cli.html#--permission\"><code>--permission</code></a> 标志启用权限模型时，会在 <code>process</code> 对象上添加一个新的属性 <code>permission</code>。\n此属性包含一个函数：</p>",
+                  "methods": [
+                    {
+                      "textRaw": "`permission.has(scope[, reference])`",
+                      "type": "method",
+                      "name": "has",
+                      "signatures": [
+                        {
+                          "params": []
+                        }
+                      ],
+                      "desc": "<p>用于在运行时检查权限的 API 调用 (<a href=\"process.html#processpermissionhasscope-reference\"><code>permission.has()</code></a>)</p>\n<pre><code class=\"language-js\">process.permission.has('fs.write'); // true\nprocess.permission.has('fs.write', '/home/rafaelgss/protected-folder'); // true\n\nprocess.permission.has('fs.read'); // true\nprocess.permission.has('fs.read', '/home/rafaelgss/protected-folder'); // false\n</code></pre>"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "运行时 API"
+                },
+                {
+                  "textRaw": "文件系统权限",
+                  "name": "文件系统权限",
+                  "desc": "<p>默认情况下，权限模型通过 <code>node:fs</code> 模块限制对文件系统的访问。\n它不保证用户无法通过其他方式访问文件系统，例如通过 <code>node:sqlite</code> 模块。</p>\n<p>要允许访问文件系统，请使用 <a href=\"cli.html#--allow-fs-read\"><code>--allow-fs-read</code></a> 和 <a href=\"cli.html#--allow-fs-write\"><code>--allow-fs-write</code></a> 标志：</p>\n<pre><code class=\"language-console\">$ node --permission --allow-fs-read=* --allow-fs-write=* index.js\nHello world!\n</code></pre>\n<p>默认情况下，您的应用程序的入口点包含在允许的文件系统读取列表中。例如：</p>\n<pre><code class=\"language-console\">$ node --permission index.js\n</code></pre>\n<ul>\n<li><code>index.js</code> 将被包含在允许的文件系统读取列表中</li>\n</ul>\n<pre><code class=\"language-console\">$ node -r /path/to/custom-require.js --permission index.js.\n</code></pre>\n<ul>\n<li><code>/path/to/custom-require.js</code> 将被包含在允许的文件系统读取列表中。</li>\n<li><code>index.js</code> 将被包含在允许的文件系统读取列表中。</li>\n</ul>\n<p>这两个标志的有效参数是：</p>\n<ul>\n<li><code>*</code> - 分别允许所有 <code>FileSystemRead</code> 或 <code>FileSystemWrite</code> 操作。</li>\n<li>相对于当前工作目录的路径。</li>\n<li>绝对路径。</li>\n</ul>\n<p>示例：</p>\n<ul>\n<li><code>--allow-fs-read=*</code> - 它将允许所有 <code>FileSystemRead</code> 操作。</li>\n<li><code>--allow-fs-write=*</code> - 它将允许所有 <code>FileSystemWrite</code> 操作。</li>\n<li><code>--allow-fs-write=/tmp/</code> - 它将允许对 <code>/tmp/</code> 文件夹的 <code>FileSystemWrite</code> 访问。</li>\n<li><code>--allow-fs-read=/tmp/ --allow-fs-read=/home/.gitignore</code> - 它允许对 <code>/tmp/</code> 文件夹 <strong>和</strong> <code>/home/.gitignore</code> 路径的 <code>FileSystemRead</code> 访问。</li>\n</ul>\n<p>也支持通配符：</p>\n<ul>\n<li><code>--allow-fs-read=/home/test*</code> 将允许读取访问匹配通配符的所有内容。例如：<code>/home/test/file1</code> 或 <code>/home/test2</code></li>\n</ul>\n<p>传递通配符 (<code>*</code>) 后，所有后续字符将被忽略。例如：<code>/home/*.js</code> 将类似于 <code>/home/*</code> 工作。</p>\n<p>当权限模型初始化时，如果指定的目录存在，它将自动添加一个通配符 (*)。例如，如果 <code>/home/test/files</code> 存在，它将被视为 <code>/home/test/files/*</code>。但是，如果目录不存在，则不会添加通配符，访问将仅限于 <code>/home/test/files</code>。如果您想允许访问尚不存在的文件夹，请确保明确包含通配符：<code>/my-path/folder-do-not-exist/*</code>。</p>",
+                  "type": "module",
+                  "displayName": "文件系统权限"
+                },
+                {
+                  "textRaw": "将权限模型与 `npx` 一起使用",
+                  "name": "将权限模型与_`npx`_一起使用",
+                  "desc": "<p>如果您使用 <a href=\"https://docs.npmjs.com/cli/commands/npx\"><code>npx</code></a> 执行 Node.js 脚本，您可以通过传递 <code>--node-options</code> 标志来启用权限模型。例如：</p>\n<pre><code class=\"language-bash\">npx --node-options=\"--permission\" package-name\n</code></pre>\n<p>这将为 <a href=\"https://docs.npmjs.com/cli/commands/npx\"><code>npx</code></a> 生成的所有 Node.js 进程设置 <code>NODE_OPTIONS</code> 环境变量，而不影响 <code>npx</code> 进程本身。</p>\n<p><strong>使用 <code>npx</code> 时的 FileSystemRead 错误</strong></p>\n<p>上述命令可能会抛出 <code>FileSystemRead</code> 无效访问错误，因为 Node.js 需要文件系统读取访问权限来定位和执行包。为避免这种情况：</p>\n<ol>\n<li>\n<p><strong>使用全局安装的包</strong>\n通过运行以下命令授予对全局 <code>node_modules</code> 目录的读取访问权限：</p>\n<pre><code class=\"language-bash\">npx --node-options=\"--permission --allow-fs-read=$(npm prefix -g)\" package-name\n</code></pre>\n</li>\n<li>\n<p><strong>使用 <code>npx</code> 缓存</strong>\n如果您是临时安装包或依赖 <code>npx</code> 缓存，请授予对 npm 缓存目录的读取访问权限：</p>\n<pre><code class=\"language-bash\">npx --node-options=\"--permission --allow-fs-read=$(npm config get cache)\" package-name\n</code></pre>\n</li>\n</ol>\n<p>您通常传递给 <code>node</code> 的任何参数（例如，<code>--allow-*</code> 标志）也可以通过 <code>--node-options</code> 标志传递。这种灵活性使得在使用 <code>npx</code> 时可以根据需要轻松配置权限。</p>",
+                  "type": "module",
+                  "displayName": "将权限模型与 `npx` 一起使用"
+                },
+                {
+                  "textRaw": "权限模型约束",
+                  "name": "权限模型约束",
+                  "desc": "<p>在使用此系统之前，您需要了解一些约束：</p>\n<ul>\n<li>该模型不会继承到工作线程。</li>\n<li>使用权限模型时，以下功能将受到限制：\n<ul>\n<li>原生模块</li>\n<li>子进程</li>\n<li>工作线程</li>\n<li>调试器协议</li>\n<li>文件系统访问</li>\n<li>WASI</li>\n</ul>\n</li>\n<li>权限模型在 Node.js 环境设置完成后初始化。\n但是，某些标志（如 <code>--env-file</code> 或 <code>--openssl-config</code>）设计为在环境初始化之前读取文件。因此，这些标志不受权限模型规则的约束。这同样适用于可以通过运行时通过 <code>v8.setFlagsFromString</code> 设置的 V8 标志。</li>\n<li>启用权限模型时，无法在运行时请求 OpenSSL 引擎，这会影响内置的 crypto、https 和 tls 模块。</li>\n<li>启用权限模型时无法加载运行时可加载扩展，这会影响 sqlite 模块。</li>\n<li>通过 <code>node:fs</code> 模块使用现有文件描述符会绕过权限模型。</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "权限模型约束"
+                },
+                {
+                  "textRaw": "限制和已知问题",
+                  "name": "限制和已知问题",
+                  "desc": "<ul>\n<li>符号链接将被跟踪，即使指向访问权限已被授予的路径集之外的位置。相对符号链接可能允许访问任意文件和目录。在启用权限模型启动应用程序时，您必须确保没有已被授予访问权限的路径包含相对符号链接。</li>\n</ul>",
+                  "type": "module",
+                  "displayName": "限制和已知问题"
+                }
+              ],
+              "type": "module",
+              "displayName": "权限模型"
+            }
+          ],
+          "type": "module",
+          "displayName": "基于进程的权限"
+        }
+      ],
+      "type": "module",
+      "displayName": "Permissions"
+    }
+  ]
+}

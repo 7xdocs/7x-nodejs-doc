@@ -1,0 +1,511 @@
+{
+  "type": "module",
+  "source": "doc/api/path.md",
+  "modules": [
+    {
+      "textRaw": "Path",
+      "name": "path",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/path.js\">lib/path.js</a></p>\n<p><code>node:path</code> 模块提供了用于处理文件和目录路径的实用工具。可以通过以下方式访问：</p>\n<pre><code class=\"language-cjs\">const path = require('node:path');\n</code></pre>\n<pre><code class=\"language-mjs\">import path from 'node:path';\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "Windows 与 POSIX",
+          "name": "windows_与_posix",
+          "desc": "<p><code>node:path</code> 模块的默认操作根据 Node.js 应用程序运行的操作系统而有所不同。具体来说，在 Windows 操作系统上运行时，<code>node:path</code> 模块将假定使用的是 Windows 风格的路径。</p>\n<p>因此，在 POSIX 和 Windows 上使用 <code>path.basename()</code> 可能会产生不同的结果：</p>\n<p>在 POSIX 上：</p>\n<pre><code class=\"language-js\">path.basename('C:\\\\temp\\\\myfile.html');\n// Returns: 'C:\\\\temp\\\\myfile.html'\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">path.basename('C:\\\\temp\\\\myfile.html');\n// Returns: 'myfile.html'\n</code></pre>\n<p>为了在任何操作系统上处理 Windows 文件路径时获得一致的结果，请使用 <a href=\"#pathwin32\"><code>path.win32</code></a>：</p>\n<p>在 POSIX 和 Windows 上：</p>\n<pre><code class=\"language-js\">path.win32.basename('C:\\\\temp\\\\myfile.html');\n// Returns: 'myfile.html'\n</code></pre>\n<p>为了在任何操作系统上处理 POSIX 文件路径时获得一致的结果，请使用 <a href=\"#pathposix\"><code>path.posix</code></a>：</p>\n<p>在 POSIX 和 Windows 上：</p>\n<pre><code class=\"language-js\">path.posix.basename('/tmp/myfile.html');\n// Returns: 'myfile.html'\n</code></pre>\n<p>在 Windows 上，Node.js 遵循每个驱动器工作目录的概念。当使用不带反斜杠的驱动器路径时，可以观察到这种行为。例如，<code>path.resolve('C:\\\\')</code> 可能返回与 <code>path.resolve('C:')</code> 不同的结果。更多信息，请参阅 <a href=\"https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#fully-qualified-vs-relative-paths\">此 MSDN 页面</a>。</p>",
+          "type": "module",
+          "displayName": "Windows 与 POSIX"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`path.basename(path[, suffix])`",
+          "type": "method",
+          "name": "basename",
+          "meta": {
+            "added": [
+              "v0.1.25"
+            ],
+            "changes": [
+              {
+                "version": "v6.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/5348",
+                "description": "Passing a non-string as the `path` argument will throw now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                },
+                {
+                  "textRaw": "`suffix` {string} 要移除的可选后缀",
+                  "name": "suffix",
+                  "type": "string",
+                  "desc": "要移除的可选后缀"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.basename()</code> 方法返回 <code>path</code> 的最后一部分，类似于 Unix 的 <code>basename</code> 命令。尾随的<a href=\"#pathsep\">目录分隔符</a>会被忽略。</p>\n<pre><code class=\"language-js\">path.basename('/foo/bar/baz/asdf/quux.html');\n// Returns: 'quux.html'\n\npath.basename('/foo/bar/baz/asdf/quux.html', '.html');\n// Returns: 'quux'\n</code></pre>\n<p>尽管 Windows 通常以不区分大小写的方式处理文件名（包括文件扩展名），但此函数不会。例如，<code>C:\\\\foo.html</code> 和 <code>C:\\\\foo.HTML</code> 指向同一个文件，但 <code>basename</code> 将扩展名视为区分大小写的字符串：</p>\n<pre><code class=\"language-js\">path.win32.basename('C:\\\\foo.html', '.html');\n// Returns: 'foo'\n\npath.win32.basename('C:\\\\foo.HTML', '.html');\n// Returns: 'foo.HTML'\n</code></pre>\n<p>如果 <code>path</code> 不是字符串，或者提供了 <code>suffix</code> 但它不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.dirname(path)`",
+          "type": "method",
+          "name": "dirname",
+          "meta": {
+            "added": [
+              "v0.1.16"
+            ],
+            "changes": [
+              {
+                "version": "v6.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/5348",
+                "description": "Passing a non-string as the `path` argument will throw now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.dirname()</code> 方法返回 <code>path</code> 的目录名，类似于 Unix 的 <code>dirname</code> 命令。尾随的目录分隔符会被忽略，参见 <a href=\"#pathsep\"><code>path.sep</code></a>。</p>\n<pre><code class=\"language-js\">path.dirname('/foo/bar/baz/asdf/quux');\n// Returns: '/foo/bar/baz/asdf'\n</code></pre>\n<p>如果 <code>path</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.extname(path)`",
+          "type": "method",
+          "name": "extname",
+          "meta": {
+            "added": [
+              "v0.1.25"
+            ],
+            "changes": [
+              {
+                "version": "v6.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/5348",
+                "description": "Passing a non-string as the `path` argument will throw now."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.extname()</code> 方法返回 <code>path</code> 的扩展名，即 <code>path</code> 的最后一部分中从最后一次出现 <code>.</code>（点）字符到字符串结尾的部分。如果 <code>path</code> 的最后一部分中没有 <code>.</code>，或者 <code>path</code> 的基本名称（参见 <code>path.basename()</code>）除了第一个字符之外没有 <code>.</code> 字符，则返回空字符串。</p>\n<pre><code class=\"language-js\">path.extname('index.html');\n// Returns: '.html'\n\npath.extname('index.coffee.md');\n// Returns: '.md'\n\npath.extname('index.');\n// Returns: '.'\n\npath.extname('index');\n// Returns: ''\n\npath.extname('.index');\n// Returns: ''\n\npath.extname('.index.md');\n// Returns: '.md'\n</code></pre>\n<p>如果 <code>path</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.format(pathObject)`",
+          "type": "method",
+          "name": "format",
+          "meta": {
+            "added": [
+              "v0.11.15"
+            ],
+            "changes": [
+              {
+                "version": "v19.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/44349",
+                "description": "The dot will be added if it is not specified in `ext`."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`pathObject` {Object} 任何具有以下属性的 JavaScript 对象：",
+                  "name": "pathObject",
+                  "type": "Object",
+                  "desc": "任何具有以下属性的 JavaScript 对象：",
+                  "options": [
+                    {
+                      "textRaw": "`dir` {string}",
+                      "name": "dir",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`root` {string}",
+                      "name": "root",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`base` {string}",
+                      "name": "base",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`ext` {string}",
+                      "name": "ext",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.format()</code> 方法从对象返回路径字符串。这与 <a href=\"#pathparsepath\"><code>path.parse()</code></a> 相反。</p>\n<p>当向 <code>pathObject</code> 提供属性时，请注意存在一些组合，其中一个属性优先于另一个：</p>\n<ul>\n<li>如果提供了 <code>pathObject.dir</code>，则 <code>pathObject.root</code> 被忽略</li>\n<li>如果存在 <code>pathObject.base</code>，则 <code>pathObject.ext</code> 和 <code>pathObject.name</code> 被忽略</li>\n</ul>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">// 如果提供了 `dir`、`root` 和 `base`，\n// 将返回 `${dir}${path.sep}${base}`。`root` 被忽略。\npath.format({\n  root: '/ignored',\n  dir: '/home/user/dir',\n  base: 'file.txt',\n});\n// Returns: '/home/user/dir/file.txt'\n\n// 如果未指定 `dir`，则将使用 `root`。\n// 如果仅提供了 `root` 或 `dir` 等于 `root`，则\n// 不会包含平台分隔符。`ext` 将被忽略。\npath.format({\n  root: '/',\n  base: 'file.txt',\n  ext: 'ignored',\n});\n// Returns: '/file.txt'\n\n// 如果未指定 `base`，则将使用 `name` + `ext`。\npath.format({\n  root: '/',\n  name: 'file',\n  ext: '.txt',\n});\n// Returns: '/file.txt'\n\n// 如果 `ext` 中未指定点，则会自动添加。\npath.format({\n  root: '/',\n  name: 'file',\n  ext: 'txt',\n});\n// Returns: '/file.txt'\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">path.format({\n  dir: 'C:\\\\path\\\\dir',\n  base: 'file.txt',\n});\n// Returns: 'C:\\\\path\\\\dir\\\\file.txt'\n</code></pre>"
+        },
+        {
+          "textRaw": "`path.matchesGlob(path, pattern)`",
+          "type": "method",
+          "name": "matchesGlob",
+          "meta": {
+            "added": [
+              "v22.5.0",
+              "v20.17.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/59572",
+                "description": "Marking the API stable."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {boolean} `path` 是否匹配 `pattern`。",
+                "name": "return",
+                "type": "boolean",
+                "desc": "`path` 是否匹配 `pattern`。"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string} 要进行全局匹配的路径。",
+                  "name": "path",
+                  "type": "string",
+                  "desc": "要进行全局匹配的路径。"
+                },
+                {
+                  "textRaw": "`pattern` {string} 要检查路径的全局模式。",
+                  "name": "pattern",
+                  "type": "string",
+                  "desc": "要检查路径的全局模式。"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.matchesGlob()</code> 方法判断 <code>path</code> 是否匹配 <code>pattern</code>。</p>\n<p>例如：</p>\n<pre><code class=\"language-js\">path.matchesGlob('/foo/bar', '/foo/*'); // true\npath.matchesGlob('/foo/bar*', 'foo/bird'); // false\n</code></pre>\n<p>如果 <code>path</code> 或 <code>pattern</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.isAbsolute(path)`",
+          "type": "method",
+          "name": "isAbsolute",
+          "meta": {
+            "added": [
+              "v0.11.2"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {boolean}",
+                "name": "return",
+                "type": "boolean"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.isAbsolute()</code> 方法判断给定的 <code>path</code> 是否是绝对路径。因此，它对于缓解路径遍历并不安全。</p>\n<p>如果给定的 <code>path</code> 是零长度字符串，则返回 <code>false</code>。</p>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">path.isAbsolute('/foo/bar');   // true\npath.isAbsolute('/baz/..');    // true\npath.isAbsolute('/baz/../..'); // true\npath.isAbsolute('qux/');       // false\npath.isAbsolute('.');          // false\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">path.isAbsolute('//server');    // true\npath.isAbsolute('\\\\\\\\server');  // true\npath.isAbsolute('C:/foo/..');   // true\npath.isAbsolute('C:\\\\foo\\\\..'); // true\npath.isAbsolute('bar\\\\baz');    // false\npath.isAbsolute('bar/baz');     // false\npath.isAbsolute('.');           // false\n</code></pre>\n<p>如果 <code>path</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.join([...paths])`",
+          "type": "method",
+          "name": "join",
+          "meta": {
+            "added": [
+              "v0.1.16"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`...paths` {string} 路径段的序列",
+                  "name": "...paths",
+                  "type": "string",
+                  "desc": "路径段的序列"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.join()</code> 方法使用平台特定的分隔符作为定界符将所有给定的 <code>path</code> 段连接在一起，然后对生成的路径进行规范化。</p>\n<p>零长度的 <code>path</code> 段会被忽略。如果连接后的路径字符串是零长度字符串，则返回 <code>'.'</code>，表示当前工作目录。</p>\n<pre><code class=\"language-js\">path.join('/foo', 'bar', 'baz/asdf', 'quux', '..');\n// Returns: '/foo/bar/baz/asdf'\n\npath.join('foo', {}, 'bar');\n// Throws 'TypeError: Path must be a string. Received {}'\n</code></pre>\n<p>如果任何路径段不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.normalize(path)`",
+          "type": "method",
+          "name": "normalize",
+          "meta": {
+            "added": [
+              "v0.1.23"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.normalize()</code> 方法对给定的 <code>path</code> 进行规范化，解析 <code>'..'</code> 和 <code>'.'</code> 段。</p>\n<p>当找到多个连续的路径段分隔符（例如，POSIX 上的 <code>/</code> 以及 Windows 上的 <code>\\</code> 或 <code>/</code>）时，它们将被替换为平台特定的路径段分隔符的单个实例（POSIX 上是 <code>/</code>，Windows 上是 <code>\\</code>）。尾随的分隔符会保留。</p>\n<p>如果 <code>path</code> 是零长度字符串，则返回 <code>'.'</code>，表示当前工作目录。</p>\n<p>在 POSIX 上，此函数应用的规范化类型并不严格遵循 POSIX 规范。例如，此函数会将两个前导斜杠替换为单个斜杠，就好像它是一个常规的绝对路径一样，而一些 POSIX 系统对以恰好两个斜杠开头的路径赋予了特殊含义。类似地，此函数执行的其他替换，例如移除 <code>..</code> 段，可能会改变底层系统解析路径的方式。</p>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">path.normalize('/foo/bar//baz/asdf/quux/..');\n// Returns: '/foo/bar/baz/asdf'\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">path.normalize('C:\\\\temp\\\\\\\\foo\\\\bar\\\\..\\\\');\n// Returns: 'C:\\\\temp\\\\foo\\\\'\n</code></pre>\n<p>由于 Windows 识别多个路径分隔符，两个分隔符都将被 Windows 首选分隔符 (<code>\\</code>) 的实例替换：</p>\n<pre><code class=\"language-js\">path.win32.normalize('C:////temp\\\\\\\\/\\\\/\\\\/foo/bar');\n// Returns: 'C:\\\\temp\\\\foo\\\\bar'\n</code></pre>\n<p>如果 <code>path</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.parse(path)`",
+          "type": "method",
+          "name": "parse",
+          "meta": {
+            "added": [
+              "v0.11.15"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {Object}",
+                "name": "return",
+                "type": "Object"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.parse()</code> 方法返回一个对象，其属性表示 <code>path</code> 的重要元素。尾随的目录分隔符会被忽略，参见 <a href=\"#pathsep\"><code>path.sep</code></a>。</p>\n<p>返回的对象将具有以下属性：</p>\n<ul>\n<li><code>dir</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>root</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>base</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>name</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n<li><code>ext</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a></li>\n</ul>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">path.parse('/home/user/dir/file.txt');\n// Returns:\n// { root: '/',\n//   dir: '/home/user/dir',\n//   base: 'file.txt',\n//   ext: '.txt',\n//   name: 'file' }\n</code></pre>\n<pre><code class=\"language-text\">┌─────────────────────┬────────────┐\n│          dir        │    base    │\n├──────┬              ├──────┬─────┤\n│ root │              │ name │ ext │\n\"  /    home/user/dir / file  .txt \"\n└──────┴──────────────┴──────┴─────┘\n(所有 \"\" 行中的空格都应被忽略。它们仅用于格式化。)\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">path.parse('C:\\\\path\\\\dir\\\\file.txt');\n// Returns:\n// { root: 'C:\\\\',\n//   dir: 'C:\\\\path\\\\dir',\n//   base: 'file.txt',\n//   ext: '.txt',\n//   name: 'file' }\n</code></pre>\n<pre><code class=\"language-text\">┌─────────────────────┬────────────┐\n│          dir        │    base    │\n├──────┬              ├──────┬─────┤\n│ root │              │ name │ ext │\n\" C:\\      path\\dir   \\ file  .txt \"\n└──────┴──────────────┴──────┴─────┘\n(所有 \"\" 行中的空格都应被忽略。它们仅用于格式化。)\n</code></pre>\n<p>如果 <code>path</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.relative(from, to)`",
+          "type": "method",
+          "name": "relative",
+          "meta": {
+            "added": [
+              "v0.5.0"
+            ],
+            "changes": [
+              {
+                "version": "v6.8.0",
+                "pr-url": "https://github.com/nodejs/node/pull/8523",
+                "description": "On Windows, the leading slashes for UNC paths are now included in the return value."
+              }
+            ]
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`from` {string}",
+                  "name": "from",
+                  "type": "string"
+                },
+                {
+                  "textRaw": "`to` {string}",
+                  "name": "to",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.relative()</code> 方法根据当前工作目录返回从 <code>from</code> 到 <code>to</code> 的相对路径。如果 <code>from</code> 和 <code>to</code> 各自解析为相同的路径（在对每个路径调用 <code>path.resolve()</code> 之后），则返回零长度字符串。</p>\n<p>如果零长度字符串作为 <code>from</code> 或 <code>to</code> 传递，则将使用当前工作目录代替零长度字符串。</p>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">path.relative('/data/orandea/test/aaa', '/data/orandea/impl/bbb');\n// Returns: '../../impl/bbb'\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">path.relative('C:\\\\orandea\\\\test\\\\aaa', 'C:\\\\orandea\\\\impl\\\\bbb');\n// Returns: '..\\\\..\\\\impl\\\\bbb'\n</code></pre>\n<p>如果 <code>from</code> 或 <code>to</code> 不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.resolve([...paths])`",
+          "type": "method",
+          "name": "resolve",
+          "meta": {
+            "added": [
+              "v0.3.4"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`...paths` {string} 路径或路径段的序列",
+                  "name": "...paths",
+                  "type": "string",
+                  "desc": "路径或路径段的序列"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>path.resolve()</code> 方法将路径或路径段的序列解析为绝对路径。</p>\n<p>给定的路径序列从右到左处理，每个后续的 <code>path</code> 会被前置，直到构造出绝对路径。例如，给定路径段序列：<code>/foo</code>, <code>/bar</code>, <code>baz</code>，调用 <code>path.resolve('/foo', '/bar', 'baz')</code> 将返回 <code>/bar/baz</code>，因为 <code>'baz'</code> 不是绝对路径，但 <code>'/bar' + '/' + 'baz'</code> 是。</p>\n<p>如果在处理所有给定的 <code>path</code> 段之后，尚未生成绝对路径，则使用当前工作目录。</p>\n<p>生成的路径会被规范化，并且除非路径解析为根目录，否则尾随斜杠会被移除。</p>\n<p>零长度的 <code>path</code> 段会被忽略。</p>\n<p>如果没有传递 <code>path</code> 段，<code>path.resolve()</code> 将返回当前工作目录的绝对路径。</p>\n<pre><code class=\"language-js\">path.resolve('/foo/bar', './baz');\n// Returns: '/foo/bar/baz'\n\npath.resolve('/foo/bar', '/tmp/file/');\n// Returns: '/tmp/file'\n\npath.resolve('wwwroot', 'static_files/png/', '../gif/image.gif');\n// 如果当前工作目录是 /home/myself/node，\n// 则返回 '/home/myself/node/wwwroot/static_files/gif/image.gif'\n</code></pre>\n<p>如果任何参数不是字符串，则会抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>"
+        },
+        {
+          "textRaw": "`path.toNamespacedPath(path)`",
+          "type": "method",
+          "name": "toNamespacedPath",
+          "meta": {
+            "added": [
+              "v9.0.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "return": {
+                "textRaw": "Returns: {string}",
+                "name": "return",
+                "type": "string"
+              },
+              "params": [
+                {
+                  "textRaw": "`path` {string}",
+                  "name": "path",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>仅在 Windows 系统上，返回给定 <code>path</code> 的等效<a href=\"https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#namespaces\">命名空间前缀路径</a>。如果 <code>path</code> 不是字符串，则 <code>path</code> 将不加修改地返回。</p>\n<p>此方法仅在 Windows 系统上有意义。在 POSIX 系统上，该方法是无效操作，并且总是返回未修改的 <code>path</code>。</p>"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`delimiter` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.9.3"
+            ],
+            "changes": []
+          },
+          "desc": "<p>提供特定于平台的路径定界符：</p>\n<ul>\n<li>Windows 上是 <code>;</code></li>\n<li>POSIX 上是 <code>:</code></li>\n</ul>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">console.log(process.env.PATH);\n// Prints: '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin'\n\nprocess.env.PATH.split(path.delimiter);\n// Returns: ['/usr/bin', '/bin', '/usr/sbin', '/sbin', '/usr/local/bin']\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">console.log(process.env.PATH);\n// Prints: 'C:\\Windows\\system32;C:\\Windows;C:\\Program Files\\node\\'\n\nprocess.env.PATH.split(path.delimiter);\n// Returns ['C:\\\\Windows\\\\system32', 'C:\\\\Windows', 'C:\\\\Program Files\\\\node\\\\']\n</code></pre>"
+        },
+        {
+          "textRaw": "`posix` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.11.15"
+            ],
+            "changes": [
+              {
+                "version": "v15.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/34962",
+                "description": "Exposed as `require('path/posix')`."
+              }
+            ]
+          },
+          "desc": "<p><code>path.posix</code> 属性提供对 <code>path</code> 方法的 POSIX 特定实现的访问。</p>\n<p>该 API 可通过 <code>require('node:path').posix</code> 或 <code>require('node:path/posix')</code> 访问。</p>"
+        },
+        {
+          "textRaw": "`sep` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.7.9"
+            ],
+            "changes": []
+          },
+          "desc": "<p>提供特定于平台的路径段分隔符：</p>\n<ul>\n<li>Windows 上是 <code>\\</code></li>\n<li>POSIX 上是 <code>/</code></li>\n</ul>\n<p>例如，在 POSIX 上：</p>\n<pre><code class=\"language-js\">'foo/bar/baz'.split(path.sep);\n// Returns: ['foo', 'bar', 'baz']\n</code></pre>\n<p>在 Windows 上：</p>\n<pre><code class=\"language-js\">'foo\\\\bar\\\\baz'.split(path.sep);\n// Returns: ['foo', 'bar', 'baz']\n</code></pre>\n<p>在 Windows 上，正斜杠 (<code>/</code>) 和反斜杠 (<code>\\</code>) 都被接受为路径段分隔符；但是，<code>path</code> 方法只添加反斜杠 (<code>\\</code>)。</p>"
+        },
+        {
+          "textRaw": "`win32` 类型: {Object}",
+          "type": "Object",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.11.15"
+            ],
+            "changes": [
+              {
+                "version": "v15.3.0",
+                "pr-url": "https://github.com/nodejs/node/pull/34962",
+                "description": "Exposed as `require('path/win32')`."
+              }
+            ]
+          },
+          "desc": "<p><code>path.win32</code> 属性提供对 <code>path</code> 方法的 Windows 特定实现的访问。</p>\n<p>该 API 可通过 <code>require('node:path').win32</code> 或 <code>require('node:path/win32')</code> 访问。</p>"
+        }
+      ],
+      "type": "module",
+      "displayName": "Path"
+    }
+  ]
+}

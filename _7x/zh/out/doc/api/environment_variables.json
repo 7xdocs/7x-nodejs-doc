@@ -1,0 +1,97 @@
+{
+  "type": "module",
+  "source": "doc/api/environment_variables.md",
+  "modules": [
+    {
+      "textRaw": "环境变量",
+      "name": "环境变量",
+      "desc": "<p>环境变量是与 Node.js 进程运行环境相关联的变量。</p>",
+      "modules": [
+        {
+          "textRaw": "CLI 环境变量",
+          "name": "cli_环境变量",
+          "desc": "<p>有一组环境变量可以定义，用于自定义 Node.js 的行为，更多详细信息请参阅 <a href=\"cli.html#environment-variables_1\">CLI 环境变量文档</a>。</p>",
+          "type": "module",
+          "displayName": "CLI 环境变量"
+        },
+        {
+          "textRaw": "DotEnv",
+          "name": "dotenv",
+          "introduced_in": "v20.12.0",
+          "desc": "<p>一组用于处理在 <code>.env</code> 文件中定义的额外环境变量的实用工具。</p>\n<blockquote>\n<p>Stability: 2 - Stable</p>\n</blockquote>",
+          "modules": [
+            {
+              "textRaw": ".env 文件",
+              "name": ".env_文件",
+              "desc": "<p><code>.env</code> 文件（也称为 dotenv 文件）是定义环境变量的文件，Node.js 应用程序随后可以与之交互（由 <a href=\"https://github.com/motdotla/dotenv\">dotenv</a> 包推广）。</p>\n<p>以下是一个基础 <code>.env</code> 文件内容的示例：</p>\n<pre><code class=\"language-text\">MY_VAR_A = \"my variable A\"\nMY_VAR_B = \"my variable B\"\n</code></pre>\n<p>这种类型的文件在各种不同的编程语言和平台中使用，但没有正式的规范，因此 Node.js 定义了自己的规范，如下所述。</p>\n<p><code>.env</code> 文件是一个包含键值对的文件，每个对由一个变量名后跟等号（<code>=</code>），再后跟变量值表示。</p>\n<p>此类文件的名称通常是 <code>.env</code> 或以 <code>.env</code> 开头（例如 <code>.env.dev</code>，其中 <code>dev</code> 表示特定的目标环境）。这是推荐的命名方案，但不是强制性的，dotenv 文件可以有任何任意的文件名。</p>",
+              "modules": [
+                {
+                  "textRaw": "变量名",
+                  "name": "变量名",
+                  "desc": "<p>有效的变量名只能包含字母（大写或小写）、数字和下划线（<code>_</code>），并且不能以数字开头。</p>\n<p>更具体地说，有效的变量名必须匹配以下正则表达式：</p>\n<pre><code class=\"language-text\">^[a-zA-Z_]+[a-zA-Z0-9_]*$\n</code></pre>\n<p>推荐的约定是使用大写字母和下划线，必要时使用数字，但任何符合上述定义的变量名都可以正常工作。</p>\n<p>例如，以下是一些有效的变量名：<code>MY_VAR</code>, <code>MY_VAR_1</code>, <code>my_var</code>, <code>my_var_1</code>, <code>myVar</code>, <code>My_Var123</code>，而这些是无效的：<code>1_VAR</code>, <code>'my-var'</code>, <code>\"my var\"</code>, <code>VAR_#1</code>。</p>",
+                  "type": "module",
+                  "displayName": "变量名"
+                },
+                {
+                  "textRaw": "变量值",
+                  "name": "变量值",
+                  "desc": "<p>变量值由任意文本组成，可以选择用单引号（<code>'</code>）或双引号（<code>\"</code>）括起来。</p>\n<p>带引号的变量可以跨越多行，而不带引号的变量则仅限于单行。</p>\n<p>请注意，当被 Node.js 解析时，所有值都被解释为文本，这意味着任何值都会在 Node.js 内部生成一个 JavaScript 字符串。例如，以下值：<code>0</code>, <code>true</code> 和 <code>{ \"hello\": \"world\" }</code> 将分别生成字面字符串 <code>'0'</code>, <code>'true'</code> 和 <code>'{ \"hello\": \"world\" }'</code>，而不是数字零、布尔值 <code>true</code> 和具有 <code>hello</code> 属性的对象。</p>\n<p>有效变量的示例：</p>\n<pre><code class=\"language-text\">MY_SIMPLE_VAR = a simple single line variable\nMY_EQUALS_VAR = \"this variable contains an = sign!\"\nMY_HASH_VAR = 'this variable contains a # symbol!'\nMY_MULTILINE_VAR = '\nthis is a multiline variable containing\ntwo separate lines\\nSorry, I meant three lines'\n</code></pre>",
+                  "type": "module",
+                  "displayName": "变量值"
+                },
+                {
+                  "textRaw": "空格",
+                  "name": "空格",
+                  "desc": "<p>变量键和值周围的前导和尾随空白字符将被忽略，除非它们被引号括起来。</p>\n<p>例如：</p>\n<pre><code class=\"language-text\">   MY_VAR_A   =    my variable a\n    MY_VAR_B   =    '   my variable b   '\n</code></pre>\n<p>将被视为等同于：</p>\n<pre><code class=\"language-text\">MY_VAR_A = my variable a\nMY_VAR_B = '   my variable b   '\n</code></pre>",
+                  "type": "module",
+                  "displayName": "空格"
+                },
+                {
+                  "textRaw": "注释",
+                  "name": "注释",
+                  "desc": "<p>井号（<code>#</code>）字符表示注释的开始，意味着该行的其余部分将被完全忽略。</p>\n<p>然而，在引号内找到的井号被视为任何其他标准字符。</p>\n<p>例如：</p>\n<pre><code class=\"language-text\"># This is a comment\nMY_VAR = my variable # This is also a comment\nMY_VAR_A = \"# this is NOT a comment\"\n</code></pre>",
+                  "type": "module",
+                  "displayName": "注释"
+                },
+                {
+                  "textRaw": "`export` 前缀",
+                  "name": "`export`_前缀",
+                  "desc": "<p><code>export</code> 关键字可以选择性地添加到变量声明的前面，该关键字将被文件的所有处理完全忽略。</p>\n<p>这很有用，使得该文件可以在 shell 终端中直接 sourcing，而无需修改。</p>\n<p>示例：</p>\n<pre><code class=\"language-text\">export MY_VAR = my variable\n</code></pre>",
+                  "type": "module",
+                  "displayName": "`export` 前缀"
+                }
+              ],
+              "type": "module",
+              "displayName": ".env 文件"
+            },
+            {
+              "textRaw": "CLI 选项",
+              "name": "cli_选项",
+              "desc": "<p>可以通过以下 CLI 选项之一使用 <code>.env</code> 文件来填充 <code>process.env</code> 对象：</p>\n<ul>\n<li>\n<p><a href=\"cli.html#--env-filefile\"><code>--env-file=file</code></a></p>\n</li>\n<li>\n<p><a href=\"cli.html#--env-file-if-existsfile\"><code>--env-file-if-exists=file</code></a></p>\n</li>\n</ul>",
+              "type": "module",
+              "displayName": "CLI 选项"
+            },
+            {
+              "textRaw": "编程 API",
+              "name": "编程_api",
+              "desc": "<p>以下两个函数允许您直接与 <code>.env</code> 文件交互：</p>\n<ul>\n<li>\n<p><a href=\"process.html#processloadenvfilepath\"><code>process.loadEnvFile</code></a> 加载一个 <code>.env</code> 文件并将其变量填充到 <code>process.env</code> 中</p>\n</li>\n<li>\n<p><a href=\"util.html#utilparseenvcontent\"><code>util.parseEnv</code></a> 解析 <code>.env</code> 文件的原始内容，并将其值返回到一个对象中</p>\n</li>\n</ul>",
+              "type": "module",
+              "displayName": "编程 API"
+            }
+          ],
+          "type": "module",
+          "displayName": "DotEnv"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`process.env`",
+          "name": "env",
+          "desc": "<p>与环境变量交互的基本 API 是 <code>process.env</code>，它包含一个预填充了用户环境变量的对象，这些变量可以被修改和扩展。</p>\n<p>更多详细信息请参阅 <a href=\"process.html#processenv\"><code>process.env</code> 文档</a>。</p>"
+        }
+      ],
+      "type": "module",
+      "displayName": "环境变量"
+    }
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "type": "module",
+  "source": "doc/api/punycode.md",
+  "modules": [
+    {
+      "textRaw": "Punycode",
+      "name": "punycode",
+      "meta": {
+        "deprecated": [
+          "v7.0.0"
+        ],
+        "changes": []
+      },
+      "introduced_in": "v0.10.0",
+      "stability": 0,
+      "stabilityText": "Deprecated",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/punycode.js\">lib/punycode.js</a></p>\n<p><strong>Node.js 内置的 punycode 模块已被弃用。</strong>\n在未来的 Node.js 主要版本中，此模块将被移除。当前依赖 <code>punycode</code> 模块的用户应切换到使用用户提供的 <a href=\"https://github.com/bestiejs/punycode.js\">Punycode.js</a> 模块。对于基于 punycode 的 URL 编码，请参阅 <a href=\"url.html#urldomaintoasciidomain\"><code>url.domainToASCII</code></a> 或更通用的 <a href=\"url.html#the-whatwg-url-api\">WHATWG URL API</a>。</p>\n<p><code>punycode</code> 模块是 <a href=\"https://github.com/bestiejs/punycode.js\">Punycode.js</a> 模块的捆绑版本。可以通过以下方式访问：</p>\n<pre><code class=\"language-js\">const punycode = require('node:punycode');\n</code></pre>\n<p><a href=\"https://tools.ietf.org/html/rfc3492\">Punycode</a> 是由 RFC 3492 定义的一种字符编码方案，主要用于国际化域名。由于 URL 中的主机名仅限于 ASCII 字符，因此包含非 ASCII 字符的域名必须使用 Punycode 方案转换为 ASCII。例如，翻译成英文单词 <code>'example'</code> 的日文字符是 <code>'例'</code>。国际化域名 <code>'例.com'</code>（相当于 <code>'example.com'</code>）由 Punycode 表示为 ASCII 字符串 <code>'xn--fsq.com'</code>。</p>\n<p><code>punycode</code> 模块提供了 Punycode 标准的一个简单实现。</p>\n<p><code>punycode</code> 模块是 Node.js 使用的第三方依赖，为了方便开发者而提供。对该模块的修复或其他修改必须指向 <a href=\"https://github.com/bestiejs/punycode.js\">Punycode.js</a> 项目。</p>",
+      "methods": [
+        {
+          "textRaw": "`punycode.decode(string)`",
+          "type": "method",
+          "name": "decode",
+          "meta": {
+            "added": [
+              "v0.5.1"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`string` {string}",
+                  "name": "string",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>punycode.decode()</code> 方法将仅包含 ASCII 字符的 <a href=\"https://tools.ietf.org/html/rfc3492\">Punycode</a> 字符串转换为等效的 Unicode 码点字符串。</p>\n<pre><code class=\"language-js\">punycode.decode('maana-pta'); // 'mañana'\npunycode.decode('--dqo34k'); // '☃-⌘'\n</code></pre>"
+        },
+        {
+          "textRaw": "`punycode.encode(string)`",
+          "type": "method",
+          "name": "encode",
+          "meta": {
+            "added": [
+              "v0.5.1"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`string` {string}",
+                  "name": "string",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>punycode.encode()</code> 方法将 Unicode 码点字符串转换为仅包含 ASCII 字符的 <a href=\"https://tools.ietf.org/html/rfc3492\">Punycode</a> 字符串。</p>\n<pre><code class=\"language-js\">punycode.encode('mañana'); // 'maana-pta'\npunycode.encode('☃-⌘'); // '--dqo34k'\n</code></pre>"
+        },
+        {
+          "textRaw": "`punycode.toASCII(domain)`",
+          "type": "method",
+          "name": "toASCII",
+          "meta": {
+            "added": [
+              "v0.6.1"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`domain` {string}",
+                  "name": "domain",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>punycode.toASCII()</code> 方法将表示国际化域名的 Unicode 字符串转换为 <a href=\"https://tools.ietf.org/html/rfc3492\">Punycode</a>。只有域名中的非 ASCII 部分会被转换。在已经只包含 ASCII 字符的字符串上调用 <code>punycode.toASCII()</code> 将不会有任何效果。</p>\n<pre><code class=\"language-js\">// encode domain names\npunycode.toASCII('mañana.com');  // 'xn--maana-pta.com'\npunycode.toASCII('☃-⌘.com');   // 'xn----dqo34k.com'\npunycode.toASCII('example.com'); // 'example.com'\n</code></pre>"
+        },
+        {
+          "textRaw": "`punycode.toUnicode(domain)`",
+          "type": "method",
+          "name": "toUnicode",
+          "meta": {
+            "added": [
+              "v0.6.1"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`domain` {string}",
+                  "name": "domain",
+                  "type": "string"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>punycode.toUnicode()</code> 方法将包含 <a href=\"https://tools.ietf.org/html/rfc3492\">Punycode</a> 编码字符的域名字符串转换为 Unicode。只有域名中 <a href=\"https://tools.ietf.org/html/rfc3492\">Punycode</a> 编码的部分会被转换。</p>\n<pre><code class=\"language-js\">// decode domain names\npunycode.toUnicode('xn--maana-pta.com'); // 'mañana.com'\npunycode.toUnicode('xn----dqo34k.com');  // '☃-⌘.com'\npunycode.toUnicode('example.com');       // 'example.com'\n</code></pre>"
+        }
+      ],
+      "properties": [
+        {
+          "textRaw": "`punycode.ucs2`",
+          "name": "ucs2",
+          "meta": {
+            "added": [
+              "v0.7.0"
+            ],
+            "changes": []
+          },
+          "methods": [
+            {
+              "textRaw": "`punycode.ucs2.decode(string)`",
+              "type": "method",
+              "name": "decode",
+              "meta": {
+                "added": [
+                  "v0.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`string` {string}",
+                      "name": "string",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>punycode.ucs2.decode()</code> 方法返回一个数组，包含字符串中每个 Unicode 符号的数值码点。</p>\n<pre><code class=\"language-js\">punycode.ucs2.decode('abc'); // [0x61, 0x62, 0x63]\n// surrogate pair for U+1D306 tetragram for centre:\npunycode.ucs2.decode('\\uD834\\uDF06'); // [0x1D306]\n</code></pre>"
+            },
+            {
+              "textRaw": "`punycode.ucs2.encode(codePoints)`",
+              "type": "method",
+              "name": "encode",
+              "meta": {
+                "added": [
+                  "v0.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`codePoints` {integer\\[]}",
+                      "name": "codePoints",
+                      "type": "integer\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>punycode.ucs2.encode()</code> 方法基于数值码点值数组返回一个字符串。</p>\n<pre><code class=\"language-js\">punycode.ucs2.encode([0x61, 0x62, 0x63]); // 'abc'\npunycode.ucs2.encode([0x1D306]); // '\\uD834\\uDF06'\n</code></pre>"
+            }
+          ]
+        },
+        {
+          "textRaw": "`version` 类型: {string}",
+          "type": "string",
+          "name": "类型",
+          "meta": {
+            "added": [
+              "v0.6.1"
+            ],
+            "changes": []
+          },
+          "desc": "<p>返回一个字符串，标识当前的 <a href=\"https://github.com/bestiejs/punycode.js\">Punycode.js</a> 版本号。</p>"
+        }
+      ],
+      "type": "module",
+      "displayName": "Punycode"
+    }
+  ]
+}

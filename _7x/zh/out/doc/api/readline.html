@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Readline | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/readline.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:630px){.with-51-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:558px){.with-42-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:742px){.with-65-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:718px){.with-62-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:646px){.with-53-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:606px){.with-48-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-readline">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline active">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="readline" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#readline">Readline</a></span>
+<ul>
+<li><a href="#interfaceconstructor">类：<code>InterfaceConstructor</code></a>
+<ul>
+<li><a href="#close">事件：<code>'close'</code></a></li>
+<li><a href="#line">事件：<code>'line'</code></a></li>
+<li><a href="#history">事件：<code>'history'</code></a></li>
+<li><a href="#pause">事件：<code>'pause'</code></a></li>
+<li><a href="#resume">事件：<code>'resume'</code></a></li>
+<li><a href="#sigcont">事件：<code>'SIGCONT'</code></a></li>
+<li><a href="#sigint">事件：<code>'SIGINT'</code></a></li>
+<li><a href="#sigtstp">事件：<code>'SIGTSTP'</code></a></li>
+<li><a href="#rlclose"><code>rl.close()</code></a></li>
+<li><a href="#rlsymboldispose"><code>rl[Symbol.dispose]()</code></a></li>
+<li><a href="#rlpause"><code>rl.pause()</code></a></li>
+<li><a href="#rlpromptpreservecursor"><code>rl.prompt([preserveCursor])</code></a></li>
+<li><a href="#rlresume"><code>rl.resume()</code></a></li>
+<li><a href="#rlsetpromptprompt"><code>rl.setPrompt(prompt)</code></a></li>
+<li><a href="#rlgetprompt"><code>rl.getPrompt()</code></a></li>
+<li><a href="#rlwritedata-key"><code>rl.write(data[, key])</code></a></li>
+<li><a href="#rlsymbolasynciterator"><code>rl[Symbol.asyncIterator]()</code></a></li>
+<li><a href="#rlline"><code>rl.line</code></a></li>
+<li><a href="#rlcursor"><code>rl.cursor</code></a></li>
+<li><a href="#rlgetcursorpos"><code>rl.getCursorPos()</code></a></li>
+</ul>
+</li>
+<li><a href="#promises-api">Promises API</a>
+<ul>
+<li><a href="#readlinepromisesinterface">类：<code>readlinePromises.Interface</code></a>
+<ul>
+<li><a href="#rlquestionquery-options"><code>rl.question(query[, options])</code></a></li>
+</ul>
+</li>
+<li><a href="#readlinepromisesreadline">类：<code>readlinePromises.Readline</code></a>
+<ul>
+<li><a href="#new-readlinepromisesreadlinestream-options"><code>new readlinePromises.Readline(stream[, options])</code></a></li>
+<li><a href="#rlclearlinedir"><code>rl.clearLine(dir)</code></a></li>
+<li><a href="#rlclearscreendown"><code>rl.clearScreenDown()</code></a></li>
+<li><a href="#rlcommit"><code>rl.commit()</code></a></li>
+<li><a href="#rlcursortox-y"><code>rl.cursorTo(x[, y])</code></a></li>
+<li><a href="#rlmovecursordx-dy"><code>rl.moveCursor(dx, dy)</code></a></li>
+<li><a href="#rlrollback"><code>rl.rollback()</code></a></li>
+</ul>
+</li>
+<li><a href="#readlinepromisescreateinterfaceoptions"><code>readlinePromises.createInterface(options)</code></a>
+<ul>
+<li><a href="#completer-"><code>completer</code> 函数的使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#-api">回调 API</a>
+<ul>
+<li><a href="#readlineinterface">类：<code>readline.Interface</code></a>
+<ul>
+<li><a href="#rlquestionquery-options-callback"><code>rl.question(query[, options], callback)</code></a></li>
+</ul>
+</li>
+<li><a href="#readlineclearlinestream-dir-callback"><code>readline.clearLine(stream, dir[, callback])</code></a></li>
+<li><a href="#readlineclearscreendownstream-callback"><code>readline.clearScreenDown(stream[, callback])</code></a></li>
+<li><a href="#readlinecreateinterfaceoptions"><code>readline.createInterface(options)</code></a>
+<ul>
+<li><a href="#completer-_1"><code>completer</code> 函数的使用</a></li>
+</ul>
+</li>
+<li><a href="#readlinecursortostream-x-y-callback"><code>readline.cursorTo(stream, x[, y][, callback])</code></a></li>
+<li><a href="#readlinemovecursorstream-dx-dy-callback"><code>readline.moveCursor(stream, dx, dy[, callback])</code></a></li>
+</ul>
+</li>
+<li><a href="#readlineemitkeypresseventsstream-interface"><code>readline.emitKeypressEvents(stream[, interface])</code></a></li>
+<li><a href="#-cli">示例：小型 CLI</a></li>
+<li><a href="#">示例：逐行读取文件流</a></li>
+<li><a href="#tty-">TTY 键绑定</a></li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline active">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/readline.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/readline.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/readline.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/readline.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/readline.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/readline.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/readline.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/readline.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/readline.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/readline.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/readline.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/readline.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/readline.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/readline.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/readline.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/readline.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/readline.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/readline.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/readline.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/readline.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/readline.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/readline.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/readline.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/readline.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="readline.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/readline.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#readline">Readline</a></span>
+<ul>
+<li><a href="#interfaceconstructor">类：<code>InterfaceConstructor</code></a>
+<ul>
+<li><a href="#close">事件：<code>'close'</code></a></li>
+<li><a href="#line">事件：<code>'line'</code></a></li>
+<li><a href="#history">事件：<code>'history'</code></a></li>
+<li><a href="#pause">事件：<code>'pause'</code></a></li>
+<li><a href="#resume">事件：<code>'resume'</code></a></li>
+<li><a href="#sigcont">事件：<code>'SIGCONT'</code></a></li>
+<li><a href="#sigint">事件：<code>'SIGINT'</code></a></li>
+<li><a href="#sigtstp">事件：<code>'SIGTSTP'</code></a></li>
+<li><a href="#rlclose"><code>rl.close()</code></a></li>
+<li><a href="#rlsymboldispose"><code>rl[Symbol.dispose]()</code></a></li>
+<li><a href="#rlpause"><code>rl.pause()</code></a></li>
+<li><a href="#rlpromptpreservecursor"><code>rl.prompt([preserveCursor])</code></a></li>
+<li><a href="#rlresume"><code>rl.resume()</code></a></li>
+<li><a href="#rlsetpromptprompt"><code>rl.setPrompt(prompt)</code></a></li>
+<li><a href="#rlgetprompt"><code>rl.getPrompt()</code></a></li>
+<li><a href="#rlwritedata-key"><code>rl.write(data[, key])</code></a></li>
+<li><a href="#rlsymbolasynciterator"><code>rl[Symbol.asyncIterator]()</code></a></li>
+<li><a href="#rlline"><code>rl.line</code></a></li>
+<li><a href="#rlcursor"><code>rl.cursor</code></a></li>
+<li><a href="#rlgetcursorpos"><code>rl.getCursorPos()</code></a></li>
+</ul>
+</li>
+<li><a href="#promises-api">Promises API</a>
+<ul>
+<li><a href="#readlinepromisesinterface">类：<code>readlinePromises.Interface</code></a>
+<ul>
+<li><a href="#rlquestionquery-options"><code>rl.question(query[, options])</code></a></li>
+</ul>
+</li>
+<li><a href="#readlinepromisesreadline">类：<code>readlinePromises.Readline</code></a>
+<ul>
+<li><a href="#new-readlinepromisesreadlinestream-options"><code>new readlinePromises.Readline(stream[, options])</code></a></li>
+<li><a href="#rlclearlinedir"><code>rl.clearLine(dir)</code></a></li>
+<li><a href="#rlclearscreendown"><code>rl.clearScreenDown()</code></a></li>
+<li><a href="#rlcommit"><code>rl.commit()</code></a></li>
+<li><a href="#rlcursortox-y"><code>rl.cursorTo(x[, y])</code></a></li>
+<li><a href="#rlmovecursordx-dy"><code>rl.moveCursor(dx, dy)</code></a></li>
+<li><a href="#rlrollback"><code>rl.rollback()</code></a></li>
+</ul>
+</li>
+<li><a href="#readlinepromisescreateinterfaceoptions"><code>readlinePromises.createInterface(options)</code></a>
+<ul>
+<li><a href="#completer-"><code>completer</code> 函数的使用</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#-api">回调 API</a>
+<ul>
+<li><a href="#readlineinterface">类：<code>readline.Interface</code></a>
+<ul>
+<li><a href="#rlquestionquery-options-callback"><code>rl.question(query[, options], callback)</code></a></li>
+</ul>
+</li>
+<li><a href="#readlineclearlinestream-dir-callback"><code>readline.clearLine(stream, dir[, callback])</code></a></li>
+<li><a href="#readlineclearscreendownstream-callback"><code>readline.clearScreenDown(stream[, callback])</code></a></li>
+<li><a href="#readlinecreateinterfaceoptions"><code>readline.createInterface(options)</code></a>
+<ul>
+<li><a href="#completer-_1"><code>completer</code> 函数的使用</a></li>
+</ul>
+</li>
+<li><a href="#readlinecursortostream-x-y-callback"><code>readline.cursorTo(stream, x[, y][, callback])</code></a></li>
+<li><a href="#readlinemovecursorstream-dx-dy-callback"><code>readline.moveCursor(stream, dx, dy[, callback])</code></a></li>
+</ul>
+</li>
+<li><a href="#readlineemitkeypresseventsstream-interface"><code>readline.emitKeypressEvents(stream[, interface])</code></a></li>
+<li><a href="#-cli">示例：小型 CLI</a></li>
+<li><a href="#">示例：逐行读取文件流</a></li>
+<li><a href="#tty-">TTY 键绑定</a></li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Readline<span><a class="mark" href="#readline" id="readline">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/readline.js">lib/readline.js</a></p>
+<p><code>node:readline</code> 模块提供了一个接口，用于从 <a href="stream.html#readable-streams">Readable</a> 流（例如 <a href="process.html#processstdin"><code>process.stdin</code></a>）一次一行地读取数据。</p>
+<p>要使用基于 Promise 的 API：</p>
+
+<pre class="with-51-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> readline <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline/promises'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> readline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline/promises'</span>);</code><button class="copy-button">copy</button></pre>
+<p>要使用回调和同步 API：</p>
+
+<pre class="with-42-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> readline <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> readline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);</code><button class="copy-button">copy</button></pre>
+<p>以下简单示例说明了 <code>node:readline</code> 模块的基本用法。</p>
+
+<pre class="with-65-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> readline <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline/promises'</span>;
+<span class="hljs-keyword">import</span> { stdin <span class="hljs-keyword">as</span> input, stdout <span class="hljs-keyword">as</span> output } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-keyword">const</span> rl = readline.<span class="hljs-title function_">createInterface</span>({ input, output });
+
+<span class="hljs-keyword">const</span> answer = <span class="hljs-keyword">await</span> rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'What do you think of Node.js? '</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Thank you for your valuable feedback: <span class="hljs-subst">${answer}</span>`</span>);
+
+rl.<span class="hljs-title function_">close</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> readline = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-attr">stdin</span>: input, <span class="hljs-attr">stdout</span>: output } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:process'</span>);
+
+<span class="hljs-keyword">const</span> rl = readline.<span class="hljs-title function_">createInterface</span>({ input, output });
+
+rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'What do you think of Node.js? '</span>, <span class="hljs-function">(<span class="hljs-params">answer</span>) =></span> {
+  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Log the answer in a database</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Thank you for your valuable feedback: <span class="hljs-subst">${answer}</span>`</span>);
+
+  rl.<span class="hljs-title function_">close</span>();
+});</code><button class="copy-button">copy</button></pre>
+<p>一旦调用此代码，Node.js 应用程序在 <code>readline.Interface</code> 关闭之前不会终止，因为接口会等待在 <code>input</code> 流上接收数据。</p>
+<p><a id="readline_class_interface"></a></p>
+<section><h3>类：<code>InterfaceConstructor</code><span><a class="mark" href="#interfaceconstructor" id="interfaceconstructor">#</a></span><a aria-hidden="true" class="legacy" id="readline_interfaceconstructor"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.1.104</span>
+</div>
+<ul>
+<li>继承自：<a href="events.html#class-eventemitter" class="type">&#x3C;EventEmitter></a></li>
+</ul>
+<p><code>InterfaceConstructor</code> 类的实例是使用 <code>readlinePromises.createInterface()</code> 或 <code>readline.createInterface()</code> 方法构造的。每个实例都与一个 <code>input</code> <a href="stream.html#readable-streams">Readable</a> 流和一个 <code>output</code> <a href="stream.html#writable-streams">Writable</a> 流相关联。<code>output</code> 流用于打印用户输入的提示，该输入到达并从 <code>input</code> 流中读取。</p>
+<div>
+<h4>事件：<code>'close'</code><span><a class="mark" href="#close" id="close">#</a></span><a aria-hidden="true" class="legacy" id="readline_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<p>在以下情况之一发生时，会触发 <code>'close'</code> 事件：</p>
+<ul>
+<li>调用 <code>rl.close()</code> 方法，并且 <code>InterfaceConstructor</code> 实例已放弃对 <code>input</code> 和 <code>output</code> 流的控制；</li>
+<li><code>input</code> 流接收到其 <code>'end'</code> 事件；</li>
+<li><code>input</code> 流接收 <kbd>Ctrl</kbd>+<kbd>D</kbd> 以发出传输结束（EOT）信号；</li>
+<li><code>input</code> 流接收 <kbd>Ctrl</kbd>+<kbd>C</kbd> 以发出 <code>SIGINT</code> 信号，并且在 <code>InterfaceConstructor</code> 实例上未注册 <code>'SIGINT'</code> 事件监听器。</li>
+</ul>
+<p>监听器函数被调用时不传递任何参数。</p>
+<p>一旦发出 <code>'close'</code> 事件，<code>InterfaceConstructor</code> 实例就完成了。</p>
+</div><div>
+<h4>事件：<code>'line'</code><span><a class="mark" href="#line" id="line">#</a></span><a aria-hidden="true" class="legacy" id="readline_line"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<p>每当 <code>input</code> 流接收到行结束输入（<code>\n</code>、<code>\r</code> 或 <code>\r\n</code>）时，就会触发 <code>'line'</code> 事件。这通常发生在用户按下 <kbd>Enter</kbd> 或 <kbd>Return</kbd> 时。</p>
+<p>如果从流中读取了新数据，并且该流在没有最终行结束标记的情况下结束，也会触发 <code>'line'</code> 事件。</p>
+<p>监听器函数被调用时，会传入一个包含接收到的单行输入的字符串。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">input</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Received: <span class="hljs-subst">${input}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'history'</code><span><a class="mark" href="#history" id="history">#</a></span><a aria-hidden="true" class="legacy" id="readline_history"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.8.0, v14.18.0</span>
+</div>
+<p>每当历史数组发生变化时，就会触发 <code>'history'</code> 事件。</p>
+<p>监听器函数被调用时，会传入一个包含历史数组的数组。它将反映所有更改，由于 <code>historySize</code> 和 <code>removeHistoryDuplicates</code> 而添加和删除的行。</p>
+<p>主要目的是允许监听器持久化历史记录。监听器也可以更改历史对象。这对于防止某些行（如密码）被添加到历史记录中可能很有用。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'history'</span>, <span class="hljs-function">(<span class="hljs-params">history</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Received: <span class="hljs-subst">${history}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'pause'</code><span><a class="mark" href="#pause" id="pause">#</a></span><a aria-hidden="true" class="legacy" id="readline_pause"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.5</span>
+</div>
+<p>在以下情况之一发生时，会触发 <code>'pause'</code> 事件：</p>
+<ul>
+<li><code>input</code> 流被暂停。</li>
+<li><code>input</code> 流未暂停并接收到 <code>'SIGCONT'</code> 事件。（参见事件 <a href="#event-sigtstp"><code>'SIGTSTP'</code></a> 和 <a href="#event-sigcont"><code>'SIGCONT'</code></a>。）</li>
+</ul>
+<p>监听器函数被调用时不传递任何参数。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'pause'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Readline paused.'</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'resume'</code><span><a class="mark" href="#resume" id="resume">#</a></span><a aria-hidden="true" class="legacy" id="readline_resume"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.5</span>
+</div>
+<p>每当 <code>input</code> 流恢复时，就会触发 <code>'resume'</code> 事件。</p>
+<p>监听器函数被调用时不传递任何参数。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'resume'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Readline resumed.'</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'SIGCONT'</code><span><a class="mark" href="#sigcont" id="sigcont">#</a></span><a aria-hidden="true" class="legacy" id="readline_sigcont"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.5</span>
+</div>
+<p>当先前使用 <kbd>Ctrl</kbd>+<kbd>Z</kbd>（即 <code>SIGTSTP</code>）移动到后台的 Node.js 进程随后使用 <a href="http://man7.org/linux/man-pages/man1/fg.1p.html"><code>fg(1p)</code></a> 被带回前台时，会触发 <code>'SIGCONT'</code> 事件。</p>
+<p>如果在 <code>SIGTSTP</code> 请求<em>之前</em> <code>input</code> 流已被暂停，则不会发出此事件。</p>
+<p>监听器函数被调用时不传递任何参数。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'SIGCONT'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// `prompt` 会自动恢复流</span>
+  rl.<span class="hljs-title function_">prompt</span>();
+});</code> <button class="copy-button">copy</button></pre>
+<p>Windows 上<em>不</em>支持 <code>'SIGCONT'</code> 事件。</p>
+</div><div>
+<h4>事件：<code>'SIGINT'</code><span><a class="mark" href="#sigint" id="sigint">#</a></span><a aria-hidden="true" class="legacy" id="readline_sigint"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.3.0</span>
+</div>
+<p>每当 <code>input</code> 流接收到 <kbd>Ctrl+C</kbd> 输入（通常称为 <code>SIGINT</code>）时，就会触发 <code>'SIGINT'</code> 事件。如果在 <code>input</code> 流接收到 <code>SIGINT</code> 时没有注册 <code>'SIGINT'</code> 事件监听器，则会发出 <code>'pause'</code> 事件。</p>
+<p>监听器函数被调用时不传递任何参数。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'SIGINT'</span>, <span class="hljs-function">() =></span> {
+  rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'Are you sure you want to exit? '</span>, <span class="hljs-function">(<span class="hljs-params">answer</span>) =></span> {
+    <span class="hljs-keyword">if</span> (answer.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/^y(es)?$/i</span>)) rl.<span class="hljs-title function_">pause</span>();
+  });
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'SIGTSTP'</code><span><a class="mark" href="#sigtstp" id="sigtstp">#</a></span><a aria-hidden="true" class="legacy" id="readline_sigtstp"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.5</span>
+</div>
+<p>当 <code>input</code> 流接收到 <kbd>Ctrl</kbd>+<kbd>Z</kbd> 输入（通常称为 <code>SIGTSTP</code>）时，会触发 <code>'SIGTSTP'</code> 事件。如果在 <code>input</code> 流接收到 <code>SIGTSTP</code> 时没有注册 <code>'SIGTSTP'</code> 事件监听器，Node.js 进程将被发送到后台。</p>
+<p>当使用 <a href="http://man7.org/linux/man-pages/man1/fg.1p.html"><code>fg(1p)</code></a> 恢复程序时，将发出 <code>'pause'</code> 和 <code>'SIGCONT'</code> 事件。这些可用于恢复 <code>input</code> 流。</p>
+<p>如果在进程被发送到后台之前 <code>input</code> 已被暂停，则不会发出 <code>'pause'</code> 和 <code>'SIGCONT'</code> 事件。</p>
+<p>监听器函数被调用时不传递任何参数。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'SIGTSTP'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// 这将覆盖 SIGTSTP 并防止程序进入后台。</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Caught SIGTSTP.'</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p>Windows 上<em>不</em>支持 <code>'SIGTSTP'</code> 事件。</p>
+</div><div>
+<h4><code>rl.close()</code><span><a class="mark" href="#rlclose" id="rlclose">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_close"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<p><code>rl.close()</code> 方法关闭 <code>InterfaceConstructor</code> 实例并放弃对 <code>input</code> 和 <code>output</code> 流的控制。调用时，将发出 <code>'close'</code> 事件。</p>
+<p>调用 <code>rl.close()</code> 不会立即停止 <code>InterfaceConstructor</code> 实例发出其他事件（包括 <code>'line'</code>）。</p>
+</div><div>
+<h4><code>rl[Symbol.dispose]()</code><span><a class="mark" href="#rlsymboldispose" id="rlsymboldispose">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_symbol_dispose"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.10.0, v22.15.0</span>
+</div>
+<p><code>rl.close()</code> 的别名。</p>
+</div><div>
+<h4><code>rl.pause()</code><span><a class="mark" href="#rlpause" id="rlpause">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_pause"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.3.4</span>
+</div>
+<p><code>rl.pause()</code> 方法暂停 <code>input</code> 流，允许在必要时稍后恢复。</p>
+<p>调用 <code>rl.pause()</code> 不会立即停止 <code>InterfaceConstructor</code> 实例发出其他事件（包括 <code>'line'</code>）。</p>
+</div><div>
+<h4><code>rl.prompt([preserveCursor])</code><span><a class="mark" href="#rlpromptpreservecursor" id="rlpromptpreservecursor">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_prompt_preservecursor"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<ul>
+<li><code>preserveCursor</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则防止光标位置重置为 <code>0</code>。</li>
+</ul>
+<p><code>rl.prompt()</code> 方法将 <code>InterfaceConstructor</code> 实例配置的 <code>prompt</code> 写入 <code>output</code> 中的新行，以便为用户提供新的输入位置。</p>
+<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.prompt()</code> 将恢复它。</p>
+<p>如果创建 <code>InterfaceConstructor</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入提示。</p>
+</div><div>
+<h4><code>rl.resume()</code><span><a class="mark" href="#rlresume" id="rlresume">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_resume"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.3.4</span>
+</div>
+<p>如果 <code>input</code> 流已暂停，<code>rl.resume()</code> 方法会恢复它。</p>
+</div><div>
+<h4><code>rl.setPrompt(prompt)</code><span><a class="mark" href="#rlsetpromptprompt" id="rlsetpromptprompt">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_setprompt_prompt"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<ul>
+<li><code>prompt</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p><code>rl.setPrompt()</code> 方法设置每当调用 <code>rl.prompt()</code> 时将写入 <code>output</code> 的提示。</p>
+</div><div>
+<h4><code>rl.getPrompt()</code><span><a class="mark" href="#rlgetprompt" id="rlgetprompt">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_getprompt"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.3.0, v14.17.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 当前提示字符串</li>
+</ul>
+<p><code>rl.getPrompt()</code> 方法返回 <code>rl.prompt()</code> 使用的当前提示。</p>
+</div><div>
+<h4><code>rl.write(data[, key])</code><span><a class="mark" href="#rlwritedata-key" id="rlwritedata-key">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_write_data_key"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<ul>
+<li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>key</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>ctrl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <code>true</code> 表示 <kbd>Ctrl</kbd> 键。</li>
+<li><code>meta</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <code>true</code> 表示 <kbd>Meta</kbd> 键。</li>
+<li><code>shift</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <code>true</code> 表示 <kbd>Shift</kbd> 键。</li>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 键的名称。</li>
+</ul>
+</li>
+</ul>
+<p><code>rl.write()</code> 方法将 <code>data</code> 或由 <code>key</code> 标识的键序列写入 <code>output</code>。仅当 <code>output</code> 是 <a href="tty.html">TTY</a> 文本终端时才支持 <code>key</code> 参数。有关键组合的列表，请参阅 [TTY 键绑定][]。</p>
+<p>如果指定了 <code>key</code>，则忽略 <code>data</code>。</p>
+<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.write()</code> 将恢复它。</p>
+<p>如果创建 <code>InterfaceConstructor</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入 <code>data</code> 和 <code>key</code>。</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">write</span>(<span class="hljs-string">'Delete this!'</span>);
+<span class="hljs-comment">// 模拟 Ctrl+U 删除之前写入的行</span>
+rl.<span class="hljs-title function_">write</span>(<span class="hljs-literal">null</span>, { <span class="hljs-attr">ctrl</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">name</span>: <span class="hljs-string">'u'</span> });</code> <button class="copy-button">copy</button></pre>
+<p><code>rl.write()</code> 方法将数据写入 <code>readline</code> <code>Interface</code> 的 <code>input</code>，<em>就像由用户提供一样</em>。</p>
+</div><div>
+<h4><code>rl[Symbol.asyncIterator]()</code><span><a class="mark" href="#rlsymbolasynciterator" id="rlsymbolasynciterator">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_symbol_asynciterator"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v11.14.0, v10.17.0</td>
+<td><p>Symbol.asyncIterator support is no longer experimental.</p></td></tr>
+<tr><td>v11.4.0, v10.16.0</td>
+<td><p><span>Added in: v11.4.0, v10.16.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回：<a href="https://tc39.github.io/ecma262/#sec-asynciterator-interface" class="type">&#x3C;AsyncIterator></a></li>
+</ul>
+<p>创建一个 <code>AsyncIterator</code> 对象，该对象将输入流中的每一行作为字符串进行迭代。此方法允许通过 <code>for await...of</code> 循环异步迭代 <code>InterfaceConstructor</code> 对象。</p>
+<p>输入流中的错误不会被转发。</p>
+<p>如果循环通过 <code>break</code>、<code>throw</code> 或 <code>return</code> 终止，将调用 <a href="#rlclose"><code>rl.close()</code></a>。换句话说，迭代 <code>InterfaceConstructor</code> 将始终完全消耗输入流。</p>
+<p>性能与传统的 <code>'line'</code> 事件 API 不相当。对于性能敏感的应用，请使用 <code>'line'</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processLineByLine</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> rl = readline.<span class="hljs-title function_">createInterface</span>({
+    <span class="hljs-comment">// ...</span>
+  });
+
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> rl) {
+    <span class="hljs-comment">// 读取输入中的每一行将在此处作为 `line` 依次可用。</span>
+  }
+}</code> <button class="copy-button">copy</button></pre>
+<p>一旦调用，<code>readline.createInterface()</code> 将开始消耗输入流。在接口创建和异步迭代之间进行异步操作可能会导致遗漏行。</p>
+</div><div>
+<h4><code>rl.line</code><span><a class="mark" href="#rlline" id="rlline">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_line"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.8.0, v14.18.0</td>
+<td><p>Value will always be a string, never undefined.</p></td></tr>
+<tr><td>v0.1.98</td>
+<td><p><span>Added in: v0.1.98</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>当前由 node 处理的输入数据。</p>
+<p>这可以在从 TTY 流收集输入时使用，以检索在 <code>line</code> 事件发出之前已处理到当前的值。一旦发出 <code>line</code> 事件，此属性将为空字符串。</p>
+<p>请注意，如果在实例运行时修改该值，并且没有同时控制 <code>rl.cursor</code>，可能会产生意外后果。</p>
+<p><strong>如果不使用 TTY 流进行输入，请使用 <a href="#event-line"><code>'line'</code></a> 事件。</strong></p>
+<p>一个可能的使用案例如下：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> values = [<span class="hljs-string">'lorem ipsum'</span>, <span class="hljs-string">'dolor sit amet'</span>];
+<span class="hljs-keyword">const</span> rl = readline.<span class="hljs-title function_">createInterface</span>(process.<span class="hljs-property">stdin</span>);
+<span class="hljs-keyword">const</span> showResults = <span class="hljs-title function_">debounce</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+    <span class="hljs-string">'\n'</span>,
+    values.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">val</span>) =></span> val.<span class="hljs-title function_">startsWith</span>(rl.<span class="hljs-property">line</span>)).<span class="hljs-title function_">join</span>(<span class="hljs-string">' '</span>),
+  );
+}, <span class="hljs-number">300</span>);
+process.<span class="hljs-property">stdin</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">'keypress'</span>, <span class="hljs-function">(<span class="hljs-params">c, k</span>) =></span> {
+  <span class="hljs-title function_">showResults</span>();
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>rl.cursor</code><span><a class="mark" href="#rlcursor" id="rlcursor">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_cursor"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.1.98</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></li>
+</ul>
+<p>光标相对于 <code>rl.line</code> 的位置。</p>
+<p>当从 TTY 流读取输入时，这将跟踪当前光标在输入字符串中的位置。光标的位置决定了在处理输入时将修改输入字符串的哪部分，以及终端插入符号将呈现的列。</p>
+</div><div>
+<h4><code>rl.getCursorPos()</code><span><a class="mark" href="#rlgetcursorpos" id="rlgetcursorpos">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_getcursorpos"></a></h4>
+<div class="api_metadata">
+<span>Added in: v13.5.0, v12.16.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>rows</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 光标当前所在提示符的行</li>
+<li><code>cols</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 光标当前所在的屏幕列</li>
+</ul>
+</li>
+</ul>
+<p>返回光标相对于输入提示符 + 字符串的实际位置。长输入（换行）字符串以及多行提示符都包含在计算中。</p>
+</div>
+</section><section><h3>Promises API<span><a class="mark" href="#promises-api" id="promises-api">#</a></span><a aria-hidden="true" class="legacy" id="readline_promises_api"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>Marking the API stable.</p></td></tr>
+<tr><td>v17.0.0</td>
+<td><p><span>Added in: v17.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<div>
+<h4>类：<code>readlinePromises.Interface</code><span><a class="mark" href="#readlinepromisesinterface" id="readlinepromisesinterface">#</a></span><a aria-hidden="true" class="legacy" id="readline_readlinepromises_interface"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li>继承自：<a href="readline.html#class-interfaceconstructor" class="type">&#x3C;readline.InterfaceConstructor></a></li>
+</ul>
+<p><code>readlinePromises.Interface</code> 类的实例是使用 <code>readlinePromises.createInterface()</code> 方法构造的。每个实例都与一个 <code>input</code> <a href="stream.html#readable-streams">Readable</a> 流和一个 <code>output</code> <a href="stream.html#writable-streams">Writable</a> 流相关联。<code>output</code> 流用于打印用户输入的提示，该输入到达并从 <code>input</code> 流中读取。</p>
+<div>
+<h5><code>rl.question(query[, options])</code><span><a class="mark" href="#rlquestionquery-options" id="rlquestionquery-options">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_question_query_options"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li><code>query</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要写入 <code>output</code> 的语句或查询，前置到提示符。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 可选地允许使用 <code>AbortSignal</code> 取消 <code>question()</code>。</li>
+</ul>
+</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 一个 Promise，使用用户对 <code>query</code> 的输入来兑现。</li>
+</ul>
+<p><code>rl.question()</code> 方法通过将 <code>query</code> 写入 <code>output</code> 来显示它，等待用户在 <code>input</code> 上提供输入，然后调用 <code>callback</code> 函数，将提供的输入作为第一个参数传递。</p>
+<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.question()</code> 将恢复它。</p>
+<p>如果创建 <code>readlinePromises.Interface</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入 <code>query</code>。</p>
+<p>如果在 <code>rl.close()</code> 之后调用问题，它将返回一个被拒绝的 Promise。</p>
+<p>用法示例：</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">const</span> answer = <span class="hljs-keyword">await</span> rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'What is your favorite food? '</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Oh, so your favorite food is <span class="hljs-subst">${answer}</span>`</span>);</code> <button class="copy-button">copy</button></pre>
+<p>使用 <code>AbortSignal</code> 取消问题。</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">const</span> signal = <span class="hljs-title class_">AbortSignal</span>.<span class="hljs-title function_">timeout</span>(<span class="hljs-number">10_000</span>);
+
+signal.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">'abort'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'The food question timed out'</span>);
+}, { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });
+
+<span class="hljs-keyword">const</span> answer = <span class="hljs-keyword">await</span> rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'What is your favorite food? '</span>, { signal });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Oh, so your favorite food is <span class="hljs-subst">${answer}</span>`</span>);</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4>类：<code>readlinePromises.Readline</code><span><a class="mark" href="#readlinepromisesreadline" id="readlinepromisesreadline">#</a></span><a aria-hidden="true" class="legacy" id="readline_readlinepromises_readline"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<div>
+<h5><code>new readlinePromises.Readline(stream[, options])</code><span><a class="mark" href="#new-readlinepromisesreadlinestream-options" id="new-readlinepromisesreadlinestream-options">#</a></span><a aria-hidden="true" class="legacy" id="readline_new_readlinepromises_readline_stream_options"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li><code>stream</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a> 一个 <a href="tty.html">TTY</a> 流。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>autoCommit</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则无需调用 <code>rl.commit()</code>。</li>
+</ul>
+</li>
+</ul>
+</div><div>
+<h5><code>rl.clearLine(dir)</code><span><a class="mark" href="#rlclearlinedir" id="rlclearlinedir">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_clearline_dir"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li><code>dir</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a>
+<ul>
+<li><code>-1</code>：从光标向左</li>
+<li><code>1</code>：从光标向右</li>
+<li><code>0</code>：整行</li>
+</ul>
+</li>
+<li>返回：this</li>
+</ul>
+<p><code>rl.clearLine()</code> 方法向内部待处理操作列表添加一个操作，该操作清除关联 <code>stream</code> 的当前行，方向由 <code>dir</code> 指定。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>
+</div><div>
+<h5><code>rl.clearScreenDown()</code><span><a class="mark" href="#rlclearscreendown" id="rlclearscreendown">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_clearscreendown"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li>返回：this</li>
+</ul>
+<p><code>rl.clearScreenDown()</code> 方法向内部待处理操作列表添加一个操作，该操作从光标当前位置向下清除关联的流。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>
+</div><div>
+<h5><code>rl.commit()</code><span><a class="mark" href="#rlcommit" id="rlcommit">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_commit"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a></li>
+</ul>
+<p><code>rl.commit()</code> 方法将所有待处理操作发送到关联的 <code>stream</code> 并清除内部待处理操作列表。</p>
+</div><div>
+<h5><code>rl.cursorTo(x[, y])</code><span><a class="mark" href="#rlcursortox-y" id="rlcursortox-y">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_cursorto_x_y"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li><code>x</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+<li><code>y</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+<li>返回：this</li>
+</ul>
+<p><code>rl.cursorTo()</code> 方法向内部待处理操作列表添加一个操作，该操作将光标移动到关联 <code>stream</code> 中的指定位置。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>
+</div><div>
+<h5><code>rl.moveCursor(dx, dy)</code><span><a class="mark" href="#rlmovecursordx-dy" id="rlmovecursordx-dy">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_movecursor_dx_dy"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li><code>dx</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+<li><code>dy</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+<li>返回：this</li>
+</ul>
+<p><code>rl.moveCursor()</code> 方法向内部待处理操作列表添加一个操作，该操作将光标<em>相对</em>于其当前位置在关联的 <code>stream</code> 中移动。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>
+</div><div>
+<h5><code>rl.rollback()</code><span><a class="mark" href="#rlrollback" id="rlrollback">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_rollback"></a></h5>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li>返回：this</li>
+</ul>
+<p><code>rl.rollback</code> 方法清除内部待处理操作列表，而不将其发送到关联的 <code>stream</code>。</p>
+</div></div><div>
+<h4><code>readlinePromises.createInterface(options)</code><span><a class="mark" href="#readlinepromisescreateinterfaceoptions" id="readlinepromisescreateinterfaceoptions">#</a></span><a aria-hidden="true" class="legacy" id="readline_readlinepromises_createinterface_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.0.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>input</code> <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a> 要监听的 <a href="stream.html#readable-streams">Readable</a> 流。此选项是<em>必需的</em>。</li>
+<li><code>output</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a> 要写入 readline 数据的 <a href="stream.html#writable-streams">Writable</a> 流。</li>
+<li><code>completer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 用于 Tab 自动补全的可选函数。</li>
+<li><code>terminal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果 <code>input</code> 和 <code>output</code> 流应被视为 TTY，并向其写入 ANSI/VT100 转义码，则为 <code>true</code>。<strong>默认值：</strong> 在实例化时检查 <code>output</code> 流上的 <code>isTTY</code>。</li>
+<li><code>history</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 历史行的初始列表。此选项仅在 <code>terminal</code> 由用户或通过内部 <code>output</code> 检查设置为 <code>true</code> 时才有意义，否则根本不会初始化历史缓存机制。<strong>默认值：</strong> <code>[]</code>。</li>
+<li><code>historySize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 保留的历史行最大数量。要禁用历史记录，请将此值设置为 <code>0</code>。此选项仅在 <code>terminal</code> 由用户或通过内部 <code>output</code> 检查设置为 <code>true</code> 时才有意义，否则根本不会初始化历史缓存机制。<strong>默认值：</strong> <code>30</code>。</li>
+<li><code>removeHistoryDuplicates</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则当添加到历史列表的新输入行与旧行重复时，从列表中删除旧行。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>prompt</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要使用的提示字符串。<strong>默认值：</strong> <code>'> '</code>。</li>
+<li><code>crlfDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 如果 <code>\r</code> 和 <code>\n</code> 之间的延迟超过 <code>crlfDelay</code> 毫秒，则 <code>\r</code> 和 <code>\n</code> 都将被视为单独的行结束输入。<code>crlfDelay</code> 将被强制转换为不小于 <code>100</code> 的数字。可以设置为 <code>Infinity</code>，在这种情况下，<code>\r</code> 后跟 <code>\n</code> 将始终被视为单个换行符（这对于读取具有 <code>\r\n</code> 行分隔符的[文件][]可能是合理的）。<strong>默认值：</strong> <code>100</code>。</li>
+<li><code>escapeCodeTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>readlinePromises</code> 等待字符的持续时间（当读取模糊键序列时，以毫秒为单位，该序列既可以形成使用到目前为止读取的输入的完整键序列，也可以接受额外输入以完成更长的键序列）。<strong>默认值：</strong> <code>500</code>。</li>
+<li><code>tabSize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 制表符等于的空格数（最小为 1）。<strong>默认值：</strong> <code>8</code>。</li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 允许使用 AbortSignal 关闭接口。</li>
+</ul>
+</li>
+<li>返回：<a href="readline.html#class-readlinepromisesinterface" class="type">&#x3C;readlinePromises.Interface></a></li>
+</ul>
+<p><code>readlinePromises.createInterface()</code> 方法创建一个新的 <code>readlinePromises.Interface</code> 实例。</p>
+
+<pre class="with-62-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createInterface } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline/promises'</span>;
+<span class="hljs-keyword">import</span> { stdin, stdout } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: stdin,
+  <span class="hljs-attr">output</span>: stdout,
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createInterface } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline/promises'</span>);
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: process.<span class="hljs-property">stdin</span>,
+  <span class="hljs-attr">output</span>: process.<span class="hljs-property">stdout</span>,
+});</code><button class="copy-button">copy</button></pre>
+<p>一旦创建了 <code>readlinePromises.Interface</code> 实例，最常见的情况是监听 <code>'line'</code> 事件：</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Received: <span class="hljs-subst">${line}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p>如果此实例的 <code>terminal</code> 为 <code>true</code>，那么如果 <code>output</code> 流定义了 <code>output.columns</code> 属性并在列更改时（或在列更改时）在 <code>output</code> 上发出 <code>'resize'</code> 事件，则 <code>output</code> 流将获得最佳兼容性（<a href="process.html#processstdout"><code>process.stdout</code></a> 在它是 TTY 时会自动执行此操作）。</p>
+<div>
+<h5><code>completer</code> 函数的使用<span><a class="mark" href="#completer-" id="completer-">#</a></span><a aria-hidden="true" class="legacy" id="readline_completer"></a></h5>
+<p><code>completer</code> 函数将用户输入的当前行作为参数，并返回一个包含 2 个条目的 <code>Array</code>：</p>
+<ul>
+<li>一个包含补全匹配项的 <code>Array</code>。</li>
+<li>用于匹配的子字符串。</li>
+</ul>
+<p>例如：<code>[[substr1, substr2, ...], originalsubstring]</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">completer</span>(<span class="hljs-params">line</span>) {
+  <span class="hljs-keyword">const</span> completions = <span class="hljs-string">'.help .error .exit .quit .q'</span>.<span class="hljs-title function_">split</span>(<span class="hljs-string">' '</span>);
+  <span class="hljs-keyword">const</span> hits = completions.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =></span> c.<span class="hljs-title function_">startsWith</span>(line));
+  <span class="hljs-comment">// 如果未找到匹配项，则显示所有补全</span>
+  <span class="hljs-keyword">return</span> [hits.<span class="hljs-property">length</span> ? hits : completions, line];
+}</code> <button class="copy-button">copy</button></pre>
+<p><code>completer</code> 函数也可以返回一个 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a>，或者是异步的：</p>
+<pre><code class="language-js"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">completer</span>(<span class="hljs-params">linePartial</span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">someAsyncWork</span>();
+  <span class="hljs-keyword">return</span> [[<span class="hljs-string">'123'</span>], linePartial];
+}</code> <button class="copy-button">copy</button></pre>
+</div></div>
+</section><section><h3>回调 API<span><a class="mark" href="#-api" id="-api">#</a></span><a aria-hidden="true" class="legacy" id="readline_api"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.1.104</span>
+</div>
+<div>
+<h4>类：<code>readline.Interface</code><span><a class="mark" href="#readlineinterface" id="readlineinterface">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_interface"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v17.0.0</td>
+<td><p>The class <code>readline.Interface</code> now inherits from <code>Interface</code>.</p></td></tr>
+<tr><td>v0.1.104</td>
+<td><p><span>Added in: v0.1.104</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>继承自：<a href="readline.html#class-interfaceconstructor" class="type">&#x3C;readline.InterfaceConstructor></a></li>
+</ul>
+<p><code>readline.Interface</code> 类的实例是使用 <code>readline.createInterface()</code> 方法构造的。每个实例都与一个 <code>input</code> <a href="stream.html#readable-streams">Readable</a> 流和一个 <code>output</code> <a href="stream.html#writable-streams">Writable</a> 流相关联。<code>output</code> 流用于打印用户输入的提示，该输入到达并从 <code>input</code> 流中读取。</p>
+<div>
+<h5><code>rl.question(query[, options], callback)</code><span><a class="mark" href="#rlquestionquery-options-callback" id="rlquestionquery-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="readline_rl_question_query_options_callback"></a></h5>
+<div class="api_metadata">
+<span>Added in: v0.3.3</span>
+</div>
+<ul>
+<li><code>query</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要写入 <code>output</code> 的语句或查询，前置到提示符。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 可选地允许使用 <code>AbortController</code> 取消 <code>question()</code>。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 一个回调函数，使用用户对 <code>query</code> 的输入调用。</li>
+</ul>
+<p><code>rl.question()</code> 方法通过将 <code>query</code> 写入 <code>output</code> 来显示它，等待用户在 <code>input</code> 上提供输入，然后调用 <code>callback</code> 函数，将提供的输入作为第一个参数传递。</p>
+<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.question()</code> 将恢复它。</p>
+<p>如果创建 <code>readline.Interface</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入 <code>query</code>。</p>
+<p>传递给 <code>rl.question()</code> 的 <code>callback</code> 函数不接受典型的 <code>Error</code> 对象或 <code>null</code> 作为第一个参数。<code>callback</code> 使用提供的答案作为唯一参数调用。</p>
+<p>如果在 <code>rl.close()</code> 之后调用 <code>rl.question()</code>，将抛出错误。</p>
+<p>用法示例：</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'What is your favorite food? '</span>, <span class="hljs-function">(<span class="hljs-params">answer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Oh, so your favorite food is <span class="hljs-subst">${answer}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p>使用 <code>AbortController</code> 取消问题。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> ac = <span class="hljs-keyword">new</span> <span class="hljs-title class_">AbortController</span>();
+<span class="hljs-keyword">const</span> signal = ac.<span class="hljs-property">signal</span>;
+
+rl.<span class="hljs-title function_">question</span>(<span class="hljs-string">'What is your favorite food? '</span>, { signal }, <span class="hljs-function">(<span class="hljs-params">answer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Oh, so your favorite food is <span class="hljs-subst">${answer}</span>`</span>);
+});
+
+signal.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">'abort'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'The food question timed out'</span>);
+}, { <span class="hljs-attr">once</span>: <span class="hljs-literal">true</span> });
+
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> ac.<span class="hljs-title function_">abort</span>(), <span class="hljs-number">10000</span>);</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4><code>readline.clearLine(stream, dir[, callback])</code><span><a class="mark" href="#readlineclearlinestream-dir-callback" id="readlineclearlinestream-dir-callback">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_clearline_stream_dir_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>stream</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a></li>
+<li><code>dir</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a>
+<ul>
+<li><code>-1</code>：从光标向左</li>
+<li><code>1</code>：从光标向右</li>
+<li><code>0</code>：整行</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果 <code>stream</code> 希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件发出，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>readline.clearLine()</code> 方法清除给定 <a href="tty.html">TTY</a> 流的当前行，方向由 <code>dir</code> 指定。</p>
+</div><div>
+<h4><code>readline.clearScreenDown(stream[, callback])</code><span><a class="mark" href="#readlineclearscreendownstream-callback" id="readlineclearscreendownstream-callback">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_clearscreendown_stream_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>stream</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果 <code>stream</code> 希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件发出，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>readline.clearScreenDown()</code> 方法从光标当前位置向下清除给定的 <a href="tty.html">TTY</a> 流。</p>
+</div><div>
+<h4><code>readline.createInterface(options)</code><span><a class="mark" href="#readlinecreateinterfaceoptions" id="readlinecreateinterfaceoptions">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_createinterface_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.14.0, v14.18.0</td>
+<td><p>The <code>signal</code> option is supported now.</p></td></tr>
+<tr><td>v15.8.0, v14.18.0</td>
+<td><p>The <code>history</code> option is supported now.</p></td></tr>
+<tr><td>v13.9.0</td>
+<td><p>The <code>tabSize</code> option is supported now.</p></td></tr>
+<tr><td>v8.3.0, v6.11.4</td>
+<td><p>Remove max limit of <code>crlfDelay</code> option.</p></td></tr>
+<tr><td>v6.6.0</td>
+<td><p>The <code>crlfDelay</code> option is supported now.</p></td></tr>
+<tr><td>v6.3.0</td>
+<td><p>The <code>prompt</code> option is supported now.</p></td></tr>
+<tr><td>v6.0.0</td>
+<td><p>The <code>historySize</code> option can be <code>0</code> now.</p></td></tr>
+<tr><td>v0.1.98</td>
+<td><p><span>Added in: v0.1.98</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>input</code> <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a> 要监听的 <a href="stream.html#readable-streams">Readable</a> 流。此选项是<em>必需的</em>。</li>
+<li><code>output</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a> 要写入 readline 数据的 <a href="stream.html#writable-streams">Writable</a> 流。</li>
+<li><code>completer</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 用于 Tab 自动补全的可选函数。</li>
+<li><code>terminal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果 <code>input</code> 和 <code>output</code> 流应被视为 TTY，并向其写入 ANSI/VT100 转义码，则为 <code>true</code>。<strong>默认值：</strong> 在实例化时检查 <code>output</code> 流上的 <code>isTTY</code>。</li>
+<li><code>history</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 历史行的初始列表。此选项仅在 <code>terminal</code> 由用户或通过内部 <code>output</code> 检查设置为 <code>true</code> 时才有意义，否则根本不会初始化历史缓存机制。<strong>默认值：</strong> <code>[]</code>。</li>
+<li><code>historySize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 保留的历史行最大数量。要禁用历史记录，请将此值设置为 <code>0</code>。此选项仅在 <code>terminal</code> 由用户或通过内部 <code>output</code> 检查设置为 <code>true</code> 时才有意义，否则根本不会初始化历史缓存机制。<strong>默认值：</strong> <code>30</code>。</li>
+<li><code>removeHistoryDuplicates</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则当添加到历史列表的新输入行与旧行重复时，从列表中删除旧行。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>prompt</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要使用的提示字符串。<strong>默认值：</strong> <code>'> '</code>。</li>
+<li><code>crlfDelay</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 如果 <code>\r</code> 和 <code>\n</code> 之间的延迟超过 <code>crlfDelay</code> 毫秒，则 <code>\r</code> 和 <code>\n</code> 都将被视为单独的行结束输入。<code>crlfDelay</code> 将被强制转换为不小于 <code>100</code> 的数字。可以设置为 <code>Infinity</code>，在这种情况下，<code>\r</code> 后跟 <code>\n</code> 将始终被视为单个换行符（这对于读取具有 <code>\r\n</code> 行分隔符的[文件][]可能是合理的）。<strong>默认值：</strong> <code>100</code>。</li>
+<li><code>escapeCodeTimeout</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>readline</code> 等待字符的持续时间（当读取模糊键序列时，以毫秒为单位，该序列既可以形成使用到目前为止读取的输入的完整键序列，也可以接受额外输入以完成更长的键序列）。<strong>默认值：</strong> <code>500</code>。</li>
+<li><code>tabSize</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> 制表符等于的空格数（最小为 1）。<strong>默认值：</strong> <code>8</code>。</li>
+<li><code>signal</code> <a href="globals.html#class-abortsignal" class="type">&#x3C;AbortSignal></a> 允许使用 AbortSignal 关闭接口。中止信号将在内部调用接口上的 <code>close</code>。</li>
+</ul>
+</li>
+<li>返回：<a href="readline.html#class-readlineinterface" class="type">&#x3C;readline.Interface></a></li>
+</ul>
+<p><code>readline.createInterface()</code> 方法创建一个新的 <code>readline.Interface</code> 实例。</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createInterface } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline'</span>;
+<span class="hljs-keyword">import</span> { stdin, stdout } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: stdin,
+  <span class="hljs-attr">output</span>: stdout,
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createInterface } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: process.<span class="hljs-property">stdin</span>,
+  <span class="hljs-attr">output</span>: process.<span class="hljs-property">stdout</span>,
+});</code><button class="copy-button">copy</button></pre>
+<p>一旦创建了 <code>readline.Interface</code> 实例，最常见的情况是监听 <code>'line'</code> 事件：</p>
+<pre><code class="language-js">rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Received: <span class="hljs-subst">${line}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p>如果此实例的 <code>terminal</code> 为 <code>true</code>，那么如果 <code>output</code> 流定义了 <code>output.columns</code> 属性并在列更改时（或在列更改时）在 <code>output</code> 上发出 <code>'resize'</code> 事件，则 <code>output</code> 流将获得最佳兼容性（<a href="process.html#processstdout"><code>process.stdout</code></a> 在它是 TTY 时会自动执行此操作）。</p>
+<p>当使用 <code>stdin</code> 作为输入创建 <code>readline.Interface</code> 时，程序在接收到 [EOF 字符][]之前不会终止。要退出而不等待用户输入，请调用 <code>process.stdin.unref()</code>。</p>
+<div>
+<h5><code>completer</code> 函数的使用<span><a class="mark" href="#completer-_1" id="completer-_1">#</a></span><a aria-hidden="true" class="legacy" id="readline_completer_1"></a></h5>
+<p><code>completer</code> 函数将用户输入的当前行作为参数，并返回一个包含 2 个条目的 <code>Array</code>：</p>
+<ul>
+<li>一个包含补全匹配项的 <code>Array</code>。</li>
+<li>用于匹配的子字符串。</li>
+</ul>
+<p>例如：<code>[[substr1, substr2, ...], originalsubstring]</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">completer</span>(<span class="hljs-params">line</span>) {
+  <span class="hljs-keyword">const</span> completions = <span class="hljs-string">'.help .error .exit .quit .q'</span>.<span class="hljs-title function_">split</span>(<span class="hljs-string">' '</span>);
+  <span class="hljs-keyword">const</span> hits = completions.<span class="hljs-title function_">filter</span>(<span class="hljs-function">(<span class="hljs-params">c</span>) =></span> c.<span class="hljs-title function_">startsWith</span>(line));
+  <span class="hljs-comment">// 如果未找到匹配项，则显示所有补全</span>
+  <span class="hljs-keyword">return</span> [hits.<span class="hljs-property">length</span> ? hits : completions, line];
+}</code> <button class="copy-button">copy</button></pre>
+<p>如果 <code>completer</code> 函数接受两个参数，则可以异步调用它：</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">completer</span>(<span class="hljs-params">linePartial, callback</span>) {
+  <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, [[<span class="hljs-string">'123'</span>], linePartial]);
+}</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4><code>readline.cursorTo(stream, x[, y][, callback])</code><span><a class="mark" href="#readlinecursortostream-x-y-callback" id="readlinecursortostream-x-y-callback">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_cursorto_stream_x_y_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>stream</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a></li>
+<li><code>x</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>y</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果 <code>stream</code> 希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件发出，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>readline.cursorTo()</code> 方法将光标移动到给定 <a href="tty.html">TTY</a> <code>stream</code> 中的指定位置。</p>
+</div><div>
+<h4><code>readline.moveCursor(stream, dx, dy[, callback])</code><span><a class="mark" href="#readlinemovecursorstream-dx-dy-callback" id="readlinemovecursorstream-dx-dy-callback">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_movecursor_stream_dx_dy_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v12.7.0</td>
+<td><p>The stream's write() callback and return value are exposed.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>stream</code> <a href="stream.html#class-streamwritable" class="type">&#x3C;stream.Writable></a></li>
+<li><code>dx</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>dy</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 操作完成后调用。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果 <code>stream</code> 希望调用代码在继续写入更多数据之前等待 <code>'drain'</code> 事件发出，则为 <code>false</code>；否则为 <code>true</code>。</li>
+</ul>
+<p><code>readline.moveCursor()</code> 方法将光标<em>相对</em>于其当前位置在给定的 <a href="tty.html">TTY</a> <code>stream</code> 中移动。</p>
+</div>
+</section><section><h3><code>readline.emitKeypressEvents(stream[, interface])</code><span><a class="mark" href="#readlineemitkeypresseventsstream-interface" id="readlineemitkeypresseventsstream-interface">#</a></span><a aria-hidden="true" class="legacy" id="readline_readline_emitkeypressevents_stream_interface"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<ul>
+<li><code>stream</code> <a href="stream.html#class-streamreadable" class="type">&#x3C;stream.Readable></a></li>
+<li><code>interface</code> <a href="readline.html#class-interfaceconstructor" class="type">&#x3C;readline.InterfaceConstructor></a></li>
+</ul>
+<p><code>readline.emitKeypressEvents()</code> 方法使给定的 <a href="stream.html#readable-streams">Readable</a> 流开始发出与接收到的输入对应的 <code>'keypress'</code> 事件。</p>
+<p>可选地，<code>interface</code> 指定一个 <code>readline.Interface</code> 实例，当检测到复制粘贴的输入时，该实例的自动补全将被禁用。</p>
+<p>如果 <code>stream</code> 是 <a href="tty.html">TTY</a>，则它必须处于原始模式。</p>
+<p>如果 <code>input</code> 是终端，任何 readline 实例都会自动在其 <code>input</code> 上调用此方法。关闭 <code>readline</code> 实例不会停止 <code>input</code> 发出 <code>'keypress'</code> 事件。</p>
+<pre><code class="language-js">readline.<span class="hljs-title function_">emitKeypressEvents</span>(process.<span class="hljs-property">stdin</span>);
+<span class="hljs-keyword">if</span> (process.<span class="hljs-property">stdin</span>.<span class="hljs-property">isTTY</span>)
+  process.<span class="hljs-property">stdin</span>.<span class="hljs-title function_">setRawMode</span>(<span class="hljs-literal">true</span>);</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>示例：小型 CLI<span><a class="mark" href="#-cli" id="-cli">#</a></span><a aria-hidden="true" class="legacy" id="readline_cli"></a></h3>
+<p>以下示例说明了使用 <code>readline.Interface</code> 类实现一个小型命令行界面：</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createInterface } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline'</span>;
+<span class="hljs-keyword">import</span> { exit, stdin, stdout } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: stdin,
+  <span class="hljs-attr">output</span>: stdout,
+  <span class="hljs-attr">prompt</span>: <span class="hljs-string">'OHAI> '</span>,
+});
+
+rl.<span class="hljs-title function_">prompt</span>();
+
+rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+  <span class="hljs-keyword">switch</span> (line.<span class="hljs-title function_">trim</span>()) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">'hello'</span>:
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'world!'</span>);
+      <span class="hljs-keyword">break</span>;
+    <span class="hljs-attr">default</span>:
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Say what? I might have heard '<span class="hljs-subst">${line.trim()}</span>'`</span>);
+      <span class="hljs-keyword">break</span>;
+  }
+  rl.<span class="hljs-title function_">prompt</span>();
+}).<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Have a great day!'</span>);
+  <span class="hljs-title function_">exit</span>(<span class="hljs-number">0</span>);
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createInterface } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: process.<span class="hljs-property">stdin</span>,
+  <span class="hljs-attr">output</span>: process.<span class="hljs-property">stdout</span>,
+  <span class="hljs-attr">prompt</span>: <span class="hljs-string">'OHAI> '</span>,
+});
+
+rl.<span class="hljs-title function_">prompt</span>();
+
+rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+  <span class="hljs-keyword">switch</span> (line.<span class="hljs-title function_">trim</span>()) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">'hello'</span>:
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'world!'</span>);
+      <span class="hljs-keyword">break</span>;
+    <span class="hljs-attr">default</span>:
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Say what? I might have heard '<span class="hljs-subst">${line.trim()}</span>'`</span>);
+      <span class="hljs-keyword">break</span>;
+  }
+  rl.<span class="hljs-title function_">prompt</span>();
+}).<span class="hljs-title function_">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Have a great day!'</span>);
+  process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">0</span>);
+});</code><button class="copy-button">copy</button></pre>
+</section><section><h3>示例：逐行读取文件流<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="readline"></a></h3>
+<p><code>readline</code> 的一个常见用例是一次一行地使用输入文件。最简单的方法是利用 <a href="fs.html#class-fsreadstream"><code>fs.ReadStream</code></a> API 以及 <code>for await...of</code> 循环：</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createReadStream } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { createInterface } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline'</span>;
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processLineByLine</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> fileStream = <span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'input.txt'</span>);
+
+  <span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+    <span class="hljs-attr">input</span>: fileStream,
+    <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+  });
+  <span class="hljs-comment">// 注意：我们使用 crlfDelay 选项将 input.txt 中的所有 CR LF 实例（'\r\n'）识别为单个换行符。</span>
+
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> rl) {
+    <span class="hljs-comment">// input.txt 中的每一行将在此处作为 `line` 依次可用。</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Line from file: <span class="hljs-subst">${line}</span>`</span>);
+  }
+}
+
+<span class="hljs-title function_">processLineByLine</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createReadStream } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+<span class="hljs-keyword">const</span> { createInterface } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processLineByLine</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> fileStream = <span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'input.txt'</span>);
+
+  <span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+    <span class="hljs-attr">input</span>: fileStream,
+    <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+  });
+  <span class="hljs-comment">// 注意：我们使用 crlfDelay 选项将 input.txt 中的所有 CR LF 实例（'\r\n'）识别为单个换行符。</span>
+
+  <span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> line <span class="hljs-keyword">of</span> rl) {
+    <span class="hljs-comment">// input.txt 中的每一行将在此处作为 `line` 依次可用。</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Line from file: <span class="hljs-subst">${line}</span>`</span>);
+  }
+}
+
+<span class="hljs-title function_">processLineByLine</span>();</code><button class="copy-button">copy</button></pre>
+<p>或者，可以使用 <a href="#event-line"><code>'line'</code></a> 事件：</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createReadStream } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { createInterface } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline'</span>;
+
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: <span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'sample.txt'</span>),
+  <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+});
+
+rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Line from file: <span class="hljs-subst">${line}</span>`</span>);
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { createReadStream } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+<span class="hljs-keyword">const</span> { createInterface } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);
+
+<span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+  <span class="hljs-attr">input</span>: <span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'sample.txt'</span>),
+  <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+});
+
+rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Line from file: <span class="hljs-subst">${line}</span>`</span>);
+});</code><button class="copy-button">copy</button></pre>
+<p>目前，<code>for await...of</code> 循环可能稍慢一些。如果 <code>async</code> / <code>await</code> 流程和速度都至关重要，可以采用混合方法：</p>
+
+<pre class="with-48-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { once } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:events'</span>;
+<span class="hljs-keyword">import</span> { createReadStream } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { createInterface } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:readline'</span>;
+
+(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processLineByLine</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+      <span class="hljs-attr">input</span>: <span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'big-file.txt'</span>),
+      <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+    });
+
+    rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+      <span class="hljs-comment">// 处理该行。</span>
+    });
+
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">once</span>(rl, <span class="hljs-string">'close'</span>);
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'File processed.'</span>);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);
+  }
+})();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { once } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:events'</span>);
+<span class="hljs-keyword">const</span> { createReadStream } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+<span class="hljs-keyword">const</span> { createInterface } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:readline'</span>);
+
+(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">processLineByLine</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> rl = <span class="hljs-title function_">createInterface</span>({
+      <span class="hljs-attr">input</span>: <span class="hljs-title function_">createReadStream</span>(<span class="hljs-string">'big-file.txt'</span>),
+      <span class="hljs-attr">crlfDelay</span>: <span class="hljs-title class_">Infinity</span>,
+    });
+
+    rl.<span class="hljs-title function_">on</span>(<span class="hljs-string">'line'</span>, <span class="hljs-function">(<span class="hljs-params">line</span>) =></span> {
+      <span class="hljs-comment">// 处理该行。</span>
+    });
+
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">once</span>(rl, <span class="hljs-string">'close'</span>);
+
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'File processed.'</span>);
+  } <span class="hljs-keyword">catch</span> (err) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err);
+  }
+})();</code><button class="copy-button">copy</button></pre>
+</section><section><h3>TTY 键绑定<span><a class="mark" href="#tty-" id="tty-">#</a></span><a aria-hidden="true" class="legacy" id="readline_tty"></a></h3>
+<table>
+  <tbody><tr>
+    <th>键绑定</th>
+    <th>描述</th>
+    <th>备注</th>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Backspace</kbd></td>
+    <td>向左删除行</td>
+    <td>在 Linux、Mac 和 Windows 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Delete</kbd></td>
+    <td>向右删除行</td>
+    <td>在 Mac 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>C</kbd></td>
+    <td>发出 <code>SIGINT</code> 或关闭 readline 实例</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>H</kbd></td>
+    <td>向左删除</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>D</kbd></td>
+    <td>向右删除或在当前行为空 / EOF 时关闭 readline 实例</td>
+    <td>在 Windows 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>U</kbd></td>
+    <td>从当前位置删除到行首</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>K</kbd></td>
+    <td>从当前位置删除到行尾</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td>
+    <td>召回先前删除的文本</td>
+    <td>仅适用于通过 <kbd>Ctrl</kbd>+<kbd>U</kbd> 或 <kbd>Ctrl</kbd>+<kbd>K</kbd> 删除的文本</td>
+  </tr>
+  <tr>
+    <td><kbd>Meta</kbd>+<kbd>Y</kbd></td>
+    <td>在先前删除的文本之间循环</td>
+    <td>仅当最后一次击键是 <kbd>Ctrl</kbd>+<kbd>Y</kbd> 或 <kbd>Meta</kbd>+<kbd>Y</kbd> 时可用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>A</kbd></td>
+    <td>转到行首</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>E</kbd></td>
+    <td>转到行尾</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>
+    <td>向后一个字符</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>F</kbd></td>
+    <td>向前一个字符</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>L</kbd></td>
+    <td>清屏</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>N</kbd></td>
+    <td>下一个历史项</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>P</kbd></td>
+    <td>上一个历史项</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>-</kbd></td>
+    <td>撤销上一个更改</td>
+    <td>任何发出键码 <code>0x1F</code> 的击键都将执行此操作。
+    在许多终端中，例如 <code>xterm</code>，
+    这绑定到 <kbd>Ctrl</kbd>+<kbd>-</kbd>。</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>6</kbd></td>
+    <td>重做上一个更改</td>
+    <td>许多终端没有默认的重做击键。
+    我们选择键码 <code>0x1E</code> 来执行重做。
+    在 <code>xterm</code> 中，默认绑定到 <kbd>Ctrl</kbd>+<kbd>6</kbd>。</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
+    <td>将正在运行的进程移动到后台。键入
+    <code>fg</code> 并按 <kbd>Enter</kbd>
+    返回。</td>
+    <td>在 Windows 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>W</kbd> 或 <kbd>Ctrl</kbd>
+   +<kbd>Backspace</kbd></td>
+    <td>向后删除到单词边界</td>
+    <td><kbd>Ctrl</kbd>+<kbd>Backspace</kbd> 在
+    Linux、Mac 和 Windows 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>Delete</kbd></td>
+    <td>向前删除到单词边界</td>
+    <td>在 Mac 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>左箭头</kbd> 或
+    <kbd>Meta</kbd>+<kbd>B</kbd></td>
+    <td>向左一个单词</td>
+    <td><kbd>Ctrl</kbd>+<kbd>左箭头</kbd> 在
+    Mac 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Ctrl</kbd>+<kbd>右箭头</kbd> 或
+    <kbd>Meta</kbd>+<kbd>F</kbd></td>
+    <td>向右一个单词</td>
+    <td><kbd>Ctrl</kbd>+<kbd>右箭头</kbd> 在
+    Mac 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Meta</kbd>+<kbd>D</kbd> 或 <kbd>Meta</kbd>
+   +<kbd>Delete</kbd></td>
+    <td>向右删除单词</td>
+    <td><kbd>Meta</kbd>+<kbd>Delete</kbd> 在
+    Windows 上不起作用</td>
+  </tr>
+  <tr>
+    <td><kbd>Meta</kbd>+<kbd>Backspace</kbd></td>
+    <td>向左删除单词</td>
+    <td>在 Mac 上不起作用</td>
+  </tr>
+</tbody></table></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

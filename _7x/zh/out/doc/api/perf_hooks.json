@@ -1,0 +1,2150 @@
+{
+  "type": "module",
+  "source": "doc/api/perf_hooks.md",
+  "modules": [
+    {
+      "textRaw": "Performance measurement APIs",
+      "name": "performance_measurement_apis",
+      "introduced_in": "v8.5.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/perf_hooks.js\">lib/perf_hooks.js</a></p>\n<p>此模块实现了 W3C <a href=\"https://w3c.github.io/perf-timing-primer/\">Web Performance APIs</a> 的子集以及用于 Node.js 特定性能测量的额外 API。</p>\n<p>Node.js 支持以下 <a href=\"https://w3c.github.io/perf-timing-primer/\">Web Performance APIs</a>：</p>\n<ul>\n<li><a href=\"https://www.w3.org/TR/hr-time-2\">High Resolution Time</a></li>\n<li><a href=\"https://w3c.github.io/performance-timeline/\">Performance Timeline</a></li>\n<li><a href=\"https://www.w3.org/TR/user-timing/\">User Timing</a></li>\n<li><a href=\"https://www.w3.org/TR/resource-timing-2/\">Resource Timing</a></li>\n</ul>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst obs = new PerformanceObserver((items) => {\n  console.log(items.getEntries()[0].duration);\n  performance.clearMarks();\n});\nobs.observe({ type: 'measure' });\nperformance.measure('Start to Now');\n\nperformance.mark('A');\ndoSomeLongRunningProcess(() => {\n  performance.measure('A to Now', 'A');\n\n  performance.mark('B');\n  performance.measure('A to B', 'A', 'B');\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { PerformanceObserver, performance } = require('node:perf_hooks');\n\nconst obs = new PerformanceObserver((items) => {\n  console.log(items.getEntries()[0].duration);\n});\nobs.observe({ type: 'measure' });\nperformance.measure('Start to Now');\n\nperformance.mark('A');\n(async function doSomeLongRunningProcess() {\n  await new Promise((r) => setTimeout(r, 5000));\n  performance.measure('A to Now', 'A');\n\n  performance.mark('B');\n  performance.measure('A to B', 'A', 'B');\n})();\n</code></pre>",
+      "properties": [
+        {
+          "textRaw": "`perf_hooks.performance`",
+          "name": "performance",
+          "meta": {
+            "added": [
+              "v8.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>一个可用于从当前 Node.js 实例收集性能指标的对象。它类似于浏览器中的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Window/performance\"><code>window.performance</code></a>。</p>",
+          "methods": [
+            {
+              "textRaw": "`performance.clearMarks([name])`",
+              "type": "method",
+              "name": "clearMarks",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果未提供 <code>name</code>，则从性能时间线中移除所有 <code>PerformanceMark</code> 对象。如果提供了 <code>name</code>，则仅移除指定名称的标记。</p>"
+            },
+            {
+              "textRaw": "`performance.clearMeasures([name])`",
+              "type": "method",
+              "name": "clearMeasures",
+              "meta": {
+                "added": [
+                  "v16.7.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果未提供 <code>name</code>，则从性能时间线中移除所有 <code>PerformanceMeasure</code> 对象。如果提供了 <code>name</code>，则仅移除指定名称的测量。</p>"
+            },
+            {
+              "textRaw": "`performance.clearResourceTimings([name])`",
+              "type": "method",
+              "name": "clearResourceTimings",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果未提供 <code>name</code>，则从资源时间线中移除所有 <code>PerformanceResourceTiming</code> 对象。如果提供了 <code>name</code>，则仅移除指定名称的资源。</p>"
+            },
+            {
+              "textRaw": "`performance.eventLoopUtilization([utilization1[, utilization2]])`",
+              "type": "method",
+              "name": "eventLoopUtilization",
+              "meta": {
+                "added": [
+                  "v14.10.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`utilization1` {Object} 之前调用 `eventLoopUtilization()` 的结果。",
+                      "name": "utilization1",
+                      "type": "Object",
+                      "desc": "之前调用 `eventLoopUtilization()` 的结果。"
+                    },
+                    {
+                      "textRaw": "`utilization2` {Object} 在 `utilization1` 之前调用 `eventLoopUtilization()` 的结果。",
+                      "name": "utilization2",
+                      "type": "Object",
+                      "desc": "在 `utilization1` 之前调用 `eventLoopUtilization()` 的结果。"
+                    },
+                    {
+                      "textRaw": "返回: {Object}",
+                      "name": "返回",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`idle` {number}",
+                          "name": "idle",
+                          "type": "number"
+                        },
+                        {
+                          "textRaw": "`active` {number}",
+                          "name": "active",
+                          "type": "number"
+                        },
+                        {
+                          "textRaw": "`utilization` {number}",
+                          "name": "utilization",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>eventLoopUtilization()</code> 方法返回一个对象，其中包含事件循环在空闲和活动状态下的累计持续时间，以高精度毫秒计时器表示。<code>utilization</code> 值是计算得到的事件循环利用率（ELU）。</p>\n<p>如果主线程上的引导尚未完成，则属性的值为 <code>0</code>。ELU 在 [Worker 线程][]上立即可用，因为引导发生在事件循环内。</p>\n<p><code>utilization1</code> 和 <code>utilization2</code> 都是可选参数。</p>\n<p>如果传入了 <code>utilization1</code>，则计算并返回当前调用的 <code>active</code> 和 <code>idle</code> 时间之间的差值，以及相应的 <code>utilization</code> 值（类似于 <a href=\"process.html#processhrtimetime\"><code>process.hrtime()</code></a>）。</p>\n<p>如果同时传入了 <code>utilization1</code> 和 <code>utilization2</code>，则计算两个参数之间的差值。这是一个便捷选项，因为与 <a href=\"process.html#processhrtimetime\"><code>process.hrtime()</code></a> 不同，计算 ELU 比单个减法更复杂。</p>\n<p>ELU 类似于 CPU 利用率，不同之处在于它只测量事件循环统计信息而不测量 CPU 使用情况。它表示事件循环在事件循环的事件提供者（例如 <code>epoll_wait</code>）之外花费的时间百分比。不考虑其他 CPU 空闲时间。以下是一个示例，说明一个大部分空闲的进程将具有较高的 ELU。</p>\n<pre><code class=\"language-mjs\">import { eventLoopUtilization } from 'node:perf_hooks';\nimport { spawnSync } from 'node:child_process';\n\nsetImmediate(() => {\n  const elu = eventLoopUtilization();\n  spawnSync('sleep', ['5']);\n  console.log(eventLoopUtilization(elu).utilization);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { eventLoopUtilization } = require('node:perf_hooks').performance;\nconst { spawnSync } = require('node:child_process');\n\nsetImmediate(() => {\n  const elu = eventLoopUtilization();\n  spawnSync('sleep', ['5']);\n  console.log(eventLoopUtilization(elu).utilization);\n});\n</code></pre>\n<p>尽管运行此脚本时 CPU 大部分空闲，但 <code>utilization</code> 的值为 <code>1</code>。这是因为对 <a href=\"child_process.html#child_processspawnsynccommand-args-options\"><code>child_process.spawnSync()</code></a> 的调用阻止了事件循环继续。</p>\n<p>传入用户定义的对象而不是之前调用 <code>eventLoopUtilization()</code> 的结果将导致未定义的行为。返回值不能保证反映事件循环的任何正确状态。</p>"
+            },
+            {
+              "textRaw": "`performance.getEntries()`",
+              "type": "method",
+              "name": "getEntries",
+              "meta": {
+                "added": [
+                  "v16.7.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]}",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表。如果只对特定类型或具有特定名称的性能条目感兴趣，请参阅 <code>performance.getEntriesByType()</code> 和 <code>performance.getEntriesByName()</code>。</p>"
+            },
+            {
+              "textRaw": "`performance.getEntriesByName(name[, type])`",
+              "type": "method",
+              "name": "getEntriesByName",
+              "meta": {
+                "added": [
+                  "v16.7.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`type` {string}",
+                      "name": "type",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]}",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.name</code> 等于 <code>name</code>，并且可选地，其 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>"
+            },
+            {
+              "textRaw": "`performance.getEntriesByType(type)`",
+              "type": "method",
+              "name": "getEntriesByType",
+              "meta": {
+                "added": [
+                  "v16.7.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`type` {string}",
+                      "name": "type",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]}",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>"
+            },
+            {
+              "textRaw": "`performance.mark(name[, options])`",
+              "type": "method",
+              "name": "mark",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver. The name argument is no longer optional."
+                  },
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37136",
+                    "description": "Updated to conform to the User Timing Level 3 specification."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`detail` {any} 包含在标记中的额外可选详细信息。",
+                          "name": "detail",
+                          "type": "any",
+                          "desc": "包含在标记中的额外可选详细信息。"
+                        },
+                        {
+                          "textRaw": "`startTime` {number} 用作标记时间的可选时间戳。**默认值**: `performance.now()`。",
+                          "name": "startTime",
+                          "type": "number",
+                          "desc": "用作标记时间的可选时间戳。**默认值**: `performance.now()`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在性能时间线中创建一个新的 <code>PerformanceMark</code> 条目。<code>PerformanceMark</code> 是 <code>PerformanceEntry</code> 的子类，其 <code>performanceEntry.entryType</code> 始终为 <code>'mark'</code>，且 <code>performanceEntry.duration</code> 始终为 <code>0</code>。性能标记用于标记性能时间线中的特定重要时刻。</p>\n<p>创建的 <code>PerformanceMark</code> 条目被放入全局性能时间线中，可以通过 <code>performance.getEntries</code>、<code>performance.getEntriesByName</code> 和 <code>performance.getEntriesByType</code> 进行查询。当观察完成时，应使用 <code>performance.clearMarks</code> 手动从全局性能时间线中清除条目。</p>"
+            },
+            {
+              "textRaw": "`performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])`",
+              "type": "method",
+              "name": "markResourceTiming",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v22.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/51589",
+                    "description": "Added bodyInfo, responseStatus, and deliveryType arguments."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`timingInfo` {Object} [Fetch Timing Info][]",
+                      "name": "timingInfo",
+                      "type": "Object",
+                      "desc": "[Fetch Timing Info][]"
+                    },
+                    {
+                      "textRaw": "`requestedUrl` {string} 资源 URL",
+                      "name": "requestedUrl",
+                      "type": "string",
+                      "desc": "资源 URL"
+                    },
+                    {
+                      "textRaw": "`initiatorType` {string} 发起者名称，例如：'fetch'",
+                      "name": "initiatorType",
+                      "type": "string",
+                      "desc": "发起者名称，例如：'fetch'"
+                    },
+                    {
+                      "textRaw": "`global` {Object}",
+                      "name": "global",
+                      "type": "Object"
+                    },
+                    {
+                      "textRaw": "`cacheMode` {string} 缓存模式必须为空字符串 ('') 或 'local'",
+                      "name": "cacheMode",
+                      "type": "string",
+                      "desc": "缓存模式必须为空字符串 ('') 或 'local'"
+                    },
+                    {
+                      "textRaw": "`bodyInfo` {Object} [Fetch Response Body Info][]",
+                      "name": "bodyInfo",
+                      "type": "Object",
+                      "desc": "[Fetch Response Body Info][]"
+                    },
+                    {
+                      "textRaw": "`responseStatus` {number} 响应的状态码",
+                      "name": "responseStatus",
+                      "type": "number",
+                      "desc": "响应的状态码"
+                    },
+                    {
+                      "textRaw": "`deliveryType` {string} 交付类型。**默认值:** `''`。",
+                      "name": "deliveryType",
+                      "type": "string",
+                      "desc": "交付类型。**默认值:** `''`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>\n<p>在资源时间线中创建一个新的 <code>PerformanceResourceTiming</code> 条目。<code>PerformanceResourceTiming</code> 是 <code>PerformanceEntry</code> 的子类，其 <code>performanceEntry.entryType</code> 始终为 <code>'resource'</code>。性能资源用于标记资源时间线中的时刻。</p>\n<p>创建的 <code>PerformanceMark</code> 条目被放入全局资源时间线中，可以通过 <code>performance.getEntries</code>、<code>performance.getEntriesByName</code> 和 <code>performance.getEntriesByType</code> 进行查询。当观察完成时，应使用 <code>performance.clearResourceTimings</code> 手动从全局性能时间线中清除条目。</p>"
+            },
+            {
+              "textRaw": "`performance.measure(name[, startMarkOrOptions[, endMark]])`",
+              "type": "method",
+              "name": "measure",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  },
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37136",
+                    "description": "Updated to conform to the User Timing Level 3 specification."
+                  },
+                  {
+                    "version": [
+                      "v13.13.0",
+                      "v12.16.3"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/32651",
+                    "description": "Make `startMark` and `endMark` parameters optional."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`startMarkOrOptions` {string|Object} 可选。",
+                      "name": "startMarkOrOptions",
+                      "type": "string|Object",
+                      "desc": "可选。",
+                      "options": [
+                        {
+                          "textRaw": "`detail` {any} 包含在测量中的额外可选详细信息。",
+                          "name": "detail",
+                          "type": "any",
+                          "desc": "包含在测量中的额外可选详细信息。"
+                        },
+                        {
+                          "textRaw": "`duration` {number} 开始和结束时间之间的持续时间。",
+                          "name": "duration",
+                          "type": "number",
+                          "desc": "开始和结束时间之间的持续时间。"
+                        },
+                        {
+                          "textRaw": "`end` {number|string} 用作结束时间的时间戳，或标识先前记录的标记的字符串。",
+                          "name": "end",
+                          "type": "number|string",
+                          "desc": "用作结束时间的时间戳，或标识先前记录的标记的字符串。"
+                        },
+                        {
+                          "textRaw": "`start` {number|string} 用作开始时间的时间戳，或标识先前记录的标记的字符串。",
+                          "name": "start",
+                          "type": "number|string",
+                          "desc": "用作开始时间的时间戳，或标识先前记录的标记的字符串。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`endMark` {string} 可选。如果 `startMarkOrOptions` 是 {Object}，则必须省略。",
+                      "name": "endMark",
+                      "type": "string",
+                      "desc": "可选。如果 `startMarkOrOptions` 是 {Object}，则必须省略。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在性能时间线中创建一个新的 <code>PerformanceMeasure</code> 条目。<code>PerformanceMeasure</code> 是 <code>PerformanceEntry</code> 的子类，其 <code>performanceEntry.entryType</code> 始终为 <code>'measure'</code>，且 <code>performanceEntry.duration</code> 测量自 <code>startMark</code> 和 <code>endMark</code> 以来经过的毫秒数。</p>\n<p><code>startMark</code> 参数可以标识性能时间线中的任何 <em>现有</em> <code>PerformanceMark</code>，或者 <em>可以</em> 标识由 <code>PerformanceNodeTiming</code> 类提供的任何时间戳属性。如果指定的 <code>startMark</code> 不存在，则抛出错误。</p>\n<p>可选的 <code>endMark</code> 参数必须标识性能时间线中的任何 <em>现有</em> <code>PerformanceMark</code> 或由 <code>PerformanceNodeTiming</code> 类提供的任何时间戳属性。如果未传递参数，<code>endMark</code> 将为 <code>performance.now()</code>，否则如果指定的 <code>endMark</code> 不存在，将抛出错误。</p>\n<p>创建的 <code>PerformanceMeasure</code> 条目被放入全局性能时间线中，可以通过 <code>performance.getEntries</code>、<code>performance.getEntriesByName</code> 和 <code>performance.getEntriesByType</code> 进行查询。当观察完成时，应使用 <code>performance.clearMeasures</code> 手动从全局性能时间线中清除条目。</p>"
+            },
+            {
+              "textRaw": "`performance.now()`",
+              "type": "method",
+              "name": "now",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {number}",
+                      "name": "返回",
+                      "type": "number"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回当前高精度毫秒时间戳，其中 0 表示当前 <code>node</code> 进程的开始。</p>"
+            },
+            {
+              "textRaw": "`performance.setResourceTimingBufferSize(maxSize)`",
+              "type": "method",
+              "name": "setResourceTimingBufferSize",
+              "meta": {
+                "added": [
+                  "v18.8.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>将全局性能资源计时缓冲区大小设置为指定数量的 \"resource\" 类型性能条目对象。</p>\n<p>默认情况下，最大缓冲区大小设置为 250。</p>"
+            },
+            {
+              "textRaw": "`performance.timerify(fn[, options])`",
+              "type": "method",
+              "name": "timerify",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37475",
+                    "description": "Added the histogram option."
+                  },
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37136",
+                    "description": "Re-implemented to use pure-JavaScript and the ability to time async functions."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`fn` {Function}",
+                      "name": "fn",
+                      "type": "Function"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`histogram` {RecordableHistogram} 使用 `perf_hooks.createHistogram()` 创建的直方图对象，将记录运行时间（以纳秒为单位）。",
+                          "name": "histogram",
+                          "type": "RecordableHistogram",
+                          "desc": "使用 `perf_hooks.createHistogram()` 创建的直方图对象，将记录运行时间（以纳秒为单位）。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>\n<p>将一个函数包装在一个新函数中，该新函数测量被包装函数的运行时间。必须将 <code>PerformanceObserver</code> 订阅到 <code>'function'</code> 事件类型才能访问计时详细信息。</p>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nfunction someFunction() {\n  console.log('hello world');\n}\n\nconst wrapped = performance.timerify(someFunction);\n\nconst obs = new PerformanceObserver((list) => {\n  console.log(list.getEntries()[0].duration);\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  obs.disconnect();\n});\nobs.observe({ entryTypes: ['function'] });\n\n// 将创建一个性能时间线条目\nwrapped();\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nfunction someFunction() {\n  console.log('hello world');\n}\n\nconst wrapped = performance.timerify(someFunction);\n\nconst obs = new PerformanceObserver((list) => {\n  console.log(list.getEntries()[0].duration);\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  obs.disconnect();\n});\nobs.observe({ entryTypes: ['function'] });\n\n// 将创建一个性能时间线条目\nwrapped();\n</code></pre>\n<p>如果包装的函数返回一个 promise，则会在 promise 上附加一个 finally 处理程序，并在调用 finally 处理程序时报告持续时间。</p>"
+            },
+            {
+              "textRaw": "`performance.toJSON()`",
+              "type": "method",
+              "name": "toJSON",
+              "meta": {
+                "added": [
+                  "v16.1.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `performance` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>一个对象，它是 <code>performance</code> 对象的 JSON 表示。它类似于浏览器中的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Performance/toJSON\"><code>window.performance.toJSON</code></a>。</p>",
+              "modules": [
+                {
+                  "textRaw": "事件: `'resourcetimingbufferfull'`",
+                  "name": "事件:_`'resourcetimingbufferfull'`",
+                  "meta": {
+                    "added": [
+                      "v18.8.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>当全局性能资源计时缓冲区已满时，会触发 <code>'resourcetimingbufferfull'</code> 事件。在事件监听器中使用 <code>performance.setResourceTimingBufferSize()</code> 调整资源计时缓冲区大小，或使用 <code>performance.clearResourceTimings()</code> 清除缓冲区，以允许将更多条目添加到性能时间线缓冲区。</p>",
+                  "type": "module",
+                  "displayName": "事件: `'resourcetimingbufferfull'`"
+                }
+              ]
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`nodeTiming` 类型: {PerformanceNodeTiming}",
+              "type": "PerformanceNodeTiming",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>\n<p><code>PerformanceNodeTiming</code> 类的一个实例，提供特定 Node.js 操作里程碑的性能指标。</p>"
+            },
+            {
+              "textRaw": "`timeOrigin` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p><a href=\"https://w3c.github.io/hr-time/#dom-performance-timeorigin\"><code>timeOrigin</code></a> 指定了当前 <code>node</code> 进程开始的高精度毫秒时间戳，以 Unix 时间测量。</p>"
+            }
+          ]
+        }
+      ],
+      "modules": [
+        {
+          "textRaw": "类: `PerformanceEntry`",
+          "name": "类:_`performanceentry`",
+          "meta": {
+            "added": [
+              "v8.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p>此类的构造函数不直接向用户暴露。</p>",
+          "properties": [
+            {
+              "textRaw": "`duration` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceEntry` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>此条目经过的总毫秒数。此值并非对所有性能条目类型都有意义。</p>"
+            },
+            {
+              "textRaw": "`entryType` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceEntry` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>性能条目的类型。它可能是以下之一：</p>\n<ul>\n<li><code>'dns'</code>（仅 Node.js）</li>\n<li><code>'function'</code>（仅 Node.js）</li>\n<li><code>'gc'</code>（仅 Node.js）</li>\n<li><code>'http2'</code>（仅 Node.js）</li>\n<li><code>'http'</code>（仅 Node.js）</li>\n<li><code>'mark'</code>（在 Web 上可用）</li>\n<li><code>'measure'</code>（在 Web 上可用）</li>\n<li><code>'net'</code>（仅 Node.js）</li>\n<li><code>'node'</code>（仅 Node.js）</li>\n<li><code>'resource'</code>（在 Web 上可用）</li>\n</ul>"
+            },
+            {
+              "textRaw": "`name` 类型: {string}",
+              "type": "string",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceEntry` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>性能条目的名称。</p>"
+            },
+            {
+              "textRaw": "`startTime` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceEntry` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>标记性能条目开始时间的高精度毫秒时间戳。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceEntry`"
+        },
+        {
+          "textRaw": "类: `PerformanceMark`",
+          "name": "类:_`performancemark`",
+          "meta": {
+            "added": [
+              "v18.2.0",
+              "v16.17.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"perf_hooks.html#class-performanceentry\" class=\"type\">&lt;PerformanceEntry&gt;</a></li>\n</ul>\n<p>暴露通过 <code>Performance.mark()</code> 方法创建的标记。</p>",
+          "properties": [
+            {
+              "textRaw": "`detail` 类型: {any}",
+              "type": "any",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v16.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceMark` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>使用 <code>Performance.mark()</code> 方法创建时指定的额外详细信息。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceMark`"
+        },
+        {
+          "textRaw": "类: `PerformanceMeasure`",
+          "name": "类:_`performancemeasure`",
+          "meta": {
+            "added": [
+              "v18.2.0",
+              "v16.17.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"perf_hooks.html#class-performanceentry\" class=\"type\">&lt;PerformanceEntry&gt;</a></li>\n</ul>\n<p>暴露通过 <code>Performance.measure()</code> 方法创建的测量。</p>\n<p>此类的构造函数不直接向用户暴露。</p>",
+          "properties": [
+            {
+              "textRaw": "`detail` 类型: {any}",
+              "type": "any",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v16.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceMeasure` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>使用 <code>Performance.measure()</code> 方法创建时指定的额外详细信息。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceMeasure`"
+        },
+        {
+          "textRaw": "类: `PerformanceNodeEntry`",
+          "name": "类:_`performancenodeentry`",
+          "meta": {
+            "added": [
+              "v19.0.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"perf_hooks.html#class-performanceentry\" class=\"type\">&lt;PerformanceEntry&gt;</a></li>\n</ul>\n<p><em>此类是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>\n<p>提供详细的 Node.js 计时数据。</p>\n<p>此类的构造函数不直接向用户暴露。</p>",
+          "properties": [
+            {
+              "textRaw": "`detail` 类型: {any}",
+              "type": "any",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v16.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceNodeEntry` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>特定于 <code>entryType</code> 的额外详细信息。</p>"
+            },
+            {
+              "textRaw": "`performanceNodeEntry.flags`",
+              "name": "flags",
+              "meta": {
+                "added": [
+                  "v13.9.0",
+                  "v12.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37136",
+                    "description": "Runtime deprecated. Now moved to the detail property when entryType is 'gc'."
+                  }
+                ]
+              },
+              "desc": "<blockquote>\n<p>稳定性: 0 - 已弃用：改用 <code>performanceNodeEntry.detail</code>。</p>\n</blockquote>\n<ul>\n<li>类型: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<p>当 <code>performanceEntry.entryType</code> 等于 <code>'gc'</code> 时，<code>performance.flags</code> 属性包含有关垃圾回收操作的额外信息。该值可能是以下之一：</p>\n<ul>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_NO</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_CONSTRUCT_RETAINED</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_FORCED</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SYNCHRONOUS_PHANTOM_PROCESSING</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_AVAILABLE_GARBAGE</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_EXTERNAL_MEMORY</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SCHEDULE_IDLE</code></li>\n</ul>"
+            },
+            {
+              "textRaw": "`performanceNodeEntry.kind`",
+              "name": "kind",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37136",
+                    "description": "Runtime deprecated. Now moved to the detail property when entryType is 'gc'."
+                  }
+                ]
+              },
+              "desc": "<blockquote>\n<p>稳定性: 0 - 已弃用：改用 <code>performanceNodeEntry.detail</code>。</p>\n</blockquote>\n<ul>\n<li>类型: <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n<p>当 <code>performanceEntry.entryType</code> 等于 <code>'gc'</code> 时，<code>performance.kind</code> 属性标识发生的垃圾回收操作的类型。该值可能是以下之一：</p>\n<ul>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MAJOR</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MINOR</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_INCREMENTAL</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_WEAKCB</code></li>\n</ul>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "垃圾回收 ('gc') 详细信息",
+              "name": "垃圾回收_('gc')_详细信息",
+              "desc": "<p>当 <code>performanceEntry.type</code> 等于 <code>'gc'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含两个属性的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>：</p>\n<ul>\n<li><code>kind</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 以下之一：\n<ul>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MAJOR</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MINOR</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_INCREMENTAL</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_WEAKCB</code></li>\n</ul>\n</li>\n<li><code>flags</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 以下之一：\n<ul>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_NO</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_CONSTRUCT_RETAINED</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_FORCED</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SYNCHRONOUS_PHANTOM_PROCESSING</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_AVAILABLE_GARBAGE</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_EXTERNAL_MEMORY</code></li>\n<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SCHEDULE_IDLE</code></li>\n</ul>\n</li>\n</ul>",
+              "type": "module",
+              "displayName": "垃圾回收 ('gc') 详细信息"
+            },
+            {
+              "textRaw": "HTTP ('http') 详细信息",
+              "name": "http_('http')_详细信息",
+              "desc": "<p>当 <code>performanceEntry.type</code> 等于 <code>'http'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外信息的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>HttpClient</code>，则 <code>detail</code> 将包含以下属性：<code>req</code>、<code>res</code>。并且 <code>req</code> 属性将是一个包含 <code>method</code>、<code>url</code>、<code>headers</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>，<code>res</code> 属性将是一个包含 <code>statusCode</code>、<code>statusMessage</code>、<code>headers</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>HttpRequest</code>，则 <code>detail</code> 将包含以下属性：<code>req</code>、<code>res</code>。并且 <code>req</code> 属性将是一个包含 <code>method</code>、<code>url</code>、<code>headers</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>，<code>res</code> 属性将是一个包含 <code>statusCode</code>、<code>statusMessage</code>、<code>headers</code> 的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>。</p>\n<p>这可能会增加额外的内存开销，应仅用于诊断目的，默认情况下不应在生产中开启。</p>",
+              "type": "module",
+              "displayName": "HTTP ('http') 详细信息"
+            },
+            {
+              "textRaw": "HTTP/2 ('http2') 详细信息",
+              "name": "http/2_('http2')_详细信息",
+              "desc": "<p>当 <code>performanceEntry.type</code> 等于 <code>'http2'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外性能信息的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>Http2Stream</code>，则 <code>detail</code> 将包含以下属性：</p>\n<ul>\n<li><code>bytesRead</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 为此 <code>Http2Stream</code> 接收的 <code>DATA</code> 帧字节数。</li>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 为此 <code>Http2Stream</code> 发送的 <code>DATA</code> 帧字节数。</li>\n<li><code>id</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 关联的 <code>Http2Stream</code> 的标识符</li>\n<li><code>timeToFirstByte</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> <code>PerformanceEntry</code> <code>startTime</code> 与接收第一个 <code>DATA</code> 帧之间经过的毫秒数。</li>\n<li><code>timeToFirstByteSent</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> <code>PerformanceEntry</code> <code>startTime</code> 与发送第一个 <code>DATA</code> 帧之间经过的毫秒数。</li>\n<li><code>timeToFirstHeader</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> <code>PerformanceEntry</code> <code>startTime</code> 与接收第一个头部之间经过的毫秒数。</li>\n</ul>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>Http2Session</code>，则 <code>detail</code> 将包含以下属性：</p>\n<ul>\n<li><code>bytesRead</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 为此 <code>Http2Session</code> 接收的字节数。</li>\n<li><code>bytesWritten</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 为此 <code>Http2Session</code> 发送的字节数。</li>\n<li><code>framesReceived</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> <code>Http2Session</code> 接收的 HTTP/2 帧数。</li>\n<li><code>framesSent</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> <code>Http2Session</code> 发送的 HTTP/2 帧数。</li>\n<li><code>maxConcurrentStreams</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 在 <code>Http2Session</code> 生命周期内同时打开的最大流数。</li>\n<li><code>pingRTT</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 自传输 <code>PING</code> 帧到接收到其确认之间经过的毫秒数。仅当在 <code>Http2Session</code> 上发送了 <code>PING</code> 帧时才存在。</li>\n<li><code>streamAverageDuration</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 所有 <code>Http2Stream</code> 实例的平均持续时间（以毫秒为单位）。</li>\n<li><code>streamCount</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> <code>Http2Session</code> 处理的 <code>Http2Stream</code> 实例数。</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> <code>'server'</code> 或 <code>'client'</code> 以标识 <code>Http2Session</code> 的类型。</li>\n</ul>",
+              "type": "module",
+              "displayName": "HTTP/2 ('http2') 详细信息"
+            },
+            {
+              "textRaw": "Timerify ('function') 详细信息",
+              "name": "timerify_('function')_详细信息",
+              "desc": "<p>当 <code>performanceEntry.type</code> 等于 <code>'function'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个列出定时函数输入参数的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array\" class=\"type\">&lt;Array&gt;</a>。</p>",
+              "type": "module",
+              "displayName": "Timerify ('function') 详细信息"
+            },
+            {
+              "textRaw": "Net ('net') 详细信息",
+              "name": "net_('net')_详细信息",
+              "desc": "<p>当 <code>performanceEntry.type</code> 等于 <code>'net'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外信息的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>connect</code>，则 <code>detail</code> 将包含以下属性：<code>host</code>、<code>port</code>。</p>",
+              "type": "module",
+              "displayName": "Net ('net') 详细信息"
+            },
+            {
+              "textRaw": "DNS ('dns') 详细信息",
+              "name": "dns_('dns')_详细信息",
+              "desc": "<p>当 <code>performanceEntry.type</code> 等于 <code>'dns'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外信息的 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>lookup</code>，则 <code>detail</code> 将包含以下属性：<code>hostname</code>、<code>family</code>、<code>hints</code>、<code>verbatim</code>、<code>addresses</code>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>lookupService</code>，则 <code>detail</code> 将包含以下属性：<code>host</code>、<code>port</code>、<code>hostname</code>、<code>service</code>。</p>\n<p>如果 <code>performanceEntry.name</code> 等于 <code>queryxxx</code> 或 <code>getHostByAddr</code>，则 <code>detail</code> 将包含以下属性：<code>host</code>、<code>ttl</code>、<code>result</code>。<code>result</code> 的值与 <code>queryxxx</code> 或 <code>getHostByAddr</code> 的结果相同。</p>",
+              "type": "module",
+              "displayName": "DNS ('dns') 详细信息"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceNodeEntry`"
+        },
+        {
+          "textRaw": "类: `PerformanceNodeTiming`",
+          "name": "类:_`performancenodetiming`",
+          "meta": {
+            "added": [
+              "v8.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"perf_hooks.html#class-performanceentry\" class=\"type\">&lt;PerformanceEntry&gt;</a></li>\n</ul>\n<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>\n<p>提供 Node.js 本身的计时详细信息。此类的构造函数不向用户暴露。</p>",
+          "properties": [
+            {
+              "textRaw": "`bootstrapComplete` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Node.js 进程完成引导的高精度毫秒时间戳。如果引导尚未完成，则属性的值为 -1。</p>"
+            },
+            {
+              "textRaw": "`environment` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Node.js 环境初始化的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`idleTime` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v14.10.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>事件循环在事件循环的事件提供者（例如 <code>epoll_wait</code>）内空闲的时间的高精度毫秒时间戳。这不考虑 CPU 使用情况。如果事件循环尚未启动（例如，在主脚本的第一个 tick 中），则属性的值为 0。</p>"
+            },
+            {
+              "textRaw": "`loopExit` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Node.js 事件循环退出的高精度毫秒时间戳。如果事件循环尚未退出，则属性的值为 -1。它只能在 <a href=\"process.html#event-exit\"><code>'exit'</code></a> 事件的处理程序中具有非 -1 的值。</p>"
+            },
+            {
+              "textRaw": "`loopStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Node.js 事件循环开始的高精度毫秒时间戳。如果事件循环尚未启动（例如，在主脚本的第一个 tick 中），则属性的值为 -1。</p>"
+            },
+            {
+              "textRaw": "`nodeStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>Node.js 进程初始化的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`uvMetricsInfo` 返回: {Object}",
+              "type": "Object",
+              "name": "返回",
+              "meta": {
+                "added": [
+                  "v22.8.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "options": [
+                {
+                  "textRaw": "`loopCount` {number} 事件循环迭代次数。",
+                  "name": "loopCount",
+                  "type": "number",
+                  "desc": "事件循环迭代次数。"
+                },
+                {
+                  "textRaw": "`events` {number} 事件处理程序已处理的事件数。",
+                  "name": "events",
+                  "type": "number",
+                  "desc": "事件处理程序已处理的事件数。"
+                },
+                {
+                  "textRaw": "`eventsWaiting` {number} 调用事件提供者时等待处理的事件数。",
+                  "name": "eventsWaiting",
+                  "type": "number",
+                  "desc": "调用事件提供者时等待处理的事件数。"
+                }
+              ],
+              "desc": "<p>这是 <code>uv_metrics_info</code> 函数的包装器。它返回当前的事件循环指标集。</p>\n<p>建议在通过 <code>setImmediate</code> 调度的函数内部使用此属性，以避免在当前循环迭代期间完成所有调度的操作之前收集指标。</p>\n<pre><code class=\"language-cjs\">const { performance } = require('node:perf_hooks');\n\nsetImmediate(() => {\n  console.log(performance.nodeTiming.uvMetricsInfo);\n});\n</code></pre>\n<pre><code class=\"language-mjs\">import { performance } from 'node:perf_hooks';\n\nsetImmediate(() => {\n  console.log(performance.nodeTiming.uvMetricsInfo);\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`v8Start` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>V8 平台初始化的高精度毫秒时间戳。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceNodeTiming`"
+        },
+        {
+          "textRaw": "类: `PerformanceResourceTiming`",
+          "name": "类:_`performanceresourcetiming`",
+          "meta": {
+            "added": [
+              "v18.2.0",
+              "v16.17.0"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>扩展: <a href=\"perf_hooks.html#class-performanceentry\" class=\"type\">&lt;PerformanceEntry&gt;</a></li>\n</ul>\n<p>提供有关应用程序资源加载的详细网络计时数据。</p>\n<p>此类的构造函数不直接向用户暴露。</p>",
+          "properties": [
+            {
+              "textRaw": "`workerStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>在立即分发 <code>fetch</code> 请求之前的高精度毫秒时间戳。如果资源未被 worker 拦截，则属性将始终返回 0。</p>"
+            },
+            {
+              "textRaw": "`redirectStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示启动重定向的获取开始时间的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`redirectEnd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>在接收到最后一个重定向响应的最后一个字节后立即创建的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`fetchStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>在 Node.js 开始获取资源之前的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`domainLookupStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>在 Node.js 开始对资源进行域名查找之前的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`domainLookupEnd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示 Node.js 完成资源域名查找之后的时间的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`connectStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示在 Node.js 开始与服务器建立连接以检索资源之前的时间的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`connectEnd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示在 Node.js 完成与服务器建立连接以检索资源之后的时间的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`secureConnectionStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示在 Node.js 开始握手过程以保护当前连接之前的时间的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`requestStart` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示在 Node.js 从服务器接收响应的第一个字节之前的时间的高精度毫秒时间戳。</p>"
+            },
+            {
+              "textRaw": "`responseEnd` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示在 Node.js 接收到资源的最后一个字节之后或传输连接关闭之前的时间的高精度毫秒时间戳，以先发生者为准。</p>"
+            },
+            {
+              "textRaw": "`transferSize` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示获取资源的大小（以八位字节为单位）的数字。大小包括响应头字段和响应负载体。</p>"
+            },
+            {
+              "textRaw": "`encodedBodySize` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示从获取（HTTP 或缓存）接收到的负载体的大小（以八位字节为单位）的数字，在移除任何应用的内容编码之前。</p>"
+            },
+            {
+              "textRaw": "`decodedBodySize` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This property getter must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "desc": "<p>表示从获取（HTTP 或缓存）接收到的消息体的大小（以八位字节为单位）的数字，在移除任何应用的内容编码之后。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`performanceResourceTiming.toJSON()`",
+              "type": "method",
+              "name": "toJSON",
+              "meta": {
+                "added": [
+                  "v18.2.0",
+                  "v16.17.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v19.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44483",
+                    "description": "This method must be called with the `PerformanceResourceTiming` object as the receiver."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>返回一个 <code>object</code>，它是 <code>PerformanceResourceTiming</code> 对象的 JSON 表示。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceResourceTiming`"
+        },
+        {
+          "textRaw": "类: `PerformanceObserver`",
+          "name": "类:_`performanceobserver`",
+          "meta": {
+            "added": [
+              "v8.5.0"
+            ],
+            "changes": []
+          },
+          "properties": [
+            {
+              "textRaw": "`supportedEntryTypes` 类型: {string\\[]}",
+              "type": "string\\[]",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v16.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>获取支持的类型。</p>"
+            }
+          ],
+          "ctors": [
+            {
+              "textRaw": "`new PerformanceObserver(callback)`",
+              "type": "ctor",
+              "name": "PerformanceObserver",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function}",
+                      "name": "callback",
+                      "type": "Function",
+                      "options": [
+                        {
+                          "textRaw": "`list` {PerformanceObserverEntryList}",
+                          "name": "list",
+                          "type": "PerformanceObserverEntryList"
+                        },
+                        {
+                          "textRaw": "`observer` {PerformanceObserver}",
+                          "name": "observer",
+                          "type": "PerformanceObserver"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>PerformanceObserver</code> 对象在新的 <code>PerformanceEntry</code> 实例被添加到性能时间线时提供通知。</p>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst obs = new PerformanceObserver((list, observer) => {\n  console.log(list.getEntries());\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ entryTypes: ['mark'], buffered: true });\n\nperformance.mark('test');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nconst obs = new PerformanceObserver((list, observer) => {\n  console.log(list.getEntries());\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ entryTypes: ['mark'], buffered: true });\n\nperformance.mark('test');\n</code></pre>\n<p>由于 <code>PerformanceObserver</code> 实例会引入它们自己的额外性能开销，因此实例不应无限期地保持订阅通知。用户应在不再需要观察者时立即断开连接。</p>\n<p>当 <code>PerformanceObserver</code> 被通知有关新的 <code>PerformanceEntry</code> 实例时，会调用 <code>callback</code>。回调接收一个 <code>PerformanceObserverEntryList</code> 实例和一个对 <code>PerformanceObserver</code> 的引用。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`performanceObserver.disconnect()`",
+              "type": "method",
+              "name": "disconnect",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>断开 <code>PerformanceObserver</code> 实例与所有通知的连接。</p>"
+            },
+            {
+              "textRaw": "`performanceObserver.observe(options)`",
+              "type": "method",
+              "name": "observe",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v16.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/39297",
+                    "description": "Updated to conform to Performance Timeline Level 2. The buffered option has been added back."
+                  },
+                  {
+                    "version": "v16.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37136",
+                    "description": "Updated to conform to User Timing Level 3. The buffered option has been removed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`type` {string} 单个 {PerformanceEntry} 类型。如果已指定 `entryTypes`，则不得提供。",
+                          "name": "type",
+                          "type": "string",
+                          "desc": "单个 {PerformanceEntry} 类型。如果已指定 `entryTypes`，则不得提供。"
+                        },
+                        {
+                          "textRaw": "`entryTypes` {string\\[]} 标识观察者感兴趣的 {PerformanceEntry} 实例类型的字符串数组。如果未提供，将抛出错误。",
+                          "name": "entryTypes",
+                          "type": "string\\[]",
+                          "desc": "标识观察者感兴趣的 {PerformanceEntry} 实例类型的字符串数组。如果未提供，将抛出错误。"
+                        },
+                        {
+                          "textRaw": "`buffered` {boolean} 如果为 true，则使用全局 `PerformanceEntry` 缓冲条目列表调用观察者回调。如果为 false，则仅将时间点之后创建的 `PerformanceEntry` 发送到观察者回调。**默认值:** `false`。",
+                          "name": "buffered",
+                          "type": "boolean",
+                          "desc": "如果为 true，则使用全局 `PerformanceEntry` 缓冲条目列表调用观察者回调。如果为 false，则仅将时间点之后创建的 `PerformanceEntry` 发送到观察者回调。**默认值:** `false`。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 <a href=\"perf_hooks.html#class-performanceobserver\" class=\"type\">&lt;PerformanceObserver&gt;</a> 实例订阅到由 <code>options.entryTypes</code> 或 <code>options.type</code> 标识的新 <a href=\"perf_hooks.html#class-performanceentry\" class=\"type\">&lt;PerformanceEntry&gt;</a> 实例的通知：</p>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst obs = new PerformanceObserver((list, observer) => {\n  // 异步调用一次。`list` 包含三个项目。\n});\nobs.observe({ type: 'mark' });\n\nfor (let n = 0; n &#x3C; 3; n++)\n  performance.mark(`test${n}`);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nconst obs = new PerformanceObserver((list, observer) => {\n  // 异步调用一次。`list` 包含三个项目。\n});\nobs.observe({ type: 'mark' });\n\nfor (let n = 0; n &#x3C; 3; n++)\n  performance.mark(`test${n}`);\n</code></pre>"
+            },
+            {
+              "textRaw": "`performanceObserver.takeRecords()`",
+              "type": "method",
+              "name": "takeRecords",
+              "meta": {
+                "added": [
+                  "v16.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]} 存储在性能观察器中的当前条目列表，并将其清空。",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]",
+                      "desc": "存储在性能观察器中的当前条目列表，并将其清空。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceObserver`"
+        },
+        {
+          "textRaw": "类: `PerformanceObserverEntryList`",
+          "name": "类:_`performanceobserverentrylist`",
+          "meta": {
+            "added": [
+              "v8.5.0"
+            ],
+            "changes": []
+          },
+          "desc": "<p><code>PerformanceObserverEntryList</code> 类用于提供对传递给 <code>PerformanceObserver</code> 的 <code>PerformanceEntry</code> 实例的访问。此类的构造函数不向用户暴露。</p>",
+          "methods": [
+            {
+              "textRaw": "`performanceObserverEntryList.getEntries()`",
+              "type": "method",
+              "name": "getEntries",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]}",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表。</p>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst obs = new PerformanceObserver((perfObserverList, observer) => {\n  console.log(perfObserverList.getEntries());\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'test',\n   *     entryType: 'mark',\n   *     startTime: 81.465639,\n   *     duration: 0,\n   *     detail: null\n   *   },\n   *   PerformanceEntry {\n   *     name: 'meow',\n   *     entryType: 'mark',\n   *     startTime: 81.860064,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ type: 'mark' });\n\nperformance.mark('test');\nperformance.mark('meow');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nconst obs = new PerformanceObserver((perfObserverList, observer) => {\n  console.log(perfObserverList.getEntries());\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'test',\n   *     entryType: 'mark',\n   *     startTime: 81.465639,\n   *     duration: 0,\n   *     detail: null\n   *   },\n   *   PerformanceEntry {\n   *     name: 'meow',\n   *     entryType: 'mark',\n   *     startTime: 81.860064,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ type: 'mark' });\n\nperformance.mark('test');\nperformance.mark('meow');\n</code></pre>"
+            },
+            {
+              "textRaw": "`performanceObserverEntryList.getEntriesByName(name[, type])`",
+              "type": "method",
+              "name": "getEntriesByName",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`name` {string}",
+                      "name": "name",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`type` {string}",
+                      "name": "type",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]}",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.name</code> 等于 <code>name</code>，并且可选地，其 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst obs = new PerformanceObserver((perfObserverList, observer) => {\n  console.log(perfObserverList.getEntriesByName('meow'));\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'meow',\n   *     entryType: 'mark',\n   *     startTime: 98.545991,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n  console.log(perfObserverList.getEntriesByName('nope')); // []\n\n  console.log(perfObserverList.getEntriesByName('test', 'mark'));\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'test',\n   *     entryType: 'mark',\n   *     startTime: 63.518931,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n  console.log(perfObserverList.getEntriesByName('test', 'measure')); // []\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ entryTypes: ['mark', 'measure'] });\n\nperformance.mark('test');\nperformance.mark('meow');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nconst obs = new PerformanceObserver((perfObserverList, observer) => {\n  console.log(perfObserverList.getEntriesByName('meow'));\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'meow',\n   *     entryType: 'mark',\n   *     startTime: 98.545991,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n  console.log(perfObserverList.getEntriesByName('nope')); // []\n\n  console.log(perfObserverList.getEntriesByName('test', 'mark'));\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'test',\n   *     entryType: 'mark',\n   *     startTime: 63.518931,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n  console.log(perfObserverList.getEntriesByName('test', 'measure')); // []\n\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ entryTypes: ['mark', 'measure'] });\n\nperformance.mark('test');\nperformance.mark('meow');\n</code></pre>"
+            },
+            {
+              "textRaw": "`performanceObserverEntryList.getEntriesByType(type)`",
+              "type": "method",
+              "name": "getEntriesByType",
+              "meta": {
+                "added": [
+                  "v8.5.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`type` {string}",
+                      "name": "type",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "返回: {PerformanceEntry\\[]}",
+                      "name": "返回",
+                      "type": "PerformanceEntry\\[]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst obs = new PerformanceObserver((perfObserverList, observer) => {\n  console.log(perfObserverList.getEntriesByType('mark'));\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'test',\n   *     entryType: 'mark',\n   *     startTime: 55.897834,\n   *     duration: 0,\n   *     detail: null\n   *   },\n   *   PerformanceEntry {\n   *     name: 'meow',\n   *     entryType: 'mark',\n   *     startTime: 56.350146,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ type: 'mark' });\n\nperformance.mark('test');\nperformance.mark('meow');\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nconst obs = new PerformanceObserver((perfObserverList, observer) => {\n  console.log(perfObserverList.getEntriesByType('mark'));\n  /**\n   * [\n   *   PerformanceEntry {\n   *     name: 'test',\n   *     entryType: 'mark',\n   *     startTime: 55.897834,\n   *     duration: 0,\n   *     detail: null\n   *   },\n   *   PerformanceEntry {\n   *     name: 'meow',\n   *     entryType: 'mark',\n   *     startTime: 56.350146,\n   *     duration: 0,\n   *     detail: null\n   *   }\n   * ]\n   */\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ type: 'mark' });\n\nperformance.mark('test');\nperformance.mark('meow');\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `PerformanceObserverEntryList`"
+        },
+        {
+          "textRaw": "类: `Histogram`",
+          "name": "类:_`histogram`",
+          "meta": {
+            "added": [
+              "v11.10.0"
+            ],
+            "changes": []
+          },
+          "properties": [
+            {
+              "textRaw": "`count` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>直方图记录的样本数。</p>"
+            },
+            {
+              "textRaw": "`countBigInt` 类型: {bigint}",
+              "type": "bigint",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>直方图记录的样本数。</p>"
+            },
+            {
+              "textRaw": "`exceeds` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>事件循环延迟超过最大 1 小时事件循环延迟阈值的次数。</p>"
+            },
+            {
+              "textRaw": "`exceedsBigInt` 类型: {bigint}",
+              "type": "bigint",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>事件循环延迟超过最大 1 小时事件循环延迟阈值的次数。</p>"
+            },
+            {
+              "textRaw": "`max` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>记录的最大事件循环延迟。</p>"
+            },
+            {
+              "textRaw": "`maxBigInt` 类型: {bigint}",
+              "type": "bigint",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>记录的最大事件循环延迟。</p>"
+            },
+            {
+              "textRaw": "`mean` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>记录的事件循环延迟的平均值。</p>"
+            },
+            {
+              "textRaw": "`min` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>记录的最小事件循环延迟。</p>"
+            },
+            {
+              "textRaw": "`minBigInt` 类型: {bigint}",
+              "type": "bigint",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>记录的最小事件循环延迟。</p>"
+            },
+            {
+              "textRaw": "`percentiles` 类型: {Map}",
+              "type": "Map",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>返回一个 <code>Map</code> 对象，详细说明累积的百分位分布。</p>"
+            },
+            {
+              "textRaw": "`percentilesBigInt` 类型: {Map}",
+              "type": "Map",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>返回一个 <code>Map</code> 对象，详细说明累积的百分位分布。</p>"
+            },
+            {
+              "textRaw": "`stddev` 类型: {number}",
+              "type": "number",
+              "name": "类型",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>记录的事件循环延迟的标准差。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`histogram.percentile(percentile)`",
+              "type": "method",
+              "name": "percentile",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`percentile` {number} 百分位数值，范围在 (0, 100]。",
+                      "name": "percentile",
+                      "type": "number",
+                      "desc": "百分位数值，范围在 (0, 100]。"
+                    },
+                    {
+                      "textRaw": "返回: {number}",
+                      "name": "返回",
+                      "type": "number"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回给定百分位数的值。</p>"
+            },
+            {
+              "textRaw": "`histogram.percentileBigInt(percentile)`",
+              "type": "method",
+              "name": "percentileBigInt",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`percentile` {number} 百分位数值，范围在 (0, 100]。",
+                      "name": "percentile",
+                      "type": "number",
+                      "desc": "百分位数值，范围在 (0, 100]。"
+                    },
+                    {
+                      "textRaw": "返回: {bigint}",
+                      "name": "返回",
+                      "type": "bigint"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回给定百分位数的值。</p>"
+            },
+            {
+              "textRaw": "`histogram.reset()`",
+              "type": "method",
+              "name": "reset",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>重置收集的直方图数据。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `Histogram`"
+        },
+        {
+          "textRaw": "类: `IntervalHistogram extends Histogram`",
+          "name": "类:_`intervalhistogram_extends_histogram`",
+          "desc": "<p>一个在给定间隔上定期更新的 <code>Histogram</code>。</p>",
+          "methods": [
+            {
+              "textRaw": "`histogram.disable()`",
+              "type": "method",
+              "name": "disable",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>禁用更新间隔计时器。如果计时器已停止，返回 <code>true</code>，如果已经停止，返回 <code>false</code>。</p>"
+            },
+            {
+              "textRaw": "`histogram.enable()`",
+              "type": "method",
+              "name": "enable",
+              "meta": {
+                "added": [
+                  "v11.10.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>启用更新间隔计时器。如果计时器已启动，返回 <code>true</code>，如果已经启动，返回 <code>false</code>。</p>"
+            },
+            {
+              "textRaw": "`histogram[Symbol.dispose]()`",
+              "type": "method",
+              "name": "[Symbol.dispose]",
+              "meta": {
+                "added": [
+                  "v24.2.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>当直方图被处置时，禁用更新间隔计时器。</p>\n<pre><code class=\"language-js\">const { monitorEventLoopDelay } = require('node:perf_hooks');\n{\n  using hist = monitorEventLoopDelay({ resolution: 20 });\n  hist.enable();\n  // 当退出块时，直方图将被禁用。\n}\n</code></pre>"
+            }
+          ],
+          "modules": [
+            {
+              "textRaw": "克隆 `IntervalHistogram`",
+              "name": "克隆_`intervalhistogram`",
+              "desc": "<p><a href=\"perf_hooks.html#class-intervalhistogram-extends-histogram\" class=\"type\">&lt;IntervalHistogram&gt;</a> 实例可以通过 <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a> 克隆。在接收端，直方图被克隆为一个普通的 <a href=\"perf_hooks.html#class-histogram\" class=\"type\">&lt;Histogram&gt;</a> 对象，该对象不实现 <code>enable()</code> 和 <code>disable()</code> 方法。</p>",
+              "type": "module",
+              "displayName": "克隆 `IntervalHistogram`"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `IntervalHistogram extends Histogram`"
+        },
+        {
+          "textRaw": "类: `RecordableHistogram extends Histogram`",
+          "name": "类:_`recordablehistogram_extends_histogram`",
+          "meta": {
+            "added": [
+              "v15.9.0",
+              "v14.18.0"
+            ],
+            "changes": []
+          },
+          "methods": [
+            {
+              "textRaw": "`histogram.add(other)`",
+              "type": "method",
+              "name": "add",
+              "meta": {
+                "added": [
+                  "v17.4.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`other` {RecordableHistogram}",
+                      "name": "other",
+                      "type": "RecordableHistogram"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 <code>other</code> 中的值添加到此直方图。</p>"
+            },
+            {
+              "textRaw": "`histogram.record(val)`",
+              "type": "method",
+              "name": "record",
+              "meta": {
+                "added": [
+                  "v15.9.0",
+                  "v14.18.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`val` {number|bigint} 要记录在直方图中的量。",
+                      "name": "val",
+                      "type": "number|bigint",
+                      "desc": "要记录在直方图中的量。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "textRaw": "`histogram.recordDelta()`",
+              "type": "method",
+              "name": "recordDelta",
+              "meta": {
+                "added": [
+                  "v15.9.0",
+                  "v14.18.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>计算自上次调用 <code>recordDelta()</code> 以来经过的时间（以纳秒为单位），并将该量记录在直方图中。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `RecordableHistogram extends Histogram`"
+        },
+        {
+          "textRaw": "示例",
+          "name": "示例",
+          "modules": [
+            {
+              "textRaw": "测量异步操作的持续时间",
+              "name": "测量异步操作的持续时间",
+              "desc": "<p>以下示例使用 <a href=\"async_hooks.html\">Async Hooks</a> 和 Performance APIs 来测量 Timeout 操作的实际持续时间（包括执行回调所需的时间）。</p>\n<pre><code class=\"language-mjs\">import { createHook } from 'node:async_hooks';\nimport { performance, PerformanceObserver } from 'node:perf_hooks';\n\nconst set = new Set();\nconst hook = createHook({\n  init(id, type) {\n    if (type === 'Timeout') {\n      performance.mark(`Timeout-${id}-Init`);\n      set.add(id);\n    }\n  },\n  destroy(id) {\n    if (set.has(id)) {\n      set.delete(id);\n      performance.mark(`Timeout-${id}-Destroy`);\n      performance.measure(`Timeout-${id}`,\n                          `Timeout-${id}-Init`,\n                          `Timeout-${id}-Destroy`);\n    }\n  },\n});\nhook.enable();\n\nconst obs = new PerformanceObserver((list, observer) => {\n  console.log(list.getEntries()[0]);\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ entryTypes: ['measure'], buffered: true });\n\nsetTimeout(() => {}, 1000);\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst async_hooks = require('node:async_hooks');\nconst {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\n\nconst set = new Set();\nconst hook = async_hooks.createHook({\n  init(id, type) {\n    if (type === 'Timeout') {\n      performance.mark(`Timeout-${id}-Init`);\n      set.add(id);\n    }\n  },\n  destroy(id) {\n    if (set.has(id)) {\n      set.delete(id);\n      performance.mark(`Timeout-${id}-Destroy`);\n      performance.measure(`Timeout-${id}`,\n                          `Timeout-${id}-Init`,\n                          `Timeout-${id}-Destroy`);\n    }\n  },\n});\nhook.enable();\n\nconst obs = new PerformanceObserver((list, observer) => {\n  console.log(list.getEntries()[0]);\n  performance.clearMarks();\n  performance.clearMeasures();\n  observer.disconnect();\n});\nobs.observe({ entryTypes: ['measure'] });\n\nsetTimeout(() => {}, 1000);\n</code></pre>",
+              "type": "module",
+              "displayName": "测量异步操作的持续时间"
+            },
+            {
+              "textRaw": "测量加载依赖项所需的时间",
+              "name": "测量加载依赖项所需的时间",
+              "desc": "<p>以下示例测量 <code>require()</code> 操作加载依赖项的持续时间：</p>\n<!-- eslint-disable no-global-assign -->\n<pre><code class=\"language-mjs\">import { performance, PerformanceObserver } from 'node:perf_hooks';\n\n// 激活观察者\nconst obs = new PerformanceObserver((list) => {\n  const entries = list.getEntries();\n  entries.forEach((entry) => {\n    console.log(`import('${entry[0]}')`, entry.duration);\n  });\n  performance.clearMarks();\n  performance.clearMeasures();\n  obs.disconnect();\n});\nobs.observe({ entryTypes: ['function'], buffered: true });\n\nconst timedImport = performance.timerify(async (module) => {\n  return await import(module);\n});\n\nawait timedImport('some-module');\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst {\n  performance,\n  PerformanceObserver,\n} = require('node:perf_hooks');\nconst mod = require('node:module');\n\n// 猴子补丁 require 函数\nmod.Module.prototype.require =\n  performance.timerify(mod.Module.prototype.require);\nrequire = performance.timerify(require);\n\n// 激活观察者\nconst obs = new PerformanceObserver((list) => {\n  const entries = list.getEntries();\n  entries.forEach((entry) => {\n    console.log(`require('${entry[0]}')`, entry.duration);\n  });\n  performance.clearMarks();\n  performance.clearMeasures();\n  obs.disconnect();\n});\nobs.observe({ entryTypes: ['function'] });\n\nrequire('some-module');\n</code></pre>",
+              "type": "module",
+              "displayName": "测量加载依赖项所需的时间"
+            },
+            {
+              "textRaw": "测量一次 HTTP 往返所需的时间",
+              "name": "测量一次_http_往返所需的时间",
+              "desc": "<p>以下示例用于跟踪 HTTP 客户端（<code>OutgoingMessage</code>）和 HTTP 请求（<code>IncomingMessage</code>）所花费的时间。对于 HTTP 客户端，它表示从开始请求到接收响应之间的时间间隔，对于 HTTP 请求，它表示从接收请求到发送响应之间的时间间隔：</p>\n<pre><code class=\"language-mjs\">import { PerformanceObserver } from 'node:perf_hooks';\nimport { createServer, get } from 'node:http';\n\nconst obs = new PerformanceObserver((items) => {\n  items.getEntries().forEach((item) => {\n    console.log(item);\n  });\n});\n\nobs.observe({ entryTypes: ['http'] });\n\nconst PORT = 8080;\n\ncreateServer((req, res) => {\n  res.end('ok');\n}).listen(PORT, () => {\n  get(`http://127.0.0.1:${PORT}`);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { PerformanceObserver } = require('node:perf_hooks');\nconst http = require('node:http');\n\nconst obs = new PerformanceObserver((items) => {\n  items.getEntries().forEach((item) => {\n    console.log(item);\n  });\n});\n\nobs.observe({ entryTypes: ['http'] });\n\nconst PORT = 8080;\n\nhttp.createServer((req, res) => {\n  res.end('ok');\n}).listen(PORT, () => {\n  http.get(`http://127.0.0.1:${PORT}`);\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "测量一次 HTTP 往返所需的时间"
+            },
+            {
+              "textRaw": "测量 `net.connect`（仅限 TCP）在连接成功时所需的时间",
+              "name": "测量_`net.connect`（仅限_tcp）在连接成功时所需的时间",
+              "desc": "<pre><code class=\"language-mjs\">import { PerformanceObserver } from 'node:perf_hooks';\nimport { connect, createServer } from 'node:net';\n\nconst obs = new PerformanceObserver((items) => {\n  items.getEntries().forEach((item) => {\n    console.log(item);\n  });\n});\nobs.observe({ entryTypes: ['net'] });\nconst PORT = 8080;\ncreateServer((socket) => {\n  socket.destroy();\n}).listen(PORT, () => {\n  connect(PORT);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { PerformanceObserver } = require('node:perf_hooks');\nconst net = require('node:net');\nconst obs = new PerformanceObserver((items) => {\n  items.getEntries().forEach((item) => {\n    console.log(item);\n  });\n});\nobs.observe({ entryTypes: ['net'] });\nconst PORT = 8080;\nnet.createServer((socket) => {\n  socket.destroy();\n}).listen(PORT, () => {\n  net.connect(PORT);\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "测量 `net.connect`（仅限 TCP）在连接成功时所需的时间"
+            },
+            {
+              "textRaw": "测量 DNS 在请求成功时所需的时间",
+              "name": "测量_dns_在请求成功时所需的时间",
+              "desc": "<pre><code class=\"language-mjs\">import { PerformanceObserver } from 'node:perf_hooks';\nimport { lookup, promises } from 'node:dns';\n\nconst obs = new PerformanceObserver((items) => {\n  items.getEntries().forEach((item) => {\n    console.log(item);\n  });\n});\nobs.observe({ entryTypes: ['dns'] });\nlookup('localhost', () => {});\npromises.resolve('localhost');\n</code></pre>\n<pre><code class=\"language-cjs\">'use strict';\nconst { PerformanceObserver } = require('node:perf_hooks');\nconst dns = require('node:dns');\nconst obs = new PerformanceObserver((items) => {\n  items.getEntries().forEach((item) => {\n    console.log(item);\n  });\n});\nobs.observe({ entryTypes: ['dns'] });\ndns.lookup('localhost', () => {});\ndns.promises.resolve('localhost');\n</code></pre>",
+              "type": "module",
+              "displayName": "测量 DNS 在请求成功时所需的时间"
+            }
+          ],
+          "type": "module",
+          "displayName": "示例"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`perf_hooks.createHistogram([options])`",
+          "type": "method",
+          "name": "createHistogram",
+          "meta": {
+            "added": [
+              "v15.9.0",
+              "v14.18.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`lowest` {number|bigint} 最低可分辨值。必须是大于 0 的整数值。**默认值:** `1`。",
+                      "name": "lowest",
+                      "type": "number|bigint",
+                      "desc": "最低可分辨值。必须是大于 0 的整数值。**默认值:** `1`。"
+                    },
+                    {
+                      "textRaw": "`highest` {number|bigint} 最高可记录值。必须是等于或大于 `lowest` 两倍的整数值。**默认值:** `Number.MAX_SAFE_INTEGER`。",
+                      "name": "highest",
+                      "type": "number|bigint",
+                      "desc": "最高可记录值。必须是等于或大于 `lowest` 两倍的整数值。**默认值:** `Number.MAX_SAFE_INTEGER`。"
+                    },
+                    {
+                      "textRaw": "`figures` {number} 精度位数。必须是介于 `1` 和 `5` 之间的数字。**默认值:** `3`。",
+                      "name": "figures",
+                      "type": "number",
+                      "desc": "精度位数。必须是介于 `1` 和 `5` 之间的数字。**默认值:** `3`。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {RecordableHistogram}",
+                  "name": "返回",
+                  "type": "RecordableHistogram"
+                }
+              ]
+            }
+          ],
+          "desc": "<p>返回一个 <a href=\"perf_hooks.html#class-recordablehistogram-extends-histogram\" class=\"type\">&lt;RecordableHistogram&gt;</a>。</p>"
+        },
+        {
+          "textRaw": "`perf_hooks.monitorEventLoopDelay([options])`",
+          "type": "method",
+          "name": "monitorEventLoopDelay",
+          "meta": {
+            "added": [
+              "v11.10.0"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`options` {Object}",
+                  "name": "options",
+                  "type": "Object",
+                  "options": [
+                    {
+                      "textRaw": "`resolution` {number} 采样率，以毫秒为单位。必须大于零。**默认值:** `10`。",
+                      "name": "resolution",
+                      "type": "number",
+                      "desc": "采样率，以毫秒为单位。必须大于零。**默认值:** `10`。"
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "返回: {IntervalHistogram}",
+                  "name": "返回",
+                  "type": "IntervalHistogram"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>\n<p>创建一个 <code>IntervalHistogram</code> 对象，该对象随时间采样和报告事件循环延迟。延迟将以纳秒报告。</p>\n<p>使用计时器检测近似事件循环延迟是有效的，因为计时器的执行与 libuv 事件循环的生命周期 specifically 相关。也就是说，循环中的延迟将导致计时器执行的延迟，而此 API 旨在 specifically 检测这些延迟。</p>\n<pre><code class=\"language-mjs\">import { monitorEventLoopDelay } from 'node:perf_hooks';\n\nconst h = monitorEventLoopDelay({ resolution: 20 });\nh.enable();\n// 执行某些操作。\nh.disable();\nconsole.log(h.min);\nconsole.log(h.max);\nconsole.log(h.mean);\nconsole.log(h.stddev);\nconsole.log(h.percentiles);\nconsole.log(h.percentile(50));\nconsole.log(h.percentile(99));\n</code></pre>\n<pre><code class=\"language-cjs\">const { monitorEventLoopDelay } = require('node:perf_hooks');\nconst h = monitorEventLoopDelay({ resolution: 20 });\nh.enable();\n// 执行某些操作。\nh.disable();\nconsole.log(h.min);\nconsole.log(h.max);\nconsole.log(h.mean);\nconsole.log(h.stddev);\nconsole.log(h.percentiles);\nconsole.log(h.percentile(50));\nconsole.log(h.percentile(99));\n</code></pre>"
+        }
+      ],
+      "type": "module",
+      "displayName": "Performance measurement APIs"
+    }
+  ]
+}

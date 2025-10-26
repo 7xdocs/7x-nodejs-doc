@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>URL | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/url.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:478px){.with-32-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:686px){.with-58-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:606px){.with-48-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:654px){.with-54-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:614px){.with-49-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-url">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url active">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="url" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#url">URL</a></span>
+<ul>
+<li><a href="#url--url-">URL 字符串与 URL 对象</a>
+<ul>
+<li><a href="#-url-">从组件部分构建 URL 并获取构建后的字符串</a></li>
+</ul>
+</li>
+<li><a href="#whatwg-url-api">WHATWG URL API</a>
+<ul>
+<li><a href="#url_1">类：<code>URL</code></a>
+<ul>
+<li><a href="#new-urlinput-base"><code>new URL(input[, base])</code></a></li>
+<li><a href="#urlhash"><code>url.hash</code></a></li>
+<li><a href="#urlhost"><code>url.host</code></a></li>
+<li><a href="#urlhostname"><code>url.hostname</code></a></li>
+<li><a href="#urlhref"><code>url.href</code></a></li>
+<li><a href="#urlorigin"><code>url.origin</code></a></li>
+<li><a href="#urlpassword"><code>url.password</code></a></li>
+<li><a href="#urlpathname"><code>url.pathname</code></a></li>
+<li><a href="#urlport"><code>url.port</code></a></li>
+<li><a href="#urlprotocol"><code>url.protocol</code></a>
+<ul>
+<li><a href="#">特殊方案</a></li>
+</ul>
+</li>
+<li><a href="#urlsearch"><code>url.search</code></a></li>
+<li><a href="#urlsearchparams"><code>url.searchParams</code></a></li>
+<li><a href="#urlusername"><code>url.username</code></a></li>
+<li><a href="#urltostring"><code>url.toString()</code></a></li>
+<li><a href="#urltojson"><code>url.toJSON()</code></a></li>
+<li><a href="#urlcreateobjecturlblob"><code>URL.createObjectURL(blob)</code></a></li>
+<li><a href="#urlrevokeobjecturlid"><code>URL.revokeObjectURL(id)</code></a></li>
+<li><a href="#urlcanparseinput-base"><code>URL.canParse(input[, base])</code></a></li>
+<li><a href="#urlparseinput-base"><code>URL.parse(input[, base])</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#urlpattern">类：<code>URLPattern</code></a></span>
+<ul>
+<li><a href="#new-urlpattern"><code>new URLPattern()</code></a></li>
+<li><a href="#new-urlpatternstring-baseurl-options"><code>new URLPattern(string[, baseURL][, options])</code></a></li>
+<li><a href="#new-urlpatternobj-baseurl-options"><code>new URLPattern(obj[, baseURL][, options])</code></a></li>
+<li><a href="#urlpatternexecinput-baseurl"><code>urlPattern.exec(input[, baseURL])</code></a></li>
+<li><a href="#urlpatterntestinput-baseurl"><code>urlPattern.test(input[, baseURL])</code></a></li>
+</ul>
+</li>
+<li><a href="#urlsearchparams_1">类：<code>URLSearchParams</code></a>
+<ul>
+<li><a href="#new-urlsearchparams"><code>new URLSearchParams()</code></a></li>
+<li><a href="#new-urlsearchparamsstring"><code>new URLSearchParams(string)</code></a></li>
+<li><a href="#new-urlsearchparamsobj"><code>new URLSearchParams(obj)</code></a></li>
+<li><a href="#new-urlsearchparamsiterable"><code>new URLSearchParams(iterable)</code></a></li>
+<li><a href="#urlsearchparamsappendname-value"><code>urlSearchParams.append(name, value)</code></a></li>
+<li><a href="#urlsearchparamsdeletename-value"><code>urlSearchParams.delete(name[, value])</code></a></li>
+<li><a href="#urlsearchparamsentries"><code>urlSearchParams.entries()</code></a></li>
+<li><a href="#urlsearchparamsforeachfn-thisarg"><code>urlSearchParams.forEach(fn[, thisArg])</code></a></li>
+<li><a href="#urlsearchparamsgetname"><code>urlSearchParams.get(name)</code></a></li>
+<li><a href="#urlsearchparamsgetallname"><code>urlSearchParams.getAll(name)</code></a></li>
+<li><a href="#urlsearchparamshasname-value"><code>urlSearchParams.has(name[, value])</code></a></li>
+<li><a href="#urlsearchparamskeys"><code>urlSearchParams.keys()</code></a></li>
+<li><a href="#urlsearchparamssetname-value"><code>urlSearchParams.set(name, value)</code></a></li>
+<li><a href="#urlsearchparamssize"><code>urlSearchParams.size</code></a></li>
+<li><a href="#urlsearchparamssort"><code>urlSearchParams.sort()</code></a></li>
+<li><a href="#urlsearchparamstostring"><code>urlSearchParams.toString()</code></a></li>
+<li><a href="#urlsearchparamsvalues"><code>urlSearchParams.values()</code></a></li>
+<li><a href="#urlsearchparamssymboliterator"><code>urlSearchParams[Symbol.iterator]()</code></a></li>
+</ul>
+</li>
+<li><a href="#urldomaintoasciidomain"><code>url.domainToASCII(domain)</code></a></li>
+<li><a href="#urldomaintounicodedomain"><code>url.domainToUnicode(domain)</code></a></li>
+<li><a href="#urlfileurltopathurl-options"><code>url.fileURLToPath(url[, options])</code></a></li>
+<li><a href="#urlfileurltopathbufferurl-options"><code>url.fileURLToPathBuffer(url[, options])</code></a></li>
+<li><a href="#urlformaturl-options"><code>url.format(URL[, options])</code></a></li>
+<li><a href="#urlpathtofileurlpath-options"><code>url.pathToFileURL(path[, options])</code></a></li>
+<li><a href="#urlurltohttpoptionsurl"><code>url.urlToHttpOptions(url)</code></a></li>
+</ul>
+</li>
+<li><span class="stability_3"><a href="#-url-api">旧版 URL API</a></span>
+<ul>
+<li><a href="#-urlobject">旧版 <code>urlObject</code></a>
+<ul>
+<li><a href="#urlobjectauth"><code>urlObject.auth</code></a></li>
+<li><a href="#urlobjecthash"><code>urlObject.hash</code></a></li>
+<li><a href="#urlobjecthost"><code>urlObject.host</code></a></li>
+<li><a href="#urlobjecthostname"><code>urlObject.hostname</code></a></li>
+<li><a href="#urlobjecthref"><code>urlObject.href</code></a></li>
+<li><a href="#urlobjectpath"><code>urlObject.path</code></a></li>
+<li><a href="#urlobjectpathname"><code>urlObject.pathname</code></a></li>
+<li><a href="#urlobjectport"><code>urlObject.port</code></a></li>
+<li><a href="#urlobjectprotocol"><code>urlObject.protocol</code></a></li>
+<li><a href="#urlobjectquery"><code>urlObject.query</code></a></li>
+<li><a href="#urlobjectsearch"><code>urlObject.search</code></a></li>
+<li><a href="#urlobjectslashes"><code>urlObject.slashes</code></a></li>
+</ul>
+</li>
+<li><a href="#urlformaturlobject"><code>url.format(urlObject)</code></a></li>
+<li><span class="stability_0"><a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse(urlString[, parseQueryString[, slashesDenoteHost]])</code></a></span></li>
+<li><a href="#urlresolvefrom-to"><code>url.resolve(from, to)</code></a></li>
+</ul>
+</li>
+<li><a href="#url-">URL 中的百分比编码</a>
+<ul>
+<li><a href="#-api">旧版 API</a></li>
+<li><a href="#whatwg-api">WHATWG API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url active">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/url.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/url.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/url.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/url.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/url.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/url.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/url.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/url.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/url.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/url.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/url.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/url.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/url.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/url.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/url.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/url.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/url.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/url.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/url.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/url.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/url.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/url.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/url.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/url.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="url.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/url.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#url">URL</a></span>
+<ul>
+<li><a href="#url--url-">URL 字符串与 URL 对象</a>
+<ul>
+<li><a href="#-url-">从组件部分构建 URL 并获取构建后的字符串</a></li>
+</ul>
+</li>
+<li><a href="#whatwg-url-api">WHATWG URL API</a>
+<ul>
+<li><a href="#url_1">类：<code>URL</code></a>
+<ul>
+<li><a href="#new-urlinput-base"><code>new URL(input[, base])</code></a></li>
+<li><a href="#urlhash"><code>url.hash</code></a></li>
+<li><a href="#urlhost"><code>url.host</code></a></li>
+<li><a href="#urlhostname"><code>url.hostname</code></a></li>
+<li><a href="#urlhref"><code>url.href</code></a></li>
+<li><a href="#urlorigin"><code>url.origin</code></a></li>
+<li><a href="#urlpassword"><code>url.password</code></a></li>
+<li><a href="#urlpathname"><code>url.pathname</code></a></li>
+<li><a href="#urlport"><code>url.port</code></a></li>
+<li><a href="#urlprotocol"><code>url.protocol</code></a>
+<ul>
+<li><a href="#">特殊方案</a></li>
+</ul>
+</li>
+<li><a href="#urlsearch"><code>url.search</code></a></li>
+<li><a href="#urlsearchparams"><code>url.searchParams</code></a></li>
+<li><a href="#urlusername"><code>url.username</code></a></li>
+<li><a href="#urltostring"><code>url.toString()</code></a></li>
+<li><a href="#urltojson"><code>url.toJSON()</code></a></li>
+<li><a href="#urlcreateobjecturlblob"><code>URL.createObjectURL(blob)</code></a></li>
+<li><a href="#urlrevokeobjecturlid"><code>URL.revokeObjectURL(id)</code></a></li>
+<li><a href="#urlcanparseinput-base"><code>URL.canParse(input[, base])</code></a></li>
+<li><a href="#urlparseinput-base"><code>URL.parse(input[, base])</code></a></li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#urlpattern">类：<code>URLPattern</code></a></span>
+<ul>
+<li><a href="#new-urlpattern"><code>new URLPattern()</code></a></li>
+<li><a href="#new-urlpatternstring-baseurl-options"><code>new URLPattern(string[, baseURL][, options])</code></a></li>
+<li><a href="#new-urlpatternobj-baseurl-options"><code>new URLPattern(obj[, baseURL][, options])</code></a></li>
+<li><a href="#urlpatternexecinput-baseurl"><code>urlPattern.exec(input[, baseURL])</code></a></li>
+<li><a href="#urlpatterntestinput-baseurl"><code>urlPattern.test(input[, baseURL])</code></a></li>
+</ul>
+</li>
+<li><a href="#urlsearchparams_1">类：<code>URLSearchParams</code></a>
+<ul>
+<li><a href="#new-urlsearchparams"><code>new URLSearchParams()</code></a></li>
+<li><a href="#new-urlsearchparamsstring"><code>new URLSearchParams(string)</code></a></li>
+<li><a href="#new-urlsearchparamsobj"><code>new URLSearchParams(obj)</code></a></li>
+<li><a href="#new-urlsearchparamsiterable"><code>new URLSearchParams(iterable)</code></a></li>
+<li><a href="#urlsearchparamsappendname-value"><code>urlSearchParams.append(name, value)</code></a></li>
+<li><a href="#urlsearchparamsdeletename-value"><code>urlSearchParams.delete(name[, value])</code></a></li>
+<li><a href="#urlsearchparamsentries"><code>urlSearchParams.entries()</code></a></li>
+<li><a href="#urlsearchparamsforeachfn-thisarg"><code>urlSearchParams.forEach(fn[, thisArg])</code></a></li>
+<li><a href="#urlsearchparamsgetname"><code>urlSearchParams.get(name)</code></a></li>
+<li><a href="#urlsearchparamsgetallname"><code>urlSearchParams.getAll(name)</code></a></li>
+<li><a href="#urlsearchparamshasname-value"><code>urlSearchParams.has(name[, value])</code></a></li>
+<li><a href="#urlsearchparamskeys"><code>urlSearchParams.keys()</code></a></li>
+<li><a href="#urlsearchparamssetname-value"><code>urlSearchParams.set(name, value)</code></a></li>
+<li><a href="#urlsearchparamssize"><code>urlSearchParams.size</code></a></li>
+<li><a href="#urlsearchparamssort"><code>urlSearchParams.sort()</code></a></li>
+<li><a href="#urlsearchparamstostring"><code>urlSearchParams.toString()</code></a></li>
+<li><a href="#urlsearchparamsvalues"><code>urlSearchParams.values()</code></a></li>
+<li><a href="#urlsearchparamssymboliterator"><code>urlSearchParams[Symbol.iterator]()</code></a></li>
+</ul>
+</li>
+<li><a href="#urldomaintoasciidomain"><code>url.domainToASCII(domain)</code></a></li>
+<li><a href="#urldomaintounicodedomain"><code>url.domainToUnicode(domain)</code></a></li>
+<li><a href="#urlfileurltopathurl-options"><code>url.fileURLToPath(url[, options])</code></a></li>
+<li><a href="#urlfileurltopathbufferurl-options"><code>url.fileURLToPathBuffer(url[, options])</code></a></li>
+<li><a href="#urlformaturl-options"><code>url.format(URL[, options])</code></a></li>
+<li><a href="#urlpathtofileurlpath-options"><code>url.pathToFileURL(path[, options])</code></a></li>
+<li><a href="#urlurltohttpoptionsurl"><code>url.urlToHttpOptions(url)</code></a></li>
+</ul>
+</li>
+<li><span class="stability_3"><a href="#-url-api">旧版 URL API</a></span>
+<ul>
+<li><a href="#-urlobject">旧版 <code>urlObject</code></a>
+<ul>
+<li><a href="#urlobjectauth"><code>urlObject.auth</code></a></li>
+<li><a href="#urlobjecthash"><code>urlObject.hash</code></a></li>
+<li><a href="#urlobjecthost"><code>urlObject.host</code></a></li>
+<li><a href="#urlobjecthostname"><code>urlObject.hostname</code></a></li>
+<li><a href="#urlobjecthref"><code>urlObject.href</code></a></li>
+<li><a href="#urlobjectpath"><code>urlObject.path</code></a></li>
+<li><a href="#urlobjectpathname"><code>urlObject.pathname</code></a></li>
+<li><a href="#urlobjectport"><code>urlObject.port</code></a></li>
+<li><a href="#urlobjectprotocol"><code>urlObject.protocol</code></a></li>
+<li><a href="#urlobjectquery"><code>urlObject.query</code></a></li>
+<li><a href="#urlobjectsearch"><code>urlObject.search</code></a></li>
+<li><a href="#urlobjectslashes"><code>urlObject.slashes</code></a></li>
+</ul>
+</li>
+<li><a href="#urlformaturlobject"><code>url.format(urlObject)</code></a></li>
+<li><span class="stability_0"><a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse(urlString[, parseQueryString[, slashesDenoteHost]])</code></a></span></li>
+<li><a href="#urlresolvefrom-to"><code>url.resolve(from, to)</code></a></li>
+</ul>
+</li>
+<li><a href="#url-">URL 中的百分比编码</a>
+<ul>
+<li><a href="#-api">旧版 API</a></li>
+<li><a href="#whatwg-api">WHATWG API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>URL<span><a class="mark" href="#url" id="url">#</a></span><a aria-hidden="true" class="legacy" id="url_url"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/url.js">lib/url.js</a></p>
+<p><code>node:url</code> 模块提供了用于 URL 解析和处理的实用工具。可以通过以下方式访问：</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> url <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;</code><code class="language-js cjs"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);</code><button class="copy-button">copy</button></pre>
+<section><h3>URL 字符串与 URL 对象<span><a class="mark" href="#url--url-" id="url--url-">#</a></span><a aria-hidden="true" class="legacy" id="url_url_url"></a></h3>
+<p>URL 字符串是包含多个有意义组件的结构化字符串。解析后，会返回一个 URL 对象，其中包含每个组件的属性。</p>
+<p><code>node:url</code> 模块提供了两种用于处理 URL 的 API：一种是 Node.js 特定的旧版 API，另一种是实现了与 Web 浏览器相同的 [WHATWG URL 标准][] 的新版 API。</p>
+<p>下面提供了 WHATWG 与旧版 API 的比较。在 URL <code>'https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</code> 上方，显示的是旧版 <code>url.parse()</code> 返回的对象的属性。其下方是 WHATWG <code>URL</code> 对象的属性。</p>
+<p>WHATWG URL 的 <code>origin</code> 属性包括 <code>protocol</code> 和 <code>host</code>，但不包括 <code>username</code> 或 <code>password</code>。</p>
+<pre><code class="language-text">┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                              href                                              │
+├──────────┬──┬─────────────────────┬────────────────────────┬───────────────────────────┬───────┤
+│ protocol │  │        auth         │          host          │           path            │ hash  │
+│          │  │                     ├─────────────────┬──────┼──────────┬────────────────┤       │
+│          │  │                     │    hostname     │ port │ pathname │     search     │       │
+│          │  │                     │                 │      │          ├─┬──────────────┤       │
+│          │  │                     │                 │      │          │ │    query     │       │
+"  https:   //    user   :   pass   @ sub.example.com : 8080   /p/a/t/h  ?  query=string   #hash "
+│          │  │          │          │    hostname     │ port │          │                │       │
+│          │  │          │          ├─────────────────┴──────┤          │                │       │
+│ protocol │  │ username │ password │          host          │          │                │       │
+├──────────┴──┼──────────┴──────────┼────────────────────────┤          │                │       │
+│   origin    │                     │         origin         │ pathname │     search     │ hash  │
+├─────────────┴─────────────────────┴────────────────────────┴──────────┴────────────────┴───────┤
+│                                              href                                              │
+└────────────────────────────────────────────────────────────────────────────────────────────────┘
+("" 行中的所有空格都应被忽略。它们纯粹用于格式化。)</code> <button class="copy-button">copy</button></pre>
+<p>使用 WHATWG API 解析 URL 字符串：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL =
+  <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</span>);</code> <button class="copy-button">copy</button></pre>
+<p>使用旧版 API 解析 URL 字符串：</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> url <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+<span class="hljs-keyword">const</span> myURL =
+  url.<span class="hljs-title function_">parse</span>(<span class="hljs-string">'https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">const</span> myURL =
+  url.<span class="hljs-title function_">parse</span>(<span class="hljs-string">'https://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</span>);</code><button class="copy-button">copy</button></pre>
+<div>
+<h4>从组件部分构建 URL 并获取构建后的字符串<span><a class="mark" href="#-url-" id="-url-">#</a></span><a aria-hidden="true" class="legacy" id="url_url_1"></a></h4>
+<p>可以使用属性设置器或模板字面量字符串从组件部分构建 WHATWG URL：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org'</span>);
+myURL.<span class="hljs-property">pathname</span> = <span class="hljs-string">'/a/b/c'</span>;
+myURL.<span class="hljs-property">search</span> = <span class="hljs-string">'?d=e'</span>;
+myURL.<span class="hljs-property">hash</span> = <span class="hljs-string">'#fgh'</span>;</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> pathname = <span class="hljs-string">'/a/b/c'</span>;
+<span class="hljs-keyword">const</span> search = <span class="hljs-string">'?d=e'</span>;
+<span class="hljs-keyword">const</span> hash = <span class="hljs-string">'#fgh'</span>;
+<span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">`https://example.org<span class="hljs-subst">${pathname}</span><span class="hljs-subst">${search}</span><span class="hljs-subst">${hash}</span>`</span>);</code> <button class="copy-button">copy</button></pre>
+<p>要获取构建后的 URL 字符串，请使用 <code>href</code> 属性访问器：</p>
+<pre><code class="language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>WHATWG URL API<span><a class="mark" href="#whatwg-url-api" id="whatwg-url-api">#</a></span><a aria-hidden="true" class="legacy" id="url_whatwg_url_api"></a></h3>
+<div>
+<h4>类：<code>URL</code><span><a class="mark" href="#url_1" id="url_1">#</a></span><a aria-hidden="true" class="legacy" id="url_url_2"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v10.0.0</td>
+<td><p>The class is now available on the global object.</p></td></tr>
+<tr><td>v7.0.0, v6.13.0</td>
+<td><p><span>Added in: v7.0.0, v6.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>兼容浏览器的 <code>URL</code> 类，通过遵循 WHATWG URL 标准实现。[已解析 URL 的示例][]可以在标准自身中找到。<code>URL</code> 类在全局对象上也可用。</p>
+<p>根据浏览器约定，<code>URL</code> 对象的所有属性都作为类原型上的 getter 和 setter 实现，而不是作为对象自身的数据属性。因此，与[旧版 <code>urlObject</code>][] 不同，在 <code>URL</code> 对象的任何属性上使用 <code>delete</code> 关键字（例如 <code>delete myURL.protocol</code>、<code>delete myURL.pathname</code> 等）没有效果，但仍然会返回 <code>true</code>。</p>
+<div>
+<h5><code>new URL(input[, base])</code><span><a class="mark" href="#new-urlinput-base" id="new-urlinput-base">#</a></span><a aria-hidden="true" class="legacy" id="url_new_url_input_base"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.0.0, v18.17.0</td>
+<td><p>ICU requirement is removed.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的绝对或相对输入 URL。如果 <code>input</code> 是相对的，则必须提供 <code>base</code>。如果 <code>input</code> 是绝对的，则忽略 <code>base</code>。如果 <code>input</code> 不是字符串，会先[转换为字符串][]。</li>
+<li><code>base</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 如果 <code>input</code> 不是绝对 URL，则用于解析的基础 URL。如果 <code>base</code> 不是字符串，会先[转换为字符串][]。</li>
+</ul>
+<p>通过解析相对于 <code>base</code> 的 <code>input</code> 来创建一个新的 <code>URL</code> 对象。如果 <code>base</code> 作为字符串传递，它将被解析为等同于 <code>new URL(base)</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'/foo'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// https://example.org/foo</span></code> <button class="copy-button">copy</button></pre>
+<p>URL 构造函数可以作为全局对象上的属性访问。它也可以从内置的 url 模块导入：</p>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">URL</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable constant_">URL</span> === globalThis.<span class="hljs-property">URL</span>); <span class="hljs-comment">// 打印 'true'。</span></code><code class="language-js cjs"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable constant_">URL</span> === <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>).<span class="hljs-property">URL</span>); <span class="hljs-comment">// 打印 'true'。</span></code><button class="copy-button">copy</button></pre>
+<p>如果 <code>input</code> 或 <code>base</code> 不是有效的 URL，将抛出 <code>TypeError</code>。请注意，会尽力将给定的值强制转换为字符串。例如：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>({ <span class="hljs-attr">toString</span>: <span class="hljs-function">() =></span> <span class="hljs-string">'https://example.org/'</span> });
+<span class="hljs-comment">// https://example.org/</span></code> <button class="copy-button">copy</button></pre>
+<p>出现在 <code>input</code> 主机名中的 Unicode 字符将使用 <a href="https://tools.ietf.org/html/rfc5891#section-4.4">Punycode</a> 算法自动转换为 ASCII。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://測試'</span>);
+<span class="hljs-comment">// https://xn--g6w251d/</span></code> <button class="copy-button">copy</button></pre>
+<p>在事先不知道 <code>input</code> 是否是绝对 URL 并且提供了 <code>base</code> 的情况下，建议验证 <code>URL</code> 对象的 <code>origin</code> 是否符合预期。</p>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'http://Example.com/'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// http://example.com/</span>
+
+myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://Example.com/'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// https://example.com/</span>
+
+myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'foo://Example.com/'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// foo://Example.com/</span>
+
+myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'http:Example.com/'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// http://example.com/</span>
+
+myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https:Example.com/'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// https://example.org/Example.com/</span>
+
+myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'foo:Example.com/'</span>, <span class="hljs-string">'https://example.org/'</span>);
+<span class="hljs-comment">// foo:Example.com/</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>url.hash</code><span><a class="mark" href="#urlhash" id="urlhash">#</a></span><a aria-hidden="true" class="legacy" id="url_url_hash"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的片段部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/foo#bar'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">hash</span>);
+<span class="hljs-comment">// 打印 #bar</span>
+
+myURL.<span class="hljs-property">hash</span> = <span class="hljs-string">'baz'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/foo#baz</span></code> <button class="copy-button">copy</button></pre>
+<p>分配给 <code>hash</code> 属性的值中包含的无效 URL 字符将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse()</code></a> 和 <a href="#urlformaturlobject"><code>url.format()</code></a> 方法产生的结果略有不同。</p>
+</div><div>
+<h5><code>url.host</code><span><a class="mark" href="#urlhost" id="urlhost">#</a></span><a aria-hidden="true" class="legacy" id="url_url_host"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的主机部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org:81/foo'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">host</span>);
+<span class="hljs-comment">// 打印 example.org:81</span>
+
+myURL.<span class="hljs-property">host</span> = <span class="hljs-string">'example.com:82'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.com:82/foo</span></code> <button class="copy-button">copy</button></pre>
+<p>分配给 <code>host</code> 属性的无效主机值将被忽略。</p>
+</div><div>
+<h5><code>url.hostname</code><span><a class="mark" href="#urlhostname" id="urlhostname">#</a></span><a aria-hidden="true" class="legacy" id="url_url_hostname"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的主机名部分。<code>url.host</code> 和 <code>url.hostname</code> 的关键区别在于 <code>url.hostname</code> <strong>不</strong> 包括端口。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org:81/foo'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">hostname</span>);
+<span class="hljs-comment">// 打印 example.org</span>
+
+<span class="hljs-comment">// 设置 hostname 不会改变端口</span>
+myURL.<span class="hljs-property">hostname</span> = <span class="hljs-string">'example.com'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.com:81/foo</span>
+
+<span class="hljs-comment">// 使用 myURL.host 来更改主机名和端口</span>
+myURL.<span class="hljs-property">host</span> = <span class="hljs-string">'example.org:82'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org:82/foo</span></code> <button class="copy-button">copy</button></pre>
+<p>分配给 <code>hostname</code> 属性的无效主机名值将被忽略。</p>
+</div><div>
+<h5><code>url.href</code><span><a class="mark" href="#urlhref" id="urlhref">#</a></span><a aria-hidden="true" class="legacy" id="url_url_href"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置序列化的 URL。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/foo'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/foo</span>
+
+myURL.<span class="hljs-property">href</span> = <span class="hljs-string">'https://example.com/bar'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.com/bar</span></code> <button class="copy-button">copy</button></pre>
+<p>获取 <code>href</code> 属性的值等同于调用 <a href="#urltostring"><code>url.toString()</code></a>。</p>
+<p>将此属性的值设置为新值等同于使用 <a href="#new-urlinput-base"><code>new URL(value)</code></a> 创建一个新的 <code>URL</code> 对象。<code>URL</code> 对象的每个属性都将被修改。</p>
+<p>如果分配给 <code>href</code> 属性的值不是有效的 URL，将抛出 <code>TypeError</code>。</p>
+</div><div>
+<h5><code>url.origin</code><span><a class="mark" href="#urlorigin" id="urlorigin">#</a></span><a aria-hidden="true" class="legacy" id="url_url_origin"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.0.0</td>
+<td><p>The scheme "gopher" is no longer special and <code>url.origin</code> now returns <code>'null'</code> for it.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取 URL 来源的只读序列化形式。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/foo/bar?baz'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">origin</span>);
+<span class="hljs-comment">// 打印 https://example.org</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> idnURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://測試'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(idnURL.<span class="hljs-property">origin</span>);
+<span class="hljs-comment">// 打印 https://xn--g6w251d</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(idnURL.<span class="hljs-property">hostname</span>);
+<span class="hljs-comment">// 打印 xn--g6w251d</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>url.password</code><span><a class="mark" href="#urlpassword" id="urlpassword">#</a></span><a aria-hidden="true" class="legacy" id="url_url_password"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的密码部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://abc:xyz@example.com'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">password</span>);
+<span class="hljs-comment">// 打印 xyz</span>
+
+myURL.<span class="hljs-property">password</span> = <span class="hljs-string">'123'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://abc:123@example.com/</span></code> <button class="copy-button">copy</button></pre>
+<p>分配给 <code>password</code> 属性的值中包含的无效 URL 字符将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse()</code></a> 和 <a href="#urlformaturlobject"><code>url.format()</code></a> 方法产生的结果略有不同。</p>
+</div><div>
+<h5><code>url.pathname</code><span><a class="mark" href="#urlpathname" id="urlpathname">#</a></span><a aria-hidden="true" class="legacy" id="url_url_pathname"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的路径部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/abc/xyz?123'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">pathname</span>);
+<span class="hljs-comment">// 打印 /abc/xyz</span>
+
+myURL.<span class="hljs-property">pathname</span> = <span class="hljs-string">'/abcdef'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/abcdef?123</span></code> <button class="copy-button">copy</button></pre>
+<p>分配给 <code>pathname</code> 属性的值中包含的无效 URL 字符将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse()</code></a> 和 <a href="#urlformaturlobject"><code>url.format()</code></a> 方法产生的结果略有不同。</p>
+</div><div>
+<h5><code>url.port</code><span><a class="mark" href="#urlport" id="urlport">#</a></span><a aria-hidden="true" class="legacy" id="url_url_port"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.0.0</td>
+<td><p>The scheme "gopher" is no longer special.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的端口部分。</p>
+<p>端口值可以是一个数字或包含一个在 <code>0</code> 到 <code>65535</code>（含）范围内数字的字符串。将值设置为 <code>URL</code> 对象给定 <code>protocol</code> 的默认端口将导致 <code>port</code> 值变为空字符串 (<code>''</code>)。</p>
+<p>端口值可以是空字符串，这种情况下端口取决于协议/方案：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>协议</th><th>端口</th></tr></thead><tbody><tr><td>"ftp"</td><td>21</td></tr><tr><td>"file"</td><td></td></tr><tr><td>"http"</td><td>80</td></tr><tr><td>"https"</td><td>443</td></tr><tr><td>"ws"</td><td>80</td></tr><tr><td>"wss"</td><td>443</td></tr></tbody></table>
+<p>在给端口赋值时，该值将首先使用 <code>.toString()</code> 转换为字符串。</p>
+<p>如果该字符串无效但以数字开头，则前导数字将被分配给 <code>port</code>。
+如果该数字超出上述范围，它将被忽略。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org:8888'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 8888</span>
+
+<span class="hljs-comment">// 默认端口会自动转换为空字符串</span>
+<span class="hljs-comment">// (HTTPS 协议的默认端口是 443)</span>
+myURL.<span class="hljs-property">port</span> = <span class="hljs-string">'443'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印空字符串</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/</span>
+
+myURL.<span class="hljs-property">port</span> = <span class="hljs-number">1234</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 1234</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org:1234/</span>
+
+<span class="hljs-comment">// 完全无效的端口字符串被忽略</span>
+myURL.<span class="hljs-property">port</span> = <span class="hljs-string">'abcd'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 1234</span>
+
+<span class="hljs-comment">// 前导数字被视为端口号</span>
+myURL.<span class="hljs-property">port</span> = <span class="hljs-string">'5678abcd'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 5678</span>
+
+<span class="hljs-comment">// 非整数会被截断</span>
+myURL.<span class="hljs-property">port</span> = <span class="hljs-number">1234.5678</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 1234</span>
+
+<span class="hljs-comment">// 超出范围且不以科学记数法表示的数字将被忽略。</span>
+myURL.<span class="hljs-property">port</span> = <span class="hljs-number">1e10</span>; <span class="hljs-comment">// 10000000000, 将按如下所述进行范围检查</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 1234</span></code> <button class="copy-button">copy</button></pre>
+<p>包含小数点的数字，例如浮点数或科学记数法表示的数字，也不例外。
+小数点前的数字将被设置为 URL 的端口，假设它们是有效的：</p>
+<pre><code class="language-js">myURL.<span class="hljs-property">port</span> = <span class="hljs-number">4.567e21</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">port</span>);
+<span class="hljs-comment">// 打印 4 (因为它是字符串 '4.567e21' 中的前导数字)</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>url.protocol</code><span><a class="mark" href="#urlprotocol" id="urlprotocol">#</a></span><a aria-hidden="true" class="legacy" id="url_url_protocol"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的协议部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">protocol</span>);
+<span class="hljs-comment">// 打印 https:</span>
+
+myURL.<span class="hljs-property">protocol</span> = <span class="hljs-string">'ftp'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 ftp://example.org/</span></code> <button class="copy-button">copy</button></pre>
+<p>分配给 <code>protocol</code> 属性的无效 URL 协议值将被忽略。</p>
+<div>
+<h6>特殊方案<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="url"></a></h6>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.0.0</td>
+<td><p>The scheme "gopher" is no longer special.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>[WHATWG URL 标准][] 认为少数 URL 协议方案在解析和序列化方式上是<strong>特殊的</strong>。当使用这些特殊协议之一解析 URL 时，<code>url.protocol</code> 属性可以更改为另一个特殊协议，但不能更改为非特殊协议，反之亦然。</p>
+<p>例如，从 <code>http</code> 更改为 <code>https</code> 是有效的：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> u = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'http://example.org'</span>);
+u.<span class="hljs-property">protocol</span> = <span class="hljs-string">'https'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(u.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// https://example.org/</span></code> <button class="copy-button">copy</button></pre>
+<p>但是，从 <code>http</code> 更改为一个假设的 <code>fish</code> 协议是无效的，因为新协议不是特殊的。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> u = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'http://example.org'</span>);
+u.<span class="hljs-property">protocol</span> = <span class="hljs-string">'fish'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(u.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// http://example.org/</span></code> <button class="copy-button">copy</button></pre>
+<p>同样，从非特殊协议更改为特殊协议也是不允许的：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> u = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'fish://example.org'</span>);
+u.<span class="hljs-property">protocol</span> = <span class="hljs-string">'http'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(u.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// fish://example.org</span></code> <button class="copy-button">copy</button></pre>
+<p>根据 WHATWG URL 标准，特殊协议方案包括 <code>ftp</code>、<code>file</code>、<code>http</code>、<code>https</code>、<code>ws</code> 和 <code>wss</code>。</p>
+</div></div><div>
+<h5><code>url.search</code><span><a class="mark" href="#urlsearch" id="urlsearch">#</a></span><a aria-hidden="true" class="legacy" id="url_url_search"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的序列化查询部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/abc?123'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">search</span>);
+<span class="hljs-comment">// 打印 ?123</span>
+
+myURL.<span class="hljs-property">search</span> = <span class="hljs-string">'abc=xyz'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/abc?abc=xyz</span></code> <button class="copy-button">copy</button></pre>
+<p>出现在分配给 <code>search</code> 属性的值中的任何无效 URL 字符都将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse()</code></a> 和 <a href="#urlformaturlobject"><code>url.format()</code></a> 方法产生的结果略有不同。</p>
+</div><div>
+<h5><code>url.searchParams</code><span><a class="mark" href="#urlsearchparams" id="urlsearchparams">#</a></span><a aria-hidden="true" class="legacy" id="url_url_searchparams"></a></h5>
+<ul>
+<li>类型：<a href="url.html#class-urlsearchparams" class="type">&#x3C;URLSearchParams></a></li>
+</ul>
+<p>获取表示 URL 查询参数的 <a href="#class-urlsearchparams"><code>URLSearchParams</code></a> 对象。此属性是只读的，但它提供的 <code>URLSearchParams</code> 对象可用于改变 URL 实例；要替换 URL 的整个查询参数，请使用 <a href="#urlsearch"><code>url.search</code></a> setter。有关详细信息，请参阅 <a href="#class-urlsearchparams"><code>URLSearchParams</code></a> 文档。</p>
+<p>使用 <code>.searchParams</code> 修改 <code>URL</code> 时要小心，因为根据 WHATWG 规范，<code>URLSearchParams</code> 对象使用不同的规则来确定哪些字符需要百分比编码。例如，<code>URL</code> 对象不会对 ASCII 波浪号 (<code>~</code>) 字符进行百分比编码，而 <code>URLSearchParams</code> 总是会编码它：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/abc?foo=~bar'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">search</span>);  <span class="hljs-comment">// 打印 ?foo=~bar</span>
+
+<span class="hljs-comment">// 通过 searchParams 修改 URL...</span>
+myURL.<span class="hljs-property">searchParams</span>.<span class="hljs-title function_">sort</span>();
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">search</span>);  <span class="hljs-comment">// 打印 ?foo=%7Ebar</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>url.username</code><span><a class="mark" href="#urlusername" id="urlusername">#</a></span><a aria-hidden="true" class="legacy" id="url_url_username"></a></h5>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>获取和设置 URL 的用户名部分。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://abc:xyz@example.com'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">username</span>);
+<span class="hljs-comment">// 打印 abc</span>
+
+myURL.<span class="hljs-property">username</span> = <span class="hljs-string">'123'</span>;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://123:xyz@example.com/</span></code> <button class="copy-button">copy</button></pre>
+<p>出现在分配给 <code>username</code> 属性的值中的任何无效 URL 字符都将被[百分比编码][]。对哪些字符进行百分比编码的选择可能与 <a href="#urlparseurlstring-parsequerystring-slashesdenotehost"><code>url.parse()</code></a> 和 <a href="#urlformaturlobject"><code>url.format()</code></a> 方法产生的结果略有不同。</p>
+</div><div>
+<h5><code>url.toString()</code><span><a class="mark" href="#urltostring" id="urltostring">#</a></span><a aria-hidden="true" class="legacy" id="url_url_tostring"></a></h5>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p><code>URL</code> 对象上的 <code>toString()</code> 方法返回序列化的 URL。返回的值等同于 <a href="#urlhref"><code>url.href</code></a> 和 <a href="#urltojson"><code>url.toJSON()</code></a> 的值。</p>
+</div><div>
+<h5><code>url.toJSON()</code><span><a class="mark" href="#urltojson" id="urltojson">#</a></span><a aria-hidden="true" class="legacy" id="url_url_tojson"></a></h5>
+<div class="api_metadata">
+<span>Added in: v7.7.0, v6.13.0</span>
+</div>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p><code>URL</code> 对象上的 <code>toJSON()</code> 方法返回序列化的 URL。返回的值等同于 <a href="#urlhref"><code>url.href</code></a> 和 <a href="#urltostring"><code>url.toString()</code></a> 的值。</p>
+<p>当使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"><code>JSON.stringify()</code></a> 序列化 <code>URL</code> 对象时，会自动调用此方法。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURLs = [
+  <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://www.example.com'</span>),
+  <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://test.example.org'</span>),
+];
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(myURLs));
+<span class="hljs-comment">// 打印 ["https://www.example.com/","https://test.example.org/"]</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>URL.createObjectURL(blob)</code><span><a class="mark" href="#urlcreateobjecturlblob" id="urlcreateobjecturlblob">#</a></span><a aria-hidden="true" class="legacy" id="url_url_createobjecturl_blob"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>Marking the API stable.</p></td></tr>
+<tr><td>v16.7.0</td>
+<td><p><span>Added in: v16.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>blob</code> <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>创建一个 <code>'blob:nodedata:...'</code> URL 字符串，表示给定的 <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a> 对象，并可用于稍后检索该 <code>Blob</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> {
+  <span class="hljs-title class_">Blob</span>,
+  resolveObjectURL,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:buffer'</span>);
+
+<span class="hljs-keyword">const</span> blob = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Blob</span>([<span class="hljs-string">'hello'</span>]);
+<span class="hljs-keyword">const</span> id = <span class="hljs-variable constant_">URL</span>.<span class="hljs-title function_">createObjectURL</span>(blob);
+
+<span class="hljs-comment">// 稍后...</span>
+
+<span class="hljs-keyword">const</span> otherBlob = <span class="hljs-title function_">resolveObjectURL</span>(id);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(otherBlob.<span class="hljs-property">size</span>);</code> <button class="copy-button">copy</button></pre>
+<p>已注册的 <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a> 存储的数据将保留在内存中，直到调用 <code>URL.revokeObjectURL()</code> 将其移除。</p>
+<p><code>Blob</code> 对象在当前线程内注册。如果使用工作线程，在一个工作线程内注册的 <code>Blob</code> 对象将无法被其他工作线程或主线程访问。</p>
+</div><div>
+<h5><code>URL.revokeObjectURL(id)</code><span><a class="mark" href="#urlrevokeobjecturlid" id="urlrevokeobjecturlid">#</a></span><a aria-hidden="true" class="legacy" id="url_url_revokeobjecturl_id"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v24.0.0</td>
+<td><p>Marking the API stable.</p></td></tr>
+<tr><td>v16.7.0</td>
+<td><p><span>Added in: v16.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 先前调用 <code>URL.createObjectURL()</code> 返回的 <code>'blob:nodedata:...</code> URL 字符串。</li>
+</ul>
+<p>移除由给定 ID 标识的已存储 <a href="buffer.html#class-blob" class="type">&#x3C;Blob></a>。尝试撤销未注册的 ID 将静默失败。</p>
+</div><div>
+<h5><code>URL.canParse(input[, base])</code><span><a class="mark" href="#urlcanparseinput-base" id="urlcanparseinput-base">#</a></span><a aria-hidden="true" class="legacy" id="url_url_canparse_input_base"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.9.0, v18.17.0</span>
+</div>
+<ul>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的绝对或相对输入 URL。如果 <code>input</code> 是相对的，则必须提供 <code>base</code>。如果 <code>input</code> 是绝对的，则忽略 <code>base</code>。如果 <code>input</code> 不是字符串，会先[转换为字符串][]。</li>
+<li><code>base</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 如果 <code>input</code> 不是绝对 URL，则用于解析的基础 URL。如果 <code>base</code> 不是字符串，会先[转换为字符串][]。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>检查相对于 <code>base</code> 的 <code>input</code> 是否可以解析为 <code>URL</code>。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> isValid = <span class="hljs-variable constant_">URL</span>.<span class="hljs-title function_">canParse</span>(<span class="hljs-string">'/foo'</span>, <span class="hljs-string">'https://example.org/'</span>); <span class="hljs-comment">// true</span>
+
+<span class="hljs-keyword">const</span> isNotValid = <span class="hljs-variable constant_">URL</span>.<span class="hljs-title function_">canParse</span>(<span class="hljs-string">'/foo'</span>); <span class="hljs-comment">// false</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>URL.parse(input[, base])</code><span><a class="mark" href="#urlparseinput-base" id="urlparseinput-base">#</a></span><a aria-hidden="true" class="legacy" id="url_url_parse_input_base"></a></h5>
+<div class="api_metadata">
+<span>Added in: v22.1.0</span>
+</div>
+<ul>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的绝对或相对输入 URL。如果 <code>input</code> 是相对的，则必须提供 <code>base</code>。如果 <code>input</code> 是绝对的，则忽略 <code>base</code>。如果 <code>input</code> 不是字符串，会先[转换为字符串][]。</li>
+<li><code>base</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 如果 <code>input</code> 不是绝对 URL，则用于解析的基础 URL。如果 <code>base</code> 不是字符串，会先[转换为字符串][]。</li>
+<li>返回：<a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></li>
+</ul>
+<p>将字符串解析为 URL。如果提供了 <code>base</code>，它将用作解析非绝对 <code>input</code> URL 的基础 URL。如果参数无法解析为有效的 URL，则返回 <code>null</code>。</p>
+</div></div><div>
+<h4>类：<code>URLPattern</code><span><a class="mark" href="#urlpattern" id="urlpattern">#</a></span><a aria-hidden="true" class="legacy" id="url_urlpattern"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.8.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p><code>URLPattern</code> API 提供了一个接口，用于将 URL 或 URL 部分与模式进行匹配。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myPattern = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLPattern</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/*.html'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myPattern.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/dns.html'</span>));
+<span class="hljs-comment">// 打印：</span>
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//  "hash": { "groups": {  "0": "" },  "input": "" },</span>
+<span class="hljs-comment">//  "hostname": { "groups": {}, "input": "nodejs.org" },</span>
+<span class="hljs-comment">//  "inputs": [</span>
+<span class="hljs-comment">//    "https://nodejs.org/docs/latest/api/dns.html"</span>
+<span class="hljs-comment">//  ],</span>
+<span class="hljs-comment">//  "password": { "groups": { "0": "" }, "input": "" },</span>
+<span class="hljs-comment">//  "pathname": { "groups": { "0": "dns" }, "input": "/docs/latest/api/dns.html" },</span>
+<span class="hljs-comment">//  "port": { "groups": {}, "input": "" },</span>
+<span class="hljs-comment">//  "protocol": { "groups": {}, "input": "https" },</span>
+<span class="hljs-comment">//  "search": { "groups": { "0": "" }, "input": "" },</span>
+<span class="hljs-comment">//  "username": { "groups": { "0": "" }, "input": "" }</span>
+<span class="hljs-comment">// }</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myPattern.<span class="hljs-title function_">test</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/dns.html'</span>));
+<span class="hljs-comment">// 打印：true</span></code> <button class="copy-button">copy</button></pre>
+<div>
+<h5><code>new URLPattern()</code><span><a class="mark" href="#new-urlpattern" id="new-urlpattern">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlpattern"></a></h5>
+<p>实例化一个新的空 <code>URLPattern</code> 对象。</p>
+</div><div>
+<h5><code>new URLPattern(string[, baseURL][, options])</code><span><a class="mark" href="#new-urlpatternstring-baseurl-options" id="new-urlpatternstring-baseurl-options">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlpattern_string_baseurl_options"></a></h5>
+<ul>
+<li><code>string</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 一个 URL 字符串</li>
+<li><code>baseURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 一个基础 URL 字符串</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 选项</li>
+</ul>
+<p>将 <code>string</code> 解析为 URL，并使用它实例化一个新的 <code>URLPattern</code> 对象。</p>
+<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>
+<p>选项可以具有 <code>ignoreCase</code> 布尔属性，如果设置为 true，则启用不区分大小写的匹配。</p>
+<p>构造函数可能抛出 <code>TypeError</code> 以指示解析失败。</p>
+</div><div>
+<h5><code>new URLPattern(obj[, baseURL][, options])</code><span><a class="mark" href="#new-urlpatternobj-baseurl-options" id="new-urlpatternobj-baseurl-options">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlpattern_obj_baseurl_options"></a></h5>
+<ul>
+<li><code>obj</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个输入模式</li>
+<li><code>baseURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 一个基础 URL 字符串</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 选项</li>
+</ul>
+<p>将 <code>Object</code> 解析为输入模式，并使用它实例化一个新的 <code>URLPattern</code> 对象。对象成员可以是 <code>protocol</code>、<code>username</code>、<code>password</code>、<code>hostname</code>、<code>port</code>、<code>pathname</code>、<code>search</code>、<code>hash</code> 或 <code>baseURL</code> 中的任何一个。</p>
+<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>
+<p>选项可以具有 <code>ignoreCase</code> 布尔属性，如果设置为 true，则启用不区分大小写的匹配。</p>
+<p>构造函数可能抛出 <code>TypeError</code> 以指示解析失败。</p>
+</div><div>
+<h5><code>urlPattern.exec(input[, baseURL])</code><span><a class="mark" href="#urlpatternexecinput-baseurl" id="urlpatternexecinput-baseurl">#</a></span><a aria-hidden="true" class="legacy" id="url_urlpattern_exec_input_baseurl"></a></h5>
+<ul>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个 URL 或 URL 部分</li>
+<li><code>baseURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 一个基础 URL 字符串</li>
+</ul>
+<p>输入可以是一个字符串或提供各个 URL 部分的对象。对象成员可以是 <code>protocol</code>、<code>username</code>、<code>password</code>、<code>hostname</code>、<code>port</code>、<code>pathname</code>、<code>search</code>、<code>hash</code> 或 <code>baseURL</code> 中的任何一个。</p>
+<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>
+<p>返回一个对象，其中包含一个 <code>inputs</code> 键，其值为传递给函数的参数数组，以及 URL 组件的键，这些键包含匹配的输入和匹配的组。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myPattern = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLPattern</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/*.html'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myPattern.<span class="hljs-title function_">exec</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/dns.html'</span>));
+<span class="hljs-comment">// 打印：</span>
+<span class="hljs-comment">// {</span>
+<span class="hljs-comment">//  "hash": { "groups": {  "0": "" },  "input": "" },</span>
+<span class="hljs-comment">//  "hostname": { "groups": {}, "input": "nodejs.org" },</span>
+<span class="hljs-comment">//  "inputs": [</span>
+<span class="hljs-comment">//    "https://nodejs.org/docs/latest/api/dns.html"</span>
+<span class="hljs-comment">//  ],</span>
+<span class="hljs-comment">//  "password": { "groups": { "0": "" }, "input": "" },</span>
+<span class="hljs-comment">//  "pathname": { "groups": { "0": "dns" }, "input": "/docs/latest/api/dns.html" },</span>
+<span class="hljs-comment">//  "port": { "groups": {}, "input": "" },</span>
+<span class="hljs-comment">//  "protocol": { "groups": {}, "input": "https" },</span>
+<span class="hljs-comment">//  "search": { "groups": { "0": "" }, "input": "" },</span>
+<span class="hljs-comment">//  "username": { "groups": { "0": "" }, "input": "" }</span>
+<span class="hljs-comment">// }</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>urlPattern.test(input[, baseURL])</code><span><a class="mark" href="#urlpatterntestinput-baseurl" id="urlpatterntestinput-baseurl">#</a></span><a aria-hidden="true" class="legacy" id="url_urlpattern_test_input_baseurl"></a></h5>
+<ul>
+<li><code>input</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个 URL 或 URL 部分</li>
+<li><code>baseURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 一个基础 URL 字符串</li>
+</ul>
+<p>输入可以是一个字符串或提供各个 URL 部分的对象。对象成员可以是 <code>protocol</code>、<code>username</code>、<code>password</code>、<code>hostname</code>、<code>port</code>、<code>pathname</code>、<code>search</code>、<code>hash</code> 或 <code>baseURL</code> 中的任何一个。</p>
+<p>如果未指定 <code>baseURL</code>，则默认为 <code>undefined</code>。</p>
+<p>返回一个布尔值，指示输入是否与当前模式匹配。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myPattern = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLPattern</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/*.html'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myPattern.<span class="hljs-title function_">test</span>(<span class="hljs-string">'https://nodejs.org/docs/latest/api/dns.html'</span>));
+<span class="hljs-comment">// 打印：true</span></code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4>类：<code>URLSearchParams</code><span><a class="mark" href="#urlsearchparams_1" id="urlsearchparams_1">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v10.0.0</td>
+<td><p>The class is now available on the global object.</p></td></tr>
+<tr><td>v7.5.0, v6.13.0</td>
+<td><p><span>Added in: v7.5.0, v6.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p><code>URLSearchParams</code> API 提供对 <code>URL</code> 查询的读写访问。<code>URLSearchParams</code> 类也可以独立使用，通过以下四种构造函数之一。<code>URLSearchParams</code> 类在全局对象上也可用。</p>
+<p>WHATWG <code>URLSearchParams</code> 接口和 <a href="querystring.html"><code>querystring</code></a> 模块有相似的目的，但 <a href="querystring.html"><code>querystring</code></a> 模块的目的更通用，因为它允许自定义分隔符字符（<code>&#x26;</code> 和 <code>=</code>）。另一方面，此 API 是纯粹为 URL 查询字符串设计的。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/?abc=123'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">searchParams</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">'abc'</span>));
+<span class="hljs-comment">// 打印 123</span>
+
+myURL.<span class="hljs-property">searchParams</span>.<span class="hljs-title function_">append</span>(<span class="hljs-string">'abc'</span>, <span class="hljs-string">'xyz'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/?abc=123&#x26;abc=xyz</span>
+
+myURL.<span class="hljs-property">searchParams</span>.<span class="hljs-title function_">delete</span>(<span class="hljs-string">'abc'</span>);
+myURL.<span class="hljs-property">searchParams</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">'a'</span>, <span class="hljs-string">'b'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/?a=b</span>
+
+<span class="hljs-keyword">const</span> newSearchParams = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(myURL.<span class="hljs-property">searchParams</span>);
+<span class="hljs-comment">// 上述代码等同于</span>
+<span class="hljs-comment">// const newSearchParams = new URLSearchParams(myURL.search);</span>
+
+newSearchParams.<span class="hljs-title function_">append</span>(<span class="hljs-string">'a'</span>, <span class="hljs-string">'c'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/?a=b</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(newSearchParams.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 a=b&#x26;a=c</span>
+
+<span class="hljs-comment">// newSearchParams.toString() 被隐式调用</span>
+myURL.<span class="hljs-property">search</span> = newSearchParams;
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/?a=b&#x26;a=c</span>
+newSearchParams.<span class="hljs-title function_">delete</span>(<span class="hljs-string">'a'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://example.org/?a=b&#x26;a=c</span></code> <button class="copy-button">copy</button></pre>
+<div>
+<h5><code>new URLSearchParams()</code><span><a class="mark" href="#new-urlsearchparams" id="new-urlsearchparams">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlsearchparams"></a></h5>
+<p>实例化一个新的空 <code>URLSearchParams</code> 对象。</p>
+</div><div>
+<h5><code>new URLSearchParams(string)</code><span><a class="mark" href="#new-urlsearchparamsstring" id="new-urlsearchparamsstring">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlsearchparams_string"></a></h5>
+<ul>
+<li><code>string</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 一个查询字符串</li>
+</ul>
+<p>将 <code>string</code> 解析为查询字符串，并使用它实例化一个新的 <code>URLSearchParams</code> 对象。前导的 <code>'?'</code>（如果存在）将被忽略。</p>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> params;
+
+params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(<span class="hljs-string">'user=abc&#x26;query=xyz'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">get</span>(<span class="hljs-string">'user'</span>));
+<span class="hljs-comment">// 打印 'abc'</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 'user=abc&#x26;query=xyz'</span>
+
+params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(<span class="hljs-string">'?user=abc&#x26;query=xyz'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 'user=abc&#x26;query=xyz'</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>new URLSearchParams(obj)</code><span><a class="mark" href="#new-urlsearchparamsobj" id="new-urlsearchparamsobj">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlsearchparams_obj"></a></h5>
+<div class="api_metadata">
+<span>Added in: v7.10.0, v6.13.0</span>
+</div>
+<ul>
+<li><code>obj</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 表示键值对集合的对象</li>
+</ul>
+<p>使用查询哈希映射实例化一个新的 <code>URLSearchParams</code> 对象。<code>obj</code> 的每个属性的键和值总是被强制转换为字符串。</p>
+<p>与 <a href="querystring.html"><code>querystring</code></a> 模块不同，不允许以数组值形式出现的重复键。数组使用 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toString"><code>array.toString()</code></a> 进行字符串化，这只是用逗号连接所有数组元素。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>({
+  <span class="hljs-attr">user</span>: <span class="hljs-string">'abc'</span>,
+  <span class="hljs-attr">query</span>: [<span class="hljs-string">'first'</span>, <span class="hljs-string">'second'</span>],
+});
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">getAll</span>(<span class="hljs-string">'query'</span>));
+<span class="hljs-comment">// 打印 [ 'first,second' ]</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 'user=abc&#x26;query=first%2Csecond'</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>new URLSearchParams(iterable)</code><span><a class="mark" href="#new-urlsearchparamsiterable" id="new-urlsearchparamsiterable">#</a></span><a aria-hidden="true" class="legacy" id="url_new_urlsearchparams_iterable"></a></h5>
+<div class="api_metadata">
+<span>Added in: v7.10.0, v6.13.0</span>
+</div>
+<ul>
+<li><code>iterable</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol" class="type">&#x3C;Iterable></a> 一个可迭代对象，其元素是键值对</li>
+</ul>
+<p>以类似于 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" class="type">&#x3C;Map></a> 构造函数的方式，使用可迭代映射实例化一个新的 <code>URLSearchParams</code> 对象。<code>iterable</code> 可以是一个 <code>Array</code> 或任何可迭代对象。这意味着 <code>iterable</code> 可以是另一个 <code>URLSearchParams</code>，在这种情况下，构造函数将简单地创建提供的 <code>URLSearchParams</code> 的克隆。<code>iterable</code> 的元素是键值对，并且它们本身可以是任何可迭代对象。</p>
+<p>允许重复的键。</p>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> params;
+
+<span class="hljs-comment">// 使用数组</span>
+params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>([
+  [<span class="hljs-string">'user'</span>, <span class="hljs-string">'abc'</span>],
+  [<span class="hljs-string">'query'</span>, <span class="hljs-string">'first'</span>],
+  [<span class="hljs-string">'query'</span>, <span class="hljs-string">'second'</span>],
+]);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 'user=abc&#x26;query=first&#x26;query=second'</span>
+
+<span class="hljs-comment">// 使用 Map 对象</span>
+<span class="hljs-keyword">const</span> map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+map.<span class="hljs-title function_">set</span>(<span class="hljs-string">'user'</span>, <span class="hljs-string">'abc'</span>);
+map.<span class="hljs-title function_">set</span>(<span class="hljs-string">'query'</span>, <span class="hljs-string">'xyz'</span>);
+params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(map);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 'user=abc&#x26;query=xyz'</span>
+
+<span class="hljs-comment">// 使用生成器函数</span>
+<span class="hljs-keyword">function</span>* <span class="hljs-title function_">getQueryPairs</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">yield</span> [<span class="hljs-string">'user'</span>, <span class="hljs-string">'abc'</span>];
+  <span class="hljs-keyword">yield</span> [<span class="hljs-string">'query'</span>, <span class="hljs-string">'first'</span>];
+  <span class="hljs-keyword">yield</span> [<span class="hljs-string">'query'</span>, <span class="hljs-string">'second'</span>];
+}
+params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(<span class="hljs-title function_">getQueryPairs</span>());
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 'user=abc&#x26;query=first&#x26;query=second'</span>
+
+<span class="hljs-comment">// 每个键值对必须恰好有两个元素</span>
+<span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>([
+  [<span class="hljs-string">'user'</span>, <span class="hljs-string">'abc'</span>, <span class="hljs-string">'error'</span>],
+]);
+<span class="hljs-comment">// 抛出 TypeError [ERR_INVALID_TUPLE]：</span>
+<span class="hljs-comment">//        每个查询对必须是一个可迭代的 [name, value] 元组</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>urlSearchParams.append(name, value)</code><span><a class="mark" href="#urlsearchparamsappendname-value" id="urlsearchparamsappendname-value">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_append_name_value"></a></h5>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>向查询字符串追加一个新的名称-值对。</p>
+</div><div>
+<h5><code>urlSearchParams.delete(name[, value])</code><span><a class="mark" href="#urlsearchparamsdeletename-value" id="urlsearchparamsdeletename-value">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_delete_name_value"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.2.0, v18.18.0</td>
+<td><p>Add support for optional <code>value</code> argument.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>如果提供了 <code>value</code>，则移除所有名称为 <code>name</code> 且值为 <code>value</code> 的名称-值对。</p>
+<p>如果未提供 <code>value</code>，则移除所有名称为 <code>name</code> 的名称-值对。</p>
+</div><div>
+<h5><code>urlSearchParams.entries()</code><span><a class="mark" href="#urlsearchparamsentries" id="urlsearchparamsentries">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_entries"></a></h5>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" class="type">&#x3C;Iterator></a></li>
+</ul>
+<p>返回一个 ES6 <code>Iterator</code>，遍历查询中的每个名称-值对。迭代器的每个项目是一个 JavaScript <code>Array</code>。<code>Array</code> 的第一个项目是 <code>name</code>，第二个项目是 <code>value</code>。</p>
+<p><a href="#urlsearchparamssymboliterator"><code>urlSearchParams[Symbol.iterator]()</code></a> 的别名。</p>
+</div><div>
+<h5><code>urlSearchParams.forEach(fn[, thisArg])</code><span><a class="mark" href="#urlsearchparamsforeachfn-thisarg" id="urlsearchparamsforeachfn-thisarg">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_foreach_fn_thisarg"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>fn</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 为查询中的每个名称-值对调用</li>
+<li><code>thisArg</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 当调用 <code>fn</code> 时用作 <code>this</code> 值</li>
+</ul>
+<p>遍历查询中的每个名称-值对并调用给定的函数。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://example.org/?a=b&#x26;c=d'</span>);
+myURL.<span class="hljs-property">searchParams</span>.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">value, name, searchParams</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(name, value, myURL.<span class="hljs-property">searchParams</span> === searchParams);
+});
+<span class="hljs-comment">// 打印：</span>
+<span class="hljs-comment">//   a b true</span>
+<span class="hljs-comment">//   c d true</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>urlSearchParams.get(name)</code><span><a class="mark" href="#urlsearchparamsgetname" id="urlsearchparamsgetname">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_get_name"></a></h5>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> 一个字符串，如果没有具有给定 <code>name</code> 的名称-值对，则为 <code>null</code>。</li>
+</ul>
+<p>返回第一个名称为 <code>name</code> 的名称-值对的值。如果没有这样的对，则返回 <code>null</code>。</p>
+</div><div>
+<h5><code>urlSearchParams.getAll(name)</code><span><a class="mark" href="#urlsearchparamsgetallname" id="urlsearchparamsgetallname">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_getall_name"></a></h5>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>返回所有名称为 <code>name</code> 的名称-值对的值。如果没有这样的对，则返回一个空数组。</p>
+</div><div>
+<h5><code>urlSearchParams.has(name[, value])</code><span><a class="mark" href="#urlsearchparamshasname-value" id="urlsearchparamshasname-value">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_has_name_value"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.2.0, v18.18.0</td>
+<td><p>Add support for optional <code>value</code> argument.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>检查 <code>URLSearchParams</code> 对象是否包含基于 <code>name</code> 和可选的 <code>value</code> 参数的键值对。</p>
+<p>如果提供了 <code>value</code>，当存在具有相同 <code>name</code> 和 <code>value</code> 的名称-值对时返回 <code>true</code>。</p>
+<p>如果未提供 <code>value</code>，当至少存在一个名称为 <code>name</code> 的名称-值对时返回 <code>true</code>。</p>
+</div><div>
+<h5><code>urlSearchParams.keys()</code><span><a class="mark" href="#urlsearchparamskeys" id="urlsearchparamskeys">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_keys"></a></h5>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" class="type">&#x3C;Iterator></a></li>
+</ul>
+<p>返回一个 ES6 <code>Iterator</code>，遍历每个名称-值对的名称。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(<span class="hljs-string">'foo=bar&#x26;foo=baz'</span>);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> name <span class="hljs-keyword">of</span> params.<span class="hljs-title function_">keys</span>()) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(name);
+}
+<span class="hljs-comment">// 打印：</span>
+<span class="hljs-comment">//   foo</span>
+<span class="hljs-comment">//   foo</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>urlSearchParams.set(name, value)</code><span><a class="mark" href="#urlsearchparamssetname-value" id="urlsearchparamssetname-value">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_set_name_value"></a></h5>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>value</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>将 <code>URLSearchParams</code> 对象中与 <code>name</code> 关联的值设置为 <code>value</code>。如果存在任何名称为 <code>name</code> 的预先存在的名称-值对，则将第一个这样的对的值设置为 <code>value</code> 并移除所有其他对。如果没有，则将名称-值对追加到查询字符串。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>();
+params.<span class="hljs-title function_">append</span>(<span class="hljs-string">'foo'</span>, <span class="hljs-string">'bar'</span>);
+params.<span class="hljs-title function_">append</span>(<span class="hljs-string">'foo'</span>, <span class="hljs-string">'baz'</span>);
+params.<span class="hljs-title function_">append</span>(<span class="hljs-string">'abc'</span>, <span class="hljs-string">'def'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 foo=bar&#x26;foo=baz&#x26;abc=def</span>
+
+params.<span class="hljs-title function_">set</span>(<span class="hljs-string">'foo'</span>, <span class="hljs-string">'def'</span>);
+params.<span class="hljs-title function_">set</span>(<span class="hljs-string">'xyz'</span>, <span class="hljs-string">'opq'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 foo=def&#x26;abc=def&#x26;xyz=opq</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>urlSearchParams.size</code><span><a class="mark" href="#urlsearchparamssize" id="urlsearchparamssize">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_size"></a></h5>
+<div class="api_metadata">
+<span>Added in: v19.8.0, v18.16.0</span>
+</div>
+<p>参数条目的总数。</p>
+</div><div>
+<h5><code>urlSearchParams.sort()</code><span><a class="mark" href="#urlsearchparamssort" id="urlsearchparamssort">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_sort"></a></h5>
+<div class="api_metadata">
+<span>Added in: v7.7.0, v6.13.0</span>
+</div>
+<p>按名称就地排序所有现有的名称-值对。排序使用[稳定排序算法][]完成，因此具有相同名称的名称-值对之间的相对顺序得以保留。</p>
+<p>此方法特别可用于增加缓存命中率。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(<span class="hljs-string">'query[]=abc&#x26;type=search&#x26;query[]=123'</span>);
+params.<span class="hljs-title function_">sort</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(params.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 query%5B%5D=abc&#x26;query%5B%5D=123&#x26;type=search</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>urlSearchParams.toString()</code><span><a class="mark" href="#urlsearchparamstostring" id="urlsearchparamstostring">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_tostring"></a></h5>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回序列化为字符串的搜索参数，必要时对字符进行百分比编码。</p>
+</div><div>
+<h5><code>urlSearchParams.values()</code><span><a class="mark" href="#urlsearchparamsvalues" id="urlsearchparamsvalues">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_values"></a></h5>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" class="type">&#x3C;Iterator></a></li>
+</ul>
+<p>返回一个 ES6 <code>Iterator</code>，遍历每个名称-值对的值。</p>
+</div><div>
+<h5><code>urlSearchParams[Symbol.iterator]()</code><span><a class="mark" href="#urlsearchparamssymboliterator" id="urlsearchparamssymboliterator">#</a></span><a aria-hidden="true" class="legacy" id="url_urlsearchparams_symbol_iterator"></a></h5>
+<ul>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterator_protocol" class="type">&#x3C;Iterator></a></li>
+</ul>
+<p>返回一个 ES6 <code>Iterator</code>，遍历查询字符串中的每个名称-值对。迭代器的每个项目是一个 JavaScript <code>Array</code>。<code>Array</code> 的第一个项目是 <code>name</code>，第二个项目是 <code>value</code>。</p>
+<p><a href="#urlsearchparamsentries"><code>urlSearchParams.entries()</code></a> 的别名。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> params = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URLSearchParams</span>(<span class="hljs-string">'foo=bar&#x26;xyz=baz'</span>);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [name, value] <span class="hljs-keyword">of</span> params) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(name, value);
+}
+<span class="hljs-comment">// 打印：</span>
+<span class="hljs-comment">//   foo bar</span>
+<span class="hljs-comment">//   xyz baz</span></code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h4><code>url.domainToASCII(domain)</code><span><a class="mark" href="#urldomaintoasciidomain" id="urldomaintoasciidomain">#</a></span><a aria-hidden="true" class="legacy" id="url_url_domaintoascii_domain"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.0.0, v18.17.0</td>
+<td><p>ICU requirement is removed.</p></td></tr>
+<tr><td>v7.4.0, v6.13.0</td>
+<td><p><span>Added in: v7.4.0, v6.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>domain</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回 <code>domain</code> 的 <a href="https://tools.ietf.org/html/rfc5891#section-4.4">Punycode</a> ASCII 序列化。如果 <code>domain</code> 是无效域名，则返回空字符串。</p>
+<p>它执行与 <a href="#urldomaintounicodedomain"><code>url.domainToUnicode()</code></a> 相反的操作。</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> url <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToASCII</span>(<span class="hljs-string">'español.com'</span>));
+<span class="hljs-comment">// 打印 xn--espaol-zwa.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToASCII</span>(<span class="hljs-string">'中文.com'</span>));
+<span class="hljs-comment">// 打印 xn--fiq228c.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToASCII</span>(<span class="hljs-string">'xn--iñvalid.com'</span>));
+<span class="hljs-comment">// 打印空字符串</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToASCII</span>(<span class="hljs-string">'español.com'</span>));
+<span class="hljs-comment">// 打印 xn--espaol-zwa.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToASCII</span>(<span class="hljs-string">'中文.com'</span>));
+<span class="hljs-comment">// 打印 xn--fiq228c.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToASCII</span>(<span class="hljs-string">'xn--iñvalid.com'</span>));
+<span class="hljs-comment">// 打印空字符串</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>url.domainToUnicode(domain)</code><span><a class="mark" href="#urldomaintounicodedomain" id="urldomaintounicodedomain">#</a></span><a aria-hidden="true" class="legacy" id="url_url_domaintounicode_domain"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.0.0, v18.17.0</td>
+<td><p>ICU requirement is removed.</p></td></tr>
+<tr><td>v7.4.0, v6.13.0</td>
+<td><p><span>Added in: v7.4.0, v6.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>domain</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回 <code>domain</code> 的 Unicode 序列化。如果 <code>domain</code> 是无效域名，则返回空字符串。</p>
+<p>它执行与 <a href="#urldomaintoasciidomain"><code>url.domainToASCII()</code></a> 相反的操作。</p>
+
+<pre class="with-32-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> url <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToUnicode</span>(<span class="hljs-string">'xn--espaol-zwa.com'</span>));
+<span class="hljs-comment">// 打印 español.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToUnicode</span>(<span class="hljs-string">'xn--fiq228c.com'</span>));
+<span class="hljs-comment">// 打印 中文.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToUnicode</span>(<span class="hljs-string">'xn--iñvalid.com'</span>));
+<span class="hljs-comment">// 打印空字符串</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToUnicode</span>(<span class="hljs-string">'xn--espaol-zwa.com'</span>));
+<span class="hljs-comment">// 打印 español.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToUnicode</span>(<span class="hljs-string">'xn--fiq228c.com'</span>));
+<span class="hljs-comment">// 打印 中文.com</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">domainToUnicode</span>(<span class="hljs-string">'xn--iñvalid.com'</span>));
+<span class="hljs-comment">// 打印空字符串</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>url.fileURLToPath(url[, options])</code><span><a class="mark" href="#urlfileurltopathurl-options" id="urlfileurltopathurl-options">#</a></span><a aria-hidden="true" class="legacy" id="url_url_fileurltopath_url_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>options</code> argument can now be used to determine how to parse the <code>path</code> argument.</p></td></tr>
+<tr><td>v10.12.0</td>
+<td><p><span>Added in: v10.12.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>url</code> <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要转换为路径的文件 URL 字符串或 URL 对象。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>windows</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果为 <code>true</code>，则 <code>path</code> 应作为 Windows 文件路径返回，<code>false</code> 表示 posix，<code>undefined</code> 表示系统默认值。
+<strong>默认值：</strong> <code>undefined</code>。</li>
+</ul>
+</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 完全解析的特定于平台的 Node.js 文件路径。</li>
+</ul>
+<p>此函数确保百分比编码字符的正确解码，并确保跨平台有效的绝对路径字符串。</p>
+
+<pre class="with-58-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { fileURLToPath } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+
+<span class="hljs-keyword">const</span> __filename = <span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file:///C:/path/'</span>).<span class="hljs-property">pathname</span>;      <span class="hljs-comment">// 错误：/C:/path/</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file:///C:/path/'</span>);         <span class="hljs-comment">// 正确：C:\path\ (Windows)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file://nas/foo.txt'</span>).<span class="hljs-property">pathname</span>;    <span class="hljs-comment">// 错误：/foo.txt</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file://nas/foo.txt'</span>);       <span class="hljs-comment">// 正确：\\nas\foo.txt (Windows)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file:///你好.txt'</span>).<span class="hljs-property">pathname</span>;      <span class="hljs-comment">// 错误：/%E4%BD%A0%E5%A5%BD.txt</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file:///你好.txt'</span>);         <span class="hljs-comment">// 正确：/你好.txt (POSIX)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file:///hello world'</span>).<span class="hljs-property">pathname</span>;   <span class="hljs-comment">// 错误：/hello%20world</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file:///hello world'</span>);      <span class="hljs-comment">// 正确：/hello world (POSIX)</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> { fileURLToPath } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file:///C:/path/'</span>).<span class="hljs-property">pathname</span>;      <span class="hljs-comment">// 错误：/C:/path/</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file:///C:/path/'</span>);         <span class="hljs-comment">// 正确：C:\path\ (Windows)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file://nas/foo.txt'</span>).<span class="hljs-property">pathname</span>;    <span class="hljs-comment">// 错误：/foo.txt</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file://nas/foo.txt'</span>);       <span class="hljs-comment">// 正确：\\nas\foo.txt (Windows)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file:///你好.txt'</span>).<span class="hljs-property">pathname</span>;      <span class="hljs-comment">// 错误：/%E4%BD%A0%E5%A5%BD.txt</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file:///你好.txt'</span>);         <span class="hljs-comment">// 正确：/你好.txt (POSIX)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'file:///hello world'</span>).<span class="hljs-property">pathname</span>;   <span class="hljs-comment">// 错误：/hello%20world</span>
+<span class="hljs-title function_">fileURLToPath</span>(<span class="hljs-string">'file:///hello world'</span>);      <span class="hljs-comment">// 正确：/hello world (POSIX)</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>url.fileURLToPathBuffer(url[, options])</code><span><a class="mark" href="#urlfileurltopathbufferurl-options" id="urlfileurltopathbufferurl-options">#</a></span><a aria-hidden="true" class="legacy" id="url_url_fileurltopathbuffer_url_options"></a></h4>
+<!--
+added: v24.3.0
+-->
+<ul>
+<li><code>url</code> <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要转换为路径的文件 URL 字符串或 URL 对象。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>windows</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果为 <code>true</code>，则 <code>path</code> 应作为 Windows 文件路径返回，<code>false</code> 表示 posix，<code>undefined</code> 表示系统默认值。
+<strong>默认值：</strong> <code>undefined</code>。</li>
+</ul>
+</li>
+<li>返回：<a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a> 完全解析的特定于平台的 Node.js 文件路径作为 <a href="buffer.html#class-buffer" class="type">&#x3C;Buffer></a>。</li>
+</ul>
+<p>类似于 <code>url.fileURLToPath(...)</code>，但返回的是路径的 <code>Buffer</code> 表示形式，而不是字符串。当输入 URL 包含不是有效 UTF-8 / Unicode 序列的百分比编码段时，此转换很有用。</p>
+</div><div>
+<h4><code>url.format(URL[, options])</code><span><a class="mark" href="#urlformaturl-options" id="urlformaturl-options">#</a></span><a aria-hidden="true" class="legacy" id="url_url_format_url_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v7.6.0</span>
+</div>
+<ul>
+<li><code>URL</code> <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 一个 <a href="#the-whatwg-url-api">WHATWG URL</a> 对象</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>auth</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果序列化的 URL 字符串应包括用户名和密码，则为 <code>true</code>，否则为 <code>false</code>。<strong>默认值：</strong> <code>true</code>。</li>
+<li><code>fragment</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果序列化的 URL 字符串应包括片段，则为 <code>true</code>，否则为 <code>false</code>。<strong>默认值：</strong> <code>true</code>。</li>
+<li><code>search</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果序列化的 URL 字符串应包括搜索查询，则为 <code>true</code>，否则为 <code>false</code>。<strong>默认值：</strong> <code>true</code>。</li>
+<li><code>unicode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果出现在 URL 字符串的主机组件中的 Unicode 字符应直接编码，而不是进行 Punycode 编码，则为 <code>true</code>。<strong>默认值：</strong> <code>false</code>。</li>
+</ul>
+</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回 <a href="#the-whatwg-url-api">WHATWG URL</a> 对象的 URL <code>String</code> 表示形式的可自定义序列化。</p>
+<p>URL 对象既有 <code>toString()</code> 方法，也有 <code>href</code> 属性，它们都返回 URL 的字符串序列化。然而，这些方式在任何方面都不可自定义。<code>url.format(URL[, options])</code> 方法允许对输出进行基本自定义。</p>
+
+<pre class="with-48-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> url <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+<span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://a:b@測試?abc#foo'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://a:b@xn--g6w251d/?abc#foo</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 https://a:b@xn--g6w251d/?abc#foo</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">format</span>(myURL, { <span class="hljs-attr">fragment</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">unicode</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">auth</span>: <span class="hljs-literal">false</span> }));
+<span class="hljs-comment">// 打印 'https://測試/?abc'</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://a:b@測試?abc#foo'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://a:b@xn--g6w251d/?abc#foo</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-title function_">toString</span>());
+<span class="hljs-comment">// 打印 https://a:b@xn--g6w251d/?abc#foo</span>
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(url.<span class="hljs-title function_">format</span>(myURL, { <span class="hljs-attr">fragment</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">unicode</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">auth</span>: <span class="hljs-literal">false</span> }));
+<span class="hljs-comment">// 打印 'https://測試/?abc'</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>url.pathToFileURL(path[, options])</code><span><a class="mark" href="#urlpathtofileurlpath-options" id="urlpathtofileurlpath-options">#</a></span><a aria-hidden="true" class="legacy" id="url_url_pathtofileurl_path_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.1.0, v20.13.0</td>
+<td><p>The <code>options</code> argument can now be used to determine how to return the <code>path</code> value.</p></td></tr>
+<tr><td>v10.12.0</td>
+<td><p><span>Added in: v10.12.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要转换为文件 URL 的路径。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>windows</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果为 <code>true</code>，则 <code>path</code> 应被视为 Windows 文件路径，<code>false</code> 表示 posix，<code>undefined</code> 表示系统默认值。
+<strong>默认值：</strong> <code>undefined</code>。</li>
+</ul>
+</li>
+<li>返回：<a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 文件 URL 对象。</li>
+</ul>
+<p>此函数确保 <code>path</code> 被绝对解析，并且在转换为文件 URL 时正确编码 URL 控制字符。</p>
+
+<pre class="with-54-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { pathToFileURL } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'/foo#1'</span>, <span class="hljs-string">'file:'</span>);           <span class="hljs-comment">// 错误：file:///foo#1</span>
+<span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">'/foo#1'</span>);              <span class="hljs-comment">// 正确：file:///foo%231 (POSIX)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'/some/path%.c'</span>, <span class="hljs-string">'file:'</span>);    <span class="hljs-comment">// 错误：file:///some/path%.c</span>
+<span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">'/some/path%.c'</span>);       <span class="hljs-comment">// 正确：file:///some/path%25.c (POSIX)</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(__filename);                  <span class="hljs-comment">// 错误：抛出 (POSIX)</span>
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(__filename);                  <span class="hljs-comment">// 错误：C:\... (Windows)</span>
+<span class="hljs-title function_">pathToFileURL</span>(__filename);            <span class="hljs-comment">// 正确：file:///... (POSIX)</span>
+<span class="hljs-title function_">pathToFileURL</span>(__filename);            <span class="hljs-comment">// 正确：file:///C:/... (Windows)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'/foo#1'</span>, <span class="hljs-string">'file:'</span>);           <span class="hljs-comment">// 错误：file:///foo#1</span>
+<span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">'/foo#1'</span>);              <span class="hljs-comment">// 正确：file:///foo%231 (POSIX)</span>
+
+<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'/some/path%.c'</span>, <span class="hljs-string">'file:'</span>);    <span class="hljs-comment">// 错误：file:///some/path%.c</span>
+<span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-string">'/some/path%.c'</span>);       <span class="hljs-comment">// 正确：file:///some/path%25.c (POSIX)</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>url.urlToHttpOptions(url)</code><span><a class="mark" href="#urlurltohttpoptionsurl" id="urlurltohttpoptionsurl">#</a></span><a aria-hidden="true" class="legacy" id="url_url_urltohttpoptions_url"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.9.0, v18.17.0</td>
+<td><p>The returned object will also contain all the own enumerable properties of the <code>url</code> argument.</p></td></tr>
+<tr><td>v15.7.0, v14.18.0</td>
+<td><p><span>Added in: v15.7.0, v14.18.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>url</code> <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 要转换为选项对象的 <a href="#the-whatwg-url-api">WHATWG URL</a> 对象。</li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 选项对象
+<ul>
+<li><code>protocol</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要使用的协议。</li>
+<li><code>hostname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要发出请求的服务器的域名或 IP 地址。</li>
+<li><code>hash</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> URL 的片段部分。</li>
+<li><code>search</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> URL 的序列化查询部分。</li>
+<li><code>pathname</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> URL 的路径部分。</li>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 请求路径。如果存在查询字符串，则应包括查询字符串。例如 <code>'/index.html?page=12'</code>。当请求路径包含非法字符时，将抛出异常。目前，仅拒绝空格，但未来可能会更改。</li>
+<li><code>href</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 序列化的 URL。</li>
+<li><code>port</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 远程服务器的端口。</li>
+<li><code>auth</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 基本身份验证，即 <code>'user:password'</code>，用于计算 Authorization 头。</li>
+</ul>
+</li>
+</ul>
+<p>此实用函数将 URL 对象转换为 <a href="http.html#httprequestoptions-callback"><code>http.request()</code></a> 和 <a href="https.html#httpsrequestoptions-callback"><code>https.request()</code></a> API 所期望的普通选项对象。</p>
+
+<pre class="with-49-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { urlToHttpOptions } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:url'</span>;
+<span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://a:b@測試?abc#foo'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">urlToHttpOptions</span>(myURL));
+<span class="hljs-comment">/*
+{
+  protocol: 'https:',
+  hostname: 'xn--g6w251d',
+  hash: '#foo',
+  search: '?abc',
+  pathname: '/',
+  path: '/?abc',
+  href: 'https://a:b@xn--g6w251d/?abc#foo',
+  auth: 'a:b'
+}
+*/</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> { urlToHttpOptions } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://a:b@測試?abc#foo'</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">urlToHttpOptions</span>(myURL));
+<span class="hljs-comment">/*
+{
+  protocol: 'https:',
+  hostname: 'xn--g6w251d',
+  hash: '#foo',
+  search: '?abc',
+  pathname: '/',
+  path: '/?abc',
+  href: 'https://a:b@xn--g6w251d/?abc#foo',
+  auth: 'a:b'
+}
+*/</span></code><button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>旧版 URL API<span><a class="mark" href="#-url-api" id="-url-api">#</a></span><a aria-hidden="true" class="legacy" id="url_url_api"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.13.0, v14.17.0</td>
+<td><p>Deprecation revoked. Status changed to "Legacy".</p></td></tr>
+<tr><td>v11.0.0</td>
+<td><p>This API is deprecated.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_3"><a href="documentation.html#stability-index">Stability: 3</a> - Legacy: 改用 WHATWG URL API。</div><p></p>
+<div>
+<h4>旧版 <code>urlObject</code><span><a class="mark" href="#-urlobject" id="-urlobject">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.13.0, v14.17.0</td>
+<td><p>Deprecation revoked. Status changed to "Legacy".</p></td></tr>
+<tr><td>v11.0.0</td>
+<td><p>The Legacy URL API is deprecated. Use the WHATWG URL API.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>旧版 <code>urlObject</code> (<code>require('node:url').Url</code> 或 <code>import { Url } from 'node:url'</code>) 由 <code>url.parse()</code> 函数创建并返回。</p>
+<div>
+<h5><code>urlObject.auth</code><span><a class="mark" href="#urlobjectauth" id="urlobjectauth">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_auth"></a></h5>
+<p><code>auth</code> 属性是 URL 的用户名和密码部分，也称为 <em>userinfo</em>。这个字符串子集跟在协议和双斜杠（如果存在）之后，并在主机组件之前，由 <code>@</code> 分隔。字符串要么是用户名，要么是由 <code>:</code> 分隔的用户名和密码。</p>
+<p>例如：<code>'user:pass'</code>。</p>
+</div><div>
+<h5><code>urlObject.hash</code><span><a class="mark" href="#urlobjecthash" id="urlobjecthash">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_hash"></a></h5>
+<p><code>hash</code> 属性是 URL 的片段标识符部分，包括前导 <code>#</code> 字符。</p>
+<p>例如：<code>'#hash'</code>。</p>
+</div><div>
+<h5><code>urlObject.host</code><span><a class="mark" href="#urlobjecthost" id="urlobjecthost">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_host"></a></h5>
+<p><code>host</code> 属性是 URL 的完整小写主机部分，包括指定的 <code>port</code>。</p>
+<p>例如：<code>'sub.example.com:8080'</code>。</p>
+</div><div>
+<h5><code>urlObject.hostname</code><span><a class="mark" href="#urlobjecthostname" id="urlobjecthostname">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_hostname"></a></h5>
+<p><code>hostname</code> 属性是 <code>host</code> 组件的小写主机名部分，<strong>不</strong>包括 <code>port</code>。</p>
+<p>例如：<code>'sub.example.com'</code>。</p>
+</div><div>
+<h5><code>urlObject.href</code><span><a class="mark" href="#urlobjecthref" id="urlobjecthref">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_href"></a></h5>
+<p><code>href</code> 属性是已解析的完整 URL 字符串，其中 <code>protocol</code> 和 <code>host</code> 组件都转换为小写。</p>
+<p>例如：<code>'http://user:pass@sub.example.com:8080/p/a/t/h?query=string#hash'</code>。</p>
+</div><div>
+<h5><code>urlObject.path</code><span><a class="mark" href="#urlobjectpath" id="urlobjectpath">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_path"></a></h5>
+<p><code>path</code> 属性是 <code>pathname</code> 和 <code>search</code> 组件的连接。</p>
+<p>例如：<code>'/p/a/t/h?query=string'</code>。</p>
+<p>不对 <code>path</code> 进行解码。</p>
+</div><div>
+<h5><code>urlObject.pathname</code><span><a class="mark" href="#urlobjectpathname" id="urlobjectpathname">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_pathname"></a></h5>
+<p><code>pathname</code> 属性由 URL 的整个路径部分组成。这是主机（包括 <code>port</code>）之后和查询或哈希组件开始之前的所有内容，由 ASCII 问号 (<code>?</code>) 或哈希 (<code>#</code>) 字符分隔。</p>
+<p>例如：<code>'/p/a/t/h'</code>。</p>
+<p>不对路径字符串进行解码。</p>
+</div><div>
+<h5><code>urlObject.port</code><span><a class="mark" href="#urlobjectport" id="urlobjectport">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_port"></a></h5>
+<p><code>port</code> 属性是 <code>host</code> 组件的数字端口部分。</p>
+<p>例如：<code>'8080'</code>。</p>
+</div><div>
+<h5><code>urlObject.protocol</code><span><a class="mark" href="#urlobjectprotocol" id="urlobjectprotocol">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_protocol"></a></h5>
+<p><code>protocol</code> 属性标识 URL 的小写协议方案。</p>
+<p>例如：<code>'http:'</code>。</p>
+</div><div>
+<h5><code>urlObject.query</code><span><a class="mark" href="#urlobjectquery" id="urlobjectquery">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_query"></a></h5>
+<p><code>query</code> 属性是不带前导 ASCII 问号 (<code>?</code>) 的查询字符串，或者是由 <a href="querystring.html"><code>querystring</code></a> 模块的 <code>parse()</code> 方法返回的对象。<code>query</code> 属性是字符串还是对象由传递给 <code>url.parse()</code> 的 <code>parseQueryString</code> 参数决定。</p>
+<p>例如：<code>'query=string'</code> 或 <code>{'query': 'string'}</code>。</p>
+<p>如果作为字符串返回，则不对查询字符串进行解码。如果作为对象返回，则键和值都会被解码。</p>
+</div><div>
+<h5><code>urlObject.search</code><span><a class="mark" href="#urlobjectsearch" id="urlobjectsearch">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_search"></a></h5>
+<p><code>search</code> 属性由 URL 的整个“查询字符串”部分组成，包括前导 ASCII 问号 (<code>?</code>) 字符。</p>
+<p>例如：<code>'?query=string'</code>。</p>
+<p>不对查询字符串进行解码。</p>
+</div><div>
+<h5><code>urlObject.slashes</code><span><a class="mark" href="#urlobjectslashes" id="urlobjectslashes">#</a></span><a aria-hidden="true" class="legacy" id="url_urlobject_slashes"></a></h5>
+<p><code>slashes</code> 属性是一个 <code>boolean</code>，如果协议后的冒号需要两个 ASCII 正斜杠字符 (<code>/</code>)，则值为 <code>true</code>。</p>
+</div></div><div>
+<h4><code>url.format(urlObject)</code><span><a class="mark" href="#urlformaturlobject" id="urlformaturlobject">#</a></span><a aria-hidden="true" class="legacy" id="url_url_format_urlobject"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v17.0.0</td>
+<td><p>Now throws an <code>ERR_INVALID_URL</code> exception when Punycode conversion of a hostname introduces changes that could cause the URL to be re-parsed differently.</p></td></tr>
+<tr><td>v15.13.0, v14.17.0</td>
+<td><p>Deprecation revoked. Status changed to "Legacy".</p></td></tr>
+<tr><td>v11.0.0</td>
+<td><p>The Legacy URL API is deprecated. Use the WHATWG URL API.</p></td></tr>
+<tr><td>v7.0.0</td>
+<td><p>URLs with a <code>file:</code> scheme will now always use the correct number of slashes regardless of <code>slashes</code> option. A falsy <code>slashes</code> option with no protocol is now also respected at all times.</p></td></tr>
+<tr><td>v0.1.25</td>
+<td><p><span>Added in: v0.1.25</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>urlObject</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 一个 URL 对象（由 <code>url.parse()</code> 返回或以其他方式构造）。如果是一个字符串，则通过将其传递给 <code>url.parse()</code> 转换为对象。</li>
+</ul>
+<p><code>url.format()</code> 方法返回从 <code>urlObject</code> 派生的格式化 URL 字符串。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+url.<span class="hljs-title function_">format</span>({
+  <span class="hljs-attr">protocol</span>: <span class="hljs-string">'https'</span>,
+  <span class="hljs-attr">hostname</span>: <span class="hljs-string">'example.com'</span>,
+  <span class="hljs-attr">pathname</span>: <span class="hljs-string">'/some/path'</span>,
+  <span class="hljs-attr">query</span>: {
+    <span class="hljs-attr">page</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-attr">format</span>: <span class="hljs-string">'json'</span>,
+  },
+});
+
+<span class="hljs-comment">// => 'https://example.com/some/path?page=1&#x26;format=json'</span></code> <button class="copy-button">copy</button></pre>
+<p>如果 <code>urlObject</code> 不是对象或字符串，<code>url.format()</code> 将抛出 <a href="errors.html#class-typeerror"><code>TypeError</code></a>。</p>
+<p>格式化过程按如下方式进行：</p>
+<ul>
+<li>创建一个新的空字符串 <code>result</code>。</li>
+<li>如果 <code>urlObject.protocol</code> 是一个字符串，则将其按原样追加到 <code>result</code>。</li>
+<li>否则，如果 <code>urlObject.protocol</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href="errors.html#class-error"><code>Error</code></a>。</li>
+<li>对于所有<strong>不以</strong> ASCII 冒号 (<code>:</code>) 字符结尾的 <code>urlObject.protocol</code> 字符串值，字面字符串 <code>:</code> 将被追加到 <code>result</code>。</li>
+<li>如果以下任一条件为真，则字面字符串 <code>//</code> 将被追加到 <code>result</code>：
+<ul>
+<li><code>urlObject.slashes</code> 属性为 true；</li>
+<li><code>urlObject.protocol</code> 以 <code>http</code>、<code>https</code>、<code>ftp</code>、<code>gopher</code> 或 <code>file</code> 开头；</li>
+</ul>
+</li>
+<li>如果 <code>urlObject.auth</code> 属性的值为真值，并且 <code>urlObject.host</code> 或 <code>urlObject.hostname</code> 不是 <code>undefined</code>，则 <code>urlObject.auth</code> 的值将被强制转换为字符串并追加到 <code>result</code>，后跟字面字符串 <code>@</code>。</li>
+<li>如果 <code>urlObject.host</code> 属性是 <code>undefined</code>，则：
+<ul>
+<li>如果 <code>urlObject.hostname</code> 是字符串，则将其追加到 <code>result</code>。</li>
+<li>否则，如果 <code>urlObject.hostname</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href="errors.html#class-error"><code>Error</code></a>。</li>
+<li>如果 <code>urlObject.port</code> 属性值为真值，并且 <code>urlObject.hostname</code> 不是 <code>undefined</code>：
+<ul>
+<li>字面字符串 <code>:</code> 被追加到 <code>result</code>，并且</li>
+<li><code>urlObject.port</code> 的值被强制转换为字符串并追加到 <code>result</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>否则，如果 <code>urlObject.host</code> 属性值为真值，则 <code>urlObject.host</code> 的值被强制转换为字符串并追加到 <code>result</code>。</li>
+<li>如果 <code>urlObject.pathname</code> 属性是一个非空字符串：
+<ul>
+<li>如果 <code>urlObject.pathname</code> <strong>不以</strong> ASCII 正斜杠 (<code>/</code>) 开头，则字面字符串 <code>'/'</code> 被追加到 <code>result</code>。</li>
+<li><code>urlObject.pathname</code> 的值被追加到 <code>result</code>。</li>
+</ul>
+</li>
+<li>否则，如果 <code>urlObject.pathname</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href="errors.html#class-error"><code>Error</code></a>。</li>
+<li>如果 <code>urlObject.search</code> 属性是 <code>undefined</code> 并且 <code>urlObject.query</code> 属性是一个 <code>Object</code>，则字面字符串 <code>?</code> 被追加到 <code>result</code>，后跟调用 <a href="querystring.html"><code>querystring</code></a> 模块的 <code>stringify()</code> 方法并传递 <code>urlObject.query</code> 值的输出。</li>
+<li>否则，如果 <code>urlObject.search</code> 是一个字符串：
+<ul>
+<li>如果 <code>urlObject.search</code> 的值<strong>不以</strong> ASCII 问号 (<code>?</code>) 字符开头，则字面字符串 <code>?</code> 被追加到 <code>result</code>。</li>
+<li><code>urlObject.search</code> 的值被追加到 <code>result</code>。</li>
+</ul>
+</li>
+<li>否则，如果 <code>urlObject.search</code> 不是 <code>undefined</code> 且不是字符串，则抛出 <a href="errors.html#class-error"><code>Error</code></a>。</li>
+<li>如果 <code>urlObject.hash</code> 属性是一个字符串：
+<ul>
+<li>如果 <code>urlObject.hash</code> 的值<strong>不以</strong> ASCII 哈希 (<code>#</code>) 字符开头，则字面字符串 <code>#</code> 被追加到 <code>result</code>。</li>
+<li><code>urlObject.hash</code> 的值被追加到 <code>result</code>。</li>
+</ul>
+</li>
+<li>否则，如果 <code>urlObject.hash</code> 属性不是 <code>undefined</code> 且不是字符串，则抛出 <a href="errors.html#class-error"><code>Error</code></a>。</li>
+<li>返回 <code>result</code>。</li>
+</ul>
+</div><div>
+<h4><code>url.parse(urlString[, parseQueryString[, slashesDenoteHost]])</code><span><a class="mark" href="#urlparseurlstring-parsequerystring-slashesdenotehost" id="urlparseurlstring-parsequerystring-slashesdenotehost">#</a></span><a aria-hidden="true" class="legacy" id="url_url_parse_urlstring_parsequerystring_slashesdenotehost"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0, v18.13.0</td>
+<td><p>Documentation-only deprecation.</p></td></tr>
+<tr><td>v15.13.0, v14.17.0</td>
+<td><p>Deprecation revoked. Status changed to "Legacy".</p></td></tr>
+<tr><td>v11.14.0</td>
+<td><p>The <code>pathname</code> property on the returned URL object is now <code>/</code> when there is no path and the protocol scheme is <code>ws:</code> or <code>wss:</code>.</p></td></tr>
+<tr><td>v11.0.0</td>
+<td><p>The Legacy URL API is deprecated. Use the WHATWG URL API.</p></td></tr>
+<tr><td>v9.0.0</td>
+<td><p>The <code>search</code> property on the returned URL object is now <code>null</code> when no query string is present.</p></td></tr>
+<tr><td>v0.1.25</td>
+<td><p><span>Added in: v0.1.25</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated: 改用 WHATWG URL API。</div><p></p>
+<ul>
+<li><code>urlString</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的 URL 字符串。</li>
+<li><code>parseQueryString</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则 <code>query</code> 属性将始终设置为由 <a href="querystring.html"><code>querystring</code></a> 模块的 <code>parse()</code> 方法返回的对象。如果为 <code>false</code>，返回的 URL 对象上的 <code>query</code> 属性将是未解析、未解码的字符串。<strong>默认值：</strong> <code>false</code>。</li>
+<li><code>slashesDenoteHost</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 <code>true</code>，则字面字符串 <code>//</code> 之后且下一个 <code>/</code> 之前的第一个标记将被解释为 <code>host</code>。例如，给定 <code>//foo/bar</code>，结果将是 <code>{host: 'foo', pathname: '/bar'}</code> 而不是 <code>{pathname: '//foo/bar'}</code>。<strong>默认值：</strong> <code>false</code>。</li>
+</ul>
+<p><code>url.parse()</code> 方法获取一个 URL 字符串，解析它，并返回一个 URL 对象。</p>
+<p>如果 <code>urlString</code> 不是字符串，则抛出 <code>TypeError</code>。</p>
+<p>如果 <code>auth</code> 属性存在但无法解码，则抛出 <code>URIError</code>。</p>
+<p><code>url.parse()</code> 使用宽松的、非标准算法来解析 URL 字符串。它容易出现安全问题，例如[主机名欺骗][]以及用户名和密码的错误处理。不要用于不可信的输入。不会为 <code>url.parse()</code> 的漏洞发布 CVE。请改用 <a href="#the-whatwg-url-api">WHATWG URL</a> API，例如：</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getURL</span>(<span class="hljs-params">req</span>) {
+  <span class="hljs-keyword">const</span> proto = req.<span class="hljs-property">headers</span>[<span class="hljs-string">'x-forwarded-proto'</span>] || <span class="hljs-string">'https'</span>;
+  <span class="hljs-keyword">const</span> host = req.<span class="hljs-property">headers</span>[<span class="hljs-string">'x-forwarded-host'</span>] || req.<span class="hljs-property">headers</span>.<span class="hljs-property">host</span> || <span class="hljs-string">'example.com'</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(req.<span class="hljs-property">url</span> || <span class="hljs-string">'/'</span>, <span class="hljs-string">`<span class="hljs-subst">${proto}</span>://<span class="hljs-subst">${host}</span>`</span>);
+}</code> <button class="copy-button">copy</button></pre>
+<p>上面的示例假设反向代理将格式正确的头转发到您的 Node.js 服务器。如果您没有使用反向代理，应使用以下示例：</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">getURL</span>(<span class="hljs-params">req</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(req.<span class="hljs-property">url</span> || <span class="hljs-string">'/'</span>, <span class="hljs-string">'https://example.com'</span>);
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>url.resolve(from, to)</code><span><a class="mark" href="#urlresolvefrom-to" id="urlresolvefrom-to">#</a></span><a aria-hidden="true" class="legacy" id="url_url_resolve_from_to"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v15.13.0, v14.17.0</td>
+<td><p>Deprecation revoked. Status changed to "Legacy".</p></td></tr>
+<tr><td>v11.0.0</td>
+<td><p>The Legacy URL API is deprecated. Use the WHATWG URL API.</p></td></tr>
+<tr><td>v6.6.0</td>
+<td><p>The <code>auth</code> fields are now kept intact when <code>from</code> and <code>to</code> refer to the same host.</p></td></tr>
+<tr><td>v6.0.0</td>
+<td><p>The <code>auth</code> fields is cleared now the <code>to</code> parameter contains a hostname.</p></td></tr>
+<tr><td>v6.5.0, v4.6.2</td>
+<td><p>The <code>port</code> field is copied correctly now.</p></td></tr>
+<tr><td>v0.1.25</td>
+<td><p><span>Added in: v0.1.25</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>from</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 如果 <code>to</code> 是相对 URL，则使用的基础 URL。</li>
+<li><code>to</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要解析的目标 URL。</li>
+</ul>
+<p><code>url.resolve()</code> 方法以类似于 Web 浏览器解析锚标签的方式，相对于基础 URL 解析目标 URL。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> url = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+url.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'/one/two/three'</span>, <span class="hljs-string">'four'</span>);         <span class="hljs-comment">// '/one/two/four'</span>
+url.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'http://example.com/'</span>, <span class="hljs-string">'/one'</span>);    <span class="hljs-comment">// 'http://example.com/one'</span>
+url.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'http://example.com/one'</span>, <span class="hljs-string">'/two'</span>); <span class="hljs-comment">// 'http://example.com/two'</span></code> <button class="copy-button">copy</button></pre>
+<p>要使用 WHATWG URL API 实现相同的结果：</p>
+<pre><code class="language-js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params"><span class="hljs-keyword">from</span>, to</span>) {
+  <span class="hljs-keyword">const</span> resolvedUrl = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(to, <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-keyword">from</span>, <span class="hljs-string">'resolve://'</span>));
+  <span class="hljs-keyword">if</span> (resolvedUrl.<span class="hljs-property">protocol</span> === <span class="hljs-string">'resolve:'</span>) {
+    <span class="hljs-comment">// `from` 是一个相对 URL。</span>
+    <span class="hljs-keyword">const</span> { pathname, search, hash } = resolvedUrl;
+    <span class="hljs-keyword">return</span> pathname + search + hash;
+  }
+  <span class="hljs-keyword">return</span> resolvedUrl.<span class="hljs-title function_">toString</span>();
+}
+
+<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'/one/two/three'</span>, <span class="hljs-string">'four'</span>);         <span class="hljs-comment">// '/one/two/four'</span>
+<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'http://example.com/'</span>, <span class="hljs-string">'/one'</span>);    <span class="hljs-comment">// 'http://example.com/one'</span>
+<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'http://example.com/one'</span>, <span class="hljs-string">'/two'</span>); <span class="hljs-comment">// 'http://example.com/two'</span></code> <button class="copy-button">copy</button></pre>
+<p><a id="whatwg-percent-encoding"></a></p>
+</div>
+</section><section><h3>URL 中的百分比编码<span><a class="mark" href="#url-" id="url-">#</a></span><a aria-hidden="true" class="legacy" id="url_url_3"></a></h3>
+<p>URL 只允许包含特定范围的字符。任何超出该范围的字符都必须进行编码。这些字符的编码方式以及要对哪些字符进行编码完全取决于字符在 URL 结构中的位置。</p>
+<div>
+<h4>旧版 API<span><a class="mark" href="#-api" id="-api">#</a></span><a aria-hidden="true" class="legacy" id="url_api"></a></h4>
+<p>在旧版 API 中，URL 对象的属性中的空格 (<code>' '</code>) 和以下字符将自动转义：</p>
+<pre><code class="language-text">&#x3C; > " ` \r \n \t { } | \ ^ '</code> <button class="copy-button">copy</button></pre>
+<p>例如，ASCII 空格字符 (<code>' '</code>) 被编码为 <code>%20</code>。ASCII 正斜杠 (<code>/</code>) 字符被编码为 <code>%3C</code>。</p>
+</div><div>
+<h4>WHATWG API<span><a class="mark" href="#whatwg-api" id="whatwg-api">#</a></span><a aria-hidden="true" class="legacy" id="url_whatwg_api"></a></h4>
+<p>[WHATWG URL 标准][] 使用比旧版 API 更具选择性和细粒度的方法来选择编码字符。</p>
+<p>WHATWG 算法定义了四个“百分比编码集”，描述了必须进行百分比编码的字符范围：</p>
+<ul>
+<li>
+<p><strong>C0 控制百分比编码集</strong> 包括 U+0000 到 U+001F（含）范围内的码点以及所有大于 U+007E (~) 的码点。</p>
+</li>
+<li>
+<p><strong>片段百分比编码集</strong> 包括 <strong>C0 控制百分比编码集</strong> 和码点 U+0020 空格、U+0022 (")、U+003C (&#x3C;)、U+003E (>)、和 U+0060 (`)。</p>
+</li>
+<li>
+<p><strong>路径百分比编码集</strong> 包括 <strong>C0 控制百分比编码集</strong> 和码点 U+0020 空格、U+0022 (")、U+0023 (#)、U+003C (&#x3C;)、U+003E (>)、U+003F (?)、U+0060 (`)、U+007B ({)、和 U+007D (})。</p>
+</li>
+<li>
+<p><strong>用户信息编码集</strong> 包括 <strong>路径百分比编码集</strong> 和码点 U+002F (/)、U+003A (:)、U+003B (;)、U+003D (=)、U+0040 (@)、U+005B ([) 到 U+005E(^)、和 U+007C (|)。</p>
+</li>
+</ul>
+<p><strong>用户信息百分比编码集</strong> 专门用于在 URL 内编码的用户名和密码。<strong>路径百分比编码集</strong> 用于大多数 URL 的路径。<strong>片段百分比编码集</strong> 用于 URL 片段。<strong>C0 控制百分比编码集</strong> 用于主机和路径在某些特定条件下，以及所有其他情况。</p>
+<p>当非 ASCII 字符出现在主机名中时，主机名使用 <a href="https://tools.ietf.org/html/rfc5891#section-4.4">Punycode</a> 算法进行编码。但请注意，主机名<strong>可能</strong>同时包含 Punycode 编码和百分比编码的字符：</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> myURL = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'https://%CF%80.example.com/foo'</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">href</span>);
+<span class="hljs-comment">// 打印 https://xn--1xa.example.com/foo</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(myURL.<span class="hljs-property">origin</span>);
+<span class="hljs-comment">// 打印 https://xn--1xa.example.com</span></code> <button class="copy-button">copy</button></pre></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1372 @@
+{
+  "type": "module",
+  "source": "doc/api/readline.md",
+  "modules": [
+    {
+      "textRaw": "Readline",
+      "name": "readline",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/readline.js\">lib/readline.js</a></p>\n<p><code>node:readline</code> 模块提供了一个接口，用于从 <a href=\"stream.html#readable-streams\">Readable</a> 流（例如 <a href=\"process.html#processstdin\"><code>process.stdin</code></a>）一次一行地读取数据。</p>\n<p>要使用基于 Promise 的 API：</p>\n<pre><code class=\"language-mjs\">import * as readline from 'node:readline/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const readline = require('node:readline/promises');\n</code></pre>\n<p>要使用回调和同步 API：</p>\n<pre><code class=\"language-mjs\">import * as readline from 'node:readline';\n</code></pre>\n<pre><code class=\"language-cjs\">const readline = require('node:readline');\n</code></pre>\n<p>以下简单示例说明了 <code>node:readline</code> 模块的基本用法。</p>\n<pre><code class=\"language-mjs\">import * as readline from 'node:readline/promises';\nimport { stdin as input, stdout as output } from 'node:process';\n\nconst rl = readline.createInterface({ input, output });\n\nconst answer = await rl.question('What do you think of Node.js? ');\n\nconsole.log(`Thank you for your valuable feedback: ${answer}`);\n\nrl.close();\n</code></pre>\n<pre><code class=\"language-cjs\">const readline = require('node:readline');\nconst { stdin: input, stdout: output } = require('node:process');\n\nconst rl = readline.createInterface({ input, output });\n\nrl.question('What do you think of Node.js? ', (answer) => {\n  // TODO: Log the answer in a database\n  console.log(`Thank you for your valuable feedback: ${answer}`);\n\n  rl.close();\n});\n</code></pre>\n<p>一旦调用此代码，Node.js 应用程序在 <code>readline.Interface</code> 关闭之前不会终止，因为接口会等待在 <code>input</code> 流上接收数据。</p>\n<p><a id='readline_class_interface'></a></p>",
+      "modules": [
+        {
+          "textRaw": "类：`InterfaceConstructor`",
+          "name": "类：`interfaceconstructor`",
+          "meta": {
+            "added": [
+              "v0.1.104"
+            ],
+            "changes": []
+          },
+          "desc": "<ul>\n<li>继承自：<a href=\"events.html#class-eventemitter\" class=\"type\">&lt;EventEmitter&gt;</a></li>\n</ul>\n<p><code>InterfaceConstructor</code> 类的实例是使用 <code>readlinePromises.createInterface()</code> 或 <code>readline.createInterface()</code> 方法构造的。每个实例都与一个 <code>input</code> <a href=\"stream.html#readable-streams\">Readable</a> 流和一个 <code>output</code> <a href=\"stream.html#writable-streams\">Writable</a> 流相关联。<code>output</code> 流用于打印用户输入的提示，该输入到达并从 <code>input</code> 流中读取。</p>",
+          "modules": [
+            {
+              "textRaw": "事件：`'close'`",
+              "name": "事件：`'close'`",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在以下情况之一发生时，会触发 <code>'close'</code> 事件：</p>\n<ul>\n<li>调用 <code>rl.close()</code> 方法，并且 <code>InterfaceConstructor</code> 实例已放弃对 <code>input</code> 和 <code>output</code> 流的控制；</li>\n<li><code>input</code> 流接收到其 <code>'end'</code> 事件；</li>\n<li><code>input</code> 流接收 <kbd>Ctrl</kbd>+<kbd>D</kbd> 以发出传输结束（EOT）信号；</li>\n<li><code>input</code> 流接收 <kbd>Ctrl</kbd>+<kbd>C</kbd> 以发出 <code>SIGINT</code> 信号，并且在 <code>InterfaceConstructor</code> 实例上未注册 <code>'SIGINT'</code> 事件监听器。</li>\n</ul>\n<p>监听器函数被调用时不传递任何参数。</p>\n<p>一旦发出 <code>'close'</code> 事件，<code>InterfaceConstructor</code> 实例就完成了。</p>",
+              "type": "module",
+              "displayName": "事件：`'close'`"
+            },
+            {
+              "textRaw": "事件：`'line'`",
+              "name": "事件：`'line'`",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "desc": "<p>每当 <code>input</code> 流接收到行结束输入（<code>\\n</code>、<code>\\r</code> 或 <code>\\r\\n</code>）时，就会触发 <code>'line'</code> 事件。这通常发生在用户按下 <kbd>Enter</kbd> 或 <kbd>Return</kbd> 时。</p>\n<p>如果从流中读取了新数据，并且该流在没有最终行结束标记的情况下结束，也会触发 <code>'line'</code> 事件。</p>\n<p>监听器函数被调用时，会传入一个包含接收到的单行输入的字符串。</p>\n<pre><code class=\"language-js\">rl.on('line', (input) => {\n  console.log(`Received: ${input}`);\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'line'`"
+            },
+            {
+              "textRaw": "事件：`'history'`",
+              "name": "事件：`'history'`",
+              "meta": {
+                "added": [
+                  "v15.8.0",
+                  "v14.18.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>每当历史数组发生变化时，就会触发 <code>'history'</code> 事件。</p>\n<p>监听器函数被调用时，会传入一个包含历史数组的数组。它将反映所有更改，由于 <code>historySize</code> 和 <code>removeHistoryDuplicates</code> 而添加和删除的行。</p>\n<p>主要目的是允许监听器持久化历史记录。监听器也可以更改历史对象。这对于防止某些行（如密码）被添加到历史记录中可能很有用。</p>\n<pre><code class=\"language-js\">rl.on('history', (history) => {\n  console.log(`Received: ${history}`);\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'history'`"
+            },
+            {
+              "textRaw": "事件：`'pause'`",
+              "name": "事件：`'pause'`",
+              "meta": {
+                "added": [
+                  "v0.7.5"
+                ],
+                "changes": []
+              },
+              "desc": "<p>在以下情况之一发生时，会触发 <code>'pause'</code> 事件：</p>\n<ul>\n<li><code>input</code> 流被暂停。</li>\n<li><code>input</code> 流未暂停并接收到 <code>'SIGCONT'</code> 事件。（参见事件 <a href=\"#event-sigtstp\"><code>'SIGTSTP'</code></a> 和 <a href=\"#event-sigcont\"><code>'SIGCONT'</code></a>。）</li>\n</ul>\n<p>监听器函数被调用时不传递任何参数。</p>\n<pre><code class=\"language-js\">rl.on('pause', () => {\n  console.log('Readline paused.');\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'pause'`"
+            },
+            {
+              "textRaw": "事件：`'resume'`",
+              "name": "事件：`'resume'`",
+              "meta": {
+                "added": [
+                  "v0.7.5"
+                ],
+                "changes": []
+              },
+              "desc": "<p>每当 <code>input</code> 流恢复时，就会触发 <code>'resume'</code> 事件。</p>\n<p>监听器函数被调用时不传递任何参数。</p>\n<pre><code class=\"language-js\">rl.on('resume', () => {\n  console.log('Readline resumed.');\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'resume'`"
+            },
+            {
+              "textRaw": "事件：`'SIGCONT'`",
+              "name": "事件：`'sigcont'`",
+              "meta": {
+                "added": [
+                  "v0.7.5"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当先前使用 <kbd>Ctrl</kbd>+<kbd>Z</kbd>（即 <code>SIGTSTP</code>）移动到后台的 Node.js 进程随后使用 <a href=\"http://man7.org/linux/man-pages/man1/fg.1p.html\"><code>fg(1p)</code></a> 被带回前台时，会触发 <code>'SIGCONT'</code> 事件。</p>\n<p>如果在 <code>SIGTSTP</code> 请求<em>之前</em> <code>input</code> 流已被暂停，则不会发出此事件。</p>\n<p>监听器函数被调用时不传递任何参数。</p>\n<pre><code class=\"language-js\">rl.on('SIGCONT', () => {\n  // `prompt` 会自动恢复流\n  rl.prompt();\n});\n</code></pre>\n<p>Windows 上<em>不</em>支持 <code>'SIGCONT'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'SIGCONT'`"
+            },
+            {
+              "textRaw": "事件：`'SIGINT'`",
+              "name": "事件：`'sigint'`",
+              "meta": {
+                "added": [
+                  "v0.3.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>每当 <code>input</code> 流接收到 <kbd>Ctrl+C</kbd> 输入（通常称为 <code>SIGINT</code>）时，就会触发 <code>'SIGINT'</code> 事件。如果在 <code>input</code> 流接收到 <code>SIGINT</code> 时没有注册 <code>'SIGINT'</code> 事件监听器，则会发出 <code>'pause'</code> 事件。</p>\n<p>监听器函数被调用时不传递任何参数。</p>\n<pre><code class=\"language-js\">rl.on('SIGINT', () => {\n  rl.question('Are you sure you want to exit? ', (answer) => {\n    if (answer.match(/^y(es)?$/i)) rl.pause();\n  });\n});\n</code></pre>",
+              "type": "module",
+              "displayName": "事件：`'SIGINT'`"
+            },
+            {
+              "textRaw": "事件：`'SIGTSTP'`",
+              "name": "事件：`'sigtstp'`",
+              "meta": {
+                "added": [
+                  "v0.7.5"
+                ],
+                "changes": []
+              },
+              "desc": "<p>当 <code>input</code> 流接收到 <kbd>Ctrl</kbd>+<kbd>Z</kbd> 输入（通常称为 <code>SIGTSTP</code>）时，会触发 <code>'SIGTSTP'</code> 事件。如果在 <code>input</code> 流接收到 <code>SIGTSTP</code> 时没有注册 <code>'SIGTSTP'</code> 事件监听器，Node.js 进程将被发送到后台。</p>\n<p>当使用 <a href=\"http://man7.org/linux/man-pages/man1/fg.1p.html\"><code>fg(1p)</code></a> 恢复程序时，将发出 <code>'pause'</code> 和 <code>'SIGCONT'</code> 事件。这些可用于恢复 <code>input</code> 流。</p>\n<p>如果在进程被发送到后台之前 <code>input</code> 已被暂停，则不会发出 <code>'pause'</code> 和 <code>'SIGCONT'</code> 事件。</p>\n<p>监听器函数被调用时不传递任何参数。</p>\n<pre><code class=\"language-js\">rl.on('SIGTSTP', () => {\n  // 这将覆盖 SIGTSTP 并防止程序进入后台。\n  console.log('Caught SIGTSTP.');\n});\n</code></pre>\n<p>Windows 上<em>不</em>支持 <code>'SIGTSTP'</code> 事件。</p>",
+              "type": "module",
+              "displayName": "事件：`'SIGTSTP'`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`rl.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><code>rl.close()</code> 方法关闭 <code>InterfaceConstructor</code> 实例并放弃对 <code>input</code> 和 <code>output</code> 流的控制。调用时，将发出 <code>'close'</code> 事件。</p>\n<p>调用 <code>rl.close()</code> 不会立即停止 <code>InterfaceConstructor</code> 实例发出其他事件（包括 <code>'line'</code>）。</p>"
+            },
+            {
+              "textRaw": "`rl[Symbol.dispose]()`",
+              "type": "method",
+              "name": "[Symbol.dispose]",
+              "meta": {
+                "added": [
+                  "v23.10.0",
+                  "v22.15.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><code>rl.close()</code> 的别名。</p>"
+            },
+            {
+              "textRaw": "`rl.pause()`",
+              "type": "method",
+              "name": "pause",
+              "meta": {
+                "added": [
+                  "v0.3.4"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p><code>rl.pause()</code> 方法暂停 <code>input</code> 流，允许在必要时稍后恢复。</p>\n<p>调用 <code>rl.pause()</code> 不会立即停止 <code>InterfaceConstructor</code> 实例发出其他事件（包括 <code>'line'</code>）。</p>"
+            },
+            {
+              "textRaw": "`rl.prompt([preserveCursor])`",
+              "type": "method",
+              "name": "prompt",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`preserveCursor` {boolean} 如果为 `true`，则防止光标位置重置为 `0`。",
+                      "name": "preserveCursor",
+                      "type": "boolean",
+                      "desc": "如果为 `true`，则防止光标位置重置为 `0`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>rl.prompt()</code> 方法将 <code>InterfaceConstructor</code> 实例配置的 <code>prompt</code> 写入 <code>output</code> 中的新行，以便为用户提供新的输入位置。</p>\n<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.prompt()</code> 将恢复它。</p>\n<p>如果创建 <code>InterfaceConstructor</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入提示。</p>"
+            },
+            {
+              "textRaw": "`rl.resume()`",
+              "type": "method",
+              "name": "resume",
+              "meta": {
+                "added": [
+                  "v0.3.4"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>如果 <code>input</code> 流已暂停，<code>rl.resume()</code> 方法会恢复它。</p>"
+            },
+            {
+              "textRaw": "`rl.setPrompt(prompt)`",
+              "type": "method",
+              "name": "setPrompt",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`prompt` {string}",
+                      "name": "prompt",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>rl.setPrompt()</code> 方法设置每当调用 <code>rl.prompt()</code> 时将写入 <code>output</code> 的提示。</p>"
+            },
+            {
+              "textRaw": "`rl.getPrompt()`",
+              "type": "method",
+              "name": "getPrompt",
+              "meta": {
+                "added": [
+                  "v15.3.0",
+                  "v14.17.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{string} 当前提示字符串",
+                      "name": "返回：",
+                      "type": "string",
+                      "desc": "当前提示字符串"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>rl.getPrompt()</code> 方法返回 <code>rl.prompt()</code> 使用的当前提示。</p>"
+            },
+            {
+              "textRaw": "`rl.write(data[, key])`",
+              "type": "method",
+              "name": "write",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`data` {string}",
+                      "name": "data",
+                      "type": "string"
+                    },
+                    {
+                      "textRaw": "`key` {Object}",
+                      "name": "key",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`ctrl` {boolean} `true` 表示 <kbd>Ctrl</kbd> 键。",
+                          "name": "ctrl",
+                          "type": "boolean",
+                          "desc": "`true` 表示 <kbd>Ctrl</kbd> 键。"
+                        },
+                        {
+                          "textRaw": "`meta` {boolean} `true` 表示 <kbd>Meta</kbd> 键。",
+                          "name": "meta",
+                          "type": "boolean",
+                          "desc": "`true` 表示 <kbd>Meta</kbd> 键。"
+                        },
+                        {
+                          "textRaw": "`shift` {boolean} `true` 表示 <kbd>Shift</kbd> 键。",
+                          "name": "shift",
+                          "type": "boolean",
+                          "desc": "`true` 表示 <kbd>Shift</kbd> 键。"
+                        },
+                        {
+                          "textRaw": "`name` {string} 键的名称。",
+                          "name": "name",
+                          "type": "string",
+                          "desc": "键的名称。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>rl.write()</code> 方法将 <code>data</code> 或由 <code>key</code> 标识的键序列写入 <code>output</code>。仅当 <code>output</code> 是 <a href=\"tty.html\">TTY</a> 文本终端时才支持 <code>key</code> 参数。有关键组合的列表，请参阅 [TTY 键绑定][]。</p>\n<p>如果指定了 <code>key</code>，则忽略 <code>data</code>。</p>\n<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.write()</code> 将恢复它。</p>\n<p>如果创建 <code>InterfaceConstructor</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入 <code>data</code> 和 <code>key</code>。</p>\n<pre><code class=\"language-js\">rl.write('Delete this!');\n// 模拟 Ctrl+U 删除之前写入的行\nrl.write(null, { ctrl: true, name: 'u' });\n</code></pre>\n<p><code>rl.write()</code> 方法将数据写入 <code>readline</code> <code>Interface</code> 的 <code>input</code>，<em>就像由用户提供一样</em>。</p>"
+            },
+            {
+              "textRaw": "`rl[Symbol.asyncIterator]()`",
+              "type": "method",
+              "name": "[Symbol.asyncIterator]",
+              "meta": {
+                "added": [
+                  "v11.4.0",
+                  "v10.16.0"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v11.14.0",
+                      "v10.17.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/26989",
+                    "description": "Symbol.asyncIterator support is no longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{AsyncIterator}",
+                      "name": "返回：",
+                      "type": "AsyncIterator"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个 <code>AsyncIterator</code> 对象，该对象将输入流中的每一行作为字符串进行迭代。此方法允许通过 <code>for await...of</code> 循环异步迭代 <code>InterfaceConstructor</code> 对象。</p>\n<p>输入流中的错误不会被转发。</p>\n<p>如果循环通过 <code>break</code>、<code>throw</code> 或 <code>return</code> 终止，将调用 <a href=\"#rlclose\"><code>rl.close()</code></a>。换句话说，迭代 <code>InterfaceConstructor</code> 将始终完全消耗输入流。</p>\n<p>性能与传统的 <code>'line'</code> 事件 API 不相当。对于性能敏感的应用，请使用 <code>'line'</code>。</p>\n<pre><code class=\"language-js\">async function processLineByLine() {\n  const rl = readline.createInterface({\n    // ...\n  });\n\n  for await (const line of rl) {\n    // 读取输入中的每一行将在此处作为 `line` 依次可用。\n  }\n}\n</code></pre>\n<p>一旦调用，<code>readline.createInterface()</code> 将开始消耗输入流。在接口创建和异步迭代之间进行异步操作可能会导致遗漏行。</p>"
+            },
+            {
+              "textRaw": "`rl.getCursorPos()`",
+              "type": "method",
+              "name": "getCursorPos",
+              "meta": {
+                "added": [
+                  "v13.5.0",
+                  "v12.16.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{Object}",
+                      "name": "返回：",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`rows` {number} 光标当前所在提示符的行",
+                          "name": "rows",
+                          "type": "number",
+                          "desc": "光标当前所在提示符的行"
+                        },
+                        {
+                          "textRaw": "`cols` {number} 光标当前所在的屏幕列",
+                          "name": "cols",
+                          "type": "number",
+                          "desc": "光标当前所在的屏幕列"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回光标相对于输入提示符 + 字符串的实际位置。长输入（换行）字符串以及多行提示符都包含在计算中。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`line` 类型：{string}",
+              "type": "string",
+              "name": "类型：",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v15.8.0",
+                      "v14.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/33676",
+                    "description": "Value will always be a string, never undefined."
+                  }
+                ]
+              },
+              "desc": "<p>当前由 node 处理的输入数据。</p>\n<p>这可以在从 TTY 流收集输入时使用，以检索在 <code>line</code> 事件发出之前已处理到当前的值。一旦发出 <code>line</code> 事件，此属性将为空字符串。</p>\n<p>请注意，如果在实例运行时修改该值，并且没有同时控制 <code>rl.cursor</code>，可能会产生意外后果。</p>\n<p><strong>如果不使用 TTY 流进行输入，请使用 <a href=\"#event-line\"><code>'line'</code></a> 事件。</strong></p>\n<p>一个可能的使用案例如下：</p>\n<pre><code class=\"language-js\">const values = ['lorem ipsum', 'dolor sit amet'];\nconst rl = readline.createInterface(process.stdin);\nconst showResults = debounce(() => {\n  console.log(\n    '\\n',\n    values.filter((val) => val.startsWith(rl.line)).join(' '),\n  );\n}, 300);\nprocess.stdin.on('keypress', (c, k) => {\n  showResults();\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`cursor` 类型：{number|undefined}",
+              "type": "number|undefined",
+              "name": "类型：",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": []
+              },
+              "desc": "<p>光标相对于 <code>rl.line</code> 的位置。</p>\n<p>当从 TTY 流读取输入时，这将跟踪当前光标在输入字符串中的位置。光标的位置决定了在处理输入时将修改输入字符串的哪部分，以及终端插入符号将呈现的列。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`InterfaceConstructor`"
+        },
+        {
+          "textRaw": "Promises API",
+          "name": "promises_api",
+          "meta": {
+            "added": [
+              "v17.0.0"
+            ],
+            "changes": [
+              {
+                "version": "v24.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/57513",
+                "description": "Marking the API stable."
+              }
+            ]
+          },
+          "modules": [
+            {
+              "textRaw": "类：`readlinePromises.Interface`",
+              "name": "类：`readlinepromises.interface`",
+              "meta": {
+                "added": [
+                  "v17.0.0"
+                ],
+                "changes": []
+              },
+              "desc": "<ul>\n<li>继承自：<a href=\"readline.html#class-interfaceconstructor\" class=\"type\">&lt;readline.InterfaceConstructor&gt;</a></li>\n</ul>\n<p><code>readlinePromises.Interface</code> 类的实例是使用 <code>readlinePromises.createInterface()</code> 方法构造的。每个实例都与一个 <code>input</code> <a href=\"stream.html#readable-streams\">Readable</a> 流和一个 <code>output</code> <a href=\"stream.html#writable-streams\">Writable</a> 流相关联。<code>output</code> 流用于打印用户输入的提示，该输入到达并从 <code>input</code> 流中读取。</p>",
+              "methods": [
+                {
+                  "textRaw": "`rl.question(query[, options])`",
+                  "type": "method",
+                  "name": "question",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`query` {string} 要写入 `output` 的语句或查询，前置到提示符。",
+                          "name": "query",
+                          "type": "string",
+                          "desc": "要写入 `output` 的语句或查询，前置到提示符。"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`signal` {AbortSignal} 可选地允许使用 `AbortSignal` 取消 `question()`。",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "可选地允许使用 `AbortSignal` 取消 `question()`。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回：{Promise} 一个 Promise，使用用户对 `query` 的输入来兑现。",
+                          "name": "返回：",
+                          "type": "Promise",
+                          "desc": "一个 Promise，使用用户对 `query` 的输入来兑现。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.question()</code> 方法通过将 <code>query</code> 写入 <code>output</code> 来显示它，等待用户在 <code>input</code> 上提供输入，然后调用 <code>callback</code> 函数，将提供的输入作为第一个参数传递。</p>\n<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.question()</code> 将恢复它。</p>\n<p>如果创建 <code>readlinePromises.Interface</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入 <code>query</code>。</p>\n<p>如果在 <code>rl.close()</code> 之后调用问题，它将返回一个被拒绝的 Promise。</p>\n<p>用法示例：</p>\n<pre><code class=\"language-mjs\">const answer = await rl.question('What is your favorite food? ');\nconsole.log(`Oh, so your favorite food is ${answer}`);\n</code></pre>\n<p>使用 <code>AbortSignal</code> 取消问题。</p>\n<pre><code class=\"language-mjs\">const signal = AbortSignal.timeout(10_000);\n\nsignal.addEventListener('abort', () => {\n  console.log('The food question timed out');\n}, { once: true });\n\nconst answer = await rl.question('What is your favorite food? ', { signal });\nconsole.log(`Oh, so your favorite food is ${answer}`);\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`readlinePromises.Interface`"
+            },
+            {
+              "textRaw": "类：`readlinePromises.Readline`",
+              "name": "类：`readlinepromises.readline`",
+              "meta": {
+                "added": [
+                  "v17.0.0"
+                ],
+                "changes": []
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new readlinePromises.Readline(stream[, options])`",
+                  "type": "ctor",
+                  "name": "readlinePromises.Readline",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {stream.Writable} 一个 [TTY][] 流。",
+                          "name": "stream",
+                          "type": "stream.Writable",
+                          "desc": "一个 [TTY][] 流。"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`autoCommit` {boolean} 如果为 `true`，则无需调用 `rl.commit()`。",
+                              "name": "autoCommit",
+                              "type": "boolean",
+                              "desc": "如果为 `true`，则无需调用 `rl.commit()`。"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`rl.clearLine(dir)`",
+                  "type": "method",
+                  "name": "clearLine",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`dir` {integer}",
+                          "name": "dir",
+                          "type": "integer",
+                          "options": [
+                            {
+                              "textRaw": "`-1`：从光标向左",
+                              "name": "-1",
+                              "desc": "：从光标向左"
+                            },
+                            {
+                              "textRaw": "`1`：从光标向右",
+                              "name": "1",
+                              "desc": "：从光标向右"
+                            },
+                            {
+                              "textRaw": "`0`：整行",
+                              "name": "0",
+                              "desc": "：整行"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回：this",
+                          "name": "返回：this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.clearLine()</code> 方法向内部待处理操作列表添加一个操作，该操作清除关联 <code>stream</code> 的当前行，方向由 <code>dir</code> 指定。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>"
+                },
+                {
+                  "textRaw": "`rl.clearScreenDown()`",
+                  "type": "method",
+                  "name": "clearScreenDown",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：this",
+                          "name": "返回：this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.clearScreenDown()</code> 方法向内部待处理操作列表添加一个操作，该操作从光标当前位置向下清除关联的流。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>"
+                },
+                {
+                  "textRaw": "`rl.commit()`",
+                  "type": "method",
+                  "name": "commit",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{Promise}",
+                          "name": "返回：",
+                          "type": "Promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.commit()</code> 方法将所有待处理操作发送到关联的 <code>stream</code> 并清除内部待处理操作列表。</p>"
+                },
+                {
+                  "textRaw": "`rl.cursorTo(x[, y])`",
+                  "type": "method",
+                  "name": "cursorTo",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`x` {integer}",
+                          "name": "x",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "`y` {integer}",
+                          "name": "y",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "返回：this",
+                          "name": "返回：this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.cursorTo()</code> 方法向内部待处理操作列表添加一个操作，该操作将光标移动到关联 <code>stream</code> 中的指定位置。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>"
+                },
+                {
+                  "textRaw": "`rl.moveCursor(dx, dy)`",
+                  "type": "method",
+                  "name": "moveCursor",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`dx` {integer}",
+                          "name": "dx",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "`dy` {integer}",
+                          "name": "dy",
+                          "type": "integer"
+                        },
+                        {
+                          "textRaw": "返回：this",
+                          "name": "返回：this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.moveCursor()</code> 方法向内部待处理操作列表添加一个操作，该操作将光标<em>相对</em>于其当前位置在关联的 <code>stream</code> 中移动。调用 <code>rl.commit()</code> 以查看此方法的效果，除非构造时传入了 <code>autoCommit: true</code>。</p>"
+                },
+                {
+                  "textRaw": "`rl.rollback()`",
+                  "type": "method",
+                  "name": "rollback",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：this",
+                          "name": "返回：this"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.rollback</code> 方法清除内部待处理操作列表，而不将其发送到关联的 <code>stream</code>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`readlinePromises.Readline`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`readlinePromises.createInterface(options)`",
+              "type": "method",
+              "name": "createInterface",
+              "meta": {
+                "added": [
+                  "v17.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`input` {stream.Readable} 要监听的 [Readable][] 流。此选项是*必需的*。",
+                          "name": "input",
+                          "type": "stream.Readable",
+                          "desc": "要监听的 [Readable][] 流。此选项是*必需的*。"
+                        },
+                        {
+                          "textRaw": "`output` {stream.Writable} 要写入 readline 数据的 [Writable][] 流。",
+                          "name": "output",
+                          "type": "stream.Writable",
+                          "desc": "要写入 readline 数据的 [Writable][] 流。"
+                        },
+                        {
+                          "textRaw": "`completer` {Function} 用于 Tab 自动补全的可选函数。",
+                          "name": "completer",
+                          "type": "Function",
+                          "desc": "用于 Tab 自动补全的可选函数。"
+                        },
+                        {
+                          "textRaw": "`terminal` {boolean} 如果 `input` 和 `output` 流应被视为 TTY，并向其写入 ANSI/VT100 转义码，则为 `true`。**默认值：** 在实例化时检查 `output` 流上的 `isTTY`。",
+                          "name": "terminal",
+                          "type": "boolean",
+                          "desc": "如果 `input` 和 `output` 流应被视为 TTY，并向其写入 ANSI/VT100 转义码，则为 `true`。**默认值：** 在实例化时检查 `output` 流上的 `isTTY`。"
+                        },
+                        {
+                          "textRaw": "`history` {string\\[]} 历史行的初始列表。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `[]`。",
+                          "name": "history",
+                          "type": "string\\[]",
+                          "desc": "历史行的初始列表。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `[]`。"
+                        },
+                        {
+                          "textRaw": "`historySize` {number} 保留的历史行最大数量。要禁用历史记录，请将此值设置为 `0`。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `30`。",
+                          "name": "historySize",
+                          "type": "number",
+                          "desc": "保留的历史行最大数量。要禁用历史记录，请将此值设置为 `0`。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `30`。"
+                        },
+                        {
+                          "textRaw": "`removeHistoryDuplicates` {boolean} 如果为 `true`，则当添加到历史列表的新输入行与旧行重复时，从列表中删除旧行。**默认值：** `false`。",
+                          "name": "removeHistoryDuplicates",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，则当添加到历史列表的新输入行与旧行重复时，从列表中删除旧行。**默认值：** `false`。"
+                        },
+                        {
+                          "textRaw": "`prompt` {string} 要使用的提示字符串。**默认值：** `'> '`。",
+                          "name": "prompt",
+                          "type": "string",
+                          "desc": "要使用的提示字符串。**默认值：** `'> '`。"
+                        },
+                        {
+                          "textRaw": "`crlfDelay` {number} 如果 `\\r` 和 `\\n` 之间的延迟超过 `crlfDelay` 毫秒，则 `\\r` 和 `\\n` 都将被视为单独的行结束输入。`crlfDelay` 将被强制转换为不小于 `100` 的数字。可以设置为 `Infinity`，在这种情况下，`\\r` 后跟 `\\n` 将始终被视为单个换行符（这对于读取具有 `\\r\\n` 行分隔符的[文件][]可能是合理的）。**默认值：** `100`。",
+                          "name": "crlfDelay",
+                          "type": "number",
+                          "desc": "如果 `\\r` 和 `\\n` 之间的延迟超过 `crlfDelay` 毫秒，则 `\\r` 和 `\\n` 都将被视为单独的行结束输入。`crlfDelay` 将被强制转换为不小于 `100` 的数字。可以设置为 `Infinity`，在这种情况下，`\\r` 后跟 `\\n` 将始终被视为单个换行符（这对于读取具有 `\\r\\n` 行分隔符的[文件][]可能是合理的）。**默认值：** `100`。"
+                        },
+                        {
+                          "textRaw": "`escapeCodeTimeout` {number} `readlinePromises` 等待字符的持续时间（当读取模糊键序列时，以毫秒为单位，该序列既可以形成使用到目前为止读取的输入的完整键序列，也可以接受额外输入以完成更长的键序列）。**默认值：** `500`。",
+                          "name": "escapeCodeTimeout",
+                          "type": "number",
+                          "desc": "`readlinePromises` 等待字符的持续时间（当读取模糊键序列时，以毫秒为单位，该序列既可以形成使用到目前为止读取的输入的完整键序列，也可以接受额外输入以完成更长的键序列）。**默认值：** `500`。"
+                        },
+                        {
+                          "textRaw": "`tabSize` {integer} 制表符等于的空格数（最小为 1）。**默认值：** `8`。",
+                          "name": "tabSize",
+                          "type": "integer",
+                          "desc": "制表符等于的空格数（最小为 1）。**默认值：** `8`。"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} 允许使用 AbortSignal 关闭接口。",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "允许使用 AbortSignal 关闭接口。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回：{readlinePromises.Interface}",
+                      "name": "返回：",
+                      "type": "readlinePromises.Interface"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>readlinePromises.createInterface()</code> 方法创建一个新的 <code>readlinePromises.Interface</code> 实例。</p>\n<pre><code class=\"language-mjs\">import { createInterface } from 'node:readline/promises';\nimport { stdin, stdout } from 'node:process';\nconst rl = createInterface({\n  input: stdin,\n  output: stdout,\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { createInterface } = require('node:readline/promises');\nconst rl = createInterface({\n  input: process.stdin,\n  output: process.stdout,\n});\n</code></pre>\n<p>一旦创建了 <code>readlinePromises.Interface</code> 实例，最常见的情况是监听 <code>'line'</code> 事件：</p>\n<pre><code class=\"language-js\">rl.on('line', (line) => {\n  console.log(`Received: ${line}`);\n});\n</code></pre>\n<p>如果此实例的 <code>terminal</code> 为 <code>true</code>，那么如果 <code>output</code> 流定义了 <code>output.columns</code> 属性并在列更改时（或在列更改时）在 <code>output</code> 上发出 <code>'resize'</code> 事件，则 <code>output</code> 流将获得最佳兼容性（<a href=\"process.html#processstdout\"><code>process.stdout</code></a> 在它是 TTY 时会自动执行此操作）。</p>",
+              "modules": [
+                {
+                  "textRaw": "`completer` 函数的使用",
+                  "name": "`completer`_函数的使用",
+                  "desc": "<p><code>completer</code> 函数将用户输入的当前行作为参数，并返回一个包含 2 个条目的 <code>Array</code>：</p>\n<ul>\n<li>一个包含补全匹配项的 <code>Array</code>。</li>\n<li>用于匹配的子字符串。</li>\n</ul>\n<p>例如：<code>[[substr1, substr2, ...], originalsubstring]</code>。</p>\n<pre><code class=\"language-js\">function completer(line) {\n  const completions = '.help .error .exit .quit .q'.split(' ');\n  const hits = completions.filter((c) => c.startsWith(line));\n  // 如果未找到匹配项，则显示所有补全\n  return [hits.length ? hits : completions, line];\n}\n</code></pre>\n<p><code>completer</code> 函数也可以返回一个 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise\" class=\"type\">&lt;Promise&gt;</a>，或者是异步的：</p>\n<pre><code class=\"language-js\">async function completer(linePartial) {\n  await someAsyncWork();\n  return [['123'], linePartial];\n}\n</code></pre>",
+                  "type": "module",
+                  "displayName": "`completer` 函数的使用"
+                }
+              ]
+            }
+          ],
+          "type": "module",
+          "displayName": "Promises API"
+        },
+        {
+          "textRaw": "回调 API",
+          "name": "回调_api",
+          "meta": {
+            "added": [
+              "v0.1.104"
+            ],
+            "changes": []
+          },
+          "modules": [
+            {
+              "textRaw": "类：`readline.Interface`",
+              "name": "类：`readline.interface`",
+              "meta": {
+                "added": [
+                  "v0.1.104"
+                ],
+                "changes": [
+                  {
+                    "version": "v17.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/37947",
+                    "description": "The class `readline.Interface` now inherits from `Interface`."
+                  }
+                ]
+              },
+              "desc": "<ul>\n<li>继承自：<a href=\"readline.html#class-interfaceconstructor\" class=\"type\">&lt;readline.InterfaceConstructor&gt;</a></li>\n</ul>\n<p><code>readline.Interface</code> 类的实例是使用 <code>readline.createInterface()</code> 方法构造的。每个实例都与一个 <code>input</code> <a href=\"stream.html#readable-streams\">Readable</a> 流和一个 <code>output</code> <a href=\"stream.html#writable-streams\">Writable</a> 流相关联。<code>output</code> 流用于打印用户输入的提示，该输入到达并从 <code>input</code> 流中读取。</p>",
+              "methods": [
+                {
+                  "textRaw": "`rl.question(query[, options], callback)`",
+                  "type": "method",
+                  "name": "question",
+                  "meta": {
+                    "added": [
+                      "v0.3.3"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`query` {string} 要写入 `output` 的语句或查询，前置到提示符。",
+                          "name": "query",
+                          "type": "string",
+                          "desc": "要写入 `output` 的语句或查询，前置到提示符。"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`signal` {AbortSignal} 可选地允许使用 `AbortController` 取消 `question()`。",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "可选地允许使用 `AbortController` 取消 `question()`。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`callback` {Function} 一个回调函数，使用用户对 `query` 的输入调用。",
+                          "name": "callback",
+                          "type": "Function",
+                          "desc": "一个回调函数，使用用户对 `query` 的输入调用。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p><code>rl.question()</code> 方法通过将 <code>query</code> 写入 <code>output</code> 来显示它，等待用户在 <code>input</code> 上提供输入，然后调用 <code>callback</code> 函数，将提供的输入作为第一个参数传递。</p>\n<p>调用时，如果 <code>input</code> 流已暂停，<code>rl.question()</code> 将恢复它。</p>\n<p>如果创建 <code>readline.Interface</code> 时将 <code>output</code> 设置为 <code>null</code> 或 <code>undefined</code>，则不会写入 <code>query</code>。</p>\n<p>传递给 <code>rl.question()</code> 的 <code>callback</code> 函数不接受典型的 <code>Error</code> 对象或 <code>null</code> 作为第一个参数。<code>callback</code> 使用提供的答案作为唯一参数调用。</p>\n<p>如果在 <code>rl.close()</code> 之后调用 <code>rl.question()</code>，将抛出错误。</p>\n<p>用法示例：</p>\n<pre><code class=\"language-js\">rl.question('What is your favorite food? ', (answer) => {\n  console.log(`Oh, so your favorite food is ${answer}`);\n});\n</code></pre>\n<p>使用 <code>AbortController</code> 取消问题。</p>\n<pre><code class=\"language-js\">const ac = new AbortController();\nconst signal = ac.signal;\n\nrl.question('What is your favorite food? ', { signal }, (answer) => {\n  console.log(`Oh, so your favorite food is ${answer}`);\n});\n\nsignal.addEventListener('abort', () => {\n  console.log('The food question timed out');\n}, { once: true });\n\nsetTimeout(() => ac.abort(), 10000);\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`readline.Interface`"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`readline.clearLine(stream, dir[, callback])`",
+              "type": "method",
+              "name": "clearLine",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  },
+                  {
+                    "version": "v12.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/28674",
+                    "description": "The stream's write() callback and return value are exposed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`stream` {stream.Writable}",
+                      "name": "stream",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`dir` {number}",
+                      "name": "dir",
+                      "type": "number",
+                      "options": [
+                        {
+                          "textRaw": "`-1`：从光标向左",
+                          "name": "-1",
+                          "desc": "：从光标向左"
+                        },
+                        {
+                          "textRaw": "`1`：从光标向右",
+                          "name": "1",
+                          "desc": "：从光标向右"
+                        },
+                        {
+                          "textRaw": "`0`：整行",
+                          "name": "0",
+                          "desc": "：整行"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 操作完成后调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "操作完成后调用。"
+                    },
+                    {
+                      "textRaw": "返回：{boolean} 如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。",
+                      "name": "返回：",
+                      "type": "boolean",
+                      "desc": "如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>readline.clearLine()</code> 方法清除给定 <a href=\"tty.html\">TTY</a> 流的当前行，方向由 <code>dir</code> 指定。</p>"
+            },
+            {
+              "textRaw": "`readline.clearScreenDown(stream[, callback])`",
+              "type": "method",
+              "name": "clearScreenDown",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  },
+                  {
+                    "version": "v12.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/28641",
+                    "description": "The stream's write() callback and return value are exposed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`stream` {stream.Writable}",
+                      "name": "stream",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 操作完成后调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "操作完成后调用。"
+                    },
+                    {
+                      "textRaw": "返回：{boolean} 如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。",
+                      "name": "返回：",
+                      "type": "boolean",
+                      "desc": "如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>readline.clearScreenDown()</code> 方法从光标当前位置向下清除给定的 <a href=\"tty.html\">TTY</a> 流。</p>"
+            },
+            {
+              "textRaw": "`readline.createInterface(options)`",
+              "type": "method",
+              "name": "createInterface",
+              "meta": {
+                "added": [
+                  "v0.1.98"
+                ],
+                "changes": [
+                  {
+                    "version": [
+                      "v15.14.0",
+                      "v14.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/37932",
+                    "description": "The `signal` option is supported now."
+                  },
+                  {
+                    "version": [
+                      "v15.8.0",
+                      "v14.18.0"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/33662",
+                    "description": "The `history` option is supported now."
+                  },
+                  {
+                    "version": "v13.9.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/31318",
+                    "description": "The `tabSize` option is supported now."
+                  },
+                  {
+                    "version": [
+                      "v8.3.0",
+                      "v6.11.4"
+                    ],
+                    "pr-url": "https://github.com/nodejs/node/pull/13497",
+                    "description": "Remove max limit of `crlfDelay` option."
+                  },
+                  {
+                    "version": "v6.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/8109",
+                    "description": "The `crlfDelay` option is supported now."
+                  },
+                  {
+                    "version": "v6.3.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/7125",
+                    "description": "The `prompt` option is supported now."
+                  },
+                  {
+                    "version": "v6.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/6352",
+                    "description": "The `historySize` option can be `0` now."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`input` {stream.Readable} 要监听的 [Readable][] 流。此选项是*必需的*。",
+                          "name": "input",
+                          "type": "stream.Readable",
+                          "desc": "要监听的 [Readable][] 流。此选项是*必需的*。"
+                        },
+                        {
+                          "textRaw": "`output` {stream.Writable} 要写入 readline 数据的 [Writable][] 流。",
+                          "name": "output",
+                          "type": "stream.Writable",
+                          "desc": "要写入 readline 数据的 [Writable][] 流。"
+                        },
+                        {
+                          "textRaw": "`completer` {Function} 用于 Tab 自动补全的可选函数。",
+                          "name": "completer",
+                          "type": "Function",
+                          "desc": "用于 Tab 自动补全的可选函数。"
+                        },
+                        {
+                          "textRaw": "`terminal` {boolean} 如果 `input` 和 `output` 流应被视为 TTY，并向其写入 ANSI/VT100 转义码，则为 `true`。**默认值：** 在实例化时检查 `output` 流上的 `isTTY`。",
+                          "name": "terminal",
+                          "type": "boolean",
+                          "desc": "如果 `input` 和 `output` 流应被视为 TTY，并向其写入 ANSI/VT100 转义码，则为 `true`。**默认值：** 在实例化时检查 `output` 流上的 `isTTY`。"
+                        },
+                        {
+                          "textRaw": "`history` {string\\[]} 历史行的初始列表。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `[]`。",
+                          "name": "history",
+                          "type": "string\\[]",
+                          "desc": "历史行的初始列表。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `[]`。"
+                        },
+                        {
+                          "textRaw": "`historySize` {number} 保留的历史行最大数量。要禁用历史记录，请将此值设置为 `0`。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `30`。",
+                          "name": "historySize",
+                          "type": "number",
+                          "desc": "保留的历史行最大数量。要禁用历史记录，请将此值设置为 `0`。此选项仅在 `terminal` 由用户或通过内部 `output` 检查设置为 `true` 时才有意义，否则根本不会初始化历史缓存机制。**默认值：** `30`。"
+                        },
+                        {
+                          "textRaw": "`removeHistoryDuplicates` {boolean} 如果为 `true`，则当添加到历史列表的新输入行与旧行重复时，从列表中删除旧行。**默认值：** `false`。",
+                          "name": "removeHistoryDuplicates",
+                          "type": "boolean",
+                          "desc": "如果为 `true`，则当添加到历史列表的新输入行与旧行重复时，从列表中删除旧行。**默认值：** `false`。"
+                        },
+                        {
+                          "textRaw": "`prompt` {string} 要使用的提示字符串。**默认值：** `'> '`。",
+                          "name": "prompt",
+                          "type": "string",
+                          "desc": "要使用的提示字符串。**默认值：** `'> '`。"
+                        },
+                        {
+                          "textRaw": "`crlfDelay` {number} 如果 `\\r` 和 `\\n` 之间的延迟超过 `crlfDelay` 毫秒，则 `\\r` 和 `\\n` 都将被视为单独的行结束输入。`crlfDelay` 将被强制转换为不小于 `100` 的数字。可以设置为 `Infinity`，在这种情况下，`\\r` 后跟 `\\n` 将始终被视为单个换行符（这对于读取具有 `\\r\\n` 行分隔符的[文件][]可能是合理的）。**默认值：** `100`。",
+                          "name": "crlfDelay",
+                          "type": "number",
+                          "desc": "如果 `\\r` 和 `\\n` 之间的延迟超过 `crlfDelay` 毫秒，则 `\\r` 和 `\\n` 都将被视为单独的行结束输入。`crlfDelay` 将被强制转换为不小于 `100` 的数字。可以设置为 `Infinity`，在这种情况下，`\\r` 后跟 `\\n` 将始终被视为单个换行符（这对于读取具有 `\\r\\n` 行分隔符的[文件][]可能是合理的）。**默认值：** `100`。"
+                        },
+                        {
+                          "textRaw": "`escapeCodeTimeout` {number} `readline` 等待字符的持续时间（当读取模糊键序列时，以毫秒为单位，该序列既可以形成使用到目前为止读取的输入的完整键序列，也可以接受额外输入以完成更长的键序列）。**默认值：** `500`。",
+                          "name": "escapeCodeTimeout",
+                          "type": "number",
+                          "desc": "`readline` 等待字符的持续时间（当读取模糊键序列时，以毫秒为单位，该序列既可以形成使用到目前为止读取的输入的完整键序列，也可以接受额外输入以完成更长的键序列）。**默认值：** `500`。"
+                        },
+                        {
+                          "textRaw": "`tabSize` {integer} 制表符等于的空格数（最小为 1）。**默认值：** `8`。",
+                          "name": "tabSize",
+                          "type": "integer",
+                          "desc": "制表符等于的空格数（最小为 1）。**默认值：** `8`。"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} 允许使用 AbortSignal 关闭接口。中止信号将在内部调用接口上的 `close`。",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "允许使用 AbortSignal 关闭接口。中止信号将在内部调用接口上的 `close`。"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回：{readline.Interface}",
+                      "name": "返回：",
+                      "type": "readline.Interface"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>readline.createInterface()</code> 方法创建一个新的 <code>readline.Interface</code> 实例。</p>\n<pre><code class=\"language-mjs\">import { createInterface } from 'node:readline';\nimport { stdin, stdout } from 'node:process';\nconst rl = createInterface({\n  input: stdin,\n  output: stdout,\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { createInterface } = require('node:readline');\nconst rl = createInterface({\n  input: process.stdin,\n  output: process.stdout,\n});\n</code></pre>\n<p>一旦创建了 <code>readline.Interface</code> 实例，最常见的情况是监听 <code>'line'</code> 事件：</p>\n<pre><code class=\"language-js\">rl.on('line', (line) => {\n  console.log(`Received: ${line}`);\n});\n</code></pre>\n<p>如果此实例的 <code>terminal</code> 为 <code>true</code>，那么如果 <code>output</code> 流定义了 <code>output.columns</code> 属性并在列更改时（或在列更改时）在 <code>output</code> 上发出 <code>'resize'</code> 事件，则 <code>output</code> 流将获得最佳兼容性（<a href=\"process.html#processstdout\"><code>process.stdout</code></a> 在它是 TTY 时会自动执行此操作）。</p>\n<p>当使用 <code>stdin</code> 作为输入创建 <code>readline.Interface</code> 时，程序在接收到 [EOF 字符][]之前不会终止。要退出而不等待用户输入，请调用 <code>process.stdin.unref()</code>。</p>",
+              "modules": [
+                {
+                  "textRaw": "`completer` 函数的使用",
+                  "name": "`completer`_函数的使用",
+                  "desc": "<p><code>completer</code> 函数将用户输入的当前行作为参数，并返回一个包含 2 个条目的 <code>Array</code>：</p>\n<ul>\n<li>一个包含补全匹配项的 <code>Array</code>。</li>\n<li>用于匹配的子字符串。</li>\n</ul>\n<p>例如：<code>[[substr1, substr2, ...], originalsubstring]</code>。</p>\n<pre><code class=\"language-js\">function completer(line) {\n  const completions = '.help .error .exit .quit .q'.split(' ');\n  const hits = completions.filter((c) => c.startsWith(line));\n  // 如果未找到匹配项，则显示所有补全\n  return [hits.length ? hits : completions, line];\n}\n</code></pre>\n<p>如果 <code>completer</code> 函数接受两个参数，则可以异步调用它：</p>\n<pre><code class=\"language-js\">function completer(linePartial, callback) {\n  callback(null, [['123'], linePartial]);\n}\n</code></pre>",
+                  "type": "module",
+                  "displayName": "`completer` 函数的使用"
+                }
+              ]
+            },
+            {
+              "textRaw": "`readline.cursorTo(stream, x[, y][, callback])`",
+              "type": "method",
+              "name": "cursorTo",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  },
+                  {
+                    "version": "v12.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/28674",
+                    "description": "The stream's write() callback and return value are exposed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`stream` {stream.Writable}",
+                      "name": "stream",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`x` {number}",
+                      "name": "x",
+                      "type": "number"
+                    },
+                    {
+                      "textRaw": "`y` {number}",
+                      "name": "y",
+                      "type": "number"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 操作完成后调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "操作完成后调用。"
+                    },
+                    {
+                      "textRaw": "返回：{boolean} 如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。",
+                      "name": "返回：",
+                      "type": "boolean",
+                      "desc": "如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>readline.cursorTo()</code> 方法将光标移动到给定 <a href=\"tty.html\">TTY</a> <code>stream</code> 中的指定位置。</p>"
+            },
+            {
+              "textRaw": "`readline.moveCursor(stream, dx, dy[, callback])`",
+              "type": "method",
+              "name": "moveCursor",
+              "meta": {
+                "added": [
+                  "v0.7.7"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  },
+                  {
+                    "version": "v12.7.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/28674",
+                    "description": "The stream's write() callback and return value are exposed."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`stream` {stream.Writable}",
+                      "name": "stream",
+                      "type": "stream.Writable"
+                    },
+                    {
+                      "textRaw": "`dx` {number}",
+                      "name": "dx",
+                      "type": "number"
+                    },
+                    {
+                      "textRaw": "`dy` {number}",
+                      "name": "dy",
+                      "type": "number"
+                    },
+                    {
+                      "textRaw": "`callback` {Function} 操作完成后调用。",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "操作完成后调用。"
+                    },
+                    {
+                      "textRaw": "返回：{boolean} 如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。",
+                      "name": "返回：",
+                      "type": "boolean",
+                      "desc": "如果 `stream` 希望调用代码在继续写入更多数据之前等待 `'drain'` 事件发出，则为 `false`；否则为 `true`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p><code>readline.moveCursor()</code> 方法将光标<em>相对</em>于其当前位置在给定的 <a href=\"tty.html\">TTY</a> <code>stream</code> 中移动。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "回调 API"
+        },
+        {
+          "textRaw": "示例：小型 CLI",
+          "name": "示例：小型_cli",
+          "desc": "<p>以下示例说明了使用 <code>readline.Interface</code> 类实现一个小型命令行界面：</p>\n<pre><code class=\"language-mjs\">import { createInterface } from 'node:readline';\nimport { exit, stdin, stdout } from 'node:process';\nconst rl = createInterface({\n  input: stdin,\n  output: stdout,\n  prompt: 'OHAI> ',\n});\n\nrl.prompt();\n\nrl.on('line', (line) => {\n  switch (line.trim()) {\n    case 'hello':\n      console.log('world!');\n      break;\n    default:\n      console.log(`Say what? I might have heard '${line.trim()}'`);\n      break;\n  }\n  rl.prompt();\n}).on('close', () => {\n  console.log('Have a great day!');\n  exit(0);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { createInterface } = require('node:readline');\nconst rl = createInterface({\n  input: process.stdin,\n  output: process.stdout,\n  prompt: 'OHAI> ',\n});\n\nrl.prompt();\n\nrl.on('line', (line) => {\n  switch (line.trim()) {\n    case 'hello':\n      console.log('world!');\n      break;\n    default:\n      console.log(`Say what? I might have heard '${line.trim()}'`);\n      break;\n  }\n  rl.prompt();\n}).on('close', () => {\n  console.log('Have a great day!');\n  process.exit(0);\n});\n</code></pre>",
+          "type": "module",
+          "displayName": "示例：小型 CLI"
+        },
+        {
+          "textRaw": "示例：逐行读取文件流",
+          "name": "示例：逐行读取文件流",
+          "desc": "<p><code>readline</code> 的一个常见用例是一次一行地使用输入文件。最简单的方法是利用 <a href=\"fs.html#class-fsreadstream\"><code>fs.ReadStream</code></a> API 以及 <code>for await...of</code> 循环：</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'node:fs';\nimport { createInterface } from 'node:readline';\n\nasync function processLineByLine() {\n  const fileStream = createReadStream('input.txt');\n\n  const rl = createInterface({\n    input: fileStream,\n    crlfDelay: Infinity,\n  });\n  // 注意：我们使用 crlfDelay 选项将 input.txt 中的所有 CR LF 实例（'\\r\\n'）识别为单个换行符。\n\n  for await (const line of rl) {\n    // input.txt 中的每一行将在此处作为 `line` 依次可用。\n    console.log(`Line from file: ${line}`);\n  }\n}\n\nprocessLineByLine();\n</code></pre>\n<pre><code class=\"language-cjs\">const { createReadStream } = require('node:fs');\nconst { createInterface } = require('node:readline');\n\nasync function processLineByLine() {\n  const fileStream = createReadStream('input.txt');\n\n  const rl = createInterface({\n    input: fileStream,\n    crlfDelay: Infinity,\n  });\n  // 注意：我们使用 crlfDelay 选项将 input.txt 中的所有 CR LF 实例（'\\r\\n'）识别为单个换行符。\n\n  for await (const line of rl) {\n    // input.txt 中的每一行将在此处作为 `line` 依次可用。\n    console.log(`Line from file: ${line}`);\n  }\n}\n\nprocessLineByLine();\n</code></pre>\n<p>或者，可以使用 <a href=\"#event-line\"><code>'line'</code></a> 事件：</p>\n<pre><code class=\"language-mjs\">import { createReadStream } from 'node:fs';\nimport { createInterface } from 'node:readline';\n\nconst rl = createInterface({\n  input: createReadStream('sample.txt'),\n  crlfDelay: Infinity,\n});\n\nrl.on('line', (line) => {\n  console.log(`Line from file: ${line}`);\n});\n</code></pre>\n<pre><code class=\"language-cjs\">const { createReadStream } = require('node:fs');\nconst { createInterface } = require('node:readline');\n\nconst rl = createInterface({\n  input: createReadStream('sample.txt'),\n  crlfDelay: Infinity,\n});\n\nrl.on('line', (line) => {\n  console.log(`Line from file: ${line}`);\n});\n</code></pre>\n<p>目前，<code>for await...of</code> 循环可能稍慢一些。如果 <code>async</code> / <code>await</code> 流程和速度都至关重要，可以采用混合方法：</p>\n<pre><code class=\"language-mjs\">import { once } from 'node:events';\nimport { createReadStream } from 'node:fs';\nimport { createInterface } from 'node:readline';\n\n(async function processLineByLine() {\n  try {\n    const rl = createInterface({\n      input: createReadStream('big-file.txt'),\n      crlfDelay: Infinity,\n    });\n\n    rl.on('line', (line) => {\n      // 处理该行。\n    });\n\n    await once(rl, 'close');\n\n    console.log('File processed.');\n  } catch (err) {\n    console.error(err);\n  }\n})();\n</code></pre>\n<pre><code class=\"language-cjs\">const { once } = require('node:events');\nconst { createReadStream } = require('node:fs');\nconst { createInterface } = require('node:readline');\n\n(async function processLineByLine() {\n  try {\n    const rl = createInterface({\n      input: createReadStream('big-file.txt'),\n      crlfDelay: Infinity,\n    });\n\n    rl.on('line', (line) => {\n      // 处理该行。\n    });\n\n    await once(rl, 'close');\n\n    console.log('File processed.');\n  } catch (err) {\n    console.error(err);\n  }\n})();\n</code></pre>",
+          "type": "module",
+          "displayName": "示例：逐行读取文件流"
+        },
+        {
+          "textRaw": "TTY 键绑定",
+          "name": "tty_键绑定",
+          "desc": "<table>\n  <tr>\n    <th>键绑定</th>\n    <th>描述</th>\n    <th>备注</th>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Backspace</kbd></td>\n    <td>向左删除行</td>\n    <td>在 Linux、Mac 和 Windows 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Delete</kbd></td>\n    <td>向右删除行</td>\n    <td>在 Mac 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>C</kbd></td>\n    <td>发出 <code>SIGINT</code> 或关闭 readline 实例</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>H</kbd></td>\n    <td>向左删除</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>D</kbd></td>\n    <td>向右删除或在当前行为空 / EOF 时关闭 readline 实例</td>\n    <td>在 Windows 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>U</kbd></td>\n    <td>从当前位置删除到行首</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>K</kbd></td>\n    <td>从当前位置删除到行尾</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td>\n    <td>召回先前删除的文本</td>\n    <td>仅适用于通过 <kbd>Ctrl</kbd>+<kbd>U</kbd> 或 <kbd>Ctrl</kbd>+<kbd>K</kbd> 删除的文本</td>\n  </tr>\n  <tr>\n    <td><kbd>Meta</kbd>+<kbd>Y</kbd></td>\n    <td>在先前删除的文本之间循环</td>\n    <td>仅当最后一次击键是 <kbd>Ctrl</kbd>+<kbd>Y</kbd> 或 <kbd>Meta</kbd>+<kbd>Y</kbd> 时可用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>A</kbd></td>\n    <td>转到行首</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>E</kbd></td>\n    <td>转到行尾</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>\n    <td>向后一个字符</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>F</kbd></td>\n    <td>向前一个字符</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>L</kbd></td>\n    <td>清屏</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>N</kbd></td>\n    <td>下一个历史项</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>P</kbd></td>\n    <td>上一个历史项</td>\n    <td></td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>-</kbd></td>\n    <td>撤销上一个更改</td>\n    <td>任何发出键码 <code>0x1F</code> 的击键都将执行此操作。\n    在许多终端中，例如 <code>xterm</code>，\n    这绑定到 <kbd>Ctrl</kbd>+<kbd>-</kbd>。</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>6</kbd></td>\n    <td>重做上一个更改</td>\n    <td>许多终端没有默认的重做击键。\n    我们选择键码 <code>0x1E</code> 来执行重做。\n    在 <code>xterm</code> 中，默认绑定到 <kbd>Ctrl</kbd>+<kbd>6</kbd>。</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>\n    <td>将正在运行的进程移动到后台。键入\n    <code>fg</code> 并按 <kbd>Enter</kbd>\n    返回。</td>\n    <td>在 Windows 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>W</kbd> 或 <kbd>Ctrl</kbd>\n   +<kbd>Backspace</kbd></td>\n    <td>向后删除到单词边界</td>\n    <td><kbd>Ctrl</kbd>+<kbd>Backspace</kbd> 在\n    Linux、Mac 和 Windows 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>Delete</kbd></td>\n    <td>向前删除到单词边界</td>\n    <td>在 Mac 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>左箭头</kbd> 或\n    <kbd>Meta</kbd>+<kbd>B</kbd></td>\n    <td>向左一个单词</td>\n    <td><kbd>Ctrl</kbd>+<kbd>左箭头</kbd> 在\n    Mac 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Ctrl</kbd>+<kbd>右箭头</kbd> 或\n    <kbd>Meta</kbd>+<kbd>F</kbd></td>\n    <td>向右一个单词</td>\n    <td><kbd>Ctrl</kbd>+<kbd>右箭头</kbd> 在\n    Mac 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Meta</kbd>+<kbd>D</kbd> 或 <kbd>Meta</kbd>\n   +<kbd>Delete</kbd></td>\n    <td>向右删除单词</td>\n    <td><kbd>Meta</kbd>+<kbd>Delete</kbd> 在\n    Windows 上不起作用</td>\n  </tr>\n  <tr>\n    <td><kbd>Meta</kbd>+<kbd>Backspace</kbd></td>\n    <td>向左删除单词</td>\n    <td>在 Mac 上不起作用</td>\n  </tr>\n</table>",
+          "type": "module",
+          "displayName": "TTY 键绑定"
+        }
+      ],
+      "methods": [
+        {
+          "textRaw": "`readline.emitKeypressEvents(stream[, interface])`",
+          "type": "method",
+          "name": "emitKeypressEvents",
+          "meta": {
+            "added": [
+              "v0.7.7"
+            ],
+            "changes": []
+          },
+          "signatures": [
+            {
+              "params": [
+                {
+                  "textRaw": "`stream` {stream.Readable}",
+                  "name": "stream",
+                  "type": "stream.Readable"
+                },
+                {
+                  "textRaw": "`interface` {readline.InterfaceConstructor}",
+                  "name": "interface",
+                  "type": "readline.InterfaceConstructor"
+                }
+              ]
+            }
+          ],
+          "desc": "<p><code>readline.emitKeypressEvents()</code> 方法使给定的 <a href=\"stream.html#readable-streams\">Readable</a> 流开始发出与接收到的输入对应的 <code>'keypress'</code> 事件。</p>\n<p>可选地，<code>interface</code> 指定一个 <code>readline.Interface</code> 实例，当检测到复制粘贴的输入时，该实例的自动补全将被禁用。</p>\n<p>如果 <code>stream</code> 是 <a href=\"tty.html\">TTY</a>，则它必须处于原始模式。</p>\n<p>如果 <code>input</code> 是终端，任何 readline 实例都会自动在其 <code>input</code> 上调用此方法。关闭 <code>readline</code> 实例不会停止 <code>input</code> 发出 <code>'keypress'</code> 事件。</p>\n<pre><code class=\"language-js\">readline.emitKeypressEvents(process.stdin);\nif (process.stdin.isTTY)\n  process.stdin.setRawMode(true);\n</code></pre>"
+        }
+      ],
+      "type": "module",
+      "displayName": "Readline"
+    }
+  ]
+}

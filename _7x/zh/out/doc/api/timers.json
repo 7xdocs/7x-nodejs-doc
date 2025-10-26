@@ -1,0 +1,736 @@
+{
+  "type": "module",
+  "source": "doc/api/timers.md",
+  "modules": [
+    {
+      "textRaw": "Timers",
+      "name": "timers",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/timers.js\">lib/timers.js</a></p>\n<p><code>timer</code> 模块暴露了一个全局 API，用于调度在未来的某个时间点调用的函数。因为定时器函数是全局的，所以不需要调用 <code>require('node:timers')</code> 来使用该 API。</p>\n<p>Node.js 中的定时器函数实现了一个与 Web 浏览器提供的定时器 API 类似的 API，但使用了一个围绕 Node.js [事件循环][]构建的不同内部实现。</p>",
+      "modules": [
+        {
+          "textRaw": "类: `Immediate`",
+          "name": "类:_`immediate`",
+          "desc": "<p>此对象在内部创建，并从 <a href=\"#setimmediatecallback-args\"><code>setImmediate()</code></a> 返回。它可以传递给 <a href=\"#clearimmediateimmediate\"><code>clearImmediate()</code></a> 以取消已调度的操作。</p>\n<p>默认情况下，当调度了一个 Immediate 时，只要该 Immediate 是活跃的，Node.js 事件循环将继续运行。由 <a href=\"#setimmediatecallback-args\"><code>setImmediate()</code></a> 返回的 <code>Immediate</code> 对象导出了 <code>immediate.ref()</code> 和 <code>immediate.unref()</code> 函数，可用于控制此默认行为。</p>",
+          "methods": [
+            {
+              "textRaw": "`immediate.hasRef()`",
+              "type": "method",
+              "name": "hasRef",
+              "meta": {
+                "added": [
+                  "v11.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果为 true，则 <code>Immediate</code> 对象将保持 Node.js 事件循环活跃。</p>"
+            },
+            {
+              "textRaw": "`immediate.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v9.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Immediate} 对 `immediate` 的引用",
+                      "name": "返回",
+                      "type": "Immediate",
+                      "desc": "对 `immediate` 的引用"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>调用时，只要 <code>Immediate</code> 是活跃的，就请求 Node.js 事件循环<em>不要</em>退出。多次调用 <code>immediate.ref()</code> 将没有效果。</p>\n<p>默认情况下，所有 <code>Immediate</code> 对象都是 \"ref'ed\" 的，这使得通常不需要调用 <code>immediate.ref()</code>，除非之前调用过 <code>immediate.unref()</code>。</p>"
+            },
+            {
+              "textRaw": "`immediate.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v9.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Immediate} 对 `immediate` 的引用",
+                      "name": "返回",
+                      "type": "Immediate",
+                      "desc": "对 `immediate` 的引用"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>调用时，活跃的 <code>Immediate</code> 对象将不要求 Node.js 事件循环保持活跃。如果没有其他活动保持事件循环运行，进程可能会在 <code>Immediate</code> 对象的回调被调用之前退出。多次调用 <code>immediate.unref()</code> 将没有效果。</p>"
+            },
+            {
+              "textRaw": "`immediate[Symbol.dispose]()`",
+              "type": "method",
+              "name": "[Symbol.dispose]",
+              "meta": {
+                "added": [
+                  "v20.5.0",
+                  "v18.18.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58467",
+                    "description": "No longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>取消 immediate。这类似于调用 <code>clearImmediate()</code>。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `Immediate`"
+        },
+        {
+          "textRaw": "类: `Timeout`",
+          "name": "类:_`timeout`",
+          "desc": "<p>此对象在内部创建，并从 <a href=\"#settimeoutcallback-delay-args\"><code>setTimeout()</code></a> 和 <a href=\"#setintervalcallback-delay-args\"><code>setInterval()</code></a> 返回。它可以传递给 <a href=\"#cleartimeouttimeout\"><code>clearTimeout()</code></a> 或 <a href=\"#clearintervaltimeout\"><code>clearInterval()</code></a> 以取消已调度的操作。</p>\n<p>默认情况下，当使用 <a href=\"#settimeoutcallback-delay-args\"><code>setTimeout()</code></a> 或 <a href=\"#setintervalcallback-delay-args\"><code>setInterval()</code></a> 调度定时器时，只要定时器是活跃的，Node.js 事件循环将继续运行。这些函数返回的每个 <code>Timeout</code> 对象都导出了 <code>timeout.ref()</code> 和 <code>timeout.unref()</code> 函数，可用于控制此默认行为。</p>",
+          "methods": [
+            {
+              "textRaw": "`timeout.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": []
+              },
+              "stability": 3,
+              "stabilityText": "Legacy: 使用 [`clearTimeout()`][] 代替。",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Timeout} 对 `timeout` 的引用",
+                      "name": "返回",
+                      "type": "Timeout",
+                      "desc": "对 `timeout` 的引用"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>取消超时。</p>"
+            },
+            {
+              "textRaw": "`timeout.hasRef()`",
+              "type": "method",
+              "name": "hasRef",
+              "meta": {
+                "added": [
+                  "v11.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {boolean}",
+                      "name": "返回",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>如果为 true，则 <code>Timeout</code> 对象将保持 Node.js 事件循环活跃。</p>"
+            },
+            {
+              "textRaw": "`timeout.ref()`",
+              "type": "method",
+              "name": "ref",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Timeout} 对 `timeout` 的引用",
+                      "name": "返回",
+                      "type": "Timeout",
+                      "desc": "对 `timeout` 的引用"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>调用时，只要 <code>Timeout</code> 是活跃的，就请求 Node.js 事件循环<em>不要</em>退出。多次调用 <code>timeout.ref()</code> 将没有效果。</p>\n<p>默认情况下，所有 <code>Timeout</code> 对象都是 \"ref'ed\" 的，这使得通常不需要调用 <code>timeout.ref()</code>，除非之前调用过 <code>timeout.unref()</code>。</p>"
+            },
+            {
+              "textRaw": "`timeout.refresh()`",
+              "type": "method",
+              "name": "refresh",
+              "meta": {
+                "added": [
+                  "v10.2.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Timeout} 对 `timeout` 的引用",
+                      "name": "返回",
+                      "type": "Timeout",
+                      "desc": "对 `timeout` 的引用"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将定时器的开始时间设置为当前时间，并重新调度定时器，以在当前时间调整后的先前指定持续时间调用其回调。这对于在不分配新的 JavaScript 对象的情况下刷新定时器非常有用。</p>\n<p>在已经调用过其回调的定时器上使用此方法将重新激活定时器。</p>"
+            },
+            {
+              "textRaw": "`timeout.unref()`",
+              "type": "method",
+              "name": "unref",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Timeout} 对 `timeout` 的引用",
+                      "name": "返回",
+                      "type": "Timeout",
+                      "desc": "对 `timeout` 的引用"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>调用时，活跃的 <code>Timeout</code> 对象将不要求 Node.js 事件循环保持活跃。如果没有其他活动保持事件循环运行，进程可能会在 <code>Timeout</code> 对象的回调被调用之前退出。多次调用 <code>timeout.unref()</code> 将没有效果。</p>"
+            },
+            {
+              "textRaw": "`timeout[Symbol.toPrimitive]()`",
+              "type": "method",
+              "name": "[Symbol.toPrimitive]",
+              "meta": {
+                "added": [
+                  "v14.9.0",
+                  "v12.19.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {integer} 一个可用于引用此 `timeout` 的数字",
+                      "name": "返回",
+                      "type": "integer",
+                      "desc": "一个可用于引用此 `timeout` 的数字"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>将 <code>Timeout</code> 强制转换为原始值。该原始值可用于清除 <code>Timeout</code>。该原始值只能在创建超时的同一线程中使用。因此，要在 <a href=\"worker_threads.html\"><code>worker_threads</code></a> 中使用它，必须首先将其传递到正确的线程。这增强了与浏览器 <code>setTimeout()</code> 和 <code>setInterval()</code> 实现的兼容性。</p>"
+            },
+            {
+              "textRaw": "`timeout[Symbol.dispose]()`",
+              "type": "method",
+              "name": "[Symbol.dispose]",
+              "meta": {
+                "added": [
+                  "v20.5.0",
+                  "v18.18.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v24.2.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/58467",
+                    "description": "No longer experimental."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>取消超时。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类: `Timeout`"
+        },
+        {
+          "textRaw": "调度定时器",
+          "name": "调度定时器",
+          "desc": "<p>Node.js 中的定时器是一种内部构造，它在一定时间后调用给定的函数。定时器函数的调用时间取决于用于创建定时器的方法以及 Node.js 事件循环正在执行的其他工作。</p>",
+          "methods": [
+            {
+              "textRaw": "`setImmediate(callback[, ...args])`",
+              "type": "method",
+              "name": "setImmediate",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 在 Node.js [事件循环][]的当前回合结束时调用的函数",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "在 Node.js [事件循环][]的当前回合结束时调用的函数"
+                    },
+                    {
+                      "textRaw": "`...args` {any} 调用 `callback` 时传递的可选参数",
+                      "name": "...args",
+                      "type": "any",
+                      "desc": "调用 `callback` 时传递的可选参数"
+                    },
+                    {
+                      "textRaw": "返回: {Immediate} 用于 [`clearImmediate()`][]",
+                      "name": "返回",
+                      "type": "Immediate",
+                      "desc": "用于 [`clearImmediate()`][]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>调度 <code>callback</code> 在 I/O 事件回调之后\"立即\"执行。</p>\n<p>当多次调用 <code>setImmediate()</code> 时，<code>callback</code> 函数按照它们被创建的顺序排队执行。整个回调队列在每个事件循环迭代中处理。如果从正在执行的回调内部排队了一个 immediate 定时器，则该定时器直到下一个事件循环迭代才会触发。</p>\n<p>如果 <code>callback</code> 不是函数，将抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>\n<p>此方法有一个用于 promise 的自定义变体，可通过 <a href=\"#timerspromisessetimmediatevalue-options\"><code>timersPromises.setImmediate()</code></a> 使用。</p>"
+            },
+            {
+              "textRaw": "`setInterval(callback[, delay[, ...args]])`",
+              "type": "method",
+              "name": "setInterval",
+              "meta": {
+                "added": [
+                  "v0.0.1"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 定时器到期时调用的函数",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "定时器到期时调用的函数"
+                    },
+                    {
+                      "textRaw": "`delay` {number} 在调用 `callback` 之前要等待的毫秒数。**默认值:** `1`",
+                      "name": "delay",
+                      "type": "number",
+                      "desc": "在调用 `callback` 之前要等待的毫秒数。**默认值:** `1`"
+                    },
+                    {
+                      "textRaw": "`...args` {any} 调用 `callback` 时传递的可选参数",
+                      "name": "...args",
+                      "type": "any",
+                      "desc": "调用 `callback` 时传递的可选参数"
+                    },
+                    {
+                      "textRaw": "返回: {Timeout} 用于 [`clearInterval()`][]",
+                      "name": "返回",
+                      "type": "Timeout",
+                      "desc": "用于 [`clearInterval()`][]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>每隔 <code>delay</code> 毫秒调度重复执行 <code>callback</code>。</p>\n<p>当 <code>delay</code> 大于 <code>2147483647</code> 或小于 <code>1</code> 或 <code>NaN</code> 时，<code>delay</code> 将被设置为 <code>1</code>。非整数延迟会被截断为整数。</p>\n<p>如果 <code>callback</code> 不是函数，将抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>\n<p>此方法有一个用于 promise 的自定义变体，可通过 <a href=\"#timerspromisessetintervaldelay-value-options\"><code>timersPromises.setInterval()</code></a> 使用。</p>"
+            },
+            {
+              "textRaw": "`setTimeout(callback[, delay[, ...args]])`",
+              "type": "method",
+              "name": "setTimeout",
+              "meta": {
+                "added": [
+                  "v0.0.1"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/41678",
+                    "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`callback` {Function} 定时器到期时调用的函数",
+                      "name": "callback",
+                      "type": "Function",
+                      "desc": "定时器到期时调用的函数"
+                    },
+                    {
+                      "textRaw": "`delay` {number} 在调用 `callback` 之前要等待的毫秒数。**默认值:** `1`",
+                      "name": "delay",
+                      "type": "number",
+                      "desc": "在调用 `callback` 之前要等待的毫秒数。**默认值:** `1`"
+                    },
+                    {
+                      "textRaw": "`...args` {any} 调用 `callback` 时传递的可选参数",
+                      "name": "...args",
+                      "type": "any",
+                      "desc": "调用 `callback` 时传递的可选参数"
+                    },
+                    {
+                      "textRaw": "返回: {Timeout} 用于 [`clearTimeout()`][]",
+                      "name": "返回",
+                      "type": "Timeout",
+                      "desc": "用于 [`clearTimeout()`][]"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在 <code>delay</code> 毫秒后调度执行一次性的 <code>callback</code>。</p>\n<p><code>callback</code> 可能不会在精确的 <code>delay</code> 毫秒后被调用。Node.js 不保证回调触发的确切时间，也不保证它们的顺序。回调将尽可能接近指定的时间调用。</p>\n<p>当 <code>delay</code> 大于 <code>2147483647</code> 或小于 <code>1</code> 或 <code>NaN</code> 时，<code>delay</code> 将被设置为 <code>1</code>。非整数延迟会被截断为整数。</p>\n<p>如果 <code>callback</code> 不是函数，将抛出 <a href=\"errors.html#class-typeerror\"><code>TypeError</code></a>。</p>\n<p>此方法有一个用于 promise 的自定义变体，可通过 <a href=\"#timerspromisessettimeoutdelay-value-options\"><code>timersPromises.setTimeout()</code></a> 使用。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "调度定时器"
+        },
+        {
+          "textRaw": "取消定时器",
+          "name": "取消定时器",
+          "desc": "<p><a href=\"#setimmediatecallback-args\"><code>setImmediate()</code></a>、<a href=\"#setintervalcallback-delay-args\"><code>setInterval()</code></a> 和 <a href=\"#settimeoutcallback-delay-args\"><code>setTimeout()</code></a> 方法各自返回代表已调度定时器的对象。这些对象可用于取消定时器并防止其触发。</p>\n<p>对于 <a href=\"#setimmediatecallback-args\"><code>setImmediate()</code></a> 和 <a href=\"#settimeoutcallback-delay-args\"><code>setTimeout()</code></a> 的 promise 化变体，可以使用 <a href=\"globals.html#class-abortcontroller\"><code>AbortController</code></a> 来取消定时器。当取消时，返回的 Promise 将被拒绝，并带有一个 <code>'AbortError'</code>。</p>\n<p>对于 <code>setImmediate()</code>：</p>\n<pre><code class=\"language-mjs\">import { setImmediate as setImmediatePromise } from 'node:timers/promises';\n\nconst ac = new AbortController();\nconst signal = ac.signal;\n\n// We do not `await` the promise so `ac.abort()` is called concurrently.\nsetImmediatePromise('foobar', { signal })\n  .then(console.log)\n  .catch((err) => {\n    if (err.name === 'AbortError')\n      console.error('The immediate was aborted');\n  });\n\nac.abort();\n</code></pre>\n<pre><code class=\"language-cjs\">const { setImmediate: setImmediatePromise } = require('node:timers/promises');\n\nconst ac = new AbortController();\nconst signal = ac.signal;\n\nsetImmediatePromise('foobar', { signal })\n  .then(console.log)\n  .catch((err) => {\n    if (err.name === 'AbortError')\n      console.error('The immediate was aborted');\n  });\n\nac.abort();\n</code></pre>\n<p>对于 <code>setTimeout()</code>：</p>\n<pre><code class=\"language-mjs\">import { setTimeout as setTimeoutPromise } from 'node:timers/promises';\n\nconst ac = new AbortController();\nconst signal = ac.signal;\n\n// We do not `await` the promise so `ac.abort()` is called concurrently.\nsetTimeoutPromise(1000, 'foobar', { signal })\n  .then(console.log)\n  .catch((err) => {\n    if (err.name === 'AbortError')\n      console.error('The timeout was aborted');\n  });\n\nac.abort();\n</code></pre>\n<pre><code class=\"language-cjs\">const { setTimeout: setTimeoutPromise } = require('node:timers/promises');\n\nconst ac = new AbortController();\nconst signal = ac.signal;\n\nsetTimeoutPromise(1000, 'foobar', { signal })\n  .then(console.log)\n  .catch((err) => {\n    if (err.name === 'AbortError')\n      console.error('The timeout was aborted');\n  });\n\nac.abort();\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`clearImmediate(immediate)`",
+              "type": "method",
+              "name": "clearImmediate",
+              "meta": {
+                "added": [
+                  "v0.9.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`immediate` {Immediate} 一个由 [`setImmediate()`][] 返回的 `Immediate` 对象",
+                      "name": "immediate",
+                      "type": "Immediate",
+                      "desc": "一个由 [`setImmediate()`][] 返回的 `Immediate` 对象"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>取消由 <a href=\"#setimmediatecallback-args\"><code>setImmediate()</code></a> 创建的 <code>Immediate</code> 对象。</p>"
+            },
+            {
+              "textRaw": "`clearInterval(timeout)`",
+              "type": "method",
+              "name": "clearInterval",
+              "meta": {
+                "added": [
+                  "v0.0.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`timeout` {Timeout|string|number} 一个由 [`setInterval()`][] 返回的 `Timeout` 对象，或者是 `Timeout` 对象的[原始值][]（作为字符串或数字）",
+                      "name": "timeout",
+                      "type": "Timeout|string|number",
+                      "desc": "一个由 [`setInterval()`][] 返回的 `Timeout` 对象，或者是 `Timeout` 对象的[原始值][]（作为字符串或数字）"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>取消由 <a href=\"#setintervalcallback-delay-args\"><code>setInterval()</code></a> 创建的 <code>Timeout</code> 对象。</p>"
+            },
+            {
+              "textRaw": "`clearTimeout(timeout)`",
+              "type": "method",
+              "name": "clearTimeout",
+              "meta": {
+                "added": [
+                  "v0.0.1"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`timeout` {Timeout|string|number} 一个由 [`setTimeout()`][] 返回的 `Timeout` 对象，或者是 `Timeout` 对象的[原始值][]（作为字符串或数字）",
+                      "name": "timeout",
+                      "type": "Timeout|string|number",
+                      "desc": "一个由 [`setTimeout()`][] 返回的 `Timeout` 对象，或者是 `Timeout` 对象的[原始值][]（作为字符串或数字）"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>取消由 <a href=\"#settimeoutcallback-delay-args\"><code>setTimeout()</code></a> 创建的 <code>Timeout</code> 对象。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "取消定时器"
+        },
+        {
+          "textRaw": "Timers Promises API",
+          "name": "timers_promises_api",
+          "meta": {
+            "added": [
+              "v15.0.0"
+            ],
+            "changes": [
+              {
+                "version": "v16.0.0",
+                "pr-url": "https://github.com/nodejs/node/pull/38112",
+                "description": "Graduated from experimental."
+              }
+            ]
+          },
+          "desc": "<p><code>timers/promises</code> API 提供了一组返回 <code>Promise</code> 对象的定时器函数。该 API 可通过 <code>require('node:timers/promises')</code> 访问。</p>\n<pre><code class=\"language-mjs\">import {\n  setTimeout,\n  setImmediate,\n  setInterval,\n} from 'node:timers/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  setTimeout,\n  setImmediate,\n  setInterval,\n} = require('node:timers/promises');\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`timersPromises.setTimeout([delay[, value[, options]]])`",
+              "type": "method",
+              "name": "setTimeout",
+              "meta": {
+                "added": [
+                  "v15.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`delay` {number} 在履行 promise 之前要等待的毫秒数。**默认值:** `1`",
+                      "name": "delay",
+                      "type": "number",
+                      "desc": "在履行 promise 之前要等待的毫秒数。**默认值:** `1`"
+                    },
+                    {
+                      "textRaw": "`value` {any} 用于履行 promise 的值",
+                      "name": "value",
+                      "type": "any",
+                      "desc": "用于履行 promise 的值"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`ref` {boolean} 设置为 `false` 表示已调度的 `Timeout` 不应要求 Node.js 事件循环保持活跃。**默认值:** `true`",
+                          "name": "ref",
+                          "type": "boolean",
+                          "desc": "设置为 `false` 表示已调度的 `Timeout` 不应要求 Node.js 事件循环保持活跃。**默认值:** `true`"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} 一个可选的 `AbortSignal`，可用于取消已调度的 `Timeout`",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "一个可选的 `AbortSignal`，可用于取消已调度的 `Timeout`"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<pre><code class=\"language-mjs\">import {\n  setTimeout,\n} from 'node:timers/promises';\n\nconst res = await setTimeout(100, 'result');\n\nconsole.log(res);  // Prints 'result'\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  setTimeout,\n} = require('node:timers/promises');\n\nsetTimeout(100, 'result').then((res) => {\n  console.log(res);  // Prints 'result'\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`timersPromises.setImmediate([value[, options]])`",
+              "type": "method",
+              "name": "setImmediate",
+              "meta": {
+                "added": [
+                  "v15.0.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`value` {any} 用于履行 promise 的值",
+                      "name": "value",
+                      "type": "any",
+                      "desc": "用于履行 promise 的值"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`ref` {boolean} 设置为 `false` 表示已调度的 `Immediate` 不应要求 Node.js 事件循环保持活跃。**默认值:** `true`",
+                          "name": "ref",
+                          "type": "boolean",
+                          "desc": "设置为 `false` 表示已调度的 `Immediate` 不应要求 Node.js 事件循环保持活跃。**默认值:** `true`"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} 一个可选的 `AbortSignal`，可用于取消已调度的 `Immediate`",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "一个可选的 `AbortSignal`，可用于取消已调度的 `Immediate`"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "desc": "<pre><code class=\"language-mjs\">import {\n  setImmediate,\n} from 'node:timers/promises';\n\nconst res = await setImmediate('result');\n\nconsole.log(res);  // Prints 'result'\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  setImmediate,\n} = require('node:timers/promises');\n\nsetImmediate('result').then((res) => {\n  console.log(res);  // Prints 'result'\n});\n</code></pre>"
+            },
+            {
+              "textRaw": "`timersPromises.setInterval([delay[, value[, options]]])`",
+              "type": "method",
+              "name": "setInterval",
+              "meta": {
+                "added": [
+                  "v15.9.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>返回一个异步迭代器，该迭代器每隔 <code>delay</code> 毫秒生成值。如果 <code>ref</code> 为 <code>true</code>，则需要显式或隐式调用异步迭代器的 <code>next()</code> 来保持事件循环活跃。</p>\n<ul>\n<li><code>delay</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 迭代之间等待的毫秒数。<strong>默认值:</strong> <code>1</code></li>\n<li><code>value</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a> 迭代器返回的值</li>\n<li><code>options</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>ref</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type\" class=\"type\">&lt;boolean&gt;</a> 设置为 <code>false</code> 表示迭代之间的已调度 <code>Timeout</code> 不应要求 Node.js 事件循环保持活跃。<strong>默认值:</strong> <code>true</code></li>\n<li><code>signal</code> <a href=\"globals.html#class-abortsignal\" class=\"type\">&lt;AbortSignal&gt;</a> 一个可选的 <code>AbortSignal</code>，可用于取消操作之间的已调度 <code>Timeout</code></li>\n</ul>\n</li>\n</ul>\n<pre><code class=\"language-mjs\">import {\n  setInterval,\n} from 'node:timers/promises';\n\nconst interval = 100;\nfor await (const startTime of setInterval(interval, Date.now())) {\n  const now = Date.now();\n  console.log(now);\n  if ((now - startTime) > 1000)\n    break;\n}\nconsole.log(Date.now());\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  setInterval,\n} = require('node:timers/promises');\nconst interval = 100;\n\n(async function() {\n  for await (const startTime of setInterval(interval, Date.now())) {\n    const now = Date.now();\n    console.log(now);\n    if ((now - startTime) > 1000)\n      break;\n  }\n  console.log(Date.now());\n})();\n</code></pre>"
+            },
+            {
+              "textRaw": "`timersPromises.scheduler.wait(delay[, options])`",
+              "type": "method",
+              "name": "wait",
+              "meta": {
+                "added": [
+                  "v17.3.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`delay` {number} 在解决 promise 之前要等待的毫秒数",
+                      "name": "delay",
+                      "type": "number",
+                      "desc": "在解决 promise 之前要等待的毫秒数"
+                    },
+                    {
+                      "textRaw": "`options` {Object}",
+                      "name": "options",
+                      "type": "Object",
+                      "options": [
+                        {
+                          "textRaw": "`ref` {boolean} 设置为 `false` 表示已调度的 `Timeout` 不应要求 Node.js 事件循环保持活跃。**默认值:** `true`",
+                          "name": "ref",
+                          "type": "boolean",
+                          "desc": "设置为 `false` 表示已调度的 `Timeout` 不应要求 Node.js 事件循环保持活跃。**默认值:** `true`"
+                        },
+                        {
+                          "textRaw": "`signal` {AbortSignal} 一个可选的 `AbortSignal`，可用于取消等待",
+                          "name": "signal",
+                          "type": "AbortSignal",
+                          "desc": "一个可选的 `AbortSignal`，可用于取消等待"
+                        }
+                      ]
+                    },
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>由[调度 APIs][]草案规范定义的一个实验性 API，该规范正在作为标准 Web 平台 API 开发。</p>\n<p>调用 <code>timersPromises.scheduler.wait(delay, options)</code> 等同于调用 <code>timersPromises.setTimeout(delay, undefined, options)</code>。</p>\n<pre><code class=\"language-mjs\">import { scheduler } from 'node:timers/promises';\n\nawait scheduler.wait(1000); // Wait one second before continuing\n</code></pre>"
+            },
+            {
+              "textRaw": "`timersPromises.scheduler.yield()`",
+              "type": "method",
+              "name": "yield",
+              "meta": {
+                "added": [
+                  "v17.3.0",
+                  "v16.14.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": "Experimental",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回: {Promise}",
+                      "name": "返回",
+                      "type": "Promise"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>由[调度 APIs][]草案规范定义的一个实验性 API，该规范正在作为标准 Web 平台 API 开发。</p>\n<p>调用 <code>timersPromises.scheduler.yield()</code> 等同于调用不带参数的 <code>timersPromises.setImmediate()</code>。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "Timers Promises API"
+        }
+      ],
+      "type": "module",
+      "displayName": "Timers"
+    }
+  ]
+}

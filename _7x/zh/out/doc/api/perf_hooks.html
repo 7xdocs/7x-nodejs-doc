@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Performance measurement APIs | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/perf_hooks.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:1072px){.with-72-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:758px){.with-67-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:630px){.with-51-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:710px){.with-61-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-perf_hooks">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks active">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="perf_hooks" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#performance-measurement-apis">Performance measurement APIs</a></span>
+<ul>
+<li><a href="#perf_hooksperformance"><code>perf_hooks.performance</code></a>
+<ul>
+<li><a href="#performanceclearmarksname"><code>performance.clearMarks([name])</code></a></li>
+<li><a href="#performanceclearmeasuresname"><code>performance.clearMeasures([name])</code></a></li>
+<li><a href="#performanceclearresourcetimingsname"><code>performance.clearResourceTimings([name])</code></a></li>
+<li><a href="#performanceeventlooputilizationutilization1-utilization2"><code>performance.eventLoopUtilization([utilization1[, utilization2]])</code></a></li>
+<li><a href="#performancegetentries"><code>performance.getEntries()</code></a></li>
+<li><a href="#performancegetentriesbynamename-type"><code>performance.getEntriesByName(name[, type])</code></a></li>
+<li><a href="#performancegetentriesbytypetype"><code>performance.getEntriesByType(type)</code></a></li>
+<li><a href="#performancemarkname-options"><code>performance.mark(name[, options])</code></a></li>
+<li><a href="#performancemarkresourcetimingtiminginfo-requestedurl-initiatortype-global-cachemode-bodyinfo-responsestatus-deliverytype"><code>performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])</code></a></li>
+<li><a href="#performancemeasurename-startmarkoroptions-endmark"><code>performance.measure(name[, startMarkOrOptions[, endMark]])</code></a></li>
+<li><a href="#performancenodetiming"><code>performance.nodeTiming</code></a></li>
+<li><a href="#performancenow"><code>performance.now()</code></a></li>
+<li><a href="#performancesetresourcetimingbuffersizemaxsize"><code>performance.setResourceTimingBufferSize(maxSize)</code></a></li>
+<li><a href="#performancetimeorigin"><code>performance.timeOrigin</code></a></li>
+<li><a href="#performancetimerifyfn-options"><code>performance.timerify(fn[, options])</code></a></li>
+<li><a href="#performancetojson"><code>performance.toJSON()</code></a>
+<ul>
+<li><a href="#-resourcetimingbufferfull">事件: <code>'resourcetimingbufferfull'</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#-performanceentry">类: <code>PerformanceEntry</code></a>
+<ul>
+<li><a href="#performanceentryduration"><code>performanceEntry.duration</code></a></li>
+<li><a href="#performanceentryentrytype"><code>performanceEntry.entryType</code></a></li>
+<li><a href="#performanceentryname"><code>performanceEntry.name</code></a></li>
+<li><a href="#performanceentrystarttime"><code>performanceEntry.startTime</code></a></li>
+</ul>
+</li>
+<li><a href="#-performancemark">类: <code>PerformanceMark</code></a>
+<ul>
+<li><a href="#performancemarkdetail"><code>performanceMark.detail</code></a></li>
+</ul>
+</li>
+<li><a href="#-performancemeasure">类: <code>PerformanceMeasure</code></a>
+<ul>
+<li><a href="#performancemeasuredetail"><code>performanceMeasure.detail</code></a></li>
+</ul>
+</li>
+<li><a href="#-performancenodeentry">类: <code>PerformanceNodeEntry</code></a>
+<ul>
+<li><a href="#performancenodeentrydetail"><code>performanceNodeEntry.detail</code></a></li>
+<li><a href="#performancenodeentryflags"><code>performanceNodeEntry.flags</code></a></li>
+<li><a href="#performancenodeentrykind"><code>performanceNodeEntry.kind</code></a></li>
+<li><a href="#-gc-">垃圾回收 ('gc') 详细信息</a></li>
+<li><a href="#http-http-">HTTP ('http') 详细信息</a></li>
+<li><a href="#http2-http2-">HTTP/2 ('http2') 详细信息</a></li>
+<li><a href="#timerify-function-">Timerify ('function') 详细信息</a></li>
+<li><a href="#net-net-">Net ('net') 详细信息</a></li>
+<li><a href="#dns-dns-">DNS ('dns') 详细信息</a></li>
+</ul>
+</li>
+<li><a href="#-performancenodetiming">类: <code>PerformanceNodeTiming</code></a>
+<ul>
+<li><a href="#performancenodetimingbootstrapcomplete"><code>performanceNodeTiming.bootstrapComplete</code></a></li>
+<li><a href="#performancenodetimingenvironment"><code>performanceNodeTiming.environment</code></a></li>
+<li><a href="#performancenodetimingidletime"><code>performanceNodeTiming.idleTime</code></a></li>
+<li><a href="#performancenodetimingloopexit"><code>performanceNodeTiming.loopExit</code></a></li>
+<li><a href="#performancenodetimingloopstart"><code>performanceNodeTiming.loopStart</code></a></li>
+<li><a href="#performancenodetimingnodestart"><code>performanceNodeTiming.nodeStart</code></a></li>
+<li><a href="#performancenodetiminguvmetricsinfo"><code>performanceNodeTiming.uvMetricsInfo</code></a></li>
+<li><a href="#performancenodetimingv8start"><code>performanceNodeTiming.v8Start</code></a></li>
+</ul>
+</li>
+<li><a href="#-performanceresourcetiming">类: <code>PerformanceResourceTiming</code></a>
+<ul>
+<li><a href="#performanceresourcetimingworkerstart"><code>performanceResourceTiming.workerStart</code></a></li>
+<li><a href="#performanceresourcetimingredirectstart"><code>performanceResourceTiming.redirectStart</code></a></li>
+<li><a href="#performanceresourcetimingredirectend"><code>performanceResourceTiming.redirectEnd</code></a></li>
+<li><a href="#performanceresourcetimingfetchstart"><code>performanceResourceTiming.fetchStart</code></a></li>
+<li><a href="#performanceresourcetimingdomainlookupstart"><code>performanceResourceTiming.domainLookupStart</code></a></li>
+<li><a href="#performanceresourcetimingdomainlookupend"><code>performanceResourceTiming.domainLookupEnd</code></a></li>
+<li><a href="#performanceresourcetimingconnectstart"><code>performanceResourceTiming.connectStart</code></a></li>
+<li><a href="#performanceresourcetimingconnectend"><code>performanceResourceTiming.connectEnd</code></a></li>
+<li><a href="#performanceresourcetimingsecureconnectionstart"><code>performanceResourceTiming.secureConnectionStart</code></a></li>
+<li><a href="#performanceresourcetimingrequeststart"><code>performanceResourceTiming.requestStart</code></a></li>
+<li><a href="#performanceresourcetimingresponseend"><code>performanceResourceTiming.responseEnd</code></a></li>
+<li><a href="#performanceresourcetimingtransfersize"><code>performanceResourceTiming.transferSize</code></a></li>
+<li><a href="#performanceresourcetimingencodedbodysize"><code>performanceResourceTiming.encodedBodySize</code></a></li>
+<li><a href="#performanceresourcetimingdecodedbodysize"><code>performanceResourceTiming.decodedBodySize</code></a></li>
+<li><a href="#performanceresourcetimingtojson"><code>performanceResourceTiming.toJSON()</code></a></li>
+</ul>
+</li>
+<li><a href="#-performanceobserver">类: <code>PerformanceObserver</code></a>
+<ul>
+<li><a href="#performanceobserversupportedentrytypes"><code>PerformanceObserver.supportedEntryTypes</code></a></li>
+<li><a href="#new-performanceobservercallback"><code>new PerformanceObserver(callback)</code></a></li>
+<li><a href="#performanceobserverdisconnect"><code>performanceObserver.disconnect()</code></a></li>
+<li><a href="#performanceobserverobserveoptions"><code>performanceObserver.observe(options)</code></a></li>
+<li><a href="#performanceobservertakerecords"><code>performanceObserver.takeRecords()</code></a></li>
+</ul>
+</li>
+<li><a href="#-performanceobserverentrylist">类: <code>PerformanceObserverEntryList</code></a>
+<ul>
+<li><a href="#performanceobserverentrylistgetentries"><code>performanceObserverEntryList.getEntries()</code></a></li>
+<li><a href="#performanceobserverentrylistgetentriesbynamename-type"><code>performanceObserverEntryList.getEntriesByName(name[, type])</code></a></li>
+<li><a href="#performanceobserverentrylistgetentriesbytypetype"><code>performanceObserverEntryList.getEntriesByType(type)</code></a></li>
+</ul>
+</li>
+<li><a href="#perf_hookscreatehistogramoptions"><code>perf_hooks.createHistogram([options])</code></a></li>
+<li><a href="#perf_hooksmonitoreventloopdelayoptions"><code>perf_hooks.monitorEventLoopDelay([options])</code></a></li>
+<li><a href="#-histogram">类: <code>Histogram</code></a>
+<ul>
+<li><a href="#histogramcount"><code>histogram.count</code></a></li>
+<li><a href="#histogramcountbigint"><code>histogram.countBigInt</code></a></li>
+<li><a href="#histogramexceeds"><code>histogram.exceeds</code></a></li>
+<li><a href="#histogramexceedsbigint"><code>histogram.exceedsBigInt</code></a></li>
+<li><a href="#histogrammax"><code>histogram.max</code></a></li>
+<li><a href="#histogrammaxbigint"><code>histogram.maxBigInt</code></a></li>
+<li><a href="#histogrammean"><code>histogram.mean</code></a></li>
+<li><a href="#histogrammin"><code>histogram.min</code></a></li>
+<li><a href="#histogramminbigint"><code>histogram.minBigInt</code></a></li>
+<li><a href="#histogrampercentilepercentile"><code>histogram.percentile(percentile)</code></a></li>
+<li><a href="#histogrampercentilebigintpercentile"><code>histogram.percentileBigInt(percentile)</code></a></li>
+<li><a href="#histogrampercentiles"><code>histogram.percentiles</code></a></li>
+<li><a href="#histogrampercentilesbigint"><code>histogram.percentilesBigInt</code></a></li>
+<li><a href="#histogramreset"><code>histogram.reset()</code></a></li>
+<li><a href="#histogramstddev"><code>histogram.stddev</code></a></li>
+</ul>
+</li>
+<li><a href="#-intervalhistogram-extends-histogram">类: <code>IntervalHistogram extends Histogram</code></a>
+<ul>
+<li><a href="#histogramdisable"><code>histogram.disable()</code></a></li>
+<li><a href="#histogramenable"><code>histogram.enable()</code></a></li>
+<li><a href="#histogramsymboldispose"><code>histogram[Symbol.dispose]()</code></a></li>
+<li><a href="#-intervalhistogram">克隆 <code>IntervalHistogram</code></a></li>
+</ul>
+</li>
+<li><a href="#-recordablehistogram-extends-histogram">类: <code>RecordableHistogram extends Histogram</code></a>
+<ul>
+<li><a href="#histogramaddother"><code>histogram.add(other)</code></a></li>
+<li><a href="#histogramrecordval"><code>histogram.record(val)</code></a></li>
+<li><a href="#histogramrecorddelta"><code>histogram.recordDelta()</code></a></li>
+</ul>
+</li>
+<li><a href="#">示例</a>
+<ul>
+<li><a href="#_1">测量异步操作的持续时间</a></li>
+<li><a href="#_2">测量加载依赖项所需的时间</a></li>
+<li><a href="#-http-">测量一次 HTTP 往返所需的时间</a></li>
+<li><a href="#-netconnect-tcp">测量 <code>net.connect</code>（仅限 TCP）在连接成功时所需的时间</a></li>
+<li><a href="#-dns-">测量 DNS 在请求成功时所需的时间</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks active">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/perf_hooks.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/perf_hooks.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/perf_hooks.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/perf_hooks.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/perf_hooks.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/perf_hooks.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/perf_hooks.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/perf_hooks.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/perf_hooks.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/perf_hooks.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/perf_hooks.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/perf_hooks.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/perf_hooks.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/perf_hooks.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/perf_hooks.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/perf_hooks.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/perf_hooks.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/perf_hooks.html">8.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="perf_hooks.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/perf_hooks.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#performance-measurement-apis">Performance measurement APIs</a></span>
+<ul>
+<li><a href="#perf_hooksperformance"><code>perf_hooks.performance</code></a>
+<ul>
+<li><a href="#performanceclearmarksname"><code>performance.clearMarks([name])</code></a></li>
+<li><a href="#performanceclearmeasuresname"><code>performance.clearMeasures([name])</code></a></li>
+<li><a href="#performanceclearresourcetimingsname"><code>performance.clearResourceTimings([name])</code></a></li>
+<li><a href="#performanceeventlooputilizationutilization1-utilization2"><code>performance.eventLoopUtilization([utilization1[, utilization2]])</code></a></li>
+<li><a href="#performancegetentries"><code>performance.getEntries()</code></a></li>
+<li><a href="#performancegetentriesbynamename-type"><code>performance.getEntriesByName(name[, type])</code></a></li>
+<li><a href="#performancegetentriesbytypetype"><code>performance.getEntriesByType(type)</code></a></li>
+<li><a href="#performancemarkname-options"><code>performance.mark(name[, options])</code></a></li>
+<li><a href="#performancemarkresourcetimingtiminginfo-requestedurl-initiatortype-global-cachemode-bodyinfo-responsestatus-deliverytype"><code>performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])</code></a></li>
+<li><a href="#performancemeasurename-startmarkoroptions-endmark"><code>performance.measure(name[, startMarkOrOptions[, endMark]])</code></a></li>
+<li><a href="#performancenodetiming"><code>performance.nodeTiming</code></a></li>
+<li><a href="#performancenow"><code>performance.now()</code></a></li>
+<li><a href="#performancesetresourcetimingbuffersizemaxsize"><code>performance.setResourceTimingBufferSize(maxSize)</code></a></li>
+<li><a href="#performancetimeorigin"><code>performance.timeOrigin</code></a></li>
+<li><a href="#performancetimerifyfn-options"><code>performance.timerify(fn[, options])</code></a></li>
+<li><a href="#performancetojson"><code>performance.toJSON()</code></a>
+<ul>
+<li><a href="#-resourcetimingbufferfull">事件: <code>'resourcetimingbufferfull'</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#-performanceentry">类: <code>PerformanceEntry</code></a>
+<ul>
+<li><a href="#performanceentryduration"><code>performanceEntry.duration</code></a></li>
+<li><a href="#performanceentryentrytype"><code>performanceEntry.entryType</code></a></li>
+<li><a href="#performanceentryname"><code>performanceEntry.name</code></a></li>
+<li><a href="#performanceentrystarttime"><code>performanceEntry.startTime</code></a></li>
+</ul>
+</li>
+<li><a href="#-performancemark">类: <code>PerformanceMark</code></a>
+<ul>
+<li><a href="#performancemarkdetail"><code>performanceMark.detail</code></a></li>
+</ul>
+</li>
+<li><a href="#-performancemeasure">类: <code>PerformanceMeasure</code></a>
+<ul>
+<li><a href="#performancemeasuredetail"><code>performanceMeasure.detail</code></a></li>
+</ul>
+</li>
+<li><a href="#-performancenodeentry">类: <code>PerformanceNodeEntry</code></a>
+<ul>
+<li><a href="#performancenodeentrydetail"><code>performanceNodeEntry.detail</code></a></li>
+<li><a href="#performancenodeentryflags"><code>performanceNodeEntry.flags</code></a></li>
+<li><a href="#performancenodeentrykind"><code>performanceNodeEntry.kind</code></a></li>
+<li><a href="#-gc-">垃圾回收 ('gc') 详细信息</a></li>
+<li><a href="#http-http-">HTTP ('http') 详细信息</a></li>
+<li><a href="#http2-http2-">HTTP/2 ('http2') 详细信息</a></li>
+<li><a href="#timerify-function-">Timerify ('function') 详细信息</a></li>
+<li><a href="#net-net-">Net ('net') 详细信息</a></li>
+<li><a href="#dns-dns-">DNS ('dns') 详细信息</a></li>
+</ul>
+</li>
+<li><a href="#-performancenodetiming">类: <code>PerformanceNodeTiming</code></a>
+<ul>
+<li><a href="#performancenodetimingbootstrapcomplete"><code>performanceNodeTiming.bootstrapComplete</code></a></li>
+<li><a href="#performancenodetimingenvironment"><code>performanceNodeTiming.environment</code></a></li>
+<li><a href="#performancenodetimingidletime"><code>performanceNodeTiming.idleTime</code></a></li>
+<li><a href="#performancenodetimingloopexit"><code>performanceNodeTiming.loopExit</code></a></li>
+<li><a href="#performancenodetimingloopstart"><code>performanceNodeTiming.loopStart</code></a></li>
+<li><a href="#performancenodetimingnodestart"><code>performanceNodeTiming.nodeStart</code></a></li>
+<li><a href="#performancenodetiminguvmetricsinfo"><code>performanceNodeTiming.uvMetricsInfo</code></a></li>
+<li><a href="#performancenodetimingv8start"><code>performanceNodeTiming.v8Start</code></a></li>
+</ul>
+</li>
+<li><a href="#-performanceresourcetiming">类: <code>PerformanceResourceTiming</code></a>
+<ul>
+<li><a href="#performanceresourcetimingworkerstart"><code>performanceResourceTiming.workerStart</code></a></li>
+<li><a href="#performanceresourcetimingredirectstart"><code>performanceResourceTiming.redirectStart</code></a></li>
+<li><a href="#performanceresourcetimingredirectend"><code>performanceResourceTiming.redirectEnd</code></a></li>
+<li><a href="#performanceresourcetimingfetchstart"><code>performanceResourceTiming.fetchStart</code></a></li>
+<li><a href="#performanceresourcetimingdomainlookupstart"><code>performanceResourceTiming.domainLookupStart</code></a></li>
+<li><a href="#performanceresourcetimingdomainlookupend"><code>performanceResourceTiming.domainLookupEnd</code></a></li>
+<li><a href="#performanceresourcetimingconnectstart"><code>performanceResourceTiming.connectStart</code></a></li>
+<li><a href="#performanceresourcetimingconnectend"><code>performanceResourceTiming.connectEnd</code></a></li>
+<li><a href="#performanceresourcetimingsecureconnectionstart"><code>performanceResourceTiming.secureConnectionStart</code></a></li>
+<li><a href="#performanceresourcetimingrequeststart"><code>performanceResourceTiming.requestStart</code></a></li>
+<li><a href="#performanceresourcetimingresponseend"><code>performanceResourceTiming.responseEnd</code></a></li>
+<li><a href="#performanceresourcetimingtransfersize"><code>performanceResourceTiming.transferSize</code></a></li>
+<li><a href="#performanceresourcetimingencodedbodysize"><code>performanceResourceTiming.encodedBodySize</code></a></li>
+<li><a href="#performanceresourcetimingdecodedbodysize"><code>performanceResourceTiming.decodedBodySize</code></a></li>
+<li><a href="#performanceresourcetimingtojson"><code>performanceResourceTiming.toJSON()</code></a></li>
+</ul>
+</li>
+<li><a href="#-performanceobserver">类: <code>PerformanceObserver</code></a>
+<ul>
+<li><a href="#performanceobserversupportedentrytypes"><code>PerformanceObserver.supportedEntryTypes</code></a></li>
+<li><a href="#new-performanceobservercallback"><code>new PerformanceObserver(callback)</code></a></li>
+<li><a href="#performanceobserverdisconnect"><code>performanceObserver.disconnect()</code></a></li>
+<li><a href="#performanceobserverobserveoptions"><code>performanceObserver.observe(options)</code></a></li>
+<li><a href="#performanceobservertakerecords"><code>performanceObserver.takeRecords()</code></a></li>
+</ul>
+</li>
+<li><a href="#-performanceobserverentrylist">类: <code>PerformanceObserverEntryList</code></a>
+<ul>
+<li><a href="#performanceobserverentrylistgetentries"><code>performanceObserverEntryList.getEntries()</code></a></li>
+<li><a href="#performanceobserverentrylistgetentriesbynamename-type"><code>performanceObserverEntryList.getEntriesByName(name[, type])</code></a></li>
+<li><a href="#performanceobserverentrylistgetentriesbytypetype"><code>performanceObserverEntryList.getEntriesByType(type)</code></a></li>
+</ul>
+</li>
+<li><a href="#perf_hookscreatehistogramoptions"><code>perf_hooks.createHistogram([options])</code></a></li>
+<li><a href="#perf_hooksmonitoreventloopdelayoptions"><code>perf_hooks.monitorEventLoopDelay([options])</code></a></li>
+<li><a href="#-histogram">类: <code>Histogram</code></a>
+<ul>
+<li><a href="#histogramcount"><code>histogram.count</code></a></li>
+<li><a href="#histogramcountbigint"><code>histogram.countBigInt</code></a></li>
+<li><a href="#histogramexceeds"><code>histogram.exceeds</code></a></li>
+<li><a href="#histogramexceedsbigint"><code>histogram.exceedsBigInt</code></a></li>
+<li><a href="#histogrammax"><code>histogram.max</code></a></li>
+<li><a href="#histogrammaxbigint"><code>histogram.maxBigInt</code></a></li>
+<li><a href="#histogrammean"><code>histogram.mean</code></a></li>
+<li><a href="#histogrammin"><code>histogram.min</code></a></li>
+<li><a href="#histogramminbigint"><code>histogram.minBigInt</code></a></li>
+<li><a href="#histogrampercentilepercentile"><code>histogram.percentile(percentile)</code></a></li>
+<li><a href="#histogrampercentilebigintpercentile"><code>histogram.percentileBigInt(percentile)</code></a></li>
+<li><a href="#histogrampercentiles"><code>histogram.percentiles</code></a></li>
+<li><a href="#histogrampercentilesbigint"><code>histogram.percentilesBigInt</code></a></li>
+<li><a href="#histogramreset"><code>histogram.reset()</code></a></li>
+<li><a href="#histogramstddev"><code>histogram.stddev</code></a></li>
+</ul>
+</li>
+<li><a href="#-intervalhistogram-extends-histogram">类: <code>IntervalHistogram extends Histogram</code></a>
+<ul>
+<li><a href="#histogramdisable"><code>histogram.disable()</code></a></li>
+<li><a href="#histogramenable"><code>histogram.enable()</code></a></li>
+<li><a href="#histogramsymboldispose"><code>histogram[Symbol.dispose]()</code></a></li>
+<li><a href="#-intervalhistogram">克隆 <code>IntervalHistogram</code></a></li>
+</ul>
+</li>
+<li><a href="#-recordablehistogram-extends-histogram">类: <code>RecordableHistogram extends Histogram</code></a>
+<ul>
+<li><a href="#histogramaddother"><code>histogram.add(other)</code></a></li>
+<li><a href="#histogramrecordval"><code>histogram.record(val)</code></a></li>
+<li><a href="#histogramrecorddelta"><code>histogram.recordDelta()</code></a></li>
+</ul>
+</li>
+<li><a href="#">示例</a>
+<ul>
+<li><a href="#_1">测量异步操作的持续时间</a></li>
+<li><a href="#_2">测量加载依赖项所需的时间</a></li>
+<li><a href="#-http-">测量一次 HTTP 往返所需的时间</a></li>
+<li><a href="#-netconnect-tcp">测量 <code>net.connect</code>（仅限 TCP）在连接成功时所需的时间</a></li>
+<li><a href="#-dns-">测量 DNS 在请求成功时所需的时间</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Performance measurement APIs<span><a class="mark" href="#performance-measurement-apis" id="performance-measurement-apis">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_measurement_apis"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/perf_hooks.js">lib/perf_hooks.js</a></p>
+<p>此模块实现了 W3C <a href="https://w3c.github.io/perf-timing-primer/">Web Performance APIs</a> 的子集以及用于 Node.js 特定性能测量的额外 API。</p>
+<p>Node.js 支持以下 <a href="https://w3c.github.io/perf-timing-primer/">Web Performance APIs</a>：</p>
+<ul>
+<li><a href="https://www.w3.org/TR/hr-time-2">High Resolution Time</a></li>
+<li><a href="https://w3c.github.io/performance-timeline/">Performance Timeline</a></li>
+<li><a href="https://www.w3.org/TR/user-timing/">User Timing</a></li>
+<li><a href="https://www.w3.org/TR/resource-timing-2/">Resource Timing</a></li>
+</ul>
+
+<pre class="with-72-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(items.<span class="hljs-title function_">getEntries</span>()[<span class="hljs-number">0</span>].<span class="hljs-property">duration</span>);
+  performance.<span class="hljs-title function_">clearMarks</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'measure'</span> });
+performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">'Start to Now'</span>);
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'A'</span>);
+<span class="hljs-title function_">doSomeLongRunningProcess</span>(<span class="hljs-function">() =></span> {
+  performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">'A to Now'</span>, <span class="hljs-string">'A'</span>);
+
+  performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'B'</span>);
+  performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">'A to B'</span>, <span class="hljs-string">'A'</span>, <span class="hljs-string">'B'</span>);
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">PerformanceObserver</span>, performance } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(items.<span class="hljs-title function_">getEntries</span>()[<span class="hljs-number">0</span>].<span class="hljs-property">duration</span>);
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'measure'</span> });
+performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">'Start to Now'</span>);
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'A'</span>);
+(<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">doSomeLongRunningProcess</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =></span> <span class="hljs-built_in">setTimeout</span>(r, <span class="hljs-number">5000</span>));
+  performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">'A to Now'</span>, <span class="hljs-string">'A'</span>);
+
+  performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'B'</span>);
+  performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">'A to B'</span>, <span class="hljs-string">'A'</span>, <span class="hljs-string">'B'</span>);
+})();</code><button class="copy-button">copy</button></pre>
+<section><h3><code>perf_hooks.performance</code><span><a class="mark" href="#perf_hooksperformance" id="perf_hooksperformance">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_perf_hooks_performance"></a></h3>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<p>一个可用于从当前 Node.js 实例收集性能指标的对象。它类似于浏览器中的 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/performance"><code>window.performance</code></a>。</p>
+<div>
+<h4><code>performance.clearMarks([name])</code><span><a class="mark" href="#performanceclearmarksname" id="performanceclearmarksname">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_clearmarks_name"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>如果未提供 <code>name</code>，则从性能时间线中移除所有 <code>PerformanceMark</code> 对象。如果提供了 <code>name</code>，则仅移除指定名称的标记。</p>
+</div><div>
+<h4><code>performance.clearMeasures([name])</code><span><a class="mark" href="#performanceclearmeasuresname" id="performanceclearmeasuresname">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_clearmeasures_name"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v16.7.0</td>
+<td><p><span>Added in: v16.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>如果未提供 <code>name</code>，则从性能时间线中移除所有 <code>PerformanceMeasure</code> 对象。如果提供了 <code>name</code>，则仅移除指定名称的测量。</p>
+</div><div>
+<h4><code>performance.clearResourceTimings([name])</code><span><a class="mark" href="#performanceclearresourcetimingsname" id="performanceclearresourcetimingsname">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_clearresourcetimings_name"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>如果未提供 <code>name</code>，则从资源时间线中移除所有 <code>PerformanceResourceTiming</code> 对象。如果提供了 <code>name</code>，则仅移除指定名称的资源。</p>
+</div><div>
+<h4><code>performance.eventLoopUtilization([utilization1[, utilization2]])</code><span><a class="mark" href="#performanceeventlooputilizationutilization1-utilization2" id="performanceeventlooputilizationutilization1-utilization2">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_eventlooputilization_utilization1_utilization2"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.10.0, v12.19.0</span>
+</div>
+<ul>
+<li><code>utilization1</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 之前调用 <code>eventLoopUtilization()</code> 的结果。</li>
+<li><code>utilization2</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 在 <code>utilization1</code> 之前调用 <code>eventLoopUtilization()</code> 的结果。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>idle</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>active</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>utilization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+</li>
+</ul>
+<p><code>eventLoopUtilization()</code> 方法返回一个对象，其中包含事件循环在空闲和活动状态下的累计持续时间，以高精度毫秒计时器表示。<code>utilization</code> 值是计算得到的事件循环利用率（ELU）。</p>
+<p>如果主线程上的引导尚未完成，则属性的值为 <code>0</code>。ELU 在 [Worker 线程][]上立即可用，因为引导发生在事件循环内。</p>
+<p><code>utilization1</code> 和 <code>utilization2</code> 都是可选参数。</p>
+<p>如果传入了 <code>utilization1</code>，则计算并返回当前调用的 <code>active</code> 和 <code>idle</code> 时间之间的差值，以及相应的 <code>utilization</code> 值（类似于 <a href="process.html#processhrtimetime"><code>process.hrtime()</code></a>）。</p>
+<p>如果同时传入了 <code>utilization1</code> 和 <code>utilization2</code>，则计算两个参数之间的差值。这是一个便捷选项，因为与 <a href="process.html#processhrtimetime"><code>process.hrtime()</code></a> 不同，计算 ELU 比单个减法更复杂。</p>
+<p>ELU 类似于 CPU 利用率，不同之处在于它只测量事件循环统计信息而不测量 CPU 使用情况。它表示事件循环在事件循环的事件提供者（例如 <code>epoll_wait</code>）之外花费的时间百分比。不考虑其他 CPU 空闲时间。以下是一个示例，说明一个大部分空闲的进程将具有较高的 ELU。</p>
+
+<pre class="with-72-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { eventLoopUtilization } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+<span class="hljs-keyword">import</span> { spawnSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:child_process'</span>;
+
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-keyword">const</span> elu = <span class="hljs-title function_">eventLoopUtilization</span>();
+  <span class="hljs-title function_">spawnSync</span>(<span class="hljs-string">'sleep'</span>, [<span class="hljs-string">'5'</span>]);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">eventLoopUtilization</span>(elu).<span class="hljs-property">utilization</span>);
+});</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> { eventLoopUtilization } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>).<span class="hljs-property">performance</span>;
+<span class="hljs-keyword">const</span> { spawnSync } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:child_process'</span>);
+
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-keyword">const</span> elu = <span class="hljs-title function_">eventLoopUtilization</span>();
+  <span class="hljs-title function_">spawnSync</span>(<span class="hljs-string">'sleep'</span>, [<span class="hljs-string">'5'</span>]);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">eventLoopUtilization</span>(elu).<span class="hljs-property">utilization</span>);
+});</code><button class="copy-button">copy</button></pre>
+<p>尽管运行此脚本时 CPU 大部分空闲，但 <code>utilization</code> 的值为 <code>1</code>。这是因为对 <a href="child_process.html#child_processspawnsynccommand-args-options"><code>child_process.spawnSync()</code></a> 的调用阻止了事件循环继续。</p>
+<p>传入用户定义的对象而不是之前调用 <code>eventLoopUtilization()</code> 的结果将导致未定义的行为。返回值不能保证反映事件循环的任何正确状态。</p>
+</div><div>
+<h4><code>performance.getEntries()</code><span><a class="mark" href="#performancegetentries" id="performancegetentries">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_getentries"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v16.7.0</td>
+<td><p><span>Added in: v16.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a></li>
+</ul>
+<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表。如果只对特定类型或具有特定名称的性能条目感兴趣，请参阅 <code>performance.getEntriesByType()</code> 和 <code>performance.getEntriesByName()</code>。</p>
+</div><div>
+<h4><code>performance.getEntriesByName(name[, type])</code><span><a class="mark" href="#performancegetentriesbynamename-type" id="performancegetentriesbynamename-type">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_getentriesbyname_name_type"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v16.7.0</td>
+<td><p><span>Added in: v16.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a></li>
+</ul>
+<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.name</code> 等于 <code>name</code>，并且可选地，其 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>
+</div><div>
+<h4><code>performance.getEntriesByType(type)</code><span><a class="mark" href="#performancegetentriesbytypetype" id="performancegetentriesbytypetype">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_getentriesbytype_type"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v16.7.0</td>
+<td><p><span>Added in: v16.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a></li>
+</ul>
+<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>
+</div><div>
+<h4><code>performance.mark(name[, options])</code><span><a class="mark" href="#performancemarkname-options" id="performancemarkname-options">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_mark_name_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver. The name argument is no longer optional.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p>Updated to conform to the User Timing Level 3 specification.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>detail</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 包含在标记中的额外可选详细信息。</li>
+<li><code>startTime</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 用作标记时间的可选时间戳。<strong>默认值</strong>: <code>performance.now()</code>。</li>
+</ul>
+</li>
+</ul>
+<p>在性能时间线中创建一个新的 <code>PerformanceMark</code> 条目。<code>PerformanceMark</code> 是 <code>PerformanceEntry</code> 的子类，其 <code>performanceEntry.entryType</code> 始终为 <code>'mark'</code>，且 <code>performanceEntry.duration</code> 始终为 <code>0</code>。性能标记用于标记性能时间线中的特定重要时刻。</p>
+<p>创建的 <code>PerformanceMark</code> 条目被放入全局性能时间线中，可以通过 <code>performance.getEntries</code>、<code>performance.getEntriesByName</code> 和 <code>performance.getEntriesByType</code> 进行查询。当观察完成时，应使用 <code>performance.clearMarks</code> 手动从全局性能时间线中清除条目。</p>
+</div><div>
+<h4><code>performance.markResourceTiming(timingInfo, requestedUrl, initiatorType, global, cacheMode, bodyInfo, responseStatus[, deliveryType])</code><span><a class="mark" href="#performancemarkresourcetimingtiminginfo-requestedurl-initiatortype-global-cachemode-bodyinfo-responsestatus-deliverytype" id="performancemarkresourcetimingtiminginfo-requestedurl-initiatortype-global-cachemode-bodyinfo-responsestatus-deliverytype">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_markresourcetiming_timinginfo_requestedurl_initiatortype_global_cachemode_bodyinfo_responsestatus_deliverytype"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.2.0</td>
+<td><p>Added bodyInfo, responseStatus, and deliveryType arguments.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>timingInfo</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> <a href="https://fetch.spec.whatwg.org/#fetch-timing-info">Fetch Timing Info</a></li>
+<li><code>requestedUrl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 资源 URL</li>
+<li><code>initiatorType</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 发起者名称，例如：'fetch'</li>
+<li><code>global</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>cacheMode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 缓存模式必须为空字符串 ('') 或 'local'</li>
+<li><code>bodyInfo</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> <a href="https://fetch.spec.whatwg.org/#response-body-info">Fetch Response Body Info</a></li>
+<li><code>responseStatus</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 响应的状态码</li>
+<li><code>deliveryType</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 交付类型。<strong>默认值:</strong> <code>''</code>。</li>
+</ul>
+<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>
+<p>在资源时间线中创建一个新的 <code>PerformanceResourceTiming</code> 条目。<code>PerformanceResourceTiming</code> 是 <code>PerformanceEntry</code> 的子类，其 <code>performanceEntry.entryType</code> 始终为 <code>'resource'</code>。性能资源用于标记资源时间线中的时刻。</p>
+<p>创建的 <code>PerformanceMark</code> 条目被放入全局资源时间线中，可以通过 <code>performance.getEntries</code>、<code>performance.getEntriesByName</code> 和 <code>performance.getEntriesByType</code> 进行查询。当观察完成时，应使用 <code>performance.clearResourceTimings</code> 手动从全局性能时间线中清除条目。</p>
+</div><div>
+<h4><code>performance.measure(name[, startMarkOrOptions[, endMark]])</code><span><a class="mark" href="#performancemeasurename-startmarkoroptions-endmark" id="performancemeasurename-startmarkoroptions-endmark">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_measure_name_startmarkoroptions_endmark"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p>Updated to conform to the User Timing Level 3 specification.</p></td></tr>
+<tr><td>v13.13.0, v12.16.3</td>
+<td><p>Make <code>startMark</code> and <code>endMark</code> parameters optional.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>startMarkOrOptions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 可选。
+<ul>
+<li><code>detail</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 包含在测量中的额外可选详细信息。</li>
+<li><code>duration</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 开始和结束时间之间的持续时间。</li>
+<li><code>end</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 用作结束时间的时间戳，或标识先前记录的标记的字符串。</li>
+<li><code>start</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 用作开始时间的时间戳，或标识先前记录的标记的字符串。</li>
+</ul>
+</li>
+<li><code>endMark</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 可选。如果 <code>startMarkOrOptions</code> 是 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>，则必须省略。</li>
+</ul>
+<p>在性能时间线中创建一个新的 <code>PerformanceMeasure</code> 条目。<code>PerformanceMeasure</code> 是 <code>PerformanceEntry</code> 的子类，其 <code>performanceEntry.entryType</code> 始终为 <code>'measure'</code>，且 <code>performanceEntry.duration</code> 测量自 <code>startMark</code> 和 <code>endMark</code> 以来经过的毫秒数。</p>
+<p><code>startMark</code> 参数可以标识性能时间线中的任何 <em>现有</em> <code>PerformanceMark</code>，或者 <em>可以</em> 标识由 <code>PerformanceNodeTiming</code> 类提供的任何时间戳属性。如果指定的 <code>startMark</code> 不存在，则抛出错误。</p>
+<p>可选的 <code>endMark</code> 参数必须标识性能时间线中的任何 <em>现有</em> <code>PerformanceMark</code> 或由 <code>PerformanceNodeTiming</code> 类提供的任何时间戳属性。如果未传递参数，<code>endMark</code> 将为 <code>performance.now()</code>，否则如果指定的 <code>endMark</code> 不存在，将抛出错误。</p>
+<p>创建的 <code>PerformanceMeasure</code> 条目被放入全局性能时间线中，可以通过 <code>performance.getEntries</code>、<code>performance.getEntriesByName</code> 和 <code>performance.getEntriesByType</code> 进行查询。当观察完成时，应使用 <code>performance.clearMeasures</code> 手动从全局性能时间线中清除条目。</p>
+</div><div>
+<h4><code>performance.nodeTiming</code><span><a class="mark" href="#performancenodetiming" id="performancenodetiming">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_nodetiming"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="perf_hooks.html#class-performancenodetiming" class="type">&#x3C;PerformanceNodeTiming></a></li>
+</ul>
+<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>
+<p><code>PerformanceNodeTiming</code> 类的一个实例，提供特定 Node.js 操作里程碑的性能指标。</p>
+</div><div>
+<h4><code>performance.now()</code><span><a class="mark" href="#performancenow" id="performancenow">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_now"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>返回当前高精度毫秒时间戳，其中 0 表示当前 <code>node</code> 进程的开始。</p>
+</div><div>
+<h4><code>performance.setResourceTimingBufferSize(maxSize)</code><span><a class="mark" href="#performancesetresourcetimingbuffersizemaxsize" id="performancesetresourcetimingbuffersizemaxsize">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_setresourcetimingbuffersize_maxsize"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v18.8.0</td>
+<td><p><span>Added in: v18.8.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>将全局性能资源计时缓冲区大小设置为指定数量的 "resource" 类型性能条目对象。</p>
+<p>默认情况下，最大缓冲区大小设置为 250。</p>
+</div><div>
+<h4><code>performance.timeOrigin</code><span><a class="mark" href="#performancetimeorigin" id="performancetimeorigin">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_timeorigin"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p><a href="https://w3c.github.io/hr-time/#dom-performance-timeorigin"><code>timeOrigin</code></a> 指定了当前 <code>node</code> 进程开始的高精度毫秒时间戳，以 Unix 时间测量。</p>
+</div><div>
+<h4><code>performance.timerify(fn[, options])</code><span><a class="mark" href="#performancetimerifyfn-options" id="performancetimerifyfn-options">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_timerify_fn_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0</td>
+<td><p>Added the histogram option.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p>Re-implemented to use pure-JavaScript and the ability to time async functions.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>fn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>histogram</code> <a href="perf_hooks.html#class-recordablehistogram-extends-histogram" class="type">&#x3C;RecordableHistogram></a> 使用 <code>perf_hooks.createHistogram()</code> 创建的直方图对象，将记录运行时间（以纳秒为单位）。</li>
+</ul>
+</li>
+</ul>
+<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>
+<p>将一个函数包装在一个新函数中，该新函数测量被包装函数的运行时间。必须将 <code>PerformanceObserver</code> 订阅到 <code>'function'</code> 事件类型才能访问计时详细信息。</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">someFunction</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'hello world'</span>);
+}
+
+<span class="hljs-keyword">const</span> wrapped = performance.<span class="hljs-title function_">timerify</span>(someFunction);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(list.<span class="hljs-title function_">getEntries</span>()[<span class="hljs-number">0</span>].<span class="hljs-property">duration</span>);
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  obs.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'function'</span>] });
+
+<span class="hljs-comment">// 将创建一个性能时间线条目</span>
+<span class="hljs-title function_">wrapped</span>();</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">someFunction</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'hello world'</span>);
+}
+
+<span class="hljs-keyword">const</span> wrapped = performance.<span class="hljs-title function_">timerify</span>(someFunction);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(list.<span class="hljs-title function_">getEntries</span>()[<span class="hljs-number">0</span>].<span class="hljs-property">duration</span>);
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  obs.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'function'</span>] });
+
+<span class="hljs-comment">// 将创建一个性能时间线条目</span>
+<span class="hljs-title function_">wrapped</span>();</code><button class="copy-button">copy</button></pre>
+<p>如果包装的函数返回一个 promise，则会在 promise 上附加一个 finally 处理程序，并在调用 finally 处理程序时报告持续时间。</p>
+</div><div>
+<h4><code>performance.toJSON()</code><span><a class="mark" href="#performancetojson" id="performancetojson">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performance_tojson"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>performance</code> object as the receiver.</p></td></tr>
+<tr><td>v16.1.0</td>
+<td><p><span>Added in: v16.1.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>一个对象，它是 <code>performance</code> 对象的 JSON 表示。它类似于浏览器中的 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/toJSON"><code>window.performance.toJSON</code></a>。</p>
+<div>
+<h5>事件: <code>'resourcetimingbufferfull'</code><span><a class="mark" href="#-resourcetimingbufferfull" id="-resourcetimingbufferfull">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_resourcetimingbufferfull"></a></h5>
+<div class="api_metadata">
+<span>Added in: v18.8.0</span>
+</div>
+<p>当全局性能资源计时缓冲区已满时，会触发 <code>'resourcetimingbufferfull'</code> 事件。在事件监听器中使用 <code>performance.setResourceTimingBufferSize()</code> 调整资源计时缓冲区大小，或使用 <code>performance.clearResourceTimings()</code> 清除缓冲区，以允许将更多条目添加到性能时间线缓冲区。</p>
+</div></div>
+</section><section><h3>类: <code>PerformanceEntry</code><span><a class="mark" href="#-performanceentry" id="-performanceentry">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceentry"></a></h3>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<p>此类的构造函数不直接向用户暴露。</p>
+<div>
+<h4><code>performanceEntry.duration</code><span><a class="mark" href="#performanceentryduration" id="performanceentryduration">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceentry_duration"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceEntry</code> object as the receiver.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>此条目经过的总毫秒数。此值并非对所有性能条目类型都有意义。</p>
+</div><div>
+<h4><code>performanceEntry.entryType</code><span><a class="mark" href="#performanceentryentrytype" id="performanceentryentrytype">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceentry_entrytype"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceEntry</code> object as the receiver.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>性能条目的类型。它可能是以下之一：</p>
+<ul>
+<li><code>'dns'</code>（仅 Node.js）</li>
+<li><code>'function'</code>（仅 Node.js）</li>
+<li><code>'gc'</code>（仅 Node.js）</li>
+<li><code>'http2'</code>（仅 Node.js）</li>
+<li><code>'http'</code>（仅 Node.js）</li>
+<li><code>'mark'</code>（在 Web 上可用）</li>
+<li><code>'measure'</code>（在 Web 上可用）</li>
+<li><code>'net'</code>（仅 Node.js）</li>
+<li><code>'node'</code>（仅 Node.js）</li>
+<li><code>'resource'</code>（在 Web 上可用）</li>
+</ul>
+</div><div>
+<h4><code>performanceEntry.name</code><span><a class="mark" href="#performanceentryname" id="performanceentryname">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceentry_name"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceEntry</code> object as the receiver.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>性能条目的名称。</p>
+</div><div>
+<h4><code>performanceEntry.startTime</code><span><a class="mark" href="#performanceentrystarttime" id="performanceentrystarttime">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceentry_starttime"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceEntry</code> object as the receiver.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>标记性能条目开始时间的高精度毫秒时间戳。</p>
+</div>
+</section><section><h3>类: <code>PerformanceMark</code><span><a class="mark" href="#-performancemark" id="-performancemark">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancemark"></a></h3>
+<div class="api_metadata">
+<span>Added in: v18.2.0, v16.17.0</span>
+</div>
+<ul>
+<li>扩展: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a></li>
+</ul>
+<p>暴露通过 <code>Performance.mark()</code> 方法创建的标记。</p>
+<div>
+<h4><code>performanceMark.detail</code><span><a class="mark" href="#performancemarkdetail" id="performancemarkdetail">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancemark_detail"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceMark</code> object as the receiver.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p><span>Added in: v16.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+</ul>
+<p>使用 <code>Performance.mark()</code> 方法创建时指定的额外详细信息。</p>
+</div>
+</section><section><h3>类: <code>PerformanceMeasure</code><span><a class="mark" href="#-performancemeasure" id="-performancemeasure">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancemeasure"></a></h3>
+<div class="api_metadata">
+<span>Added in: v18.2.0, v16.17.0</span>
+</div>
+<ul>
+<li>扩展: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a></li>
+</ul>
+<p>暴露通过 <code>Performance.measure()</code> 方法创建的测量。</p>
+<p>此类的构造函数不直接向用户暴露。</p>
+<div>
+<h4><code>performanceMeasure.detail</code><span><a class="mark" href="#performancemeasuredetail" id="performancemeasuredetail">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancemeasure_detail"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceMeasure</code> object as the receiver.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p><span>Added in: v16.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+</ul>
+<p>使用 <code>Performance.measure()</code> 方法创建时指定的额外详细信息。</p>
+</div>
+</section><section><h3>类: <code>PerformanceNodeEntry</code><span><a class="mark" href="#-performancenodeentry" id="-performancenodeentry">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodeentry"></a></h3>
+<div class="api_metadata">
+<span>Added in: v19.0.0</span>
+</div>
+<ul>
+<li>扩展: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a></li>
+</ul>
+<p><em>此类是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>
+<p>提供详细的 Node.js 计时数据。</p>
+<p>此类的构造函数不直接向用户暴露。</p>
+<div>
+<h4><code>performanceNodeEntry.detail</code><span><a class="mark" href="#performancenodeentrydetail" id="performancenodeentrydetail">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodeentry_detail"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceNodeEntry</code> object as the receiver.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p><span>Added in: v16.0.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a></li>
+</ul>
+<p>特定于 <code>entryType</code> 的额外详细信息。</p>
+</div><div>
+<h4><code>performanceNodeEntry.flags</code><span><a class="mark" href="#performancenodeentryflags" id="performancenodeentryflags">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodeentry_flags"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0</td>
+<td><p>Runtime deprecated. Now moved to the detail property when entryType is 'gc'.</p></td></tr>
+<tr><td>v13.9.0, v12.17.0</td>
+<td><p><span>Added in: v13.9.0, v12.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<blockquote>
+<p>稳定性: 0 - 已弃用：改用 <code>performanceNodeEntry.detail</code>。</p>
+</blockquote>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>当 <code>performanceEntry.entryType</code> 等于 <code>'gc'</code> 时，<code>performance.flags</code> 属性包含有关垃圾回收操作的额外信息。该值可能是以下之一：</p>
+<ul>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_NO</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_CONSTRUCT_RETAINED</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_FORCED</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SYNCHRONOUS_PHANTOM_PROCESSING</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_AVAILABLE_GARBAGE</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_EXTERNAL_MEMORY</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SCHEDULE_IDLE</code></li>
+</ul>
+</div><div>
+<h4><code>performanceNodeEntry.kind</code><span><a class="mark" href="#performancenodeentrykind" id="performancenodeentrykind">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodeentry_kind"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0</td>
+<td><p>Runtime deprecated. Now moved to the detail property when entryType is 'gc'.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<blockquote>
+<p>稳定性: 0 - 已弃用：改用 <code>performanceNodeEntry.detail</code>。</p>
+</blockquote>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>当 <code>performanceEntry.entryType</code> 等于 <code>'gc'</code> 时，<code>performance.kind</code> 属性标识发生的垃圾回收操作的类型。该值可能是以下之一：</p>
+<ul>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MAJOR</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MINOR</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_INCREMENTAL</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_WEAKCB</code></li>
+</ul>
+</div><div>
+<h4>垃圾回收 ('gc') 详细信息<span><a class="mark" href="#-gc-" id="-gc-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_gc"></a></h4>
+<p>当 <code>performanceEntry.type</code> 等于 <code>'gc'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含两个属性的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>：</p>
+<ul>
+<li><code>kind</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 以下之一：
+<ul>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MAJOR</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_MINOR</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_INCREMENTAL</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_WEAKCB</code></li>
+</ul>
+</li>
+<li><code>flags</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 以下之一：
+<ul>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_NO</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_CONSTRUCT_RETAINED</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_FORCED</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SYNCHRONOUS_PHANTOM_PROCESSING</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_AVAILABLE_GARBAGE</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_ALL_EXTERNAL_MEMORY</code></li>
+<li><code>perf_hooks.constants.NODE_PERFORMANCE_GC_FLAGS_SCHEDULE_IDLE</code></li>
+</ul>
+</li>
+</ul>
+</div><div>
+<h4>HTTP ('http') 详细信息<span><a class="mark" href="#http-http-" id="http-http-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_http_http"></a></h4>
+<p>当 <code>performanceEntry.type</code> 等于 <code>'http'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外信息的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>HttpClient</code>，则 <code>detail</code> 将包含以下属性：<code>req</code>、<code>res</code>。并且 <code>req</code> 属性将是一个包含 <code>method</code>、<code>url</code>、<code>headers</code> 的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>，<code>res</code> 属性将是一个包含 <code>statusCode</code>、<code>statusMessage</code>、<code>headers</code> 的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>HttpRequest</code>，则 <code>detail</code> 将包含以下属性：<code>req</code>、<code>res</code>。并且 <code>req</code> 属性将是一个包含 <code>method</code>、<code>url</code>、<code>headers</code> 的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>，<code>res</code> 属性将是一个包含 <code>statusCode</code>、<code>statusMessage</code>、<code>headers</code> 的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>。</p>
+<p>这可能会增加额外的内存开销，应仅用于诊断目的，默认情况下不应在生产中开启。</p>
+</div><div>
+<h4>HTTP/2 ('http2') 详细信息<span><a class="mark" href="#http2-http2-" id="http2-http2-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_http_2_http2"></a></h4>
+<p>当 <code>performanceEntry.type</code> 等于 <code>'http2'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外性能信息的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>Http2Stream</code>，则 <code>detail</code> 将包含以下属性：</p>
+<ul>
+<li><code>bytesRead</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 为此 <code>Http2Stream</code> 接收的 <code>DATA</code> 帧字节数。</li>
+<li><code>bytesWritten</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 为此 <code>Http2Stream</code> 发送的 <code>DATA</code> 帧字节数。</li>
+<li><code>id</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 关联的 <code>Http2Stream</code> 的标识符</li>
+<li><code>timeToFirstByte</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>PerformanceEntry</code> <code>startTime</code> 与接收第一个 <code>DATA</code> 帧之间经过的毫秒数。</li>
+<li><code>timeToFirstByteSent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>PerformanceEntry</code> <code>startTime</code> 与发送第一个 <code>DATA</code> 帧之间经过的毫秒数。</li>
+<li><code>timeToFirstHeader</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>PerformanceEntry</code> <code>startTime</code> 与接收第一个头部之间经过的毫秒数。</li>
+</ul>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>Http2Session</code>，则 <code>detail</code> 将包含以下属性：</p>
+<ul>
+<li><code>bytesRead</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 为此 <code>Http2Session</code> 接收的字节数。</li>
+<li><code>bytesWritten</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 为此 <code>Http2Session</code> 发送的字节数。</li>
+<li><code>framesReceived</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>Http2Session</code> 接收的 HTTP/2 帧数。</li>
+<li><code>framesSent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>Http2Session</code> 发送的 HTTP/2 帧数。</li>
+<li><code>maxConcurrentStreams</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 在 <code>Http2Session</code> 生命周期内同时打开的最大流数。</li>
+<li><code>pingRTT</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 自传输 <code>PING</code> 帧到接收到其确认之间经过的毫秒数。仅当在 <code>Http2Session</code> 上发送了 <code>PING</code> 帧时才存在。</li>
+<li><code>streamAverageDuration</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 所有 <code>Http2Stream</code> 实例的平均持续时间（以毫秒为单位）。</li>
+<li><code>streamCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> <code>Http2Session</code> 处理的 <code>Http2Stream</code> 实例数。</li>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <code>'server'</code> 或 <code>'client'</code> 以标识 <code>Http2Session</code> 的类型。</li>
+</ul>
+</div><div>
+<h4>Timerify ('function') 详细信息<span><a class="mark" href="#timerify-function-" id="timerify-function-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_timerify_function"></a></h4>
+<p>当 <code>performanceEntry.type</code> 等于 <code>'function'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个列出定时函数输入参数的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a>。</p>
+</div><div>
+<h4>Net ('net') 详细信息<span><a class="mark" href="#net-net-" id="net-net-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_net_net"></a></h4>
+<p>当 <code>performanceEntry.type</code> 等于 <code>'net'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外信息的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>connect</code>，则 <code>detail</code> 将包含以下属性：<code>host</code>、<code>port</code>。</p>
+</div><div>
+<h4>DNS ('dns') 详细信息<span><a class="mark" href="#dns-dns-" id="dns-dns-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_dns_dns"></a></h4>
+<p>当 <code>performanceEntry.type</code> 等于 <code>'dns'</code> 时，<code>performanceNodeEntry.detail</code> 属性将是一个包含额外信息的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>lookup</code>，则 <code>detail</code> 将包含以下属性：<code>hostname</code>、<code>family</code>、<code>hints</code>、<code>verbatim</code>、<code>addresses</code>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>lookupService</code>，则 <code>detail</code> 将包含以下属性：<code>host</code>、<code>port</code>、<code>hostname</code>、<code>service</code>。</p>
+<p>如果 <code>performanceEntry.name</code> 等于 <code>queryxxx</code> 或 <code>getHostByAddr</code>，则 <code>detail</code> 将包含以下属性：<code>host</code>、<code>ttl</code>、<code>result</code>。<code>result</code> 的值与 <code>queryxxx</code> 或 <code>getHostByAddr</code> 的结果相同。</p>
+</div>
+</section><section><h3>类: <code>PerformanceNodeTiming</code><span><a class="mark" href="#-performancenodetiming" id="-performancenodetiming">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming"></a></h3>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>扩展: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a></li>
+</ul>
+<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>
+<p>提供 Node.js 本身的计时详细信息。此类的构造函数不向用户暴露。</p>
+<div>
+<h4><code>performanceNodeTiming.bootstrapComplete</code><span><a class="mark" href="#performancenodetimingbootstrapcomplete" id="performancenodetimingbootstrapcomplete">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_bootstrapcomplete"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>Node.js 进程完成引导的高精度毫秒时间戳。如果引导尚未完成，则属性的值为 -1。</p>
+</div><div>
+<h4><code>performanceNodeTiming.environment</code><span><a class="mark" href="#performancenodetimingenvironment" id="performancenodetimingenvironment">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_environment"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>Node.js 环境初始化的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceNodeTiming.idleTime</code><span><a class="mark" href="#performancenodetimingidletime" id="performancenodetimingidletime">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_idletime"></a></h4>
+<div class="api_metadata">
+<span>Added in: v14.10.0, v12.19.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>事件循环在事件循环的事件提供者（例如 <code>epoll_wait</code>）内空闲的时间的高精度毫秒时间戳。这不考虑 CPU 使用情况。如果事件循环尚未启动（例如，在主脚本的第一个 tick 中），则属性的值为 0。</p>
+</div><div>
+<h4><code>performanceNodeTiming.loopExit</code><span><a class="mark" href="#performancenodetimingloopexit" id="performancenodetimingloopexit">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_loopexit"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>Node.js 事件循环退出的高精度毫秒时间戳。如果事件循环尚未退出，则属性的值为 -1。它只能在 <a href="process.html#event-exit"><code>'exit'</code></a> 事件的处理程序中具有非 -1 的值。</p>
+</div><div>
+<h4><code>performanceNodeTiming.loopStart</code><span><a class="mark" href="#performancenodetimingloopstart" id="performancenodetimingloopstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_loopstart"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>Node.js 事件循环开始的高精度毫秒时间戳。如果事件循环尚未启动（例如，在主脚本的第一个 tick 中），则属性的值为 -1。</p>
+</div><div>
+<h4><code>performanceNodeTiming.nodeStart</code><span><a class="mark" href="#performancenodetimingnodestart" id="performancenodetimingnodestart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_nodestart"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>Node.js 进程初始化的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceNodeTiming.uvMetricsInfo</code><span><a class="mark" href="#performancenodetiminguvmetricsinfo" id="performancenodetiminguvmetricsinfo">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_uvmetricsinfo"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.8.0, v20.18.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>loopCount</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 事件循环迭代次数。</li>
+<li><code>events</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 事件处理程序已处理的事件数。</li>
+<li><code>eventsWaiting</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 调用事件提供者时等待处理的事件数。</li>
+</ul>
+</li>
+</ul>
+<p>这是 <code>uv_metrics_info</code> 函数的包装器。它返回当前的事件循环指标集。</p>
+<p>建议在通过 <code>setImmediate</code> 调度的函数内部使用此属性，以避免在当前循环迭代期间完成所有调度的操作之前收集指标。</p>
+
+<pre class="with-51-chars"><input class="js-flavor-toggle" type="checkbox" aria-label="Show modern ES modules syntax"><code class="language-js cjs"><span class="hljs-keyword">const</span> { performance } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(performance.<span class="hljs-property">nodeTiming</span>.<span class="hljs-property">uvMetricsInfo</span>);
+});</code><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-title function_">setImmediate</span>(<span class="hljs-function">() =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(performance.<span class="hljs-property">nodeTiming</span>.<span class="hljs-property">uvMetricsInfo</span>);
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>performanceNodeTiming.v8Start</code><span><a class="mark" href="#performancenodetimingv8start" id="performancenodetimingv8start">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performancenodetiming_v8start"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>V8 平台初始化的高精度毫秒时间戳。</p>
+</div>
+</section><section><h3>类: <code>PerformanceResourceTiming</code><span><a class="mark" href="#-performanceresourcetiming" id="-performanceresourcetiming">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming"></a></h3>
+<div class="api_metadata">
+<span>Added in: v18.2.0, v16.17.0</span>
+</div>
+<ul>
+<li>扩展: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a></li>
+</ul>
+<p>提供有关应用程序资源加载的详细网络计时数据。</p>
+<p>此类的构造函数不直接向用户暴露。</p>
+<div>
+<h4><code>performanceResourceTiming.workerStart</code><span><a class="mark" href="#performanceresourcetimingworkerstart" id="performanceresourcetimingworkerstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_workerstart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>在立即分发 <code>fetch</code> 请求之前的高精度毫秒时间戳。如果资源未被 worker 拦截，则属性将始终返回 0。</p>
+</div><div>
+<h4><code>performanceResourceTiming.redirectStart</code><span><a class="mark" href="#performanceresourcetimingredirectstart" id="performanceresourcetimingredirectstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_redirectstart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示启动重定向的获取开始时间的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.redirectEnd</code><span><a class="mark" href="#performanceresourcetimingredirectend" id="performanceresourcetimingredirectend">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_redirectend"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>在接收到最后一个重定向响应的最后一个字节后立即创建的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.fetchStart</code><span><a class="mark" href="#performanceresourcetimingfetchstart" id="performanceresourcetimingfetchstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_fetchstart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>在 Node.js 开始获取资源之前的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.domainLookupStart</code><span><a class="mark" href="#performanceresourcetimingdomainlookupstart" id="performanceresourcetimingdomainlookupstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_domainlookupstart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>在 Node.js 开始对资源进行域名查找之前的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.domainLookupEnd</code><span><a class="mark" href="#performanceresourcetimingdomainlookupend" id="performanceresourcetimingdomainlookupend">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_domainlookupend"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示 Node.js 完成资源域名查找之后的时间的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.connectStart</code><span><a class="mark" href="#performanceresourcetimingconnectstart" id="performanceresourcetimingconnectstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_connectstart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示在 Node.js 开始与服务器建立连接以检索资源之前的时间的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.connectEnd</code><span><a class="mark" href="#performanceresourcetimingconnectend" id="performanceresourcetimingconnectend">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_connectend"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示在 Node.js 完成与服务器建立连接以检索资源之后的时间的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.secureConnectionStart</code><span><a class="mark" href="#performanceresourcetimingsecureconnectionstart" id="performanceresourcetimingsecureconnectionstart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_secureconnectionstart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示在 Node.js 开始握手过程以保护当前连接之前的时间的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.requestStart</code><span><a class="mark" href="#performanceresourcetimingrequeststart" id="performanceresourcetimingrequeststart">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_requeststart"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示在 Node.js 从服务器接收响应的第一个字节之前的时间的高精度毫秒时间戳。</p>
+</div><div>
+<h4><code>performanceResourceTiming.responseEnd</code><span><a class="mark" href="#performanceresourcetimingresponseend" id="performanceresourcetimingresponseend">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_responseend"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示在 Node.js 接收到资源的最后一个字节之后或传输连接关闭之前的时间的高精度毫秒时间戳，以先发生者为准。</p>
+</div><div>
+<h4><code>performanceResourceTiming.transferSize</code><span><a class="mark" href="#performanceresourcetimingtransfersize" id="performanceresourcetimingtransfersize">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_transfersize"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示获取资源的大小（以八位字节为单位）的数字。大小包括响应头字段和响应负载体。</p>
+</div><div>
+<h4><code>performanceResourceTiming.encodedBodySize</code><span><a class="mark" href="#performanceresourcetimingencodedbodysize" id="performanceresourcetimingencodedbodysize">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_encodedbodysize"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示从获取（HTTP 或缓存）接收到的负载体的大小（以八位字节为单位）的数字，在移除任何应用的内容编码之前。</p>
+</div><div>
+<h4><code>performanceResourceTiming.decodedBodySize</code><span><a class="mark" href="#performanceresourcetimingdecodedbodysize" id="performanceresourcetimingdecodedbodysize">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_decodedbodysize"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This property getter must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>表示从获取（HTTP 或缓存）接收到的消息体的大小（以八位字节为单位）的数字，在移除任何应用的内容编码之后。</p>
+</div><div>
+<h4><code>performanceResourceTiming.toJSON()</code><span><a class="mark" href="#performanceresourcetimingtojson" id="performanceresourcetimingtojson">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceresourcetiming_tojson"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v19.0.0</td>
+<td><p>This method must be called with the <code>PerformanceResourceTiming</code> object as the receiver.</p></td></tr>
+<tr><td>v18.2.0, v16.17.0</td>
+<td><p><span>Added in: v18.2.0, v16.17.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>返回一个 <code>object</code>，它是 <code>PerformanceResourceTiming</code> 对象的 JSON 表示。</p>
+</div>
+</section><section><h3>类: <code>PerformanceObserver</code><span><a class="mark" href="#-performanceobserver" id="-performanceobserver">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserver"></a></h3>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<div>
+<h4><code>PerformanceObserver.supportedEntryTypes</code><span><a class="mark" href="#performanceobserversupportedentrytypes" id="performanceobserversupportedentrytypes">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserver_supportedentrytypes"></a></h4>
+<div class="api_metadata">
+<span>Added in: v16.0.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>获取支持的类型。</p>
+</div><div>
+<h4><code>new PerformanceObserver(callback)</code><span><a class="mark" href="#new-performanceobservercallback" id="new-performanceobservercallback">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_new_performanceobserver_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v18.0.0</td>
+<td><p>Passing an invalid callback to the <code>callback</code> argument now throws <code>ERR_INVALID_ARG_TYPE</code> instead of <code>ERR_INVALID_CALLBACK</code>.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a>
+<ul>
+<li><code>list</code> <a href="perf_hooks.html#class-performanceobserverentrylist" class="type">&#x3C;PerformanceObserverEntryList></a></li>
+<li><code>observer</code> <a href="perf_hooks.html#class-performanceobserver" class="type">&#x3C;PerformanceObserver></a></li>
+</ul>
+</li>
+</ul>
+<p><code>PerformanceObserver</code> 对象在新的 <code>PerformanceEntry</code> 实例被添加到性能时间线时提供通知。</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(list.<span class="hljs-title function_">getEntries</span>());
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'mark'</span>], <span class="hljs-attr">buffered</span>: <span class="hljs-literal">true</span> });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(list.<span class="hljs-title function_">getEntries</span>());
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'mark'</span>], <span class="hljs-attr">buffered</span>: <span class="hljs-literal">true</span> });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);</code><button class="copy-button">copy</button></pre>
+<p>由于 <code>PerformanceObserver</code> 实例会引入它们自己的额外性能开销，因此实例不应无限期地保持订阅通知。用户应在不再需要观察者时立即断开连接。</p>
+<p>当 <code>PerformanceObserver</code> 被通知有关新的 <code>PerformanceEntry</code> 实例时，会调用 <code>callback</code>。回调接收一个 <code>PerformanceObserverEntryList</code> 实例和一个对 <code>PerformanceObserver</code> 的引用。</p>
+</div><div>
+<h4><code>performanceObserver.disconnect()</code><span><a class="mark" href="#performanceobserverdisconnect" id="performanceobserverdisconnect">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserver_disconnect"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<p>断开 <code>PerformanceObserver</code> 实例与所有通知的连接。</p>
+</div><div>
+<h4><code>performanceObserver.observe(options)</code><span><a class="mark" href="#performanceobserverobserveoptions" id="performanceobserverobserveoptions">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserver_observe_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.7.0</td>
+<td><p>Updated to conform to Performance Timeline Level 2. The buffered option has been added back.</p></td></tr>
+<tr><td>v16.0.0</td>
+<td><p>Updated to conform to User Timing Level 3. The buffered option has been removed.</p></td></tr>
+<tr><td>v8.5.0</td>
+<td><p><span>Added in: v8.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 单个 <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a> 类型。如果已指定 <code>entryTypes</code>，则不得提供。</li>
+<li><code>entryTypes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 标识观察者感兴趣的 <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a> 实例类型的字符串数组。如果未提供，将抛出错误。</li>
+<li><code>buffered</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果为 true，则使用全局 <code>PerformanceEntry</code> 缓冲条目列表调用观察者回调。如果为 false，则仅将时间点之后创建的 <code>PerformanceEntry</code> 发送到观察者回调。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+</ul>
+<p>将 <a href="perf_hooks.html#class-performanceobserver" class="type">&#x3C;PerformanceObserver></a> 实例订阅到由 <code>options.entryTypes</code> 或 <code>options.type</code> 标识的新 <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry></a> 实例的通知：</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list, observer</span>) =></span> {
+  <span class="hljs-comment">// 异步调用一次。`list` 包含三个项目。</span>
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'mark'</span> });
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>; n &#x3C; <span class="hljs-number">3</span>; n++)
+  performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">`test<span class="hljs-subst">${n}</span>`</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list, observer</span>) =></span> {
+  <span class="hljs-comment">// 异步调用一次。`list` 包含三个项目。</span>
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'mark'</span> });
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> n = <span class="hljs-number">0</span>; n &#x3C; <span class="hljs-number">3</span>; n++)
+  performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">`test<span class="hljs-subst">${n}</span>`</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>performanceObserver.takeRecords()</code><span><a class="mark" href="#performanceobservertakerecords" id="performanceobservertakerecords">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserver_takerecords"></a></h4>
+<div class="api_metadata">
+<span>Added in: v16.0.0</span>
+</div>
+<ul>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a> 存储在性能观察器中的当前条目列表，并将其清空。</li>
+</ul>
+</div>
+</section><section><h3>类: <code>PerformanceObserverEntryList</code><span><a class="mark" href="#-performanceobserverentrylist" id="-performanceobserverentrylist">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserverentrylist"></a></h3>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<p><code>PerformanceObserverEntryList</code> 类用于提供对传递给 <code>PerformanceObserver</code> 的 <code>PerformanceEntry</code> 实例的访问。此类的构造函数不向用户暴露。</p>
+<div>
+<h4><code>performanceObserverEntryList.getEntries()</code><span><a class="mark" href="#performanceobserverentrylistgetentries" id="performanceobserverentrylistgetentries">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserverentrylist_getentries"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a></li>
+</ul>
+<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表。</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">perfObserverList, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntries</span>());
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'test',
+   *     entryType: 'mark',
+   *     startTime: 81.465639,
+   *     duration: 0,
+   *     detail: null
+   *   },
+   *   PerformanceEntry {
+   *     name: 'meow',
+   *     entryType: 'mark',
+   *     startTime: 81.860064,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'mark'</span> });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'meow'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">perfObserverList, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntries</span>());
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'test',
+   *     entryType: 'mark',
+   *     startTime: 81.465639,
+   *     duration: 0,
+   *     detail: null
+   *   },
+   *   PerformanceEntry {
+   *     name: 'meow',
+   *     entryType: 'mark',
+   *     startTime: 81.860064,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'mark'</span> });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'meow'</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>performanceObserverEntryList.getEntriesByName(name[, type])</code><span><a class="mark" href="#performanceobserverentrylistgetentriesbynamename-type" id="performanceobserverentrylistgetentriesbynamename-type">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserverentrylist_getentriesbyname_name_type"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a></li>
+</ul>
+<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.name</code> 等于 <code>name</code>，并且可选地，其 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">perfObserverList, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'meow'</span>));
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'meow',
+   *     entryType: 'mark',
+   *     startTime: 98.545991,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'nope'</span>)); <span class="hljs-comment">// []</span>
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'test'</span>, <span class="hljs-string">'mark'</span>));
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'test',
+   *     entryType: 'mark',
+   *     startTime: 63.518931,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'test'</span>, <span class="hljs-string">'measure'</span>)); <span class="hljs-comment">// []</span>
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'mark'</span>, <span class="hljs-string">'measure'</span>] });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'meow'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">perfObserverList, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'meow'</span>));
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'meow',
+   *     entryType: 'mark',
+   *     startTime: 98.545991,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'nope'</span>)); <span class="hljs-comment">// []</span>
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'test'</span>, <span class="hljs-string">'mark'</span>));
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'test',
+   *     entryType: 'mark',
+   *     startTime: 63.518931,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByName</span>(<span class="hljs-string">'test'</span>, <span class="hljs-string">'measure'</span>)); <span class="hljs-comment">// []</span>
+
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'mark'</span>, <span class="hljs-string">'measure'</span>] });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'meow'</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>performanceObserverEntryList.getEntriesByType(type)</code><span><a class="mark" href="#performanceobserverentrylistgetentriesbytypetype" id="performanceobserverentrylistgetentriesbytypetype">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_performanceobserverentrylist_getentriesbytype_type"></a></h4>
+<div class="api_metadata">
+<span>Added in: v8.5.0</span>
+</div>
+<ul>
+<li><code>type</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回: <a href="perf_hooks.html#class-performanceentry" class="type">&#x3C;PerformanceEntry[]></a></li>
+</ul>
+<p>返回一个按 <code>performanceEntry.startTime</code> 时间顺序排列的 <code>PerformanceEntry</code> 对象列表，这些对象的 <code>performanceEntry.entryType</code> 等于 <code>type</code>。</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">perfObserverList, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByType</span>(<span class="hljs-string">'mark'</span>));
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'test',
+   *     entryType: 'mark',
+   *     startTime: 55.897834,
+   *     duration: 0,
+   *     detail: null
+   *   },
+   *   PerformanceEntry {
+   *     name: 'meow',
+   *     entryType: 'mark',
+   *     startTime: 56.350146,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'mark'</span> });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'meow'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">perfObserverList, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(perfObserverList.<span class="hljs-title function_">getEntriesByType</span>(<span class="hljs-string">'mark'</span>));
+  <span class="hljs-comment">/**
+   * [
+   *   PerformanceEntry {
+   *     name: 'test',
+   *     entryType: 'mark',
+   *     startTime: 55.897834,
+   *     duration: 0,
+   *     detail: null
+   *   },
+   *   PerformanceEntry {
+   *     name: 'meow',
+   *     entryType: 'mark',
+   *     startTime: 56.350146,
+   *     duration: 0,
+   *     detail: null
+   *   }
+   * ]
+   */</span>
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">'mark'</span> });
+
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'test'</span>);
+performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">'meow'</span>);</code><button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3><code>perf_hooks.createHistogram([options])</code><span><a class="mark" href="#perf_hookscreatehistogramoptions" id="perf_hookscreatehistogramoptions">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_perf_hooks_createhistogram_options"></a></h3>
+<div class="api_metadata">
+<span>Added in: v15.9.0, v14.18.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>lowest</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> 最低可分辨值。必须是大于 0 的整数值。<strong>默认值:</strong> <code>1</code>。</li>
+<li><code>highest</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> 最高可记录值。必须是等于或大于 <code>lowest</code> 两倍的整数值。<strong>默认值:</strong> <code>Number.MAX_SAFE_INTEGER</code>。</li>
+<li><code>figures</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 精度位数。必须是介于 <code>1</code> 和 <code>5</code> 之间的数字。<strong>默认值:</strong> <code>3</code>。</li>
+</ul>
+</li>
+<li>返回: <a href="perf_hooks.html#class-recordablehistogram-extends-histogram" class="type">&#x3C;RecordableHistogram></a></li>
+</ul>
+<p>返回一个 <a href="perf_hooks.html#class-recordablehistogram-extends-histogram" class="type">&#x3C;RecordableHistogram></a>。</p>
+</section><section><h3><code>perf_hooks.monitorEventLoopDelay([options])</code><span><a class="mark" href="#perf_hooksmonitoreventloopdelayoptions" id="perf_hooksmonitoreventloopdelayoptions">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_perf_hooks_monitoreventloopdelay_options"></a></h3>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>resolution</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 采样率，以毫秒为单位。必须大于零。<strong>默认值:</strong> <code>10</code>。</li>
+</ul>
+</li>
+<li>返回: <a href="perf_hooks.html#class-intervalhistogram-extends-histogram" class="type">&#x3C;IntervalHistogram></a></li>
+</ul>
+<p><em>此属性是 Node.js 的扩展。它在 Web 浏览器中不可用。</em></p>
+<p>创建一个 <code>IntervalHistogram</code> 对象，该对象随时间采样和报告事件循环延迟。延迟将以纳秒报告。</p>
+<p>使用计时器检测近似事件循环延迟是有效的，因为计时器的执行与 libuv 事件循环的生命周期 specifically 相关。也就是说，循环中的延迟将导致计时器执行的延迟，而此 API 旨在 specifically 检测这些延迟。</p>
+
+<pre class="with-61-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { monitorEventLoopDelay } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> h = <span class="hljs-title function_">monitorEventLoopDelay</span>({ <span class="hljs-attr">resolution</span>: <span class="hljs-number">20</span> });
+h.<span class="hljs-title function_">enable</span>();
+<span class="hljs-comment">// 执行某些操作。</span>
+h.<span class="hljs-title function_">disable</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">min</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">max</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">mean</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">stddev</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">percentiles</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-title function_">percentile</span>(<span class="hljs-number">50</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-title function_">percentile</span>(<span class="hljs-number">99</span>));</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { monitorEventLoopDelay } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+<span class="hljs-keyword">const</span> h = <span class="hljs-title function_">monitorEventLoopDelay</span>({ <span class="hljs-attr">resolution</span>: <span class="hljs-number">20</span> });
+h.<span class="hljs-title function_">enable</span>();
+<span class="hljs-comment">// 执行某些操作。</span>
+h.<span class="hljs-title function_">disable</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">min</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">max</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">mean</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">stddev</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-property">percentiles</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-title function_">percentile</span>(<span class="hljs-number">50</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(h.<span class="hljs-title function_">percentile</span>(<span class="hljs-number">99</span>));</code><button class="copy-button">copy</button></pre>
+</section><section><h3>类: <code>Histogram</code><span><a class="mark" href="#-histogram" id="-histogram">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram"></a></h3>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<div>
+<h4><code>histogram.count</code><span><a class="mark" href="#histogramcount" id="histogramcount">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_count"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>直方图记录的样本数。</p>
+</div><div>
+<h4><code>histogram.countBigInt</code><span><a class="mark" href="#histogramcountbigint" id="histogramcountbigint">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_countbigint"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a></li>
+</ul>
+<p>直方图记录的样本数。</p>
+</div><div>
+<h4><code>histogram.exceeds</code><span><a class="mark" href="#histogramexceeds" id="histogramexceeds">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_exceeds"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>事件循环延迟超过最大 1 小时事件循环延迟阈值的次数。</p>
+</div><div>
+<h4><code>histogram.exceedsBigInt</code><span><a class="mark" href="#histogramexceedsbigint" id="histogramexceedsbigint">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_exceedsbigint"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a></li>
+</ul>
+<p>事件循环延迟超过最大 1 小时事件循环延迟阈值的次数。</p>
+</div><div>
+<h4><code>histogram.max</code><span><a class="mark" href="#histogrammax" id="histogrammax">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_max"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>记录的最大事件循环延迟。</p>
+</div><div>
+<h4><code>histogram.maxBigInt</code><span><a class="mark" href="#histogrammaxbigint" id="histogrammaxbigint">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_maxbigint"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a></li>
+</ul>
+<p>记录的最大事件循环延迟。</p>
+</div><div>
+<h4><code>histogram.mean</code><span><a class="mark" href="#histogrammean" id="histogrammean">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_mean"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>记录的事件循环延迟的平均值。</p>
+</div><div>
+<h4><code>histogram.min</code><span><a class="mark" href="#histogrammin" id="histogrammin">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_min"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>记录的最小事件循环延迟。</p>
+</div><div>
+<h4><code>histogram.minBigInt</code><span><a class="mark" href="#histogramminbigint" id="histogramminbigint">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_minbigint"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a></li>
+</ul>
+<p>记录的最小事件循环延迟。</p>
+</div><div>
+<h4><code>histogram.percentile(percentile)</code><span><a class="mark" href="#histogrampercentilepercentile" id="histogrampercentilepercentile">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_percentile_percentile"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li><code>percentile</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 百分位数值，范围在 (0, 100]。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>返回给定百分位数的值。</p>
+</div><div>
+<h4><code>histogram.percentileBigInt(percentile)</code><span><a class="mark" href="#histogrampercentilebigintpercentile" id="histogrampercentilebigintpercentile">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_percentilebigint_percentile"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li><code>percentile</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 百分位数值，范围在 (0, 100]。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a></li>
+</ul>
+<p>返回给定百分位数的值。</p>
+</div><div>
+<h4><code>histogram.percentiles</code><span><a class="mark" href="#histogrampercentiles" id="histogrampercentiles">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_percentiles"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" class="type">&#x3C;Map></a></li>
+</ul>
+<p>返回一个 <code>Map</code> 对象，详细说明累积的百分位分布。</p>
+</div><div>
+<h4><code>histogram.percentilesBigInt</code><span><a class="mark" href="#histogrampercentilesbigint" id="histogrampercentilesbigint">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_percentilesbigint"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map" class="type">&#x3C;Map></a></li>
+</ul>
+<p>返回一个 <code>Map</code> 对象，详细说明累积的百分位分布。</p>
+</div><div>
+<h4><code>histogram.reset()</code><span><a class="mark" href="#histogramreset" id="histogramreset">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_reset"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<p>重置收集的直方图数据。</p>
+</div><div>
+<h4><code>histogram.stddev</code><span><a class="mark" href="#histogramstddev" id="histogramstddev">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_stddev"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+</ul>
+<p>记录的事件循环延迟的标准差。</p>
+</div>
+</section><section><h3>类: <code>IntervalHistogram extends Histogram</code><span><a class="mark" href="#-intervalhistogram-extends-histogram" id="-intervalhistogram-extends-histogram">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_intervalhistogram_extends_histogram"></a></h3>
+<p>一个在给定间隔上定期更新的 <code>Histogram</code>。</p>
+<div>
+<h4><code>histogram.disable()</code><span><a class="mark" href="#histogramdisable" id="histogramdisable">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_disable"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>禁用更新间隔计时器。如果计时器已停止，返回 <code>true</code>，如果已经停止，返回 <code>false</code>。</p>
+</div><div>
+<h4><code>histogram.enable()</code><span><a class="mark" href="#histogramenable" id="histogramenable">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_enable"></a></h4>
+<div class="api_metadata">
+<span>Added in: v11.10.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>启用更新间隔计时器。如果计时器已启动，返回 <code>true</code>，如果已经启动，返回 <code>false</code>。</p>
+</div><div>
+<h4><code>histogram[Symbol.dispose]()</code><span><a class="mark" href="#histogramsymboldispose" id="histogramsymboldispose">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_symbol_dispose"></a></h4>
+<div class="api_metadata">
+<span>Added in: v24.2.0</span>
+</div>
+<p>当直方图被处置时，禁用更新间隔计时器。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> { monitorEventLoopDelay } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+{
+  <span class="hljs-keyword">using</span> hist = <span class="hljs-title function_">monitorEventLoopDelay</span>({ <span class="hljs-attr">resolution</span>: <span class="hljs-number">20</span> });
+  hist.<span class="hljs-title function_">enable</span>();
+  <span class="hljs-comment">// 当退出块时，直方图将被禁用。</span>
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>克隆 <code>IntervalHistogram</code><span><a class="mark" href="#-intervalhistogram" id="-intervalhistogram">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_intervalhistogram"></a></h4>
+<p><a href="perf_hooks.html#class-intervalhistogram-extends-histogram" class="type">&#x3C;IntervalHistogram></a> 实例可以通过 <a href="worker_threads.html#class-messageport" class="type">&#x3C;MessagePort></a> 克隆。在接收端，直方图被克隆为一个普通的 <a href="perf_hooks.html#class-histogram" class="type">&#x3C;Histogram></a> 对象，该对象不实现 <code>enable()</code> 和 <code>disable()</code> 方法。</p>
+</div>
+</section><section><h3>类: <code>RecordableHistogram extends Histogram</code><span><a class="mark" href="#-recordablehistogram-extends-histogram" id="-recordablehistogram-extends-histogram">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_recordablehistogram_extends_histogram"></a></h3>
+<div class="api_metadata">
+<span>Added in: v15.9.0, v14.18.0</span>
+</div>
+<div>
+<h4><code>histogram.add(other)</code><span><a class="mark" href="#histogramaddother" id="histogramaddother">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_add_other"></a></h4>
+<div class="api_metadata">
+<span>Added in: v17.4.0, v16.14.0</span>
+</div>
+<ul>
+<li><code>other</code> <a href="perf_hooks.html#class-recordablehistogram-extends-histogram" class="type">&#x3C;RecordableHistogram></a></li>
+</ul>
+<p>将 <code>other</code> 中的值添加到此直方图。</p>
+</div><div>
+<h4><code>histogram.record(val)</code><span><a class="mark" href="#histogramrecordval" id="histogramrecordval">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_record_val"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.9.0, v14.18.0</span>
+</div>
+<ul>
+<li><code>val</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt" class="type">&#x3C;bigint></a> 要记录在直方图中的量。</li>
+</ul>
+</div><div>
+<h4><code>histogram.recordDelta()</code><span><a class="mark" href="#histogramrecorddelta" id="histogramrecorddelta">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_histogram_recorddelta"></a></h4>
+<div class="api_metadata">
+<span>Added in: v15.9.0, v14.18.0</span>
+</div>
+<p>计算自上次调用 <code>recordDelta()</code> 以来经过的时间（以纳秒为单位），并将该量记录在直方图中。</p>
+</div>
+</section><section><h3>示例<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks"></a></h3>
+<div>
+<h4>测量异步操作的持续时间<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_1"></a></h4>
+<p>以下示例使用 <a href="async_hooks.html">Async Hooks</a> 和 Performance APIs 来测量 Timeout 操作的实际持续时间（包括执行回调所需的时间）。</p>
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { createHook } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:async_hooks'</span>;
+<span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-keyword">const</span> set = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>();
+<span class="hljs-keyword">const</span> hook = <span class="hljs-title function_">createHook</span>({
+  <span class="hljs-title function_">init</span>(<span class="hljs-params">id, type</span>) {
+    <span class="hljs-keyword">if</span> (type === <span class="hljs-string">'Timeout'</span>) {
+      performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Init`</span>);
+      set.<span class="hljs-title function_">add</span>(id);
+    }
+  },
+  <span class="hljs-title function_">destroy</span>(<span class="hljs-params">id</span>) {
+    <span class="hljs-keyword">if</span> (set.<span class="hljs-title function_">has</span>(id)) {
+      set.<span class="hljs-title function_">delete</span>(id);
+      performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Destroy`</span>);
+      performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>`</span>,
+                          <span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Init`</span>,
+                          <span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Destroy`</span>);
+    }
+  },
+});
+hook.<span class="hljs-title function_">enable</span>();
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(list.<span class="hljs-title function_">getEntries</span>()[<span class="hljs-number">0</span>]);
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'measure'</span>], <span class="hljs-attr">buffered</span>: <span class="hljs-literal">true</span> });
+
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {}, <span class="hljs-number">1000</span>);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> async_hooks = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:async_hooks'</span>);
+<span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+
+<span class="hljs-keyword">const</span> set = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>();
+<span class="hljs-keyword">const</span> hook = async_hooks.<span class="hljs-title function_">createHook</span>({
+  <span class="hljs-title function_">init</span>(<span class="hljs-params">id, type</span>) {
+    <span class="hljs-keyword">if</span> (type === <span class="hljs-string">'Timeout'</span>) {
+      performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Init`</span>);
+      set.<span class="hljs-title function_">add</span>(id);
+    }
+  },
+  <span class="hljs-title function_">destroy</span>(<span class="hljs-params">id</span>) {
+    <span class="hljs-keyword">if</span> (set.<span class="hljs-title function_">has</span>(id)) {
+      set.<span class="hljs-title function_">delete</span>(id);
+      performance.<span class="hljs-title function_">mark</span>(<span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Destroy`</span>);
+      performance.<span class="hljs-title function_">measure</span>(<span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>`</span>,
+                          <span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Init`</span>,
+                          <span class="hljs-string">`Timeout-<span class="hljs-subst">${id}</span>-Destroy`</span>);
+    }
+  },
+});
+hook.<span class="hljs-title function_">enable</span>();
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list, observer</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(list.<span class="hljs-title function_">getEntries</span>()[<span class="hljs-number">0</span>]);
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  observer.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'measure'</span>] });
+
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {}, <span class="hljs-number">1000</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>测量加载依赖项所需的时间<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_2"></a></h4>
+<p>以下示例测量 <code>require()</code> 操作加载依赖项的持续时间：</p>
+<!-- eslint-disable no-global-assign -->
+
+<pre class="with-67-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { performance, <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+
+<span class="hljs-comment">// 激活观察者</span>
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list</span>) =></span> {
+  <span class="hljs-keyword">const</span> entries = list.<span class="hljs-title function_">getEntries</span>();
+  entries.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">entry</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`import('<span class="hljs-subst">${entry[<span class="hljs-number">0</span>]}</span>')`</span>, entry.<span class="hljs-property">duration</span>);
+  });
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  obs.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'function'</span>], <span class="hljs-attr">buffered</span>: <span class="hljs-literal">true</span> });
+
+<span class="hljs-keyword">const</span> timedImport = performance.<span class="hljs-title function_">timerify</span>(<span class="hljs-title function_">async</span> (<span class="hljs-variable language_">module</span>) => {
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-variable language_">module</span>);
+});
+
+<span class="hljs-keyword">await</span> <span class="hljs-title function_">timedImport</span>(<span class="hljs-string">'some-module'</span>);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> {
+  performance,
+  <span class="hljs-title class_">PerformanceObserver</span>,
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+<span class="hljs-keyword">const</span> mod = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+
+<span class="hljs-comment">// 猴子补丁 require 函数</span>
+mod.<span class="hljs-property">Module</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">require</span> =
+  performance.<span class="hljs-title function_">timerify</span>(mod.<span class="hljs-property">Module</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">require</span>);
+<span class="hljs-built_in">require</span> = performance.<span class="hljs-title function_">timerify</span>(<span class="hljs-built_in">require</span>);
+
+<span class="hljs-comment">// 激活观察者</span>
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">list</span>) =></span> {
+  <span class="hljs-keyword">const</span> entries = list.<span class="hljs-title function_">getEntries</span>();
+  entries.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">entry</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`require('<span class="hljs-subst">${entry[<span class="hljs-number">0</span>]}</span>')`</span>, entry.<span class="hljs-property">duration</span>);
+  });
+  performance.<span class="hljs-title function_">clearMarks</span>();
+  performance.<span class="hljs-title function_">clearMeasures</span>();
+  obs.<span class="hljs-title function_">disconnect</span>();
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'function'</span>] });
+
+<span class="hljs-built_in">require</span>(<span class="hljs-string">'some-module'</span>);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>测量一次 HTTP 往返所需的时间<span><a class="mark" href="#-http-" id="-http-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_http"></a></h4>
+<p>以下示例用于跟踪 HTTP 客户端（<code>OutgoingMessage</code>）和 HTTP 请求（<code>IncomingMessage</code>）所花费的时间。对于 HTTP 客户端，它表示从开始请求到接收响应之间的时间间隔，对于 HTTP 请求，它表示从接收请求到发送响应之间的时间间隔：</p>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+<span class="hljs-keyword">import</span> { createServer, get } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:http'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  items.<span class="hljs-title function_">getEntries</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);
+  });
+});
+
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'http'</span>] });
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">8080</span>;
+
+<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'ok'</span>);
+}).<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-title function_">get</span>(<span class="hljs-string">`http://127.0.0.1:<span class="hljs-subst">${PORT}</span>`</span>);
+});</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">PerformanceObserver</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+<span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  items.<span class="hljs-title function_">getEntries</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);
+  });
+});
+
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'http'</span>] });
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">8080</span>;
+
+http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+  res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'ok'</span>);
+}).<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =></span> {
+  http.<span class="hljs-title function_">get</span>(<span class="hljs-string">`http://127.0.0.1:<span class="hljs-subst">${PORT}</span>`</span>);
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>测量 <code>net.connect</code>（仅限 TCP）在连接成功时所需的时间<span><a class="mark" href="#-netconnect-tcp" id="-netconnect-tcp">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_net_connect_tcp"></a></h4>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+<span class="hljs-keyword">import</span> { connect, createServer } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:net'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  items.<span class="hljs-title function_">getEntries</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);
+  });
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'net'</span>] });
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">8080</span>;
+<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">socket</span>) =></span> {
+  socket.<span class="hljs-title function_">destroy</span>();
+}).<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-title function_">connect</span>(<span class="hljs-variable constant_">PORT</span>);
+});</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">PerformanceObserver</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+<span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  items.<span class="hljs-title function_">getEntries</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);
+  });
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'net'</span>] });
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">PORT</span> = <span class="hljs-number">8080</span>;
+net.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">socket</span>) =></span> {
+  socket.<span class="hljs-title function_">destroy</span>();
+}).<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =></span> {
+  net.<span class="hljs-title function_">connect</span>(<span class="hljs-variable constant_">PORT</span>);
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>测量 DNS 在请求成功时所需的时间<span><a class="mark" href="#-dns-" id="-dns-">#</a></span><a aria-hidden="true" class="legacy" id="perf_hooks_dns"></a></h4>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">PerformanceObserver</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:perf_hooks'</span>;
+<span class="hljs-keyword">import</span> { lookup, promises } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:dns'</span>;
+
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  items.<span class="hljs-title function_">getEntries</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);
+  });
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'dns'</span>] });
+<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'localhost'</span>, <span class="hljs-function">() =></span> {});
+promises.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'localhost'</span>);</code><code class="language-js cjs"><span class="hljs-meta">'use strict'</span>;
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">PerformanceObserver</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:perf_hooks'</span>);
+<span class="hljs-keyword">const</span> dns = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:dns'</span>);
+<span class="hljs-keyword">const</span> obs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerformanceObserver</span>(<span class="hljs-function">(<span class="hljs-params">items</span>) =></span> {
+  items.<span class="hljs-title function_">getEntries</span>().<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">item</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(item);
+  });
+});
+obs.<span class="hljs-title function_">observe</span>({ <span class="hljs-attr">entryTypes</span>: [<span class="hljs-string">'dns'</span>] });
+dns.<span class="hljs-title function_">lookup</span>(<span class="hljs-string">'localhost'</span>, <span class="hljs-function">() =></span> {});
+dns.<span class="hljs-property">promises</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'localhost'</span>);</code><button class="copy-button">copy</button></pre></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "type": "module",
+  "source": "doc/api/intl.md",
+  "introduced_in": "v8.2.0",
+  "miscs": [
+    {
+      "textRaw": "国际化支持",
+      "name": "国际化支持",
+      "introduced_in": "v8.2.0",
+      "type": "misc",
+      "desc": "<p>Node.js 拥有许多特性，使得编写国际化程序更加容易。其中一些包括：</p>\n<ul>\n<li><a href=\"https://tc39.github.io/ecma262/\">ECMAScript 语言规范</a>中的区域敏感或 Unicode 感知函数：\n<ul>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize\"><code>String.prototype.normalize()</code></a></li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase\"><code>String.prototype.toLowerCase()</code></a></li>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toUpperCase\"><code>String.prototype.toUpperCase()</code></a></li>\n</ul>\n</li>\n<li><a href=\"https://tc39.github.io/ecma402/\">ECMAScript 国际化 API 规范</a>（又称 ECMA-402）中描述的所有功能：\n<ul>\n<li><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl\"><code>Intl</code></a> 对象</li>\n<li>区域敏感的方法，如 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare\"><code>String.prototype.localeCompare()</code></a> 和 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleString\"><code>Date.prototype.toLocaleString()</code></a></li>\n</ul>\n</li>\n<li>[WHATWG URL 解析器][]的<a href=\"https://en.wikipedia.org/wiki/Internationalized_domain_name\">国际化域名</a>（IDNs）支持</li>\n<li><a href=\"buffer.html#buffertranscodesource-fromenc-toenc\"><code>require('node:buffer').transcode()</code></a></li>\n<li>更准确的 <a href=\"repl.html#repl\">REPL</a> 行编辑</li>\n<li><a href=\"util.html#class-utiltextdecoder\"><code>require('node:util').TextDecoder</code></a></li>\n<li><a href=\"https://github.com/tc39/proposal-regexp-unicode-property-escapes\"><code>RegExp</code> Unicode 属性转义</a></li>\n</ul>\n<p>Node.js 和底层的 V8 引擎使用 <a href=\"http://site.icu-project.org/\">Unicode 国际化组件（ICU）</a> 在原生 C/C++ 代码中实现这些功能。Node.js 默认提供了完整的 ICU 数据集。但是，由于 ICU 数据文件的大小，提供了几个选项用于在构建或运行 Node.js 时自定义 ICU 数据集。</p>",
+      "miscs": [
+        {
+          "textRaw": "构建 Node.js 的选项",
+          "name": "构建_node.js_的选项",
+          "desc": "<p>为了控制 ICU 在 Node.js 中的使用，编译期间提供了四个 <code>configure</code> 选项。关于如何编译 Node.js 的更多细节记录在 <a href=\"https://github.com/nodejs/node/blob/HEAD/BUILDING.md\">BUILDING.md</a> 中。</p>\n<ul>\n<li><code>--with-intl=none</code> / <code>--without-intl</code></li>\n<li><code>--with-intl=system-icu</code></li>\n<li><code>--with-intl=small-icu</code></li>\n<li><code>--with-intl=full-icu</code>（默认）</li>\n</ul>\n<p>每个 <code>configure</code> 选项可用的 Node.js 和 JavaScript 功能概述：</p>\n<table>\n<thead>\n<tr>\n<th>功能</th>\n<th><code>none</code></th>\n<th><code>system-icu</code></th>\n<th><code>small-icu</code></th>\n<th><code>full-icu</code></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize\"><code>String.prototype.normalize()</code></a></td>\n<td>无（函数为空操作）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><code>String.prototype.to*Case()</code></td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl\"><code>Intl</code></a></td>\n<td>无（对象不存在）</td>\n<td>部分/完整（取决于操作系统）</td>\n<td>部分（仅英文）</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare\"><code>String.prototype.localeCompare()</code></a></td>\n<td>部分（非区域敏感）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><code>String.prototype.toLocale*Case()</code></td>\n<td>部分（非区域敏感）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString\"><code>Number.prototype.toLocaleString()</code></a></td>\n<td>部分（非区域敏感）</td>\n<td>部分/完整（取决于操作系统）</td>\n<td>部分（仅英文）</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><code>Date.prototype.toLocale*String()</code></td>\n<td>部分（非区域敏感）</td>\n<td>部分/完整（取决于操作系统）</td>\n<td>部分（仅英文）</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"url.html#legacy-url-api\">旧版 URL 解析器</a></td>\n<td>部分（无 IDN 支持）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td>[WHATWG URL 解析器][]</td>\n<td>部分（无 IDN 支持）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"buffer.html#buffertranscodesource-fromenc-toenc\"><code>require('node:buffer').transcode()</code></a></td>\n<td>无（函数不存在）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"repl.html#repl\">REPL</a></td>\n<td>部分（行编辑不准确）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n<tr>\n<td><a href=\"util.html#class-utiltextdecoder\"><code>require('node:util').TextDecoder</code></a></td>\n<td>部分（基本编码支持）</td>\n<td>部分/完整（取决于操作系统）</td>\n<td>部分（仅 Unicode）</td>\n<td>完整</td>\n</tr>\n<tr>\n<td>[<code>RegExp</code> Unicode 属性转义][]</td>\n<td>无（无效的 <code>RegExp</code> 错误）</td>\n<td>完整</td>\n<td>完整</td>\n<td>完整</td>\n</tr>\n</tbody>\n</table>\n<p>\"（非区域敏感）\" 标识表示该函数的操作方式与非 <code>Locale</code> 版本的函数相同（如果存在）。例如，在 <code>none</code> 模式下，<code>Date.prototype.toLocaleString()</code> 的操作与 <code>Date.prototype.toString()</code> 相同。</p>",
+          "modules": [
+            {
+              "textRaw": "禁用所有国际化功能（`none`）",
+              "name": "禁用所有国际化功能（`none`）",
+              "desc": "<p>如果选择此选项，ICU 将被禁用，并且上述大多数国际化功能在生成的 <code>node</code> 二进制文件中将<strong>不可用</strong>。</p>",
+              "type": "module",
+              "displayName": "禁用所有国际化功能（`none`）"
+            },
+            {
+              "textRaw": "使用预安装的 ICU 构建（`system-icu`）",
+              "name": "使用预安装的_icu_构建（`system-icu`）",
+              "desc": "<p>Node.js 可以链接到系统上已安装的 ICU 构建。事实上，大多数 Linux 发行版已经附带了 ICU，此选项使得可以重复使用操作系统中其他组件使用的同一组数据。</p>\n<p>仅需要 ICU 库本身的功能，例如 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize\"><code>String.prototype.normalize()</code></a> 和 [WHATWG URL 解析器][]，在 <code>system-icu</code> 下完全支持。需要 ICU 区域数据的特性，例如 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat\"><code>Intl.DateTimeFormat</code></a>，<em>可能</em>完全或部分支持，具体取决于系统上安装的 ICU 数据的完整性。</p>",
+              "type": "module",
+              "displayName": "使用预安装的 ICU 构建（`system-icu`）"
+            },
+            {
+              "textRaw": "嵌入有限的 ICU 数据集（`small-icu`）",
+              "name": "嵌入有限的_icu_数据集（`small-icu`）",
+              "desc": "<p>此选项使得生成的二进制文件静态链接到 ICU 库，并在 <code>node</code> 可执行文件中包含一个 ICU 数据子集（通常仅包含英文区域设置）。</p>\n<p>仅需要 ICU 库本身的功能，例如 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize\"><code>String.prototype.normalize()</code></a> 和 [WHATWG URL 解析器][]，在 <code>small-icu</code> 下完全支持。需要额外 ICU 区域数据的特性，例如 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat\"><code>Intl.DateTimeFormat</code></a>，通常仅适用于英文区域设置：</p>\n<pre><code class=\"language-js\">const january = new Date(9e8);\nconst english = new Intl.DateTimeFormat('en', { month: 'long' });\nconst spanish = new Intl.DateTimeFormat('es', { month: 'long' });\n\nconsole.log(english.format(january));\n// 打印 \"January\"\nconsole.log(spanish.format(january));\n// 在 small-icu 上，根据用户的默认区域设置，打印 \"M01\" 或 \"January\"\n// 应该打印 \"enero\"\n</code></pre>\n<p>此模式在功能和二进制大小之间提供了平衡。</p>",
+              "modules": [
+                {
+                  "textRaw": "在运行时提供 ICU 数据",
+                  "name": "在运行时提供_icu_数据",
+                  "desc": "<p>如果使用了 <code>small-icu</code> 选项，仍然可以在运行时提供额外的区域数据，以便 JS 方法适用于所有 ICU 区域设置。假设数据文件存储在 <code>/runtime/directory/with/dat/file</code>，可以通过以下任一方式使其对 ICU 可用：</p>\n<ul>\n<li>\n<p><code>--with-icu-default-data-dir</code> 配置选项：</p>\n<pre><code class=\"language-bash\">./configure --with-icu-default-data-dir=/runtime/directory/with/dat/file --with-intl=small-icu\n</code></pre>\n<p>这仅将默认数据目录路径嵌入到二进制文件中。实际的数据文件将在运行时从这个目录路径加载。</p>\n</li>\n<li>\n<p><a href=\"cli.html#node_icu_datafile\"><code>NODE_ICU_DATA</code></a> 环境变量：</p>\n<pre><code class=\"language-bash\">env NODE_ICU_DATA=/runtime/directory/with/dat/file node\n</code></pre>\n</li>\n<li>\n<p><a href=\"cli.html#--icu-data-dirfile\"><code>--icu-data-dir</code></a> 命令行参数：</p>\n<pre><code class=\"language-bash\">node --icu-data-dir=/runtime/directory/with/dat/file\n</code></pre>\n</li>\n</ul>\n<p>当指定了多个选项时，<code>--icu-data-dir</code> 命令行参数的优先级最高，其次是 <code>NODE_ICU_DATA</code> 环境变量，然后是 <code>--with-icu-default-data-dir</code> 配置选项。</p>\n<p>ICU 能够自动查找和加载多种数据格式，但数据必须适用于 ICU 版本，并且文件名必须正确。数据文件最常见的名称是 <code>icudtX[bl].dat</code>，其中 <code>X</code> 表示目标 ICU 版本，<code>b</code> 或 <code>l</code> 表示系统的字节序。如果无法从指定目录读取预期的数据文件，Node.js 将加载失败。与当前 Node.js 版本对应的数据文件名可以通过以下方式计算：</p>\n<pre><code class=\"language-js\">`icudt${process.versions.icu.split('.')[0]}${os.endianness()[0].toLowerCase()}.dat`;\n</code></pre>\n<p>有关其他支持的格式以及 ICU 数据的一般更多详细信息，请查看 ICU 用户指南中的 <a href=\"http://userguide.icu-project.org/icudata\">\"ICU Data\"</a> 文章。</p>\n<p><a href=\"https://www.npmjs.com/package/full-icu\">full-icu</a> npm 模块可以极大地简化 ICU 数据安装，通过检测正在运行的 <code>node</code> 可执行文件的 ICU 版本并下载相应的数据文件。通过 <code>npm i full-icu</code> 安装模块后，数据文件将位于 <code>./node_modules/full-icu</code>。然后，可以将此路径传递给 <code>NODE_ICU_DATA</code> 或 <code>--icu-data-dir</code>，如上所示，以启用完整的 <code>Intl</code> 支持。</p>",
+                  "type": "module",
+                  "displayName": "在运行时提供 ICU 数据"
+                }
+              ],
+              "type": "module",
+              "displayName": "嵌入有限的 ICU 数据集（`small-icu`）"
+            },
+            {
+              "textRaw": "嵌入完整的 ICU（`full-icu`）",
+              "name": "嵌入完整的_icu（`full-icu`）",
+              "desc": "<p>此选项使得生成的二进制文件静态链接到 ICU 并包含完整的 ICU 数据集。以这种方式创建的二进制文件没有进一步的外部依赖，并支持所有区域设置，但可能相当大。如果未传递 <code>--with-intl</code> 标志，这是默认行为。官方二进制文件也是以此模式构建的。</p>",
+              "type": "module",
+              "displayName": "嵌入完整的 ICU（`full-icu`）"
+            }
+          ],
+          "type": "misc",
+          "displayName": "构建 Node.js 的选项"
+        },
+        {
+          "textRaw": "检测国际化支持",
+          "name": "检测国际化支持",
+          "desc": "<p>要验证 ICU 是否已启用（<code>system-icu</code>、<code>small-icu</code> 或 <code>full-icu</code>），只需检查 <code>Intl</code> 的存在就足够了：</p>\n<pre><code class=\"language-js\">const hasICU = typeof Intl === 'object';\n</code></pre>\n<p>或者，检查 <code>process.versions.icu</code>（仅在启用 ICU 时定义的属性）也可以：</p>\n<pre><code class=\"language-js\">const hasICU = typeof process.versions.icu === 'string';\n</code></pre>\n<p>要检查对非英语区域设置的支持（即 <code>full-icu</code> 或 <code>system-icu</code>），<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat\"><code>Intl.DateTimeFormat</code></a> 可以是一个很好的区分因素：</p>\n<pre><code class=\"language-js\">const hasFullICU = (() => {\n  try {\n    const january = new Date(9e8);\n    const spanish = new Intl.DateTimeFormat('es', { month: 'long' });\n    return spanish.format(january) === 'enero';\n  } catch (err) {\n    return false;\n  }\n})();\n</code></pre>\n<p>对于更详细的 <code>Intl</code> 支持测试，以下资源可能会有所帮助：</p>\n<ul>\n<li><a href=\"https://github.com/srl295/btest402\">btest402</a>：通常用于检查是否正确构建了支持 <code>Intl</code> 的 Node.js。</li>\n<li><a href=\"https://github.com/tc39/test262/tree/HEAD/test/intl402\">Test262</a>：ECMAScript 的官方一致性测试套件包含一个专门针对 ECMA-402 的部分。</li>\n</ul>",
+          "type": "misc",
+          "displayName": "检测国际化支持"
+        }
+      ]
+    }
+  ]
+}

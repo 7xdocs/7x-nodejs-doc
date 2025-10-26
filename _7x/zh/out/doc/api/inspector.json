@@ -1,0 +1,737 @@
+{
+  "type": "module",
+  "source": "doc/api/inspector.md",
+  "modules": [
+    {
+      "textRaw": "Inspector",
+      "name": "inspector",
+      "introduced_in": "v8.0.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/inspector.js\">lib/inspector.js</a></p>\n<p><code>node:inspector</code> 模块提供了与 V8 检查器交互的 API。</p>\n<p>可以通过以下方式访问：</p>\n<pre><code class=\"language-mjs\">import * as inspector from 'node:inspector/promises';\n</code></pre>\n<pre><code class=\"language-cjs\">const inspector = require('node:inspector/promises');\n</code></pre>\n<p>或</p>\n<pre><code class=\"language-mjs\">import * as inspector from 'node:inspector';\n</code></pre>\n<pre><code class=\"language-cjs\">const inspector = require('node:inspector');\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "Promises API",
+          "name": "promises_api",
+          "meta": {
+            "added": [
+              "v19.0.0"
+            ],
+            "changes": []
+          },
+          "stability": 1,
+          "stabilityText": "Experimental",
+          "modules": [
+            {
+              "textRaw": "类：`inspector.Session`",
+              "name": "类：`inspector.session`",
+              "desc": "<ul>\n<li>继承自：<a href=\"events.html#class-eventemitter\" class=\"type\">&lt;EventEmitter&gt;</a></li>\n</ul>\n<p><code>inspector.Session</code> 用于向 V8 检查器后端分发消息并接收消息响应和通知。</p>",
+              "ctors": [
+                {
+                  "textRaw": "`new inspector.Session()`",
+                  "type": "ctor",
+                  "name": "inspector.Session",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>inspector.Session</code> 类实例。检查器会话需要通过 <a href=\"#sessionconnect\"><code>session.connect()</code></a> 连接后才能将消息分派到检查器后端。</p>\n<p>当使用 <code>Session</code> 时，控制台 API 输出的对象不会被释放，除非我们手动执行了 <code>Runtime.DiscardConsoleEntries</code> 命令。</p>"
+                }
+              ],
+              "modules": [
+                {
+                  "textRaw": "事件：`'inspectorNotification'`",
+                  "name": "事件：`'inspectornotification'`",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 通知消息对象</li>\n</ul>\n<p>当接收到来自 V8 检查器的任何通知时触发。</p>\n<pre><code class=\"language-js\">session.on('inspectorNotification', (message) => console.log(message.method));\n// Debugger.paused\n// Debugger.resumed\n</code></pre>\n<blockquote>\n<p><strong>注意</strong> 不推荐使用同线程会话设置断点，请参阅 <a href=\"#support-of-breakpoints\">断点支持</a>。</p>\n</blockquote>\n<p>也可以只订阅特定方法的通知：</p>",
+                  "type": "module",
+                  "displayName": "事件：`'inspectorNotification'`"
+                },
+                {
+                  "textRaw": "事件：`<inspector-protocol-method>`",
+                  "name": "事件：`<inspector-protocol-method>`",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 通知消息对象</li>\n</ul>\n<p>当接收到一个检查器通知，并且其 method 字段设置为 <code>&#x3C;inspector-protocol-method></code> 值时触发。</p>\n<p>以下代码片段在 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/Debugger#event-paused\"><code>'Debugger.paused'</code></a> 事件上安装了一个监听器，每当程序执行被暂停时（例如通过断点），就会打印程序暂停的原因：</p>\n<pre><code class=\"language-js\">session.on('Debugger.paused', ({ params }) => {\n  console.log(params.hitBreakpoints);\n});\n// [ '/the/file/that/has/the/breakpoint.js:11:0' ]\n</code></pre>\n<blockquote>\n<p><strong>注意</strong> 不推荐使用同线程会话设置断点，请参阅 <a href=\"#support-of-breakpoints\">断点支持</a>。</p>\n</blockquote>",
+                  "type": "module",
+                  "displayName": "事件：`<inspector-protocol-method>`"
+                },
+                {
+                  "textRaw": "用法示例",
+                  "name": "用法示例",
+                  "desc": "<p>除了调试器之外，各种 V8 分析器也可以通过 DevTools 协议使用。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "CPU 分析器",
+                      "name": "cpu_分析器",
+                      "desc": "<p>以下示例展示如何使用 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/Profiler\">CPU Profiler</a>：</p>\n<pre><code class=\"language-mjs\">import { Session } from 'node:inspector/promises';\nimport fs from 'node:fs';\nconst session = new Session();\nsession.connect();\n\nawait session.post('Profiler.enable');\nawait session.post('Profiler.start');\n// 在此处调用需要测量的业务逻辑...\n\n// 一段时间后...\nconst { profile } = await session.post('Profiler.stop');\n\n// 将分析文件写入磁盘、上传等。\nfs.writeFileSync('./profile.cpuprofile', JSON.stringify(profile));\n</code></pre>",
+                      "type": "module",
+                      "displayName": "CPU 分析器"
+                    },
+                    {
+                      "textRaw": "堆分析器",
+                      "name": "堆分析器",
+                      "desc": "<p>以下示例展示如何使用 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/HeapProfiler\">Heap Profiler</a>：</p>\n<pre><code class=\"language-mjs\">import { Session } from 'node:inspector/promises';\nimport fs from 'node:fs';\nconst session = new Session();\n\nconst fd = fs.openSync('profile.heapsnapshot', 'w');\n\nsession.connect();\n\nsession.on('HeapProfiler.addHeapSnapshotChunk', (m) => {\n  fs.writeSync(fd, m.params.chunk);\n});\n\nconst result = await session.post('HeapProfiler.takeHeapSnapshot', null);\nconsole.log('HeapProfiler.takeHeapSnapshot done:', result);\nsession.disconnect();\nfs.closeSync(fd);\n</code></pre>",
+                      "type": "module",
+                      "displayName": "堆分析器"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "用法示例"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`session.connect()`",
+                  "type": "method",
+                  "name": "connect",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>将会话连接到检查器后端。</p>"
+                },
+                {
+                  "textRaw": "`session.connectToMainThread()`",
+                  "type": "method",
+                  "name": "connectToMainThread",
+                  "meta": {
+                    "added": [
+                      "v12.11.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>将会话连接到主线程检查器后端。如果此 API 未在 Worker 线程上调用，将抛出异常。</p>"
+                },
+                {
+                  "textRaw": "`session.disconnect()`",
+                  "type": "method",
+                  "name": "disconnect",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>立即关闭会话。所有挂起的消息回调都将被调用并带有错误。需要再次调用 <a href=\"#sessionconnect\"><code>session.connect()</code></a> 才能重新发送消息。重新连接的会话将丢失所有检查器状态，例如已启用的代理或配置的断点。</p>"
+                },
+                {
+                  "textRaw": "`session.post(method[, params])`",
+                  "type": "method",
+                  "name": "post",
+                  "meta": {
+                    "added": [
+                      "v19.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`method` {string}",
+                          "name": "method",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`params` {Object}",
+                          "name": "params",
+                          "type": "Object"
+                        },
+                        {
+                          "textRaw": "返回：{Promise}",
+                          "name": "返回：",
+                          "type": "Promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>向检查器后端发送消息。</p>\n<pre><code class=\"language-mjs\">import { Session } from 'node:inspector/promises';\ntry {\n  const session = new Session();\n  session.connect();\n  const result = await session.post('Runtime.evaluate', { expression: '2 + 2' });\n  console.log(result);\n} catch (error) {\n  console.error(error);\n}\n// 输出：{ result: { type: 'number', value: 4, description: '4' } }\n</code></pre>\n<p>V8 检查器协议的最新版本发布在 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/\">Chrome DevTools Protocol Viewer</a> 上。</p>\n<p>Node.js 检查器支持 V8 声明的所有 Chrome DevTools Protocol 域。Chrome DevTools Protocol 域提供了一个接口，用于与用于检查应用程序状态和监听运行时事件的运行时代理之一进行交互。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`inspector.Session`"
+            }
+          ],
+          "type": "module",
+          "displayName": "Promises API"
+        },
+        {
+          "textRaw": "Callback API",
+          "name": "callback_api",
+          "modules": [
+            {
+              "textRaw": "类：`inspector.Session`",
+              "name": "类：`inspector.session`",
+              "desc": "<ul>\n<li>继承自：<a href=\"events.html#class-eventemitter\" class=\"type\">&lt;EventEmitter&gt;</a></li>\n</ul>\n<p><code>inspector.Session</code> 用于向 V8 检查器后端分发消息并接收消息响应和通知。</p>",
+              "ctors": [
+                {
+                  "textRaw": "`new inspector.Session()`",
+                  "type": "ctor",
+                  "name": "inspector.Session",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>inspector.Session</code> 类实例。检查器会话需要通过 <a href=\"#sessionconnect\"><code>session.connect()</code></a> 连接后才能将消息分派到检查器后端。</p>\n<p>当使用 <code>Session</code> 时，控制台 API 输出的对象不会被释放，除非我们手动执行了 <code>Runtime.DiscardConsoleEntries</code> 命令。</p>"
+                }
+              ],
+              "modules": [
+                {
+                  "textRaw": "事件：`'inspectorNotification'`",
+                  "name": "事件：`'inspectornotification'`",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 通知消息对象</li>\n</ul>\n<p>当接收到来自 V8 检查器的任何通知时触发。</p>\n<pre><code class=\"language-js\">session.on('inspectorNotification', (message) => console.log(message.method));\n// Debugger.paused\n// Debugger.resumed\n</code></pre>\n<blockquote>\n<p><strong>注意</strong> 不推荐使用同线程会话设置断点，请参阅 <a href=\"#support-of-breakpoints\">断点支持</a>。</p>\n</blockquote>\n<p>也可以只订阅特定方法的通知：</p>",
+                  "type": "module",
+                  "displayName": "事件：`'inspectorNotification'`"
+                },
+                {
+                  "textRaw": "事件：`<inspector-protocol-method>`;",
+                  "name": "事件：`<inspector-protocol-method>`;",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<ul>\n<li>类型：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a> 通知消息对象</li>\n</ul>\n<p>当接收到一个检查器通知，并且其 method 字段设置为 <code>&#x3C;inspector-protocol-method></code> 值时触发。</p>\n<p>以下代码片段在 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/Debugger#event-paused\"><code>'Debugger.paused'</code></a> 事件上安装了一个监听器，每当程序执行被暂停时（例如通过断点），就会打印程序暂停的原因：</p>\n<pre><code class=\"language-js\">session.on('Debugger.paused', ({ params }) => {\n  console.log(params.hitBreakpoints);\n});\n// [ '/the/file/that/has/the/breakpoint.js:11:0' ]\n</code></pre>\n<blockquote>\n<p><strong>注意</strong> 不推荐使用同线程会话设置断点，请参阅 <a href=\"#support-of-breakpoints\">断点支持</a>。</p>\n</blockquote>",
+                  "type": "module",
+                  "displayName": "事件：`<inspector-protocol-method>`;"
+                },
+                {
+                  "textRaw": "用法示例",
+                  "name": "用法示例",
+                  "desc": "<p>除了调试器之外，各种 V8 分析器也可以通过 DevTools 协议使用。</p>",
+                  "modules": [
+                    {
+                      "textRaw": "CPU 分析器",
+                      "name": "cpu_分析器",
+                      "desc": "<p>以下示例展示如何使用 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/Profiler\">CPU Profiler</a>：</p>\n<pre><code class=\"language-js\">const inspector = require('node:inspector');\nconst fs = require('node:fs');\nconst session = new inspector.Session();\nsession.connect();\n\nsession.post('Profiler.enable', () => {\n  session.post('Profiler.start', () => {\n    // 在此处调用需要测量的业务逻辑...\n\n    // 一段时间后...\n    session.post('Profiler.stop', (err, { profile }) => {\n      // 将分析文件写入磁盘、上传等。\n      if (!err) {\n        fs.writeFileSync('./profile.cpuprofile', JSON.stringify(profile));\n      }\n    });\n  });\n});\n</code></pre>",
+                      "type": "module",
+                      "displayName": "CPU 分析器"
+                    },
+                    {
+                      "textRaw": "堆分析器",
+                      "name": "堆分析器",
+                      "desc": "<p>以下示例展示如何使用 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/HeapProfiler\">Heap Profiler</a>：</p>\n<pre><code class=\"language-js\">const inspector = require('node:inspector');\nconst fs = require('node:fs');\nconst session = new inspector.Session();\n\nconst fd = fs.openSync('profile.heapsnapshot', 'w');\n\nsession.connect();\n\nsession.on('HeapProfiler.addHeapSnapshotChunk', (m) => {\n  fs.writeSync(fd, m.params.chunk);\n});\n\nsession.post('HeapProfiler.takeHeapSnapshot', null, (err, r) => {\n  console.log('HeapProfiler.takeHeapSnapshot done:', err, r);\n  session.disconnect();\n  fs.closeSync(fd);\n});\n</code></pre>",
+                      "type": "module",
+                      "displayName": "堆分析器"
+                    }
+                  ],
+                  "type": "module",
+                  "displayName": "用法示例"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`session.connect()`",
+                  "type": "method",
+                  "name": "connect",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>将会话连接到检查器后端。</p>"
+                },
+                {
+                  "textRaw": "`session.connectToMainThread()`",
+                  "type": "method",
+                  "name": "connectToMainThread",
+                  "meta": {
+                    "added": [
+                      "v12.11.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>将会话连接到主线程检查器后端。如果此 API 未在 Worker 线程上调用，将抛出异常。</p>"
+                },
+                {
+                  "textRaw": "`session.disconnect()`",
+                  "type": "method",
+                  "name": "disconnect",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>立即关闭会话。所有挂起的消息回调都将被调用并带有错误。需要再次调用 <a href=\"#sessionconnect\"><code>session.connect()</code></a> 才能重新发送消息。重新连接的会话将丢失所有检查器状态，例如已启用的代理或配置的断点。</p>"
+                },
+                {
+                  "textRaw": "`session.post(method[, params][, callback])`",
+                  "type": "method",
+                  "name": "post",
+                  "meta": {
+                    "added": [
+                      "v8.0.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v18.0.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/41678",
+                        "description": "Passing an invalid callback to the `callback` argument now throws `ERR_INVALID_ARG_TYPE` instead of `ERR_INVALID_CALLBACK`."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`method` {string}",
+                          "name": "method",
+                          "type": "string"
+                        },
+                        {
+                          "textRaw": "`params` {Object}",
+                          "name": "params",
+                          "type": "Object"
+                        },
+                        {
+                          "textRaw": "`callback` {Function}",
+                          "name": "callback",
+                          "type": "Function"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>向检查器后端发送消息。当收到响应时，将通知 <code>callback</code>。<code>callback</code> 是一个接受两个可选参数的函数：错误和消息特定结果。</p>\n<pre><code class=\"language-js\">session.post('Runtime.evaluate', { expression: '2 + 2' },\n             (error, { result }) => console.log(result));\n// 输出：{ type: 'number', value: 4, description: '4' }\n</code></pre>\n<p>V8 检查器协议的最新版本发布在 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/\">Chrome DevTools Protocol Viewer</a> 上。</p>\n<p>Node.js 检查器支持 V8 声明的所有 Chrome DevTools Protocol 域。Chrome DevTools Protocol 域提供了一个接口，用于与用于检查应用程序状态和监听运行时事件的运行时代理之一进行交互。</p>\n<p>向 V8 发送 <code>HeapProfiler.takeHeapSnapshot</code> 或 <code>HeapProfiler.stopTrackingHeapObjects</code> 命令时，不能将 <code>reportProgress</code> 设置为 <code>true</code>。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`inspector.Session`"
+            }
+          ],
+          "type": "module",
+          "displayName": "Callback API"
+        },
+        {
+          "textRaw": "常用对象",
+          "name": "常用对象",
+          "methods": [
+            {
+              "textRaw": "`inspector.close()`",
+              "type": "method",
+              "name": "close",
+              "meta": {
+                "added": [
+                  "v9.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44489",
+                    "description": "The API is exposed in the worker threads."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>尝试关闭所有剩余的连接，阻塞事件循环直到所有连接都关闭。一旦所有连接关闭，停用检查器。</p>"
+            },
+            {
+              "textRaw": "`inspector.open([port[, host[, wait]]])`",
+              "type": "method",
+              "name": "open",
+              "meta": {
+                "changes": [
+                  {
+                    "version": "v20.6.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/48765",
+                    "description": "inspector.open() now returns a `Disposable` object."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`port` {number} 监听检查器连接的端口。可选。**默认值:** CLI 上指定的值。",
+                      "name": "port",
+                      "type": "number",
+                      "desc": "监听检查器连接的端口。可选。**默认值:** CLI 上指定的值。"
+                    },
+                    {
+                      "textRaw": "`host` {string} 监听检查器连接的主机。可选。**默认值:** CLI 上指定的值。",
+                      "name": "host",
+                      "type": "string",
+                      "desc": "监听检查器连接的主机。可选。**默认值:** CLI 上指定的值。"
+                    },
+                    {
+                      "textRaw": "`wait` {boolean} 阻塞直到客户端连接。可选。**默认值:** `false`。",
+                      "name": "wait",
+                      "type": "boolean",
+                      "desc": "阻塞直到客户端连接。可选。**默认值:** `false`。"
+                    },
+                    {
+                      "textRaw": "返回：{Disposable} 一个调用 [`inspector.close()`][] 的 Disposable 对象。",
+                      "name": "返回：",
+                      "type": "Disposable",
+                      "desc": "一个调用 [`inspector.close()`][] 的 Disposable 对象。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>在主机和端口上激活检查器。等同于 <code>node --inspect=[[host:]port]</code>，但可以在 node 启动后通过编程方式完成。</p>\n<p>如果 wait 是 <code>true</code>，将阻塞直到客户端连接到检查端口并且流控制已传递给调试器客户端。</p>\n<p>有关 <code>host</code> 参数使用的 <a href=\"cli.html#warning-binding-inspector-to-a-public-ipport-combination-is-insecure\">安全警告</a>，请参阅相关说明。</p>"
+            },
+            {
+              "textRaw": "`inspector.url()`",
+              "type": "method",
+              "name": "url",
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "返回：{string|undefined}",
+                      "name": "返回：",
+                      "type": "string|undefined"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回活动检查器的 URL，如果没有则返回 <code>undefined</code>。</p>\n<pre><code class=\"language-console\">$ node --inspect -p 'inspector.url()'\nDebugger listening on ws://127.0.0.1:9229/166e272e-7a30-4d09-97ce-f1c012b43c34\nFor help, see: https://nodejs.org/en/docs/inspector\nws://127.0.0.1:9229/166e272e-7a30-4d09-97ce-f1c012b43c34\n\n$ node --inspect=localhost:3000 -p 'inspector.url()'\nDebugger listening on ws://localhost:3000/51cf8d0e-3c36-4c59-8efd-54519839e56a\nFor help, see: https://nodejs.org/en/docs/inspector\nws://localhost:3000/51cf8d0e-3c36-4c59-8efd-54519839e56a\n\n$ node -p 'inspector.url()'\nundefined\n</code></pre>"
+            },
+            {
+              "textRaw": "`inspector.waitForDebugger()`",
+              "type": "method",
+              "name": "waitForDebugger",
+              "meta": {
+                "added": [
+                  "v12.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": []
+                }
+              ],
+              "desc": "<p>阻塞直到客户端（现有的或后来连接的）发送了 <code>Runtime.runIfWaitingForDebugger</code> 命令。</p>\n<p>如果没有活动的检查器，将抛出异常。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`console` 类型：{Object} 用于向远程检查器控制台发送消息的对象。",
+              "type": "Object",
+              "name": "类型：",
+              "desc": "<pre><code class=\"language-js\">require('node:inspector').console.log('a message');\n</code></pre>\n<p>检查器控制台与 Node.js 控制台没有 API 对等功能。</p>",
+              "shortDesc": "用于向远程检查器控制台发送消息的对象。"
+            }
+          ],
+          "type": "module",
+          "displayName": "常用对象"
+        },
+        {
+          "textRaw": "与 DevTools 集成",
+          "name": "与_devtools_集成",
+          "stability": 1,
+          "stabilityText": ".1 - Active development",
+          "desc": "<p><code>node:inspector</code> 模块提供了与支持 Chrome DevTools Protocol 的 devtools 集成的 API。\n连接到正在运行的 Node.js 实例的 DevTools 前端可以捕获从该实例发出的协议事件，并相应地显示它们以方便调试。\n以下方法向所有连接的前端广播协议事件。\n根据协议，传递给方法的 <code>params</code> 可以是可选的。</p>\n<pre><code class=\"language-js\">// 将触发 `Network.requestWillBeSent` 事件。\ninspector.Network.requestWillBeSent({\n  requestId: 'request-id-1',\n  timestamp: Date.now() / 1000,\n  wallTime: Date.now(),\n  request: {\n    url: 'https://nodejs.org/en',\n    method: 'GET',\n  },\n});\n</code></pre>",
+          "methods": [
+            {
+              "textRaw": "`inspector.Network.dataReceived([params])`",
+              "type": "method",
+              "name": "dataReceived",
+              "meta": {
+                "added": [
+                  "v24.2.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.dataReceived</code> 事件，或者如果尚未为给定请求调用 <code>Network.streamResourceContent</code> 命令，则缓冲数据。</p>\n<p>同时启用 <code>Network.getResponseBody</code> 命令来检索响应数据。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.dataSent([params])`",
+              "type": "method",
+              "name": "dataSent",
+              "meta": {
+                "added": [
+                  "v24.3.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>启用 <code>Network.getRequestPostData</code> 命令来检索请求数据。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.requestWillBeSent([params])`",
+              "type": "method",
+              "name": "requestWillBeSent",
+              "meta": {
+                "added": [
+                  "v22.6.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.requestWillBeSent</code> 事件。此事件表明应用程序即将发送 HTTP 请求。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.responseReceived([params])`",
+              "type": "method",
+              "name": "responseReceived",
+              "meta": {
+                "added": [
+                  "v22.6.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.responseReceived</code> 事件。此事件表明 HTTP 响应已可用。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.loadingFinished([params])`",
+              "type": "method",
+              "name": "loadingFinished",
+              "meta": {
+                "added": [
+                  "v22.6.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.loadingFinished</code> 事件。此事件表明 HTTP 请求已完成加载。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.loadingFailed([params])`",
+              "type": "method",
+              "name": "loadingFailed",
+              "meta": {
+                "added": [
+                  "v22.7.0",
+                  "v20.18.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.loadingFailed</code> 事件。此事件表明 HTTP 请求加载失败。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.webSocketCreated([params])`",
+              "type": "method",
+              "name": "webSocketCreated",
+              "meta": {
+                "added": [
+                  "v24.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.webSocketCreated</code> 事件。此事件表明已发起 WebSocket 连接。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.webSocketHandshakeResponseReceived([params])`",
+              "type": "method",
+              "name": "webSocketHandshakeResponseReceived",
+              "meta": {
+                "added": [
+                  "v24.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.webSocketHandshakeResponseReceived</code> 事件。\n此事件表明已收到 WebSocket 握手响应。</p>"
+            },
+            {
+              "textRaw": "`inspector.Network.webSocketClosed([params])`",
+              "type": "method",
+              "name": "webSocketClosed",
+              "meta": {
+                "added": [
+                  "v24.7.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`params` {Object}",
+                      "name": "params",
+                      "type": "Object"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>此功能仅在启用 <code>--experimental-network-inspection</code> 标志时可用。</p>\n<p>向连接的前端广播 <code>Network.webSocketClosed</code> 事件。\n此事件表明 WebSocket 连接已关闭。</p>"
+            }
+          ],
+          "properties": [
+            {
+              "textRaw": "`inspector.NetworkResources.put`",
+              "name": "put",
+              "meta": {
+                "added": [
+                  "v24.5.0"
+                ],
+                "changes": []
+              },
+              "stability": 1,
+              "stabilityText": ".1 - Active Development",
+              "desc": "<p>此功能仅在启用 <code>--experimental-inspector-network-resource</code> 标志时可用。</p>\n<p>inspector.NetworkResources.put 方法用于为通过 Chrome DevTools Protocol (CDP) 发出的 loadNetworkResource 请求提供响应。\n这通常在通过 URL 指定源映射，并且 DevTools 前端（例如 Chrome）请求该资源以检索源映射时触发。</p>\n<p>此方法允许开发者预定义要为此类 CDP 请求服务的资源内容。</p>\n<pre><code class=\"language-js\">const inspector = require('node:inspector');\n// 通过预先调用 put 来注册资源，当从前端发出 loadNetworkResource 请求时，可以解析源映射。\nasync function setNetworkResources() {\n  const mapUrl = 'http://localhost:3000/dist/app.js.map';\n  const tsUrl = 'http://localhost:3000/src/app.ts';\n  const distAppJsMap = await fetch(mapUrl).then((res) => res.text());\n  const srcAppTs = await fetch(tsUrl).then((res) => res.text());\n  inspector.NetworkResources.put(mapUrl, distAppJsMap);\n  inspector.NetworkResources.put(tsUrl, srcAppTs);\n};\nsetNetworkResources().then(() => {\n  require('./dist/app');\n});\n</code></pre>\n<p>有关更多详细信息，请参阅官方 CDP 文档：<a href=\"https://chromedevtools.github.io/devtools-protocol/tot/Network/#method-loadNetworkResource\">Network.loadNetworkResource</a></p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "与 DevTools 集成"
+        },
+        {
+          "textRaw": "断点支持",
+          "name": "断点支持",
+          "desc": "<p>Chrome DevTools Protocol 的 <a href=\"https://chromedevtools.github.io/devtools-protocol/v8/Debugger\"><code>Debugger</code> 域</a> 允许 <code>inspector.Session</code> 附加到程序并设置断点以单步执行代码。</p>\n<p>但是，应避免使用通过 <a href=\"#sessionconnect\"><code>session.connect()</code></a> 连接的同线程 <code>inspector.Session</code> 设置断点，因为被附加和暂停的程序正是调试器本身。相反，尝试通过 <a href=\"#sessionconnecttomainthread\"><code>session.connectToMainThread()</code></a> 连接到主线程并在 worker 线程中设置断点，或者通过 WebSocket 连接与 <a href=\"debugger.html\">Debugger</a> 程序连接。</p>",
+          "type": "module",
+          "displayName": "断点支持"
+        }
+      ],
+      "type": "module",
+      "displayName": "Inspector"
+    }
+  ]
+}

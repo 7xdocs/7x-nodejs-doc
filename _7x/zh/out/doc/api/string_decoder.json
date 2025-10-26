@@ -1,0 +1,116 @@
+{
+  "type": "module",
+  "source": "doc/api/string_decoder.md",
+  "modules": [
+    {
+      "textRaw": "String decoder",
+      "name": "string_decoder",
+      "introduced_in": "v0.10.0",
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><strong>Source Code:</strong> <a href=\"https://github.com/nodejs/node/blob/v24.10.1/lib/string_decoder.js\">lib/string_decoder.js</a></p>\n<p><code>node:string_decoder</code> 模块提供了一个 API，用于将以编码的多字节 UTF-8 和 UTF-16 字符方式存储的 <code>Buffer</code> 对象解码为字符串。可以通过以下方式访问：</p>\n<pre><code class=\"language-mjs\">import { StringDecoder } from 'node:string_decoder';\n</code></pre>\n<pre><code class=\"language-cjs\">const { StringDecoder } = require('node:string_decoder');\n</code></pre>\n<p>以下示例展示了 <code>StringDecoder</code> 类的基本用法。</p>\n<pre><code class=\"language-mjs\">import { StringDecoder } from 'node:string_decoder';\nimport { Buffer } from 'node:buffer';\nconst decoder = new StringDecoder('utf8');\n\nconst cent = Buffer.from([0xC2, 0xA2]);\nconsole.log(decoder.write(cent)); // Prints: Â˘\n\nconst euro = Buffer.from([0xE2, 0x82, 0xAC]);\nconsole.log(decoder.write(euro)); // Prints: â‚¬\n</code></pre>\n<pre><code class=\"language-cjs\">const { StringDecoder } = require('node:string_decoder');\nconst decoder = new StringDecoder('utf8');\n\nconst cent = Buffer.from([0xC2, 0xA2]);\nconsole.log(decoder.write(cent)); // Prints: Â˘\n\nconst euro = Buffer.from([0xE2, 0x82, 0xAC]);\nconsole.log(decoder.write(euro)); // Prints: â‚¬\n</code></pre>\n<p>当向 <code>StringDecoder</code> 实例写入 <code>Buffer</code> 实例时，会使用一个内部缓冲区来确保解码后的字符串不包含任何不完整的多字节字符。这些字符会保留在缓冲区中，直到下一次调用 <code>stringDecoder.write()</code> 或调用 <code>stringDecoder.end()</code>。</p>\n<p>在下面的示例中，欧洲欧元符号 (<code>€</code>) 的三个 UTF-8 编码字节分三次单独的写入操作完成：</p>\n<pre><code class=\"language-mjs\">import { StringDecoder } from 'node:string_decoder';\nimport { Buffer } from 'node:buffer';\nconst decoder = new StringDecoder('utf8');\n\ndecoder.write(Buffer.from([0xE2]));\ndecoder.write(Buffer.from([0x82]));\nconsole.log(decoder.end(Buffer.from([0xAC]))); // Prints: €\n</code></pre>\n<pre><code class=\"language-cjs\">const { StringDecoder } = require('node:string_decoder');\nconst decoder = new StringDecoder('utf8');\n\ndecoder.write(Buffer.from([0xE2]));\ndecoder.write(Buffer.from([0x82]));\nconsole.log(decoder.end(Buffer.from([0xAC]))); // Prints: €\n</code></pre>",
+      "modules": [
+        {
+          "textRaw": "类：`StringDecoder`",
+          "name": "类：`stringdecoder`",
+          "ctors": [
+            {
+              "textRaw": "`new StringDecoder([encoding])`",
+              "type": "ctor",
+              "name": "StringDecoder",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`encoding` {string} `StringDecoder` 将要使用的字符[编码][]。**默认值:** `'utf8'`。",
+                      "name": "encoding",
+                      "type": "string",
+                      "desc": "`StringDecoder` 将要使用的字符[编码][]。**默认值:** `'utf8'`。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>创建一个新的 <code>StringDecoder</code> 实例。</p>"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`stringDecoder.end([buffer])`",
+              "type": "method",
+              "name": "end",
+              "meta": {
+                "added": [
+                  "v0.9.3"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {string|Buffer|TypedArray|DataView} 要解码的字节。",
+                      "name": "buffer",
+                      "type": "string|Buffer|TypedArray|DataView",
+                      "desc": "要解码的字节。"
+                    },
+                    {
+                      "textRaw": "返回: {string}",
+                      "name": "返回",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回内部缓冲区中存储的任何剩余输入作为字符串。表示不完整的 UTF-8 和 UTF-16 字符的字节将被替换为适用于字符编码的替换字符。</p>\n<p>如果提供了 <code>buffer</code> 参数，则在返回剩余输入之前会执行一次最终的 <code>stringDecoder.write()</code> 调用。\n在调用 <code>end()</code> 之后，<code>stringDecoder</code> 对象可以被重新用于新的输入。</p>"
+            },
+            {
+              "textRaw": "`stringDecoder.write(buffer)`",
+              "type": "method",
+              "name": "write",
+              "meta": {
+                "added": [
+                  "v0.1.99"
+                ],
+                "changes": [
+                  {
+                    "version": "v8.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/9618",
+                    "description": "Each invalid character is now replaced by a single replacement character instead of one for each individual byte."
+                  }
+                ]
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`buffer` {string|Buffer|TypedArray|DataView} 要解码的字节。",
+                      "name": "buffer",
+                      "type": "string|Buffer|TypedArray|DataView",
+                      "desc": "要解码的字节。"
+                    },
+                    {
+                      "textRaw": "返回: {string}",
+                      "name": "返回",
+                      "type": "string"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>返回一个解码后的字符串，确保位于 <code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code> 末尾的任何不完整多字节字符从返回的字符串中省略，并存储在内部缓冲区中，用于下一次调用 <code>stringDecoder.write()</code> 或 <code>stringDecoder.end()</code>。</p>"
+            }
+          ],
+          "type": "module",
+          "displayName": "类：`StringDecoder`"
+        }
+      ],
+      "type": "module",
+      "displayName": "String decoder"
+    }
+  ]
+}

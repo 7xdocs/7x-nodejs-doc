@@ -1,0 +1,56 @@
+{
+  "type": "module",
+  "source": "doc/api/documentation.md",
+  "introduced_in": "v0.10.0",
+  "miscs": [
+    {
+      "textRaw": "关于本文档",
+      "name": "关于本文档",
+      "introduced_in": "v0.10.0",
+      "type": "misc",
+      "desc": "<p>欢迎查阅Node.js官方API参考文档！</p>\n<p>Node.js是一个基于<a href=\"https://v8.dev/\">V8 JavaScript引擎</a>构建的JavaScript运行时。</p>",
+      "miscs": [
+        {
+          "textRaw": "贡献",
+          "name": "贡献",
+          "desc": "<p>请在<a href=\"https://github.com/nodejs/node/issues/new\">问题跟踪器</a>中报告本文档中的错误。有关提交拉取请求的指导，请参阅<a href=\"https://github.com/nodejs/node/blob/HEAD/CONTRIBUTING.md\">贡献指南</a>。</p>",
+          "type": "misc",
+          "displayName": "贡献"
+        },
+        {
+          "textRaw": "稳定性索引",
+          "name": "稳定性索引",
+          "type": "misc",
+          "desc": "<p>本文档中随处可见各部分的稳定性指示。有些API已被充分验证且被广泛依赖，因此几乎不可能发生任何变化。其他一些则是全新的、实验性的，或者已知存在风险。</p>\n<p>稳定性索引如下：</p>\n<blockquote>\n<p>Stability: 0 - 已废弃。该特性可能会发出警告。不保证向后兼容性。</p>\n</blockquote>\n<!-- separator -->\n<blockquote>\n<p>Stability: 1 - 实验性。该特性不受<a href=\"https://semver.org/\">语义化版本控制</a>规则约束。未来任何版本都可能发生不兼容的变更或被移除。不建议在生产环境中使用该特性。</p>\n<p>实验性特性细分为以下阶段：</p>\n<ul>\n<li>1.0 - 早期开发阶段。此阶段的实验性特性尚未完成，可能会有重大变更。</li>\n<li>1.1 - 积极开发阶段。此阶段的实验性特性接近最低可用状态。</li>\n<li>1.2 - 候选发布阶段。此阶段的实验性特性有望成为稳定版本。预计不会再有破坏性变更，但可能会根据用户反馈或特性的基础规范发展而发生变更。我们鼓励用户进行测试并提供反馈，以便我们确认该特性已准备好标记为稳定版本。</li>\n</ul>\n<p>实验性特性通常会通过升级为稳定版本或直接移除（无废弃周期）来脱离实验状态。</p>\n</blockquote>\n<!-- separator -->\n<blockquote>\n<p>Stability: 2 - 稳定。与npm生态系统的兼容性是首要任务。</p>\n</blockquote>\n<!-- separator -->\n<blockquote>\n<p>Stability: 3 - 遗留。尽管此特性不太可能被移除，并且仍受语义化版本控制保障，但它不再被积极维护，且存在其他替代方案。</p>\n</blockquote>\n<p>如果特性的使用无害且在npm生态系统中被广泛依赖，则会被标记为遗留特性而非废弃特性。在遗留特性中发现的漏洞不太可能被修复。</p>\n<p>使用实验性特性时请谨慎，尤其是在编写库时。用户可能不知道正在使用实验性特性。当实验性API发生修改时，漏洞或行为变化可能会让用户感到意外。为避免意外，使用实验性特性可能需要命令行标志。实验性特性也可能会发出<a href=\"process.html#event-warning\">警告</a>。</p>"
+        },
+        {
+          "textRaw": "稳定性概述",
+          "name": "稳定性概述",
+          "desc": "<!-- STABILITY_OVERVIEW_SLOT_BEGIN --><table><thead><tr><th>API</th><th>Stability</th></tr></thead><tbody><tr><td class=\"module_stability\"><a href=\"assert.html\">Assert</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"addons.html\">Assert</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"buffer.html\">Buffer</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"cluster.html\">Cluster 集群</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"crypto.html\">Crypto</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"diagnostics_channel.html\">Diagnostics Channel</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"domain.html\">Domain</a></td><td class=\"api_stability api_stability_0\">(0) Deprecated</td></tr><tr><td class=\"module_stability\"><a href=\"http.html\">HTTP</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"http2.html\">HTTP/2</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"https.html\">HTTPS</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"inspector.html\">Inspector</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"module.html\">Modules: <code>node:module</code> API</a></td><td class=\"api_stability api_stability_1\">(1) .2 - Release candidate (asynchronous version) Stability: 1.1 - Active development (synchronous version)</td></tr><tr><td class=\"module_stability\"><a href=\"modules.html\">Modules: CommonJS modules</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"typescript.html\">Modules: TypeScript</a></td><td class=\"api_stability api_stability_1\">(1) .2 - Release candidate</td></tr><tr><td class=\"module_stability\"><a href=\"os.html\">OS</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"path.html\">Path</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"perf_hooks.html\">Performance measurement APIs</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"punycode.html\">Punycode</a></td><td class=\"api_stability api_stability_0\">(0) Deprecated</td></tr><tr><td class=\"module_stability\"><a href=\"querystring.html\">Query string</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"readline.html\">Readline</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"repl.html\">REPL</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"sqlite.html\">SQLite</a></td><td class=\"api_stability api_stability_1\">(1) .1 - Active development.</td></tr><tr><td class=\"module_stability\"><a href=\"stream.html\">Stream</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"string_decoder.html\">String decoder</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"timers.html\">Timers</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"tls.html\">TLS (SSL)</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"tracing.html\">Trace events</a></td><td class=\"api_stability api_stability_1\">(1) Experimental</td></tr><tr><td class=\"module_stability\"><a href=\"tty.html\">TTY</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"dgram.html\">UDP/datagram sockets</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"url.html\">URL</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"util.html\">Util</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"vm.html\">VM (执行 JavaScript)</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"webcrypto.html\">Web Crypto API</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"webstreams.html\">Web Streams API</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"wasi.html\">WebAssembly System Interface (WASI)</a></td><td class=\"api_stability api_stability_1\">(1) Experimental</td></tr><tr><td class=\"module_stability\"><a href=\"worker_threads.html\">Worker threads</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"zlib.html\">Zlib</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"single-executable-applications.html\">单可执行应用</a></td><td class=\"api_stability api_stability_1\">(1) .1 - Active development</td></tr><tr><td class=\"module_stability\"><a href=\"dns.html\">域名系统 DNS</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"child_process.html\">子进程</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"async_context.html\">异步上下文追踪</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"async_hooks.html\">异步钩子</a></td><td class=\"api_stability api_stability_1\">(1) 实验性。如果可能，请迁移远离此 API。 我们不建议使用 [<code>createHook</code>][]、[<code>AsyncHook</code>][] 和 [<code>executionAsyncResource</code>][] API，因为它们存在可用性问题、安全风险 和性能影响。异步上下文跟踪用例更适合使用 稳定的 [<code>AsyncLocalStorage</code>][] API。如果你有超出 [<code>AsyncLocalStorage</code>][] 解决的上下文跟踪需求或 [Diagnostics Channel][] 当前提供的诊断数据 之外的 <code>createHook</code>、<code>AsyncHook</code> 或 <code>executionAsyncResource</code> 用例， 请在 <a href=\"https://github.com/nodejs/node/issues\">https://github.com/nodejs/node/issues</a> 描述你的用例， 以便我们可以创建更专注的 API。</td></tr><tr><td class=\"module_stability\"><a href=\"console.html\">控制台</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"fs.html\">文件系统</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr><tr><td class=\"module_stability\"><a href=\"test.html\">测试运行器</a></td><td class=\"api_stability api_stability_2\">(2) Stable</td></tr></tbody></table><!-- STABILITY_OVERVIEW_SLOT_END -->",
+          "type": "misc",
+          "displayName": "稳定性概述"
+        },
+        {
+          "textRaw": "JSON输出",
+          "name": "json输出",
+          "meta": {
+            "added": [
+              "v0.6.12"
+            ],
+            "changes": []
+          },
+          "desc": "<p>每个<code>.html</code>文档都有一个对应的<code>.json</code>文档。这是为了供IDE和其他使用文档的工具使用。</p>",
+          "type": "misc",
+          "displayName": "JSON输出"
+        },
+        {
+          "textRaw": "系统调用和手册页",
+          "name": "系统调用和手册页",
+          "desc": "<p>封装了系统调用的Node.js函数会对此进行说明。文档会链接到描述系统调用工作原理的相应手册页。</p>\n<p>大多数Unix系统调用在Windows上有类似的实现。不过，行为差异可能难以避免。</p>",
+          "type": "misc",
+          "displayName": "系统调用和手册页"
+        }
+      ]
+    }
+  ]
+}

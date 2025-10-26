@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Modules: node:module API | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/module.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:374px){.with-19-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:630px){.with-51-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:670px){.with-56-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:574px){.with-44-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:614px){.with-49-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:590px){.with-46-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:694px){.with-59-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:646px){.with-53-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-module">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module active">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="module" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><a href="#modules-nodemodule-api">Modules: <code>node:module</code> API</a>
+<ul>
+<li><a href="#module-"><code>Module</code> 对象</a>
+<ul>
+<li><a href="#modulebuiltinmodules"><code>module.builtinModules</code></a></li>
+<li><a href="#modulecreaterequirefilename"><code>module.createRequire(filename)</code></a></li>
+<li><span class="stability_1.1"><a href="#modulefindpackagejsonspecifier-base"><code>module.findPackageJSON(specifier[, base])</code></a></span></li>
+<li><a href="#moduleisbuiltinmodulename"><code>module.isBuiltin(moduleName)</code></a></li>
+<li><span class="stability_1.2"><a href="#moduleregisterspecifier-parenturl-options"><code>module.register(specifier[, parentURL][, options])</code></a></span></li>
+<li><span class="stability_1.1"><a href="#moduleregisterhooksoptions"><code>module.registerHooks(options)</code></a></span></li>
+<li><span class="stability_1.2"><a href="#modulestriptypescripttypescode-options"><code>module.stripTypeScriptTypes(code[, options])</code></a></span></li>
+<li><a href="#modulesyncbuiltinesmexports"><code>module.syncBuiltinESMExports()</code></a></li>
+</ul>
+</li>
+<li><a href="#">模块编译缓存</a>
+<ul>
+<li><span class="stability_1.1"><a href="#moduleconstantscompilecachestatus"><code>module.constants.compileCacheStatus</code></a></span></li>
+<li><span class="stability_1.1"><a href="#moduleenablecompilecachecachedir"><code>module.enableCompileCache([cacheDir])</code></a></span></li>
+<li><span class="stability_1.1"><a href="#moduleflushcompilecache"><code>module.flushCompileCache()</code></a></span></li>
+<li><span class="stability_1.1"><a href="#modulegetcompilecachedir"><code>module.getCompileCacheDir()</code></a></span></li>
+</ul>
+</li>
+<li><a href="#_1">自定义钩子</a>
+<ul>
+<li><a href="#_2">启用</a></li>
+<li><a href="#_3">链式调用</a></li>
+<li><a href="#_4">与模块自定义钩子的通信</a></li>
+<li><a href="#_5">钩子</a>
+<ul>
+<li><a href="#moduleregister-"><code>module.register()</code> 接受的异步钩子</a></li>
+<li><span class="stability_1.1"><a href="#moduleregisterhooks-"><code>module.registerHooks()</code> 接受的同步钩子</a></span></li>
+<li><a href="#_6">钩子的约定</a></li>
+<li><span class="stability_1.2"><a href="#initialize"><code>initialize()</code></a></span></li>
+<li><a href="#resolvespecifier-context-nextresolve"><code>resolve(specifier, context, nextResolve)</code></a></li>
+<li><a href="#loadurl-context-nextload"><code>load(url, context, nextLoad)</code></a>
+<ul>
+<li><a href="#-load-">异步 <code>load</code> 钩子的注意事项</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_7">示例</a>
+<ul>
+<li><a href="#-https-">从 HTTPS 导入</a></li>
+<li><a href="#_8">转译</a>
+<ul>
+<li><a href="#_9">异步版本</a></li>
+<li><a href="#_10">同步版本</a></li>
+</ul>
+</li>
+<li><a href="#_11">运行钩子</a></li>
+<li><a href="#_12">导入映射</a>
+<ul>
+<li><a href="#_13">异步版本</a></li>
+<li><a href="#_14">同步版本</a></li>
+<li><a href="#_15">使用钩子</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#source-map-">Source Map 支持</a></span>
+<ul>
+<li><a href="#modulegetsourcemapssupport"><code>module.getSourceMapsSupport()</code></a></li>
+<li><a href="#modulefindsourcemappath"><code>module.findSourceMap(path)</code></a></li>
+<li><a href="#modulesetsourcemapssupportenabled-options"><code>module.setSourceMapsSupport(enabled[, options])</code></a></li>
+<li><a href="#-modulesourcemap">类: <code>module.SourceMap</code></a>
+<ul>
+<li><a href="#new-sourcemappayload--linelengths-"><code>new SourceMap(payload[, { lineLengths }])</code></a></li>
+<li><a href="#sourcemappayload"><code>sourceMap.payload</code></a></li>
+<li><a href="#sourcemapfindentrylineoffset-columnoffset"><code>sourceMap.findEntry(lineOffset, columnOffset)</code></a></li>
+<li><a href="#sourcemapfindoriginlinenumber-columnnumber"><code>sourceMap.findOrigin(lineNumber, columnNumber)</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module active">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/module.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/module.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/module.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/module.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/module.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/module.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/module.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/module.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/module.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/module.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/module.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/module.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/module.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/module.html">12.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="module.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/module.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><a href="#modules-nodemodule-api">Modules: <code>node:module</code> API</a>
+<ul>
+<li><a href="#module-"><code>Module</code> 对象</a>
+<ul>
+<li><a href="#modulebuiltinmodules"><code>module.builtinModules</code></a></li>
+<li><a href="#modulecreaterequirefilename"><code>module.createRequire(filename)</code></a></li>
+<li><span class="stability_1.1"><a href="#modulefindpackagejsonspecifier-base"><code>module.findPackageJSON(specifier[, base])</code></a></span></li>
+<li><a href="#moduleisbuiltinmodulename"><code>module.isBuiltin(moduleName)</code></a></li>
+<li><span class="stability_1.2"><a href="#moduleregisterspecifier-parenturl-options"><code>module.register(specifier[, parentURL][, options])</code></a></span></li>
+<li><span class="stability_1.1"><a href="#moduleregisterhooksoptions"><code>module.registerHooks(options)</code></a></span></li>
+<li><span class="stability_1.2"><a href="#modulestriptypescripttypescode-options"><code>module.stripTypeScriptTypes(code[, options])</code></a></span></li>
+<li><a href="#modulesyncbuiltinesmexports"><code>module.syncBuiltinESMExports()</code></a></li>
+</ul>
+</li>
+<li><a href="#">模块编译缓存</a>
+<ul>
+<li><span class="stability_1.1"><a href="#moduleconstantscompilecachestatus"><code>module.constants.compileCacheStatus</code></a></span></li>
+<li><span class="stability_1.1"><a href="#moduleenablecompilecachecachedir"><code>module.enableCompileCache([cacheDir])</code></a></span></li>
+<li><span class="stability_1.1"><a href="#moduleflushcompilecache"><code>module.flushCompileCache()</code></a></span></li>
+<li><span class="stability_1.1"><a href="#modulegetcompilecachedir"><code>module.getCompileCacheDir()</code></a></span></li>
+</ul>
+</li>
+<li><a href="#_1">自定义钩子</a>
+<ul>
+<li><a href="#_2">启用</a></li>
+<li><a href="#_3">链式调用</a></li>
+<li><a href="#_4">与模块自定义钩子的通信</a></li>
+<li><a href="#_5">钩子</a>
+<ul>
+<li><a href="#moduleregister-"><code>module.register()</code> 接受的异步钩子</a></li>
+<li><span class="stability_1.1"><a href="#moduleregisterhooks-"><code>module.registerHooks()</code> 接受的同步钩子</a></span></li>
+<li><a href="#_6">钩子的约定</a></li>
+<li><span class="stability_1.2"><a href="#initialize"><code>initialize()</code></a></span></li>
+<li><a href="#resolvespecifier-context-nextresolve"><code>resolve(specifier, context, nextResolve)</code></a></li>
+<li><a href="#loadurl-context-nextload"><code>load(url, context, nextLoad)</code></a>
+<ul>
+<li><a href="#-load-">异步 <code>load</code> 钩子的注意事项</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_7">示例</a>
+<ul>
+<li><a href="#-https-">从 HTTPS 导入</a></li>
+<li><a href="#_8">转译</a>
+<ul>
+<li><a href="#_9">异步版本</a></li>
+<li><a href="#_10">同步版本</a></li>
+</ul>
+</li>
+<li><a href="#_11">运行钩子</a></li>
+<li><a href="#_12">导入映射</a>
+<ul>
+<li><a href="#_13">异步版本</a></li>
+<li><a href="#_14">同步版本</a></li>
+<li><a href="#_15">使用钩子</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="stability_1"><a href="#source-map-">Source Map 支持</a></span>
+<ul>
+<li><a href="#modulegetsourcemapssupport"><code>module.getSourceMapsSupport()</code></a></li>
+<li><a href="#modulefindsourcemappath"><code>module.findSourceMap(path)</code></a></li>
+<li><a href="#modulesetsourcemapssupportenabled-options"><code>module.setSourceMapsSupport(enabled[, options])</code></a></li>
+<li><a href="#-modulesourcemap">类: <code>module.SourceMap</code></a>
+<ul>
+<li><a href="#new-sourcemappayload--linelengths-"><code>new SourceMap(payload[, { lineLengths }])</code></a></li>
+<li><a href="#sourcemappayload"><code>sourceMap.payload</code></a></li>
+<li><a href="#sourcemapfindentrylineoffset-columnoffset"><code>sourceMap.findEntry(lineOffset, columnOffset)</code></a></li>
+<li><a href="#sourcemapfindoriginlinenumber-columnnumber"><code>sourceMap.findOrigin(lineNumber, columnNumber)</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Modules: <code>node:module</code> API<span><a class="mark" href="#modules-nodemodule-api" id="modules-nodemodule-api">#</a></span><a aria-hidden="true" class="legacy" id="module_modules_node_module_api"></a></h2>
+
+<div class="api_metadata">
+<span>Added in: v0.3.7</span>
+</div>
+<section><h3><code>Module</code> 对象<span><a class="mark" href="#module-" id="module-">#</a></span><a aria-hidden="true" class="legacy" id="module_module"></a></h3>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>提供与 <code>Module</code> 实例（在 <a href="modules.html">CommonJS</a> 模块中常见的 <a href="#the-module-object"><code>module</code></a> 变量）交互时的通用工具方法。通过 <code>import 'node:module'</code> 或 <code>require('node:module')</code> 访问。</p>
+<div>
+<h4><code>module.builtinModules</code><span><a class="mark" href="#modulebuiltinmodules" id="modulebuiltinmodules">#</a></span><a aria-hidden="true" class="legacy" id="module_module_builtinmodules"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.5.0</td>
+<td><p>The list now also contains prefix-only modules.</p></td></tr>
+<tr><td>v9.3.0, v8.10.0, v6.13.0</td>
+<td><p><span>Added in: v9.3.0, v8.10.0, v6.13.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+</ul>
+<p>Node.js 提供的所有模块名称的列表。可用于验证一个模块是否由第三方维护。</p>
+<p>此上下文中的 <code>module</code> 与 <a href="modules.html#the-module-wrapper">模块包装器</a> 提供的对象不同。要访问它，需要引入 <code>Module</code> 模块：</p>
+
+<pre class="with-19-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// module.mjs</span>
+<span class="hljs-comment">// 在 ECMAScript 模块中</span>
+<span class="hljs-keyword">import</span> { builtinModules <span class="hljs-keyword">as</span> builtin } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;</code><code class="language-js cjs"><span class="hljs-comment">// module.cjs</span>
+<span class="hljs-comment">// 在 CommonJS 模块中</span>
+<span class="hljs-keyword">const</span> builtin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>).<span class="hljs-property">builtinModules</span>;</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>module.createRequire(filename)</code><span><a class="mark" href="#modulecreaterequirefilename" id="modulecreaterequirefilename">#</a></span><a aria-hidden="true" class="legacy" id="module_module_createrequire_filename"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.2.0</span>
+</div>
+<ul>
+<li><code>filename</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 用于构造 require 函数的文件名。必须是 file URL 对象、file URL 字符串或绝对路径字符串。</li>
+<li>返回: <a href="modules.html#requireid" class="type">&#x3C;require></a> Require 函数</li>
+</ul>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { createRequire } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-built_in">require</span> = <span class="hljs-title function_">createRequire</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+
+<span class="hljs-comment">// sibling-module.js 是一个 CommonJS 模块。</span>
+<span class="hljs-keyword">const</span> siblingModule = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./sibling-module'</span>);</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>module.findPackageJSON(specifier[, base])</code><span><a class="mark" href="#modulefindpackagejsonspecifier-base" id="modulefindpackagejsonspecifier-base">#</a></span><a aria-hidden="true" class="legacy" id="module_module_findpackagejson_specifier_base"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.2.0, v22.14.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active Development</div><p></p>
+<ul>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 要检索其 <code>package.json</code> 的模块的说明符。传递 <em>裸说明符</em> 时，返回包根目录的 <code>package.json</code>。传递 <em>相对说明符</em> 或 <em>绝对说明符</em> 时，返回最近的父级 <code>package.json</code>。</li>
+<li><code>base</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 包含模块的绝对位置（<code>file:</code> URL 字符串或文件系统路径）。对于 CJS，使用 <code>__filename</code>（而不是 <code>__dirname</code>！）；对于 ESM，使用 <code>import.meta.url</code>。如果 <code>specifier</code> 是 <em>绝对说明符</em>，则无需传递此参数。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果找到 <code>package.json</code> 则返回路径。当 <code>specifier</code> 是一个包时，返回包的根目录 <code>package.json</code>；当是相对或未解析的说明符时，返回最接近 <code>specifier</code> 的 <code>package.json</code>。</li>
+</ul>
+<blockquote>
+<p><strong>注意</strong>：不要使用此功能来尝试确定模块格式。影响该确定的因素很多；package.json 的 <code>type</code> 字段是 <em>最不</em> 具有决定性的（例如，文件扩展名会覆盖它，而加载器钩子又会覆盖文件扩展名）。</p>
+</blockquote>
+<blockquote>
+<p><strong>注意</strong>：目前这仅利用了内置的默认解析器；如果注册了 <a href="#resolvespecifier-context-nextresolve"><code>resolve</code> 自定义钩子</a>，它们将不会影响解析。这将来可能会改变。</p>
+</blockquote>
+<pre><code class="language-text">/path/to/project
+  ├ packages/
+    ├ bar/
+      ├ bar.js
+      └ package.json // name = '@foo/bar'
+    └ qux/
+      ├ node_modules/
+        └ some-package/
+          └ package.json // name = 'some-package'
+      ├ qux.js
+      └ package.json // name = '@foo/qux'
+  ├ main.js
+  └ package.json // name = '@foo'</code> <button class="copy-button">copy</button></pre>
+
+<pre class="with-51-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// /path/to/project/packages/bar/bar.js</span>
+<span class="hljs-keyword">import</span> { findPackageJSON } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-string">'..'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+<span class="hljs-comment">// '/path/to/project/package.json'</span>
+<span class="hljs-comment">// 传递绝对说明符时结果相同：</span>
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(<span class="hljs-string">'../'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>));
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'../'</span>));
+
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-string">'some-package'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+<span class="hljs-comment">// '/path/to/project/packages/bar/node_modules/some-package/package.json'</span>
+<span class="hljs-comment">// 当传递绝对说明符时，如果解析的模块位于具有嵌套 `package.json` 的子文件夹内，可能会得到不同的结果。</span>
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'some-package'</span>));
+<span class="hljs-comment">// '/path/to/project/packages/bar/node_modules/some-package/some-subfolder/package.json'</span>
+
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-string">'@foo/qux'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+<span class="hljs-comment">// '/path/to/project/packages/qux/package.json'</span></code><code class="language-js cjs"><span class="hljs-comment">// /path/to/project/packages/bar/bar.js</span>
+<span class="hljs-keyword">const</span> { findPackageJSON } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:path'</span>);
+
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-string">'..'</span>, __filename);
+<span class="hljs-comment">// '/path/to/project/package.json'</span>
+<span class="hljs-comment">// 传递绝对说明符时结果相同：</span>
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-title function_">pathToFileURL</span>(path.<span class="hljs-title function_">join</span>(__dirname, <span class="hljs-string">'..'</span>)));
+
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-string">'some-package'</span>, __filename);
+<span class="hljs-comment">// '/path/to/project/packages/bar/node_modules/some-package/package.json'</span>
+<span class="hljs-comment">// 当传递绝对说明符时，如果解析的模块位于具有嵌套 `package.json` 的子文件夹内，可能会得到不同的结果。</span>
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-title function_">pathToFileURL</span>(<span class="hljs-built_in">require</span>.<span class="hljs-title function_">resolve</span>(<span class="hljs-string">'some-package'</span>)));
+<span class="hljs-comment">// '/path/to/project/packages/bar/node_modules/some-package/some-subfolder/package.json'</span>
+
+<span class="hljs-title function_">findPackageJSON</span>(<span class="hljs-string">'@foo/qux'</span>, __filename);
+<span class="hljs-comment">// '/path/to/project/packages/qux/package.json'</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>module.isBuiltin(moduleName)</code><span><a class="mark" href="#moduleisbuiltinmodulename" id="moduleisbuiltinmodulename">#</a></span><a aria-hidden="true" class="legacy" id="module_module_isbuiltin_modulename"></a></h4>
+<div class="api_metadata">
+<span>Added in: v18.6.0, v16.17.0</span>
+</div>
+<ul>
+<li><code>moduleName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 模块名称</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 如果模块是内置模块则返回 true，否则返回 false</li>
+</ul>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { isBuiltin } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-title function_">isBuiltin</span>(<span class="hljs-string">'node:fs'</span>); <span class="hljs-comment">// true</span>
+<span class="hljs-title function_">isBuiltin</span>(<span class="hljs-string">'fs'</span>); <span class="hljs-comment">// true</span>
+<span class="hljs-title function_">isBuiltin</span>(<span class="hljs-string">'wss'</span>); <span class="hljs-comment">// false</span></code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>module.register(specifier[, parentURL][, options])</code><span><a class="mark" href="#moduleregisterspecifier-parenturl-options" id="moduleregisterspecifier-parenturl-options">#</a></span><a aria-hidden="true" class="legacy" id="module_module_register_specifier_parenturl_options"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.6.1, v22.13.1, v20.18.2</td>
+<td><p>Using this feature with the permission model enabled requires passing <code>--allow-worker</code>.</p></td></tr>
+<tr><td>v20.8.0, v18.19.0</td>
+<td><p>Add support for WHATWG URL instances.</p></td></tr>
+<tr><td>v20.6.0, v18.19.0</td>
+<td><p><span>Added in: v20.6.0, v18.19.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<ul>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 要注册的自定义钩子；这应该是与传递给 <code>import()</code> 相同的字符串，但如果它是相对的，则相对于 <code>parentURL</code> 进行解析。</li>
+<li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 如果你想相对于一个基础 URL（例如 <code>import.meta.url</code>）解析 <code>specifier</code>，可以在此处传递该 URL。<strong>默认值:</strong> <code>'data:'</code></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="url.html#the-whatwg-url-api" class="type">&#x3C;URL></a> 如果你想相对于一个基础 URL（例如 <code>import.meta.url</code>）解析 <code>specifier</code>，可以在此处传递该 URL。如果 <code>parentURL</code> 作为第二个参数提供，则忽略此属性。<strong>默认值:</strong> <code>'data:'</code></li>
+<li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 传递给 <a href="#initialize"><code>initialize</code></a> 钩子的任意可克隆的 JavaScript 值。</li>
+<li><code>transferList</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object[]></a> 传递给 <code>initialize</code> 钩子的 <a href="worker_threads.html#portpostmessagevalue-transferlist">可传输对象</a>。</li>
+</ul>
+</li>
+</ul>
+<p>注册一个导出 <a href="#customization-hooks">钩子</a> 的模块，这些钩子用于自定义 Node.js 模块的解析和加载行为。参见 <a href="#customization-hooks">自定义钩子</a>。</p>
+<p>如果与 <a href="permissions.html#permission-model">权限模型</a> 一起使用，此功能需要 <code>--allow-worker</code>。</p>
+</div><div>
+<h4><code>module.registerHooks(options)</code><span><a class="mark" href="#moduleregisterhooksoptions" id="moduleregisterhooksoptions">#</a></span><a aria-hidden="true" class="legacy" id="module_module_registerhooks_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.5.0, v22.15.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development</div><p></p>
+<ul>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>load</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 参见 [load 钩子][]。<strong>默认值:</strong> <code>undefined</code>。</li>
+<li><code>resolve</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 参见 [resolve 钩子][]。<strong>默认值:</strong> <code>undefined</code>。</li>
+</ul>
+</li>
+</ul>
+<p>注册 <a href="#customization-hooks">钩子</a>，这些钩子用于自定义 Node.js 模块的解析和加载行为。参见 <a href="#customization-hooks">自定义钩子</a>。</p>
+</div><div>
+<h4><code>module.stripTypeScriptTypes(code[, options])</code><span><a class="mark" href="#modulestriptypescripttypescode-options" id="modulestriptypescripttypescode-options">#</a></span><a aria-hidden="true" class="legacy" id="module_module_striptypescripttypes_code_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.2.0, v22.13.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<ul>
+<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要从中剥离类型注解的代码。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>mode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <strong>默认值:</strong> <code>'strip'</code>。可能的值有：
+<ul>
+<li><code>'strip'</code> 仅剥离类型注解，不执行 TypeScript 特性的转换。</li>
+<li><code>'transform'</code> 剥离类型注解并将 TypeScript 特性转换为 JavaScript。</li>
+</ul>
+</li>
+<li><code>sourceMap</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> <strong>默认值:</strong> <code>false</code>。仅当 <code>mode</code> 为 <code>'transform'</code> 时，如果为 <code>true</code>，将为转换后的代码生成 source map。</li>
+<li><code>sourceUrl</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 指定在 source map 中使用的源 URL。</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 剥离了类型注解的代码。
+<code>module.stripTypeScriptTypes()</code> 从 TypeScript 代码中移除类型注解。它可以在使用 <code>vm.runInContext()</code> 或 <code>vm.compileFunction()</code> 运行 TypeScript 代码之前，用于剥离类型注解。
+默认情况下，如果代码包含需要转换的 TypeScript 特性（如 <code>Enums</code>），它将抛出一个错误，更多信息请参见 <a href="typescript.html#type-stripping">类型剥离</a>。
+当模式为 <code>'transform'</code> 时，它还会将 TypeScript 特性转换为 JavaScript，更多信息请参见 <a href="typescript.html#typescript-features">转换 TypeScript 特性</a>。
+当模式为 <code>'strip'</code> 时，不会生成 source map，因为位置信息被保留了。
+如果提供了 <code>sourceMap</code> 而模式为 <code>'strip'</code>，将会抛出错误。</li>
+</ul>
+<p><em>警告</em>：由于 TypeScript 解析器的变化，此函数的输出在不同 Node.js 版本间不应被视为稳定。</p>
+
+<pre class="with-56-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { stripTypeScriptTypes } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">const</span> code = <span class="hljs-string">'const a: number = 1;'</span>;
+<span class="hljs-keyword">const</span> strippedCode = <span class="hljs-title function_">stripTypeScriptTypes</span>(code);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strippedCode);
+<span class="hljs-comment">// 打印: const a         = 1;</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> { stripTypeScriptTypes } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> code = <span class="hljs-string">'const a: number = 1;'</span>;
+<span class="hljs-keyword">const</span> strippedCode = <span class="hljs-title function_">stripTypeScriptTypes</span>(code);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strippedCode);
+<span class="hljs-comment">// 打印: const a         = 1;</span></code><button class="copy-button">copy</button></pre>
+<p>如果提供了 <code>sourceUrl</code>，它将被附加在输出末尾作为注释：</p>
+
+<pre class="with-56-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { stripTypeScriptTypes } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">const</span> code = <span class="hljs-string">'const a: number = 1;'</span>;
+<span class="hljs-keyword">const</span> strippedCode = <span class="hljs-title function_">stripTypeScriptTypes</span>(code, { <span class="hljs-attr">mode</span>: <span class="hljs-string">'strip'</span>, <span class="hljs-attr">sourceUrl</span>: <span class="hljs-string">'source.ts'</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strippedCode);
+<span class="hljs-comment">// 打印: const a         = 1\n\n//# sourceURL=source.ts;</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> { stripTypeScriptTypes } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> code = <span class="hljs-string">'const a: number = 1;'</span>;
+<span class="hljs-keyword">const</span> strippedCode = <span class="hljs-title function_">stripTypeScriptTypes</span>(code, { <span class="hljs-attr">mode</span>: <span class="hljs-string">'strip'</span>, <span class="hljs-attr">sourceUrl</span>: <span class="hljs-string">'source.ts'</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strippedCode);
+<span class="hljs-comment">// 打印: const a         = 1\n\n//# sourceURL=source.ts;</span></code><button class="copy-button">copy</button></pre>
+<p>当 <code>mode</code> 为 <code>'transform'</code> 时，代码被转换为 JavaScript：</p>
+
+<pre class="with-56-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { stripTypeScriptTypes } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">const</span> code = <span class="hljs-string">`
+  namespace MathUtil {
+    export const add = (a: number, b: number) => a + b;
+  }`</span>;
+<span class="hljs-keyword">const</span> strippedCode = <span class="hljs-title function_">stripTypeScriptTypes</span>(code, { <span class="hljs-attr">mode</span>: <span class="hljs-string">'transform'</span>, <span class="hljs-attr">sourceMap</span>: <span class="hljs-literal">true</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strippedCode);
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">// var MathUtil;</span>
+<span class="hljs-comment">// (function(MathUtil) {</span>
+<span class="hljs-comment">//     MathUtil.add = (a, b)=>a + b;</span>
+<span class="hljs-comment">// })(MathUtil || (MathUtil = {}));</span>
+<span class="hljs-comment">// # sourceMappingURL=data:application/json;base64, ...</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> { stripTypeScriptTypes } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> code = <span class="hljs-string">`
+  namespace MathUtil {
+    export const add = (a: number, b: number) => a + b;
+  }`</span>;
+<span class="hljs-keyword">const</span> strippedCode = <span class="hljs-title function_">stripTypeScriptTypes</span>(code, { <span class="hljs-attr">mode</span>: <span class="hljs-string">'transform'</span>, <span class="hljs-attr">sourceMap</span>: <span class="hljs-literal">true</span> });
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(strippedCode);
+<span class="hljs-comment">// 打印:</span>
+<span class="hljs-comment">// var MathUtil;</span>
+<span class="hljs-comment">// (function(MathUtil) {</span>
+<span class="hljs-comment">//     MathUtil.add = (a, b)=>a + b;</span>
+<span class="hljs-comment">// })(MathUtil || (MathUtil = {}));</span>
+<span class="hljs-comment">// # sourceMappingURL=data:application/json;base64, ...</span></code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>module.syncBuiltinESMExports()</code><span><a class="mark" href="#modulesyncbuiltinesmexports" id="modulesyncbuiltinesmexports">#</a></span><a aria-hidden="true" class="legacy" id="module_module_syncbuiltinesmexports"></a></h4>
+<div class="api_metadata">
+<span>Added in: v12.12.0</span>
+</div>
+<p><code>module.syncBuiltinESMExports()</code> 方法更新所有内置 <a href="esm.html">ES 模块</a> 的实时绑定，以匹配 <a href="modules.html">CommonJS</a> 导出的属性。它不会从 <a href="esm.html">ES 模块</a> 中添加或移除导出的名称。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:fs'</span>);
+<span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:assert'</span>);
+<span class="hljs-keyword">const</span> { syncBuiltinESMExports } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+
+fs.<span class="hljs-property">readFile</span> = newAPI;
+
+<span class="hljs-keyword">delete</span> fs.<span class="hljs-property">readFileSync</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">newAPI</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// ...</span>
+}
+
+fs.<span class="hljs-property">newAPI</span> = newAPI;
+
+<span class="hljs-title function_">syncBuiltinESMExports</span>();
+
+<span class="hljs-keyword">import</span>(<span class="hljs-string">'node:fs'</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">esmFS</span>) =></span> {
+  <span class="hljs-comment">// 它将现有的 readFile 属性与新值同步</span>
+  assert.<span class="hljs-title function_">strictEqual</span>(esmFS.<span class="hljs-property">readFile</span>, newAPI);
+  <span class="hljs-comment">// readFileSync 已从所需的 fs 中删除</span>
+  assert.<span class="hljs-title function_">strictEqual</span>(<span class="hljs-string">'readFileSync'</span> <span class="hljs-keyword">in</span> fs, <span class="hljs-literal">false</span>);
+  <span class="hljs-comment">// syncBuiltinESMExports() 不会从 esmFS 中移除 readFileSync</span>
+  assert.<span class="hljs-title function_">strictEqual</span>(<span class="hljs-string">'readFileSync'</span> <span class="hljs-keyword">in</span> esmFS, <span class="hljs-literal">true</span>);
+  <span class="hljs-comment">// syncBuiltinESMExports() 不会添加名称</span>
+  assert.<span class="hljs-title function_">strictEqual</span>(esmFS.<span class="hljs-property">newAPI</span>, <span class="hljs-literal">undefined</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>模块编译缓存<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="module"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v22.8.0</td>
+<td><p>add initial JavaScript APIs for runtime access.</p></td></tr>
+<tr><td>v22.1.0</td>
+<td><p><span>Added in: v22.1.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p>模块编译缓存可以通过使用 <a href="#moduleenablecompilecachecachedir"><code>module.enableCompileCache()</code></a> 方法或 <a href="cli.html#node_compile_cachedir"><code>NODE_COMPILE_CACHE=dir</code></a> 环境变量来启用。启用后，每当 Node.js 编译一个 CommonJS 或 ECMAScript 模块时，它将使用指定目录中持久化的磁盘 <a href="https://v8.dev/blog/code-caching-for-devs">V8 代码缓存</a> 来加速编译。
+这可能会减慢模块图的首次加载速度，但如果模块的内容没有更改，后续加载同一模块图可能会获得显著的速度提升。</p>
+<p>要清理磁盘上生成的编译缓存，只需删除缓存目录。下次使用同一目录存储编译缓存时，将重新创建缓存目录。为了避免磁盘被陈旧的缓存填满，建议使用 <a href="os.html#ostmpdir"><code>os.tmpdir()</code></a> 下的目录。如果通过调用 <a href="#moduleenablecompilecachecachedir"><code>module.enableCompileCache()</code></a> 启用编译缓存而未指定目录，Node.js 将使用 <a href="cli.html#node_compile_cachedir"><code>NODE_COMPILE_CACHE=dir</code></a> 环境变量（如果已设置），否则默认使用 <code>path.join(os.tmpdir(), 'node-compile-cache')</code>。要定位正在运行的 Node.js 实例使用的编译缓存目录，请使用 <a href="#modulegetcompilecachedir"><code>module.getCompileCacheDir()</code></a>。</p>
+<p>目前，当使用编译缓存与 <a href="https://v8project.blogspot.com/2017/12/javascript-code-coverage.html">V8 JavaScript 代码覆盖率</a> 时，V8 收集的覆盖率对于从代码缓存反序列化的函数可能不太精确。建议在运行测试以生成精确覆盖率时关闭此功能。</p>
+<p>可以通过 <a href="cli.html#node_disable_compile_cache1"><code>NODE_DISABLE_COMPILE_CACHE=1</code></a> 环境变量禁用已启用的模块编译缓存。当编译缓存导致意外或不希望的行为（例如，测试覆盖率不精确）时，这可能很有用。</p>
+<p>由一个版本的 Node.js 生成的编译缓存不能被不同版本的 Node.js 重用。如果使用相同的基础目录来持久化缓存，不同版本的 Node.js 生成的缓存将分开存储，因此它们可以共存。</p>
+<p>目前，当启用编译缓存并且重新加载一个模块时，代码缓存会立即从编译后的代码生成，但仅在 Node.js 实例即将退出时才会写入磁盘。这一点可能会改变。<a href="#moduleflushcompilecache"><code>module.flushCompileCache()</code></a> 方法可用于确保累积的代码缓存被刷新到磁盘，以防应用程序想要生成其他 Node.js 实例并让它们早在父进程退出之前就共享缓存。</p>
+<div>
+<h4><code>module.constants.compileCacheStatus</code><span><a class="mark" href="#moduleconstantscompilecachestatus" id="moduleconstantscompilecachestatus">#</a></span><a aria-hidden="true" class="legacy" id="module_module_constants_compilecachestatus"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.8.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active Development</div><p></p>
+<p>以下常量作为 <a href="#moduleenablecompilecachecachedir"><code>module.enableCompileCache()</code></a> 返回的对象中的 <code>status</code> 字段返回，以指示启用 <a href="#module-compile-cache">模块编译缓存</a> 尝试的结果。</p>
+<table>
+  <tbody><tr>
+    <th>常量</th>
+    <th>描述</th>
+  </tr>
+  <tr>
+    <td><code>ENABLED</code></td>
+    <td>
+      Node.js 已成功启用编译缓存。用于存储编译缓存的目录将在返回对象的 <code>directory</code> 字段中返回。
+    </td>
+  </tr>
+  <tr>
+    <td><code>ALREADY_ENABLED</code></td>
+    <td>
+      编译缓存之前已经启用，无论是通过先前调用 <code>module.enableCompileCache()</code>，还是通过 <code>NODE_COMPILE_CACHE=dir</code> 环境变量。用于存储编译缓存的目录将在返回对象的 <code>directory</code> 字段中返回。
+    </td>
+  </tr>
+  <tr>
+    <td><code>FAILED</code></td>
+    <td>
+      Node.js 未能启用编译缓存。这可能是由于缺少使用指定目录的权限，或各种文件系统错误。失败的详细信息将在返回对象的 <code>message</code> 字段中返回。
+    </td>
+  </tr>
+  <tr>
+    <td><code>DISABLED</code></td>
+    <td>
+      Node.js 无法启用编译缓存，因为环境变量 <code>NODE_DISABLE_COMPILE_CACHE=1</code> 已被设置。
+    </td>
+  </tr>
+</tbody></table>
+</div><div>
+<h4><code>module.enableCompileCache([cacheDir])</code><span><a class="mark" href="#moduleenablecompilecachecachedir" id="moduleenablecompilecachecachedir">#</a></span><a aria-hidden="true" class="legacy" id="module_module_enablecompilecache_cachedir"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.8.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active Development</div><p></p>
+<ul>
+<li><code>cacheDir</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 可选路径，指定存储/检索编译缓存的目录。</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>status</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a> <a href="#moduleconstantscompilecachestatus"><code>module.constants.compileCacheStatus</code></a> 之一</li>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果 Node.js 无法启用编译缓存，此字段包含错误消息。仅当 <code>status</code> 为 <code>module.constants.compileCacheStatus.FAILED</code> 时设置。</li>
+<li><code>directory</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果编译缓存已启用，此字段包含存储编译缓存的目录。仅当 <code>status</code> 为 <code>module.constants.compileCacheStatus.ENABLED</code> 或 <code>module.constants.compileCacheStatus.ALREADY_ENABLED</code> 时设置。</li>
+</ul>
+</li>
+</ul>
+<p>在当前 Node.js 实例中启用 <a href="#module-compile-cache">模块编译缓存</a>。</p>
+<p>如果未指定 <code>cacheDir</code>，Node.js 将使用 <a href="cli.html#node_compile_cachedir"><code>NODE_COMPILE_CACHE=dir</code></a> 环境变量指定的目录（如果已设置），否则使用 <code>path.join(os.tmpdir(), 'node-compile-cache')</code>。对于一般用例，建议调用 <code>module.enableCompileCache()</code> 而不指定 <code>cacheDir</code>，以便在必要时可以通过 <code>NODE_COMPILE_CACHE</code> 环境变量覆盖目录。</p>
+<p>由于编译缓存应该是一种静默优化，不是应用程序功能所必需的，因此此方法设计为在无法启用编译缓存时不抛出任何异常。相反，它将返回一个包含 <code>message</code> 字段中错误信息的对象以辅助调试。
+如果编译缓存成功启用，返回对象中的 <code>directory</code> 字段包含存储编译缓存的目录路径。返回对象中的 <code>status</code> 字段将是 <code>module.constants.compileCacheStatus</code> 值之一，以指示启用 <a href="#module-compile-cache">模块编译缓存</a> 尝试的结果。</p>
+<p>此方法仅影响当前 Node.js 实例。要在子工作线程中启用它，要么在子工作线程中也调用此方法，要么将 <code>process.env.NODE_COMPILE_CACHE</code> 值设置为编译缓存目录，以便行为可以继承到子工作线程中。目录可以从该方法返回的 <code>directory</code> 字段获取，或者使用 <a href="#modulegetcompilecachedir"><code>module.getCompileCacheDir()</code></a>。</p>
+</div><div>
+<h4><code>module.flushCompileCache()</code><span><a class="mark" href="#moduleflushcompilecache" id="moduleflushcompilecache">#</a></span><a aria-hidden="true" class="legacy" id="module_module_flushcompilecache"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.0.0, v22.10.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active Development</div><p></p>
+<p>将当前 Node.js 实例中已加载模块累积的 <a href="#module-compile-cache">模块编译缓存</a> 刷新到磁盘。此方法在所有刷新文件系统操作结束（无论成功与否）后返回。如果有任何错误，此操作将静默失败，因为编译缓存未命中不应干扰应用程序的实际操作。</p>
+</div><div>
+<h4><code>module.getCompileCacheDir()</code><span><a class="mark" href="#modulegetcompilecachedir" id="modulegetcompilecachedir">#</a></span><a aria-hidden="true" class="legacy" id="module_module_getcompilecachedir"></a></h4>
+<div class="api_metadata">
+<span>Added in: v22.8.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active Development</div><p></p>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果启用了 <a href="#module-compile-cache">模块编译缓存</a>，则返回其目录路径，否则返回 <code>undefined</code>。</li>
+</ul>
+<p><i id="module_customization_hooks"></i></p>
+</div>
+</section><section><h3>自定义钩子<span><a class="mark" href="#_1" id="_1">#</a></span><a aria-hidden="true" class="legacy" id="module_1"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.5.0, v22.15.0</td>
+<td><p>Add support for synchronous and in-thread hooks.</p></td></tr>
+<tr><td>v20.6.0, v18.19.0</td>
+<td><p>Added <code>initialize</code> hook to replace <code>globalPreload</code>.</p></td></tr>
+<tr><td>v18.6.0, v16.17.0</td>
+<td><p>Add support for chaining loaders.</p></td></tr>
+<tr><td>v16.12.0</td>
+<td><p>Removed <code>getFormat</code>, <code>getSource</code>, <code>transformSource</code>, and <code>globalPreload</code>; added <code>load</code> hook and <code>getGlobalPreload</code> hook.</p></td></tr>
+<tr><td>v8.8.0</td>
+<td><p><span>Added in: v8.8.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate (asynchronous version)
+Stability: 1.1 - Active development (synchronous version)</div><p></p>
+<p>目前支持两种类型的模块自定义钩子：</p>
+<ol>
+<li><code>module.register(specifier[, parentURL][, options])</code>，它接受一个导出异步钩子函数的模块。这些函数在单独的加载器线程上运行。</li>
+<li><code>module.registerHooks(options)</code>，它接受同步钩子函数，这些函数直接在加载模块的线程上运行。</li>
+</ol>
+<p><i id="enabling_module_customization_hooks"></i></p>
+<div>
+<h4>启用<span><a class="mark" href="#_2" id="_2">#</a></span><a aria-hidden="true" class="legacy" id="module_2"></a></h4>
+<p>模块解析和加载可以通过以下方式自定义：</p>
+<ol>
+<li>使用 <code>node:module</code> 的 <a href="#moduleregisterspecifier-parenturl-options"><code>register</code></a> 方法注册一个导出一组异步钩子函数的文件，</li>
+<li>使用 <code>node:module</code> 的 <a href="#moduleregisterhooksoptions"><code>registerHooks</code></a> 方法注册一组同步钩子函数。</li>
+</ol>
+<p>可以使用 <a href="cli.html#--importmodule"><code>--import</code></a> 或 <a href="cli.html#-r---require-module"><code>--require</code></a> 标志在应用程序代码运行之前注册钩子：</p>
+<pre><code class="language-bash">node --import ./register-hooks.js ./my-app.js
+node --require ./register-hooks.js ./my-app.js</code> <button class="copy-button">copy</button></pre>
+
+<pre class="with-44-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// register-hooks.js</span>
+<span class="hljs-comment">// 如果此文件不包含顶级 await，则只能被 require()。</span>
+<span class="hljs-comment">// 使用 module.register() 在专用线程中注册异步钩子。</span>
+<span class="hljs-keyword">import</span> { register } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./hooks.mjs'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);</code><code class="language-js cjs"><span class="hljs-comment">// register-hooks.js</span>
+<span class="hljs-keyword">const</span> { register } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-comment">// 使用 module.register() 在专用线程中注册异步钩子。</span>
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./hooks.mjs'</span>, <span class="hljs-title function_">pathToFileURL</span>(__filename));</code><button class="copy-button">copy</button></pre>
+
+<pre class="with-49-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// 使用 module.registerHooks() 在主线程中注册同步钩子。</span>
+<span class="hljs-keyword">import</span> { registerHooks } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-title function_">registerHooks</span>({
+  <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) { <span class="hljs-comment">/* implementation */</span> },
+  <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) { <span class="hljs-comment">/* implementation */</span> },
+});</code><code class="language-js cjs"><span class="hljs-comment">// 使用 module.registerHooks() 在主线程中注册同步钩子。</span>
+<span class="hljs-keyword">const</span> { registerHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-title function_">registerHooks</span>({
+  <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) { <span class="hljs-comment">/* implementation */</span> },
+  <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) { <span class="hljs-comment">/* implementation */</span> },
+});</code><button class="copy-button">copy</button></pre>
+<p>传递给 <code>--import</code> 或 <code>--require</code> 的文件也可以是依赖项的导出：</p>
+<pre><code class="language-bash">node --import some-package/register ./my-app.js
+node --require some-package/register ./my-app.js</code> <button class="copy-button">copy</button></pre>
+<p>其中 <code>some-package</code> 有一个 <a href="packages.html#exports"><code>"exports"</code></a> 字段定义了 <code>/register</code> 导出，映射到一个调用 <code>register()</code> 的文件，如下面的 <code>register-hooks.js</code> 示例。</p>
+<p>使用 <code>--import</code> 或 <code>--require</code> 可确保在任何应用程序文件（包括应用程序的入口点以及默认情况下的任何工作线程）被导入之前注册钩子。</p>
+<p>或者，可以从入口点调用 <code>register()</code> 和 <code>registerHooks()</code>，但对于任何应在钩子注册后运行的 ESM 代码，必须使用动态 <code>import()</code>。</p>
+
+<pre class="with-46-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { register } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'http-to-https'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+
+<span class="hljs-comment">// 因为这是一个动态 `import()`，`http-to-https` 钩子将运行来处理 `./my-app.js` 及其导入或需要的任何其他文件。</span>
+<span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'./my-app.js'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { register } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'http-to-https'</span>, <span class="hljs-title function_">pathToFileURL</span>(__filename));
+
+<span class="hljs-comment">// 因为这是一个动态 `import()`，`http-to-https` 钩子将运行来处理 `./my-app.js` 及其导入或需要的任何其他文件。</span>
+<span class="hljs-keyword">import</span>(<span class="hljs-string">'./my-app.js'</span>);</code><button class="copy-button">copy</button></pre>
+<p>自定义钩子将对在注册之后加载的任何模块以及它们通过 <code>import</code> 和内置 <code>require</code> 引用的模块运行。
+用户使用 <code>module.createRequire()</code> 创建的 <code>require</code> 函数只能由同步钩子自定义。</p>
+<p>在此示例中，我们注册了 <code>http-to-https</code> 钩子，但它们仅对随后导入的模块可用——在本例中为 <code>my-app.js</code> 及其通过 <code>import</code> 或在 CommonJS 依赖项中通过内置 <code>require</code> 引用的任何内容。</p>
+<p>如果 <code>import('./my-app.js')</code> 是静态的 <code>import './my-app.js'</code>，那么应用程序将在 <code>http-to-https</code> 钩子注册之前 <em>已经</em> 被加载。这是由于 ES 模块规范，其中静态导入首先从树的叶子开始评估，然后回到主干。<code>my-app.js</code> 内部 <em>可能有</em> 静态导入，这些导入在 <code>my-app.js</code> 被动态导入之前不会被评估。</p>
+<p>如果使用同步钩子，则 <code>import</code>、<code>require</code> 和使用 <code>createRequire()</code> 创建的用户 <code>require</code> 都受支持。</p>
+
+<pre class="with-59-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { registerHooks, createRequire } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+
+<span class="hljs-title function_">registerHooks</span>({ <span class="hljs-comment">/* 同步钩子的实现 */</span> });
+
+<span class="hljs-keyword">const</span> <span class="hljs-built_in">require</span> = <span class="hljs-title function_">createRequire</span>(<span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+
+<span class="hljs-comment">// 同步钩子影响 import、require() 以及通过 createRequire() 创建的用户 require() 函数。</span>
+<span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'./my-app.js'</span>);
+<span class="hljs-built_in">require</span>(<span class="hljs-string">'./my-app-2.js'</span>);</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { register, registerHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+
+<span class="hljs-title function_">registerHooks</span>({ <span class="hljs-comment">/* 同步钩子的实现 */</span> });
+
+<span class="hljs-keyword">const</span> userRequire = <span class="hljs-title function_">createRequire</span>(__filename);
+
+<span class="hljs-comment">// 同步钩子影响 import、require() 以及通过 createRequire() 创建的用户 require() 函数。</span>
+<span class="hljs-keyword">import</span>(<span class="hljs-string">'./my-app.js'</span>);
+<span class="hljs-built_in">require</span>(<span class="hljs-string">'./my-app-2.js'</span>);
+<span class="hljs-title function_">userRequire</span>(<span class="hljs-string">'./my-app-3.js'</span>);</code><button class="copy-button">copy</button></pre>
+<p>最后，如果您只想在应用程序运行之前注册钩子，并且不想为此目的创建单独的文件，可以将 <code>data:</code> URL 传递给 <code>--import</code>：</p>
+<pre><code class="language-bash">node --import <span class="hljs-string">'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("http-to-https", pathToFileURL("./"));'</span> ./my-app.js</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>链式调用<span><a class="mark" href="#_3" id="_3">#</a></span><a aria-hidden="true" class="legacy" id="module_3"></a></h4>
+<p>可以多次调用 <code>register</code>：</p>
+
+<pre class="with-44-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// entrypoint.mjs</span>
+<span class="hljs-keyword">import</span> { register } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./foo.mjs'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./bar.mjs'</span>, <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>);
+<span class="hljs-keyword">await</span> <span class="hljs-keyword">import</span>(<span class="hljs-string">'./my-app.mjs'</span>);</code><code class="language-js cjs"><span class="hljs-comment">// entrypoint.cjs</span>
+<span class="hljs-keyword">const</span> { register } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+
+<span class="hljs-keyword">const</span> parentURL = <span class="hljs-title function_">pathToFileURL</span>(__filename);
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./foo.mjs'</span>, parentURL);
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./bar.mjs'</span>, parentURL);
+<span class="hljs-keyword">import</span>(<span class="hljs-string">'./my-app.mjs'</span>);</code><button class="copy-button">copy</button></pre>
+<p>在此示例中，注册的钩子将形成链。这些链以后进先出（LIFO）的方式运行。如果 <code>foo.mjs</code> 和 <code>bar.mjs</code> 都定义了一个 <code>resolve</code> 钩子，它们将被这样调用（注意从右到左）：
+Node.js 默认 ← <code>./foo.mjs</code> ← <code>./bar.mjs</code>
+（从 <code>./bar.mjs</code> 开始，然后是 <code>./foo.mjs</code>，然后是 Node.js 默认值）。
+所有其他钩子也是如此。</p>
+<p>注册的钩子也会影响 <code>register</code> 本身。在此示例中，<code>bar.mjs</code> 将通过 <code>foo.mjs</code> 注册的钩子进行解析和加载（因为 <code>foo</code> 的钩子将已经被添加到链中）。这允许实现诸如用非 JavaScript 语言编写钩子等功能，只要先前注册的钩子能够将其转译为 JavaScript。</p>
+<p>不能在定义钩子的模块内部调用 <code>register</code> 方法。</p>
+<p><code>registerHooks</code> 的链式调用工作方式类似。如果混合使用同步和异步钩子，同步钩子总是在异步钩子开始运行之前首先运行，也就是说，在最后一个运行的同步钩子中，其下一个钩子包括异步钩子的调用。</p>
+
+<pre class="with-49-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// entrypoint.mjs</span>
+<span class="hljs-keyword">import</span> { registerHooks } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+
+<span class="hljs-keyword">const</span> hook1 = { <span class="hljs-comment">/* 钩子的实现 */</span> };
+<span class="hljs-keyword">const</span> hook2 = { <span class="hljs-comment">/* 钩子的实现 */</span> };
+<span class="hljs-comment">// hook2 在 hook1 之前运行。</span>
+<span class="hljs-title function_">registerHooks</span>(hook1);
+<span class="hljs-title function_">registerHooks</span>(hook2);</code><code class="language-js cjs"><span class="hljs-comment">// entrypoint.cjs</span>
+<span class="hljs-keyword">const</span> { registerHooks } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+
+<span class="hljs-keyword">const</span> hook1 = { <span class="hljs-comment">/* 钩子的实现 */</span> };
+<span class="hljs-keyword">const</span> hook2 = { <span class="hljs-comment">/* 钩子的实现 */</span> };
+<span class="hljs-comment">// hook2 在 hook1 之前运行。</span>
+<span class="hljs-title function_">registerHooks</span>(hook1);
+<span class="hljs-title function_">registerHooks</span>(hook2);</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>与模块自定义钩子的通信<span><a class="mark" href="#_4" id="_4">#</a></span><a aria-hidden="true" class="legacy" id="module_4"></a></h4>
+<p>异步钩子在专用线程上运行，与运行应用程序代码的主线程分离。这意味着改变全局变量不会影响其他线程，并且必须使用消息通道在线程之间进行通信。</p>
+<p><code>register</code> 方法可用于将数据传递给 <a href="#initialize"><code>initialize</code></a> 钩子。传递给钩子的数据可能包括可传输对象，如端口。</p>
+
+<pre class="with-53-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> { register } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-comment">// 此示例演示了如何使用消息通道与钩子通信，通过将 `port2` 发送给钩子。</span>
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(msg);
+});
+port1.<span class="hljs-title function_">unref</span>();
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./my-hooks.mjs'</span>, {
+  <span class="hljs-attr">parentURL</span>: <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>,
+  <span class="hljs-attr">data</span>: { <span class="hljs-attr">number</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">port</span>: port2 },
+  <span class="hljs-attr">transferList</span>: [port2],
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> { register } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-comment">// 此示例展示了如何使用消息通道与钩子通信，通过将 `port2` 发送给钩子。</span>
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(msg);
+});
+port1.<span class="hljs-title function_">unref</span>();
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./my-hooks.mjs'</span>, {
+  <span class="hljs-attr">parentURL</span>: <span class="hljs-title function_">pathToFileURL</span>(__filename),
+  <span class="hljs-attr">data</span>: { <span class="hljs-attr">number</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">port</span>: port2 },
+  <span class="hljs-attr">transferList</span>: [port2],
+});</code><button class="copy-button">copy</button></pre>
+<p>同步模块钩子在运行应用程序代码的同一线程上运行。它们可以直接改变主线程访问的上下文的全局变量。</p>
+</div><div>
+<h4>钩子<span><a class="mark" href="#_5" id="_5">#</a></span><a aria-hidden="true" class="legacy" id="module_5"></a></h4>
+<div>
+<h5><code>module.register()</code> 接受的异步钩子<span><a class="mark" href="#moduleregister-" id="moduleregister-">#</a></span><a aria-hidden="true" class="legacy" id="module_module_register"></a></h5>
+<p><a href="#moduleregisterspecifier-parenturl-options"><code>register</code></a> 方法可用于注册一个导出一组钩子的模块。这些钩子是 Node.js 为自定义模块解析和加载过程而调用的函数。导出的函数必须具有特定的名称和签名，并且必须作为命名导出。</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">initialize</span>(<span class="hljs-params">{ number, port }</span>) {
+  <span class="hljs-comment">// 从 `register` 接收数据。</span>
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-comment">// 获取 `import` 或 `require` 说明符并将其解析为 URL。</span>
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-comment">// 获取已解析的 URL 并返回要评估的源代码。</span>
+}</code> <button class="copy-button">copy</button></pre>
+<p>异步钩子在单独的线程中运行，与运行应用程序代码的主线程隔离。这意味着它是一个不同的 <a href="https://tc39.es/ecma262/#realm">领域</a>。主线程可能随时终止钩子线程，因此不要依赖异步操作（如 <code>console.log</code>）完成。默认情况下，它们会被继承到子工作线程中。</p>
+</div><div>
+<h5><code>module.registerHooks()</code> 接受的同步钩子<span><a class="mark" href="#moduleregisterhooks-" id="moduleregisterhooks-">#</a></span><a aria-hidden="true" class="legacy" id="module_module_registerhooks"></a></h5>
+<div class="api_metadata">
+<span>Added in: v23.5.0, v22.15.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.1</a> - Active development</div><p></p>
+<p><code>module.registerHooks()</code> 方法接受同步钩子函数。
+不支持也不需要 <code>initialize()</code>，因为钩子实现者可以在调用 <code>module.registerHooks()</code> 之前直接运行初始化代码。</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-comment">// 获取 `import` 或 `require` 说明符并将其解析为 URL。</span>
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-comment">// 获取已解析的 URL 并返回要评估的源代码。</span>
+}</code> <button class="copy-button">copy</button></pre>
+<p>同步钩子在加载模块的同一线程和同一 <a href="https://tc39.es/ecma262/#realm">领域</a> 中运行。与异步钩子不同，默认情况下它们不会被继承到子工作线程中，但如果钩子是使用 <a href="cli.html#--importmodule"><code>--import</code></a> 或 <a href="cli.html#-r---require-module"><code>--require</code></a> 预加载的文件注册的，子工作线程可以通过 <code>process.execArgv</code> 继承预加载的脚本。有关详细信息，请参见 <a href="worker_threads.html#new-workerfilename-options"><code>Worker</code> 的文档</a>。</p>
+<p>在同步钩子中，用户可以期望 <code>console.log()</code> 以与模块代码中的 <code>console.log()</code> 相同的方式完成。</p>
+</div><div>
+<h5>钩子的约定<span><a class="mark" href="#_6" id="_6">#</a></span><a aria-hidden="true" class="legacy" id="module_6"></a></h5>
+<p>钩子是 <a href="#chaining">链</a> 的一部分，即使该链仅包含一个自定义（用户提供）钩子和始终存在的默认钩子。钩子函数是嵌套的：每个函数必须始终返回一个普通对象，而链式调用是每个函数调用 <code>next&#x3C;hookName>()</code> 的结果，这是对后续加载器钩子（按 LIFO 顺序）的引用。</p>
+<p>返回缺少必需属性的值的钩子会触发异常。返回而不调用 <code>next&#x3C;hookName>()</code> <em>且</em> 不返回 <code>shortCircuit: true</code> 的钩子也会触发异常。这些错误是为了防止链无意中断开。从钩子返回 <code>shortCircuit: true</code> 以表示链有意在您的钩子处结束。</p>
+</div><div>
+<h5><code>initialize()</code><span><a class="mark" href="#initialize" id="initialize">#</a></span><a aria-hidden="true" class="legacy" id="module_initialize"></a></h5>
+<div class="api_metadata">
+<span>Added in: v20.6.0, v18.19.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1.2</a> - Release candidate</div><p></p>
+<ul>
+<li><code>data</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types" class="type">&#x3C;any></a> 来自 <code>register(loader, import.meta.url, { data })</code> 的数据。</li>
+</ul>
+<p><code>initialize</code> 钩子仅被 <a href="#moduleregisterspecifier-parenturl-options"><code>register</code></a> 接受。<code>registerHooks()</code> 不支持也不需要它，因为同步钩子的初始化可以在调用 <code>registerHooks()</code> 之前直接运行。</p>
+<p><code>initialize</code> 钩子提供了一种定义自定义函数的方法，该函数在钩子模块初始化时在钩子线程中运行。初始化发生在通过 <a href="#moduleregisterspecifier-parenturl-options"><code>register</code></a> 注册钩子模块时。</p>
+<p>此钩子可以从 <a href="#moduleregisterspecifier-parenturl-options"><code>register</code></a> 调用接收数据，包括端口和其他可传输对象。<code>initialize</code> 的返回值可以是 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a>，在这种情况下，主应用程序线程执行恢复之前将等待它。</p>
+<p>模块自定义代码：</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// path-to-my-hooks.js</span>
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">initialize</span>(<span class="hljs-params">{ number, port }</span>) {
+  port.<span class="hljs-title function_">postMessage</span>(<span class="hljs-string">`increment: <span class="hljs-subst">${number + <span class="hljs-number">1</span>}</span>`</span>);
+}</code> <button class="copy-button">copy</button></pre>
+<p>调用者代码：</p>
+
+<pre class="with-44-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> assert <span class="hljs-keyword">from</span> <span class="hljs-string">'node:assert'</span>;
+<span class="hljs-keyword">import</span> { register } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">MessageChannel</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:worker_threads'</span>;
+
+<span class="hljs-comment">// 此示例展示了如何使用消息通道在主（应用程序）线程和运行在钩子线程上的钩子之间进行通信，通过将 `port2` 发送给 `initialize` 钩子。</span>
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =></span> {
+  assert.<span class="hljs-title function_">strictEqual</span>(msg, <span class="hljs-string">'increment: 2'</span>);
+});
+port1.<span class="hljs-title function_">unref</span>();
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./path-to-my-hooks.js'</span>, {
+  <span class="hljs-attr">parentURL</span>: <span class="hljs-keyword">import</span>.<span class="hljs-property">meta</span>.<span class="hljs-property">url</span>,
+  <span class="hljs-attr">data</span>: { <span class="hljs-attr">number</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">port</span>: port2 },
+  <span class="hljs-attr">transferList</span>: [port2],
+});</code><code class="language-js cjs"><span class="hljs-keyword">const</span> assert = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:assert'</span>);
+<span class="hljs-keyword">const</span> { register } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);
+<span class="hljs-keyword">const</span> { pathToFileURL } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:url'</span>);
+<span class="hljs-keyword">const</span> { <span class="hljs-title class_">MessageChannel</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:worker_threads'</span>);
+
+<span class="hljs-comment">// 此示例展示了如何使用消息通道在主（应用程序）线程和运行在钩子线程上的钩子之间进行通信，通过将 `port2` 发送给 `initialize` 钩子。</span>
+<span class="hljs-keyword">const</span> { port1, port2 } = <span class="hljs-keyword">new</span> <span class="hljs-title class_">MessageChannel</span>();
+
+port1.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =></span> {
+  assert.<span class="hljs-title function_">strictEqual</span>(msg, <span class="hljs-string">'increment: 2'</span>);
+});
+port1.<span class="hljs-title function_">unref</span>();
+
+<span class="hljs-title function_">register</span>(<span class="hljs-string">'./path-to-my-hooks.js'</span>, {
+  <span class="hljs-attr">parentURL</span>: <span class="hljs-title function_">pathToFileURL</span>(__filename),
+  <span class="hljs-attr">data</span>: { <span class="hljs-attr">number</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">port</span>: port2 },
+  <span class="hljs-attr">transferList</span>: [port2],
+});</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>resolve(specifier, context, nextResolve)</code><span><a class="mark" href="#resolvespecifier-context-nextresolve" id="resolvespecifier-context-nextresolve">#</a></span><a aria-hidden="true" class="legacy" id="module_resolve_specifier_context_nextresolve"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.5.0, v22.15.0</td>
+<td><p>Add support for synchronous and in-thread hooks.</p></td></tr>
+<tr><td>v21.0.0, v20.10.0, v18.19.0</td>
+<td><p>The property <code>context.importAssertions</code> is replaced with <code>context.importAttributes</code>. Using the old name is still supported and will emit an experimental warning.</p></td></tr>
+<tr><td>v18.6.0, v16.17.0</td>
+<td><p>Add support for chaining resolve hooks. Each hook must either call <code>nextResolve()</code> or include a <code>shortCircuit</code> property set to <code>true</code> in its return.</p></td></tr>
+<tr><td>v17.1.0, v16.14.0</td>
+<td><p>Add support for import assertions.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>conditions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 相关 <code>package.json</code> 的导出条件</li>
+<li><code>importAttributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 一个对象，其键值对表示要导入模块的属性</li>
+<li><code>parentURL</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 导入此模块的模块，如果这是 Node.js 入口点，则为 undefined</li>
+</ul>
+</li>
+<li><code>nextResolve</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 链中的下一个 <code>resolve</code> 钩子，或者是最后一个用户提供的 <code>resolve</code> 钩子之后的 Node.js 默认 <code>resolve</code> 钩子
+<ul>
+<li><code>specifier</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 异步版本接受包含以下属性的对象，或者将解析为此类对象的 <code>Promise</code>。同步版本仅接受同步返回的对象。
+<ul>
+<li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 给 <code>load</code> 钩子的提示（可能会被忽略）。它可以是模块格式（如 <code>'commonjs'</code> 或 <code>'module'</code>）或任意值，如 <code>'css'</code> 或 <code>'yaml'</code>。</li>
+<li><code>importAttributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 缓存模块时要使用的导入属性（可选；如果省略，将使用输入值）</li>
+<li><code>shortCircuit</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 表示此钩子意图终止 <code>resolve</code> 钩子链的信号。<strong>默认值:</strong> <code>false</code></li>
+<li><code>url</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 此输入解析到的绝对 URL</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>警告</strong> 对于异步版本，尽管支持返回 promise 和 async 函数，但调用 <code>resolve</code> 仍可能阻塞主线程，从而影响性能。</p>
+</blockquote>
+<p><code>resolve</code> 钩子链负责告诉 Node.js 在哪里找到以及如何缓存给定的 <code>import</code> 语句或表达式，或 <code>require</code> 调用。它可以可选地返回一个格式（如 <code>'module'</code>）作为给 <code>load</code> 钩子的提示。如果指定了格式，<code>load</code> 钩子最终负责提供最终的 <code>format</code> 值（并且可以自由忽略 <code>resolve</code> 提供的提示）；如果 <code>resolve</code> 提供了 <code>format</code>，则即使仅为了将值传递给 Node.js 默认 <code>load</code> 钩子，也需要自定义 <code>load</code> 钩子。</p>
+<p>导入类型属性是用于将已加载模块保存到内部模块缓存的缓存键的一部分。如果模块应使用与源代码中存在的属性不同的属性进行缓存，则 <code>resolve</code> 钩子负责返回一个 <code>importAttributes</code> 对象。</p>
+<p><code>context</code> 中的 <code>conditions</code> 属性是一个条件数组，将用于匹配此解析请求的 <a href="packages.html#conditional-exports">包导出条件</a>。它们可用于在其他地方查找条件映射，或在调用默认解析逻辑时修改列表。</p>
+<p>当前的 <a href="packages.html#conditional-exports">包导出条件</a> 始终在传递给钩子的 <code>context.conditions</code> 数组中。为了在调用 <code>defaultResolve</code> 时保证 <em>默认的 Node.js 模块说明符解析行为</em>，传递给它的 <code>context.conditions</code> 数组 <em>必须</em> 包含最初传递给 <code>resolve</code> 钩子的 <code>context.conditions</code> 数组的 <em>所有</em> 元素。</p>
+<!-- TODO(joyeecheung): Math.random() is a bit too contrived. At least do a
+find-and-replace mangling on the URLs. -->
+<pre><code class="language-js mjs"><span class="hljs-comment">// module.register() 接受的异步版本。</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-keyword">const</span> { parentURL = <span class="hljs-literal">null</span> } = context;
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() > <span class="hljs-number">0.5</span>) { <span class="hljs-comment">// 某个条件。</span>
+    <span class="hljs-comment">// 对于部分或所有说明符，执行一些自定义的解析逻辑。</span>
+    <span class="hljs-comment">// 始终返回 {url: &#x3C;string>} 形式的对象。</span>
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">url</span>: parentURL ?
+        <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(specifier, parentURL).<span class="hljs-property">href</span> :
+        <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(specifier).<span class="hljs-property">href</span>,
+    };
+  }
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() &#x3C; <span class="hljs-number">0.5</span>) { <span class="hljs-comment">// 另一个条件。</span>
+    <span class="hljs-comment">// 当调用 `defaultResolve` 时，可以修改参数。在这种情况下，它添加了另一个用于匹配条件导出的值。</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier, {
+      ...context,
+      <span class="hljs-attr">conditions</span>: [...context.<span class="hljs-property">conditions</span>, <span class="hljs-string">'another-condition'</span>],
+    });
+  }
+
+  <span class="hljs-comment">// 推迟到链中的下一个钩子，如果这是最后一个用户指定的加载器，则将是 Node.js 默认解析钩子。</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier);
+}</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js mjs"><span class="hljs-comment">// module.registerHooks() 接受的同步版本。</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-comment">// 类似于上面的异步 resolve()，因为该版本没有任何异步逻辑。</span>
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h5><code>load(url, context, nextLoad)</code><span><a class="mark" href="#loadurl-context-nextload" id="loadurl-context-nextload">#</a></span><a aria-hidden="true" class="legacy" id="module_load_url_context_nextload"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v23.5.0, v22.15.0</td>
+<td><p>Add support for synchronous and in-thread version.</p></td></tr>
+<tr><td>v22.6.0</td>
+<td><p>Add support for <code>source</code> with format <code>commonjs-typescript</code> and <code>module-typescript</code>.</p></td></tr>
+<tr><td>v20.6.0</td>
+<td><p>Add support for <code>source</code> with format <code>commonjs</code>.</p></td></tr>
+<tr><td>v18.6.0, v16.17.0</td>
+<td><p>Add support for chaining load hooks. Each hook must either call <code>nextLoad()</code> or include a <code>shortCircuit</code> property set to <code>true</code> in its return.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>url</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> <code>resolve</code> 链返回的 URL</li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>conditions</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 相关 <code>package.json</code> 的导出条件</li>
+<li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> <code>resolve</code> 钩子链可选提供的格式。这可以是任何字符串值作为输入；输入值不需要符合下面描述的可接受返回值列表。</li>
+<li><code>importAttributes</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+</li>
+<li><code>nextLoad</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 链中的下一个 <code>load</code> 钩子，或者是最后一个用户提供的 <code>load</code> 钩子之后的 Node.js 默认 <code>load</code> 钩子
+<ul>
+<li><code>url</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>context</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果省略，则提供默认值。如果提供，默认值将与提供的属性合并，优先使用提供的属性。在默认的 <code>nextLoad</code> 中，如果 <code>url</code> 指向的模块没有显式的模块类型信息，则 <code>context.format</code> 是强制性的。
+<!-- TODO(joyeecheung): make it at least optionally non-mandatory by allowing
+     JS-style/TS-style module detection when the format is simply unknown -->
+</li>
+</ul>
+</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" class="type">&#x3C;Promise></a> 异步版本接受包含以下属性的对象，或者将解析为此类对象的 <code>Promise</code>。同步版本仅接受同步返回的对象。
+<ul>
+<li><code>format</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>shortCircuit</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 表示此钩子意图终止 <code>load</code> 钩子链的信号。<strong>默认值:</strong> <code>false</code></li>
+<li><code>source</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> 供 Node.js 评估的源代码</li>
+</ul>
+</li>
+</ul>
+<p><code>load</code> 钩子提供了一种自定义方法来解释、检索和解析 URL。它还负责验证导入属性。</p>
+<p><code>format</code> 的最终值必须是以下之一：</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th><code>format</code></th><th>描述</th><th><code>load</code> 返回的 <code>source</code> 可接受类型</th></tr></thead><tbody><tr><td><code>'addon'</code></td><td>加载 Node.js 插件</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></td></tr><tr><td><code>'builtin'</code></td><td>加载 Node.js 内置模块</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a></td></tr><tr><td><code>'commonjs-typescript'</code></td><td>加载具有 TypeScript 语法的 Node.js CommonJS 模块</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></td></tr><tr><td><code>'commonjs'</code></td><td>加载 Node.js CommonJS 模块</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Null_type" class="type">&#x3C;null></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a></td></tr><tr><td><code>'json'</code></td><td>加载 JSON 文件</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a></td></tr><tr><td><code>'module-typescript'</code></td><td>加载具有 TypeScript 语法的 ES 模块</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a></td></tr><tr><td><code>'module'</code></td><td>加载 ES 模块</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a></td></tr><tr><td><code>'wasm'</code></td><td>加载 WebAssembly 模块</td><td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a></td></tr></tbody></table>
+<p>对于类型 <code>'builtin'</code>，<code>source</code> 的值被忽略，因为目前无法替换 Node.js 内置（核心）模块的值。</p>
+<div>
+<h6>异步 <code>load</code> 钩子的注意事项<span><a class="mark" href="#-load-" id="-load-">#</a></span><a aria-hidden="true" class="legacy" id="module_load"></a></h6>
+<p>当使用异步 <code>load</code> 钩子时，对于 <code>'commonjs'</code> 省略 <code>source</code> 与提供 <code>source</code> 有非常不同的效果：</p>
+<ul>
+<li>当提供了 <code>source</code> 时，此模块的所有 <code>require</code> 调用将由具有注册的 <code>resolve</code> 和 <code>load</code> 钩子的 ESM 加载器处理；此模块的所有 <code>require.resolve</code> 调用将由具有注册的 <code>resolve</code> 钩子的 ESM 加载器处理；只有一部分 CommonJS API 可用（例如，没有 <code>require.extensions</code>，没有 <code>require.cache</code>，没有 <code>require.resolve.paths</code>），并且对 CommonJS 模块加载器的猴子补丁将不适用。</li>
+<li>如果 <code>source</code> 是 undefined 或 <code>null</code>，它将由 CommonJS 模块加载器处理，并且 <code>require</code>/<code>require.resolve</code> 调用不会经过注册的钩子。对于空值 <code>source</code> 的此行为是临时的——将来，将不支持空值 <code>source</code>。</li>
+</ul>
+<p>这些注意事项不适用于同步 <code>load</code> 钩子，在这种情况下，自定义 CommonJS 模块可用的完整 CommonJS API 集，并且 <code>require</code>/<code>require.resolve</code> 总是经过注册的钩子。</p>
+<p>Node.js 内部的异步 <code>load</code> 实现（作为链中最后一个钩子的 <code>next</code> 的值）在 <code>format</code> 为 <code>'commonjs'</code> 时为了向后兼容性返回 <code>null</code> 作为 <code>source</code>。以下是一个钩子示例，它将选择使用非默认行为：</p>
+<pre><code class="language-js mjs"><span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+
+<span class="hljs-comment">// module.register() 接受的异步版本。对于 module.registerHooks() 接受的同步版本不需要此修复。</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> <span class="hljs-title function_">nextLoad</span>(url, context);
+  <span class="hljs-keyword">if</span> (result.<span class="hljs-property">format</span> === <span class="hljs-string">'commonjs'</span>) {
+    result.<span class="hljs-property">source</span> ??= <span class="hljs-keyword">await</span> <span class="hljs-title function_">readFile</span>(<span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(result.<span class="hljs-property">responseURL</span> ?? url));
+  }
+  <span class="hljs-keyword">return</span> result;
+}</code> <button class="copy-button">copy</button></pre>
+<p>这也不适用于同步 <code>load</code> 钩子，在这种情况下，返回的 <code>source</code> 包含下一个钩子加载的源代码，无论模块格式如何。</p>
+<blockquote>
+<p><strong>警告</strong>：异步 <code>load</code> 钩子和来自 CommonJS 模块的命名空间导出不兼容。尝试同时使用它们将导致导入返回空对象。这可能在将来得到解决。这不适用于同步 <code>load</code> 钩子，在这种情况下，可以正常使用导出。</p>
+</blockquote>
+<blockquote>
+<p>这些类型都对应于 ECMAScript 中定义的类。</p>
+</blockquote>
+<ul>
+<li>特定的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer" class="type">&#x3C;ArrayBuffer></a> 对象是 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer" class="type">&#x3C;SharedArrayBuffer></a>。</li>
+<li>特定的 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray" class="type">&#x3C;TypedArray></a> 对象是 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array" class="type">&#x3C;Uint8Array></a>。</li>
+</ul>
+<p>如果基于文本的格式（即 <code>'json'</code>、<code>'module'</code>）的源值不是字符串，则使用 <a href="util.html#class-utiltextdecoder"><code>util.TextDecoder</code></a> 将其转换为字符串。</p>
+<p><code>load</code> 钩子提供了一种自定义检索已解析 URL 的源代码的方法。这将允许加载器潜在地避免从磁盘读取文件。它还可以用于将无法识别的格式映射到支持的格式，例如将 <code>yaml</code> 映射到 <code>module</code>。</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// module.register() 接受的异步版本。</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-keyword">const</span> { format } = context;
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>() > <span class="hljs-number">0.5</span>) { <span class="hljs-comment">// 某个条件</span>
+    <span class="hljs-comment">/*
+      对于部分或所有 URL，执行一些自定义的检索源代码的逻辑。
+      始终返回 {
+        format: &#x3C;string>,
+        source: &#x3C;string|buffer>,
+      } 形式的对象。
+    */</span>
+    <span class="hljs-keyword">return</span> {
+      format,
+      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">source</span>: <span class="hljs-string">'...'</span>,
+    };
+  }
+
+  <span class="hljs-comment">// 推迟到链中的下一个钩子。</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextLoad</span>(url);
+}</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js mjs"><span class="hljs-comment">// module.registerHooks() 接受的同步版本。</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-comment">// 类似于上面的异步 load()，因为该版本没有任何异步逻辑。</span>
+}</code> <button class="copy-button">copy</button></pre>
+<p>在更高级的场景中，这也可以用于将不支持的源转换为支持的源（参见下面的 <a href="#%E7%A4%BA%E4%BE%8B">示例</a>）。</p>
+</div></div></div><div>
+<h4>示例<span><a class="mark" href="#_7" id="_7">#</a></span><a aria-hidden="true" class="legacy" id="module_7"></a></h4>
+<p>各种模块自定义钩子可以一起使用，以实现对 Node.js 代码加载和评估行为的广泛自定义。</p>
+<div>
+<h5>从 HTTPS 导入<span><a class="mark" href="#-https-" id="-https-">#</a></span><a aria-hidden="true" class="legacy" id="module_https"></a></h5>
+<p>下面的钩子注册了钩子以启用对此类说明符的基本支持。虽然这似乎是对 Node.js 核心功能的重大改进，但实际上使用这些钩子存在明显的缺点：性能比从磁盘加载文件慢得多，没有缓存，也没有安全性。</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// https-hooks.mjs</span>
+<span class="hljs-keyword">import</span> { get } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:https'</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-comment">// 对于要通过网络加载的 JavaScript，我们需要获取并返回它。</span>
+  <span class="hljs-keyword">if</span> (url.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">'https://'</span>)) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =></span> {
+      <span class="hljs-title function_">get</span>(url, <span class="hljs-function">(<span class="hljs-params">res</span>) =></span> {
+        <span class="hljs-keyword">let</span> data = <span class="hljs-string">''</span>;
+        res.<span class="hljs-title function_">setEncoding</span>(<span class="hljs-string">'utf8'</span>);
+        res.<span class="hljs-title function_">on</span>(<span class="hljs-string">'data'</span>, <span class="hljs-function">(<span class="hljs-params">chunk</span>) =></span> data += chunk);
+        res.<span class="hljs-title function_">on</span>(<span class="hljs-string">'end'</span>, <span class="hljs-function">() =></span> <span class="hljs-title function_">resolve</span>({
+          <span class="hljs-comment">// 此示例假设所有网络提供的 JavaScript 都是 ES 模块代码。</span>
+          <span class="hljs-attr">format</span>: <span class="hljs-string">'module'</span>,
+          <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
+          <span class="hljs-attr">source</span>: data,
+        }));
+      }).<span class="hljs-title function_">on</span>(<span class="hljs-string">'error'</span>, <span class="hljs-function">(<span class="hljs-params">err</span>) =></span> <span class="hljs-title function_">reject</span>(err));
+    });
+  }
+
+  <span class="hljs-comment">// 让 Node.js 处理所有其他 URL。</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextLoad</span>(url);
+}</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js mjs"><span class="hljs-comment">// main.mjs</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-variable constant_">VERSION</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'https://coffeescript.org/browser-compiler-modern/coffeescript.js'</span>;
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable constant_">VERSION</span>);</code> <button class="copy-button">copy</button></pre>
+<p>使用前面的钩子模块，运行
+<code>node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./https-hooks.mjs"));' ./main.mjs</code>
+根据 <code>main.mjs</code> 中 URL 处的模块打印当前版本的 CoffeeScript。</p>
+<!-- TODO(joyeecheung): add an example on how to implement it with a fetchSync based on
+workers and Atomics.wait() - or all these examples are too much to be put in the API
+documentation already and should be put into a repository instead? -->
+</div><div>
+<h5>转译<span><a class="mark" href="#_8" id="_8">#</a></span><a aria-hidden="true" class="legacy" id="module_8"></a></h5>
+<p>Node.js 无法理解的格式的源代码可以使用 <a href="#loadurl-context-nextload"><code>load</code> 钩子</a> 转换为 JavaScript。</p>
+<p>这比在运行 Node.js 之前转译源文件性能更低；转译器钩子应仅用于开发和测试目的。</p>
+<div>
+<h6>异步版本<span><a class="mark" href="#_9" id="_9">#</a></span><a aria-hidden="true" class="legacy" id="module_9"></a></h6>
+<pre><code class="language-js mjs"><span class="hljs-comment">// coffeescript-hooks.mjs</span>
+<span class="hljs-keyword">import</span> { readFile } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+<span class="hljs-keyword">import</span> { findPackageJSON } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">import</span> coffeescript <span class="hljs-keyword">from</span> <span class="hljs-string">'coffeescript'</span>;
+
+<span class="hljs-keyword">const</span> extensionsRegex = <span class="hljs-regexp">/\.(coffee|litcoffee|coffee\.md)$/</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-keyword">if</span> (extensionsRegex.<span class="hljs-title function_">test</span>(url)) {
+    <span class="hljs-comment">// CoffeeScript 文件可以是 CommonJS 或 ES 模块。使用自定义格式告诉 Node.js 不要检测其模块类型。</span>
+    <span class="hljs-keyword">const</span> { <span class="hljs-attr">source</span>: rawSource } = <span class="hljs-keyword">await</span> <span class="hljs-title function_">nextLoad</span>(url, { ...context, <span class="hljs-attr">format</span>: <span class="hljs-string">'coffee'</span> });
+    <span class="hljs-comment">// 此钩子将所有导入的 CoffeeScript 文件的 CoffeeScript 源代码转换为 JavaScript 源代码。</span>
+    <span class="hljs-keyword">const</span> transformedSource = coffeescript.<span class="hljs-title function_">compile</span>(rawSource.<span class="hljs-title function_">toString</span>(), url);
+
+    <span class="hljs-comment">// 为了确定 Node.js 将如何解释转译结果，请在文件系统中向上搜索最近的父 package.json 文件并读取其 "type" 字段。</span>
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">format</span>: <span class="hljs-keyword">await</span> <span class="hljs-title function_">getPackageType</span>(url),
+      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">source</span>: transformedSource,
+    };
+  }
+
+  <span class="hljs-comment">// 让 Node.js 处理所有其他 URL。</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextLoad</span>(url, context);
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getPackageType</span>(<span class="hljs-params">url</span>) {
+  <span class="hljs-comment">// `url` 仅在第一次迭代时是文件路径，当传递来自 load() 钩子的已解析 url 时</span>
+  <span class="hljs-comment">// 来自 load() 的实际文件路径将包含文件扩展名，因为规范要求如此</span>
+  <span class="hljs-comment">// 这个简单的检查 `url` 是否包含文件扩展名的真值检查对于大多数项目都有效，但不能涵盖一些边缘情况（例如无扩展名文件或以尾随空格结尾的 url）</span>
+  <span class="hljs-keyword">const</span> pJson = <span class="hljs-title function_">findPackageJSON</span>(url);
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">readFile</span>(pJson, <span class="hljs-string">'utf8'</span>)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-title class_">JSON</span>.<span class="hljs-property">parse</span>)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">json</span>) =></span> json?.<span class="hljs-property">type</span>)
+    .<span class="hljs-title function_">catch</span>(<span class="hljs-function">() =></span> <span class="hljs-literal">undefined</span>);
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h6>同步版本<span><a class="mark" href="#_10" id="_10">#</a></span><a aria-hidden="true" class="legacy" id="module_10"></a></h6>
+<pre><code class="language-js mjs"><span class="hljs-comment">// coffeescript-sync-hooks.mjs</span>
+<span class="hljs-keyword">import</span> { readFileSync } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs'</span>;
+<span class="hljs-keyword">import</span> { registerHooks, findPackageJSON } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+<span class="hljs-keyword">import</span> coffeescript <span class="hljs-keyword">from</span> <span class="hljs-string">'coffeescript'</span>;
+
+<span class="hljs-keyword">const</span> extensionsRegex = <span class="hljs-regexp">/\.(coffee|litcoffee|coffee\.md)$/</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">load</span>(<span class="hljs-params">url, context, nextLoad</span>) {
+  <span class="hljs-keyword">if</span> (extensionsRegex.<span class="hljs-title function_">test</span>(url)) {
+    <span class="hljs-keyword">const</span> { <span class="hljs-attr">source</span>: rawSource } = <span class="hljs-title function_">nextLoad</span>(url, { ...context, <span class="hljs-attr">format</span>: <span class="hljs-string">'coffee'</span> });
+    <span class="hljs-keyword">const</span> transformedSource = coffeescript.<span class="hljs-title function_">compile</span>(rawSource.<span class="hljs-title function_">toString</span>(), url);
+
+    <span class="hljs-keyword">return</span> {
+      <span class="hljs-attr">format</span>: <span class="hljs-title function_">getPackageType</span>(url),
+      <span class="hljs-attr">shortCircuit</span>: <span class="hljs-literal">true</span>,
+      <span class="hljs-attr">source</span>: transformedSource,
+    };
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextLoad</span>(url, context);
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getPackageType</span>(<span class="hljs-params">url</span>) {
+  <span class="hljs-keyword">const</span> pJson = <span class="hljs-title function_">findPackageJSON</span>(url);
+  <span class="hljs-keyword">if</span> (!pJson) {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>;
+  }
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> file = <span class="hljs-title function_">readFileSync</span>(pJson, <span class="hljs-string">'utf-8'</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(file)?.<span class="hljs-property">type</span>;
+  } <span class="hljs-keyword">catch</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>;
+  }
+}
+
+<span class="hljs-title function_">registerHooks</span>({ load });</code> <button class="copy-button">copy</button></pre>
+</div></div><div>
+<h5>运行钩子<span><a class="mark" href="#_11" id="_11">#</a></span><a aria-hidden="true" class="legacy" id="module_11"></a></h5>
+<pre><code class="language-coffee"><span class="hljs-comment"># main.coffee</span>
+<span class="hljs-keyword">import</span> { scream } <span class="hljs-keyword">from</span> <span class="hljs-string">'./scream.coffee'</span>
+console.log scream <span class="hljs-string">'hello, world'</span>
+
+<span class="hljs-keyword">import</span> { version } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>
+console.log <span class="hljs-string">"Brought to you by Node.js version <span class="hljs-subst">#{version}</span>"</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-coffee"><span class="hljs-comment"># scream.coffee</span>
+<span class="hljs-keyword">export</span> scream = <span class="hljs-function"><span class="hljs-params">(str)</span> -></span> str.toUpperCase()</code> <button class="copy-button">copy</button></pre>
+<p>为了运行示例，添加一个包含 CoffeeScript 文件模块类型的 <code>package.json</code> 文件。</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"module"</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<p>这仅用于运行示例。在真实的加载器中，即使在没有 <code>package.json</code> 中显式类型的情况下，<code>getPackageType()</code> 也必须能够返回 Node.js 已知的 <code>format</code>，否则 <code>nextLoad</code> 调用将抛出 <code>ERR_UNKNOWN_FILE_EXTENSION</code>（如果为 undefined）或 <code>ERR_UNKNOWN_MODULE_FORMAT</code>（如果它不是 [load 钩子][] 文档中列出的已知格式）。</p>
+<p>使用前面的钩子模块，运行
+<code>node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./coffeescript-hooks.mjs"));' ./main.coffee</code>
+或 <code>node --import ./coffeescript-sync-hooks.mjs ./main.coffee</code>
+会导致 <code>main.coffee</code> 在其源代码从磁盘加载后但在 Node.js 执行之前被转换为 JavaScript；对于任何通过任何加载文件的 <code>import</code> 语句引用的 <code>.coffee</code>、<code>.litcoffee</code> 或 <code>.coffee.md</code> 文件也是如此。</p>
+</div><div>
+<h5>导入映射<span><a class="mark" href="#_12" id="_12">#</a></span><a aria-hidden="true" class="legacy" id="module_12"></a></h5>
+<p>前两个示例定义了 <code>load</code> 钩子。这是一个 <code>resolve</code> 钩子的示例。此钩子模块读取一个 <code>import-map.json</code> 文件，该文件定义了哪些说明符应覆盖到其他 URL（这是 "导入映射" 规范的一小部分子集的非常简单的实现）。</p>
+<div>
+<h6>异步版本<span><a class="mark" href="#_13" id="_13">#</a></span><a aria-hidden="true" class="legacy" id="module_13"></a></h6>
+<pre><code class="language-js mjs"><span class="hljs-comment">// import-map-hooks.js</span>
+<span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+
+<span class="hljs-keyword">const</span> { imports } = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(<span class="hljs-keyword">await</span> fs.<span class="hljs-title function_">readFile</span>(<span class="hljs-string">'import-map.json'</span>));
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">hasOwn</span>(imports, specifier)) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(imports[specifier], context);
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier, context);
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h6>同步版本<span><a class="mark" href="#_14" id="_14">#</a></span><a aria-hidden="true" class="legacy" id="module_14"></a></h6>
+<pre><code class="language-js mjs"><span class="hljs-comment">// import-map-sync-hooks.js</span>
+<span class="hljs-keyword">import</span> fs <span class="hljs-keyword">from</span> <span class="hljs-string">'node:fs/promises'</span>;
+<span class="hljs-keyword">import</span> <span class="hljs-variable language_">module</span> <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;
+
+<span class="hljs-keyword">const</span> { imports } = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(fs.<span class="hljs-title function_">readFileSync</span>(<span class="hljs-string">'import-map.json'</span>, <span class="hljs-string">'utf-8'</span>));
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">resolve</span>(<span class="hljs-params">specifier, context, nextResolve</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-title class_">Object</span>.<span class="hljs-title function_">hasOwn</span>(imports, specifier)) {
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(imports[specifier], context);
+  }
+
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">nextResolve</span>(specifier, context);
+}
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-title function_">registerHooks</span>({ resolve });</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h6>使用钩子<span><a class="mark" href="#_15" id="_15">#</a></span><a aria-hidden="true" class="legacy" id="module_15"></a></h6>
+<p>使用这些文件：</p>
+<pre><code class="language-js mjs"><span class="hljs-comment">// main.js</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">'a-module'</span>;</code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-json"><span class="hljs-comment">// import-map.json</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"imports"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"a-module"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"./some-module.js"</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code> <button class="copy-button">copy</button></pre>
+<pre><code class="language-js mjs"><span class="hljs-comment">// some-module.js</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'some module!'</span>);</code> <button class="copy-button">copy</button></pre>
+<p>运行 <code>node --import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register(pathToFileURL("./import-map-hooks.js"));' main.js</code>
+或 <code>node --import ./import-map-sync-hooks.js main.js</code>
+应该打印 <code>some module!</code>。</p>
+</div></div></div>
+</section><section><h3>Source Map 支持<span><a class="mark" href="#source-map-" id="source-map-">#</a></span><a aria-hidden="true" class="legacy" id="module_source_map"></a></h3>
+<div class="api_metadata">
+<span>Added in: v13.7.0, v12.17.0</span>
+</div>
+<p></p><div class="api_stability api_stability_1"><a href="documentation.html#stability-index">Stability: 1</a> - Experimental</div><p></p>
+<p>Node.js 支持 TC39 ECMA-426 <a href="https://tc39.es/ecma426/">Source Map</a> 格式（以前称为 Source map revision 3 格式）。</p>
+<p>本节中的 API 是与 source map 缓存交互的辅助工具。当启用 source map 解析并且在模块的页脚中找到 <a href="https://tc39.es/ecma426/#sec-linking-generated-code">source map include directives</a> 时，将填充此缓存。</p>
+<p>要启用 source map 解析，必须使用标志 <a href="cli.html#--enable-source-maps"><code>--enable-source-maps</code></a> 运行 Node.js，或者通过设置 <a href="cli.html#node_v8_coveragedir"><code>NODE_V8_COVERAGE=dir</code></a> 启用代码覆盖，或者通过 <a href="#modulesetsourcemapssupportenabled-options"><code>module.setSourceMapsSupport()</code></a> 以编程方式启用。</p>
+
+<pre class="with-19-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-comment">// module.mjs</span>
+<span class="hljs-comment">// 在 ECMAScript 模块中</span>
+<span class="hljs-keyword">import</span> { findSourceMap, <span class="hljs-title class_">SourceMap</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:module'</span>;</code><code class="language-js cjs"><span class="hljs-comment">// module.cjs</span>
+<span class="hljs-comment">// 在 CommonJS 模块中</span>
+<span class="hljs-keyword">const</span> { findSourceMap, <span class="hljs-title class_">SourceMap</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:module'</span>);</code><button class="copy-button">copy</button></pre>
+<div>
+<h4><code>module.getSourceMapsSupport()</code><span><a class="mark" href="#modulegetsourcemapssupport" id="modulegetsourcemapssupport">#</a></span><a aria-hidden="true" class="legacy" id="module_module_getsourcemapssupport"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.7.0, v22.14.0</span>
+</div>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>enabled</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否启用了 source maps 支持</li>
+<li><code>nodeModules</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否为 <code>node_modules</code> 中的文件启用了支持。</li>
+<li><code>generatedCode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否为来自 <code>eval</code> 或 <code>new Function</code> 的生成代码启用了支持。</li>
+</ul>
+</li>
+</ul>
+<p>此方法返回是否启用于堆栈跟踪的 <a href="https://tc39.es/ecma426/">Source Map v3</a> 支持。</p>
+<!-- Anchors to make sure old links find a target -->
+<p><a id="module_module_findsourcemap_path_error"></a></p>
+</div><div>
+<h4><code>module.findSourceMap(path)</code><span><a class="mark" href="#modulefindsourcemappath" id="modulefindsourcemappath">#</a></span><a aria-hidden="true" class="legacy" id="module_module_findsourcemap_path"></a></h4>
+<div class="api_metadata">
+<span>Added in: v13.7.0, v12.17.0</span>
+</div>
+<ul>
+<li><code>path</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li>返回: <a href="module.html#class-modulesourcemap" class="type">&#x3C;module.SourceMap></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> 如果找到 source map 则返回 <code>module.SourceMap</code>，否则返回 <code>undefined</code>。</li>
+</ul>
+<p><code>path</code> 是应获取对应 source map 的文件的已解析路径。</p>
+</div><div>
+<h4><code>module.setSourceMapsSupport(enabled[, options])</code><span><a class="mark" href="#modulesetsourcemapssupportenabled-options" id="modulesetsourcemapssupportenabled-options">#</a></span><a aria-hidden="true" class="legacy" id="module_module_setsourcemapssupport_enabled_options"></a></h4>
+<div class="api_metadata">
+<span>Added in: v23.7.0, v22.14.0</span>
+</div>
+<ul>
+<li><code>enabled</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 启用 source map 支持。</li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 可选
+<ul>
+<li><code>nodeModules</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否为 <code>node_modules</code> 中的文件启用支持。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>generatedCode</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否为来自 <code>eval</code> 或 <code>new Function</code> 的生成代码启用支持。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+</ul>
+<p>此函数启用或禁用用于堆栈跟踪的 <a href="https://tc39.es/ecma426/">Source Map v3</a> 支持。</p>
+<p>它提供了与使用命令行选项 <code>--enable-source-maps</code> 启动 Node.js 进程相同的功能，并附加了用于改变对 <code>node_modules</code> 中文件或生成代码的支持的选项。</p>
+<p>只有在启用 source maps 后加载的 JavaScript 文件中的 source maps 才会被解析和加载。最好使用命令行选项 <code>--enable-source-maps</code> 以避免丢失在此 API 调用之前加载的模块的 source maps。</p>
+</div><div>
+<h4>类: <code>module.SourceMap</code><span><a class="mark" href="#-modulesourcemap" id="-modulesourcemap">#</a></span><a aria-hidden="true" class="legacy" id="module_module_sourcemap"></a></h4>
+<div class="api_metadata">
+<span>Added in: v13.7.0, v12.17.0</span>
+</div>
+<div>
+<h5><code>new SourceMap(payload[, { lineLengths }])</code><span><a class="mark" href="#new-sourcemappayload--linelengths-" id="new-sourcemappayload--linelengths-">#</a></span><a aria-hidden="true" class="legacy" id="module_new_sourcemap_payload_linelengths"></a></h5>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v20.5.0</td>
+<td><p>Add support for <code>lineLengths</code>.</p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>payload</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>lineLengths</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number[]></a></li>
+</ul>
+<p>创建一个新的 <code>sourceMap</code> 实例。</p>
+<p><code>payload</code> 是一个对象，其键与 <a href="https://tc39.es/ecma426/#sec-source-map-format">Source map 格式</a> 匹配：</p>
+<ul>
+<li><code>file</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>version</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a></li>
+<li><code>sources</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li><code>sourcesContent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li><code>names</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a></li>
+<li><code>mappings</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+<li><code>sourceRoot</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p><code>lineLengths</code> 是一个可选数组，表示生成代码中每行的长度。</p>
+</div><div>
+<h5><code>sourceMap.payload</code><span><a class="mark" href="#sourcemappayload" id="sourcemappayload">#</a></span><a aria-hidden="true" class="legacy" id="module_sourcemap_payload"></a></h5>
+<ul>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>获取用于构造 <a href="#class-modulesourcemap"><code>SourceMap</code></a> 实例的有效负载。</p>
+</div><div>
+<h5><code>sourceMap.findEntry(lineOffset, columnOffset)</code><span><a class="mark" href="#sourcemapfindentrylineoffset-columnoffset" id="sourcemapfindentrylineoffset-columnoffset">#</a></span><a aria-hidden="true" class="legacy" id="module_sourcemap_findentry_lineoffset_columnoffset"></a></h5>
+<ul>
+<li><code>lineOffset</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 生成源文件中的从零开始的行号偏移量</li>
+<li><code>columnOffset</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 生成源文件中的从零开始的列号偏移量</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>给定生成源文件中的行偏移量和列偏移量，如果找到，则返回一个表示原始文件中 SourceMap 范围的对象，否则返回一个空对象。</p>
+<p>返回的对象包含以下键：</p>
+<ul>
+<li><code>generatedLine</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 生成源中范围开始的行偏移量</li>
+<li><code>generatedColumn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 生成源中范围开始的列偏移量</li>
+<li><code>originalSource</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 原始源的文件名，如 SourceMap 中报告的那样</li>
+<li><code>originalLine</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 原始源中范围开始的行偏移量</li>
+<li><code>originalColumn</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 原始源中范围开始的列偏移量</li>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a></li>
+</ul>
+<p>返回值表示它在 SourceMap 中出现的原始范围，基于从零开始的偏移量，<em>而不是</em> 错误消息和 CallSite 对象中出现的从 1 开始的行号和列号。</p>
+<p>要从 Error 堆栈和 CallSite 对象报告的行号和列号获取对应的从 1 开始的行号和列号，请使用 <code>sourceMap.findOrigin(lineNumber, columnNumber)</code></p>
+</div><div>
+<h5><code>sourceMap.findOrigin(lineNumber, columnNumber)</code><span><a class="mark" href="#sourcemapfindoriginlinenumber-columnnumber" id="sourcemapfindoriginlinenumber-columnnumber">#</a></span><a aria-hidden="true" class="legacy" id="module_sourcemap_findorigin_linenumber_columnnumber"></a></h5>
+<div class="api_metadata">
+<span>Added in: v20.4.0, v18.18.0</span>
+</div>
+<ul>
+<li><code>lineNumber</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 生成源中调用点的从 1 开始的行号</li>
+<li><code>columnNumber</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 生成源中调用点的从 1 开始的列号</li>
+<li>返回: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>给定生成源中调用点的从 1 开始的 <code>lineNumber</code> 和 <code>columnNumber</code>，查找原始源中对应的调用点位置。</p>
+<p>如果提供的 <code>lineNumber</code> 和 <code>columnNumber</code> 在任何 source map 中都找不到，则返回一个空对象。否则，返回的对象包含以下键：</p>
+<ul>
+<li><code>name</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> source map 中范围的名称（如果提供了）</li>
+<li><code>fileName</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 原始源的文件名，如 SourceMap 中报告的那样</li>
+<li><code>lineNumber</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 原始源中对应调用点的从 1 开始的行号</li>
+<li><code>columnNumber</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 原始源中对应调用点的从 1 开始的列号</li>
+</ul></div></div></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,2494 @@
+{
+  "type": "module",
+  "source": "doc/api/webstreams.md",
+  "modules": [
+    {
+      "textRaw": "Web Streams API",
+      "name": "web_streams_api",
+      "introduced_in": "v16.5.0",
+      "meta": {
+        "added": [
+          "v16.5.0"
+        ],
+        "changes": [
+          {
+            "version": [
+              "v21.0.0"
+            ],
+            "pr-url": "https://github.com/nodejs/node/pull/45684",
+            "description": "No longer experimental."
+          },
+          {
+            "version": "v18.0.0",
+            "pr-url": "https://github.com/nodejs/node/pull/42225",
+            "description": "Use of this API no longer emit a runtime warning."
+          }
+        ]
+      },
+      "stability": 2,
+      "stabilityText": "Stable",
+      "desc": "<p><a href=\"https://streams.spec.whatwg.org/\">WHATWG Streams Standard</a> 的一个实现。</p>",
+      "modules": [
+        {
+          "textRaw": "概述",
+          "name": "概述",
+          "desc": "<p><a href=\"https://streams.spec.whatwg.org/\">WHATWG Streams Standard</a>（或称 \"web streams\"）定义了一个用于处理流数据的 API。它类似于 Node.js 的 <a href=\"stream.html\">Streams</a> API，但出现较晚，并已成为跨多种 JavaScript 环境的流数据\"标准\"API。</p>\n<p>主要有三种类型的对象：</p>\n<ul>\n<li><code>ReadableStream</code> - 表示流数据的源。</li>\n<li><code>WritableStream</code> - 表示流数据的目的地。</li>\n<li><code>TransformStream</code> - 表示用于转换流数据的算法。</li>\n</ul>",
+          "modules": [
+            {
+              "textRaw": "示例 `ReadableStream`",
+              "name": "示例_`readablestream`",
+              "desc": "<p>此示例创建一个简单的 <code>ReadableStream</code>，该流每秒永远推送当前的 <code>performance.now()</code> 时间戳。使用异步可迭代对象从流中读取数据。</p>\n<pre><code class=\"language-mjs\">import {\n  ReadableStream,\n} from 'node:stream/web';\n\nimport {\n  setInterval as every,\n} from 'node:timers/promises';\n\nimport {\n  performance,\n} from 'node:perf_hooks';\n\nconst SECOND = 1000;\n\nconst stream = new ReadableStream({\n  async start(controller) {\n    for await (const _ of every(SECOND))\n      controller.enqueue(performance.now());\n  },\n});\n\nfor await (const value of stream)\n  console.log(value);\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  ReadableStream,\n} = require('node:stream/web');\n\nconst {\n  setInterval: every,\n} = require('node:timers/promises');\n\nconst {\n  performance,\n} = require('node:perf_hooks');\n\nconst SECOND = 1000;\n\nconst stream = new ReadableStream({\n  async start(controller) {\n    for await (const _ of every(SECOND))\n      controller.enqueue(performance.now());\n  },\n});\n\n(async () => {\n  for await (const value of stream)\n    console.log(value);\n})();\n</code></pre>",
+              "type": "module",
+              "displayName": "示例 `ReadableStream`"
+            },
+            {
+              "textRaw": "Node.js 流互操作性",
+              "name": "node.js_流互操作性",
+              "desc": "<p>Node.js 流可以通过 <code>stream.Readable</code>、<code>stream.Writable</code> 和 <code>stream.Duplex</code> 对象上的 <code>toWeb</code> 和 <code>fromWeb</code> 方法转换为 Web 流，反之亦然。</p>\n<p>更多详情请参考相关文档：</p>\n<ul>\n<li><a href=\"stream.html#streamreadabletowebstreamreadable-options\"><code>stream.Readable.toWeb</code></a></li>\n<li><a href=\"stream.html#streamreadablefromwebreadablestream-options\"><code>stream.Readable.fromWeb</code></a></li>\n<li><a href=\"stream.html#streamwritabletowebstreamwritable\"><code>stream.Writable.toWeb</code></a></li>\n<li><a href=\"stream.html#streamwritablefromwebwritablestream-options\"><code>stream.Writable.fromWeb</code></a></li>\n<li><a href=\"stream.html#streamduplextowebstreamduplex\"><code>stream.Duplex.toWeb</code></a></li>\n<li><a href=\"stream.html#streamduplexfromwebpair-options\"><code>stream.Duplex.fromWeb</code></a></li>\n</ul>",
+              "type": "module",
+              "displayName": "Node.js 流互操作性"
+            }
+          ],
+          "type": "module",
+          "displayName": "概述"
+        },
+        {
+          "textRaw": "API",
+          "name": "api",
+          "modules": [
+            {
+              "textRaw": "类：`ReadableStream`",
+              "name": "类：`readablestream`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new ReadableStream([underlyingSource [, strategy]])`",
+                  "type": "ctor",
+                  "name": "ReadableStream",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<!--lint disable maximum-line-length remark-lint-->\n<ul>\n<li><code>underlyingSource</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>start</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 当 <code>ReadableStream</code> 创建时立即调用的用户定义函数。\n<ul>\n<li><code>controller</code> <a href=\"webstreams.html#class-readablestreamdefaultcontroller\" class=\"type\">&lt;ReadableStreamDefaultController&gt;</a> | <a href=\"webstreams.html#class-readablebytestreamcontroller\" class=\"type\">&lt;ReadableByteStreamController&gt;</a></li>\n<li>返回：<code>undefined</code> 或以 <code>undefined</code> 兑现的 promise。</li>\n</ul>\n</li>\n<li><code>pull</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 当 <code>ReadableStream</code> 内部队列未满时重复调用的用户定义函数。操作可以是同步或异步的。如果是异步的，该函数将不会再次被调用，直到先前返回的 promise 被兑现。\n<ul>\n<li><code>controller</code> <a href=\"webstreams.html#class-readablestreamdefaultcontroller\" class=\"type\">&lt;ReadableStreamDefaultController&gt;</a> | <a href=\"webstreams.html#class-readablebytestreamcontroller\" class=\"type\">&lt;ReadableByteStreamController&gt;</a></li>\n<li>返回：以 <code>undefined</code> 兑现的 promise。</li>\n</ul>\n</li>\n<li><code>cancel</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 当 <code>ReadableStream</code> 被取消时调用的用户定义函数。\n<ul>\n<li><code>reason</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n<li>返回：以 <code>undefined</code> 兑现的 promise。</li>\n</ul>\n</li>\n<li><code>type</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type\" class=\"type\">&lt;string&gt;</a> 必须为 <code>'bytes'</code> 或 <code>undefined</code>。</li>\n<li><code>autoAllocateChunkSize</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 仅当 <code>type</code> 等于 <code>'bytes'</code> 时使用。当设置为非零值时，会自动分配视图缓冲区给 <code>ReadableByteStreamController.byobRequest</code>。未设置时，必须使用流的内部队列通过默认读取器 <code>ReadableStreamDefaultReader</code> 传输数据。</li>\n</ul>\n</li>\n<li><code>strategy</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object\" class=\"type\">&lt;Object&gt;</a>\n<ul>\n<li><code>highWaterMark</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a> 在应用背压之前的最大内部队列大小。</li>\n<li><code>size</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function\" class=\"type\">&lt;Function&gt;</a> 用于识别每个数据块大小的用户定义函数。\n<ul>\n<li><code>chunk</code> <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Data_types\" class=\"type\">&lt;any&gt;</a></li>\n<li>返回：<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type\" class=\"type\">&lt;number&gt;</a></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n<!--lint enable maximum-line-length remark-lint-->"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`locked` 类型：{boolean} 如果此 {ReadableStream} 有活跃的读取器，则设置为 `true`。",
+                  "type": "boolean",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p><code>readableStream.locked</code> 属性默认为 <code>false</code>，当有活跃的读取器正在消费流的数据时，会切换为 <code>true</code>。</p>",
+                  "shortDesc": "如果此 {ReadableStream} 有活跃的读取器，则设置为 `true`。"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`readableStream.cancel([reason])`",
+                  "type": "method",
+                  "name": "cancel",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回：一个在取消操作完成后以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个在取消操作完成后以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "textRaw": "`readableStream.getReader([options])`",
+                  "type": "method",
+                  "name": "getReader",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`mode` {string} `'byob'` 或 `undefined`",
+                              "name": "mode",
+                              "type": "string",
+                              "desc": "`'byob'` 或 `undefined`"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回：{ReadableStreamDefaultReader|ReadableStreamBYOBReader}",
+                          "name": "返回：",
+                          "type": "ReadableStreamDefaultReader|ReadableStreamBYOBReader"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\n\nconst stream = new ReadableStream();\n\nconst reader = stream.getReader();\n\nconsole.log(await reader.read());\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\n\nconst stream = new ReadableStream();\n\nconst reader = stream.getReader();\n\nreader.read().then(console.log);\n</code></pre>\n<p>导致 <code>readableStream.locked</code> 变为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`readableStream.pipeThrough(transform[, options])`",
+                  "type": "method",
+                  "name": "pipeThrough",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`transform` {Object}",
+                          "name": "transform",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`readable` {ReadableStream} `transform.writable` 将把从此 `ReadableStream` 接收到的可能修改过的数据推送到的 `ReadableStream`。",
+                              "name": "readable",
+                              "type": "ReadableStream",
+                              "desc": "`transform.writable` 将把从此 `ReadableStream` 接收到的可能修改过的数据推送到的 `ReadableStream`。"
+                            },
+                            {
+                              "textRaw": "`writable` {WritableStream} 此 `ReadableStream` 的数据将被写入的 `WritableStream`。",
+                              "name": "writable",
+                              "type": "WritableStream",
+                              "desc": "此 `ReadableStream` 的数据将被写入的 `WritableStream`。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`preventAbort` {boolean} 当为 `true` 时，此 `ReadableStream` 中的错误不会导致 `transform.writable` 被中止。",
+                              "name": "preventAbort",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，此 `ReadableStream` 中的错误不会导致 `transform.writable` 被中止。"
+                            },
+                            {
+                              "textRaw": "`preventCancel` {boolean} 当为 `true` 时，目标 `transform.writable` 中的错误不会导致此 `ReadableStream` 被取消。",
+                              "name": "preventCancel",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，目标 `transform.writable` 中的错误不会导致此 `ReadableStream` 被取消。"
+                            },
+                            {
+                              "textRaw": "`preventClose` {boolean} 当为 `true` 时，关闭此 `ReadableStream` 不会导致 `transform.writable` 被关闭。",
+                              "name": "preventClose",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，关闭此 `ReadableStream` 不会导致 `transform.writable` 被关闭。"
+                            },
+                            {
+                              "textRaw": "`signal` {AbortSignal} 允许使用 {AbortController} 取消数据传输。",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "允许使用 {AbortController} 取消数据传输。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回：{ReadableStream} 来自 `transform.readable`。",
+                          "name": "返回：",
+                          "type": "ReadableStream",
+                          "desc": "来自 `transform.readable`。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将此 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 连接到 <code>transform</code> 参数中提供的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 和 <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 对，使得来自此 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的数据被写入 <code>transform.writable</code>，可能经过转换，然后推送到 <code>transform.readable</code>。一旦管道配置完成，返回 <code>transform.readable</code>。</p>\n<p>在管道操作活跃时，导致 <code>readableStream.locked</code> 变为 <code>true</code>。</p>\n<pre><code class=\"language-mjs\">import {\n  ReadableStream,\n  TransformStream,\n} from 'node:stream/web';\n\nconst stream = new ReadableStream({\n  start(controller) {\n    controller.enqueue('a');\n  },\n});\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  },\n});\n\nconst transformedStream = stream.pipeThrough(transform);\n\nfor await (const chunk of transformedStream)\n  console.log(chunk);\n  // 打印：A\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  ReadableStream,\n  TransformStream,\n} = require('node:stream/web');\n\nconst stream = new ReadableStream({\n  start(controller) {\n    controller.enqueue('a');\n  },\n});\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  },\n});\n\nconst transformedStream = stream.pipeThrough(transform);\n\n(async () => {\n  for await (const chunk of transformedStream)\n    console.log(chunk);\n    // 打印：A\n})();\n</code></pre>"
+                },
+                {
+                  "textRaw": "`readableStream.pipeTo(destination[, options])`",
+                  "type": "method",
+                  "name": "pipeTo",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`destination` {WritableStream} 此 `ReadableStream` 的数据将被写入的 {WritableStream}。",
+                          "name": "destination",
+                          "type": "WritableStream",
+                          "desc": "此 `ReadableStream` 的数据将被写入的 {WritableStream}。"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`preventAbort` {boolean} 当为 `true` 时，此 `ReadableStream` 中的错误不会导致 `destination` 被中止。",
+                              "name": "preventAbort",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，此 `ReadableStream` 中的错误不会导致 `destination` 被中止。"
+                            },
+                            {
+                              "textRaw": "`preventCancel` {boolean} 当为 `true` 时，`destination` 中的错误不会导致此 `ReadableStream` 被取消。",
+                              "name": "preventCancel",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，`destination` 中的错误不会导致此 `ReadableStream` 被取消。"
+                            },
+                            {
+                              "textRaw": "`preventClose` {boolean} 当为 `true` 时，关闭此 `ReadableStream` 不会导致 `destination` 被关闭。",
+                              "name": "preventClose",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，关闭此 `ReadableStream` 不会导致 `destination` 被关闭。"
+                            },
+                            {
+                              "textRaw": "`signal` {AbortSignal} 允许使用 {AbortController} 取消数据传输。",
+                              "name": "signal",
+                              "type": "AbortSignal",
+                              "desc": "允许使用 {AbortController} 取消数据传输。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在管道操作活跃时，导致 <code>readableStream.locked</code> 变为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`readableStream.tee()`",
+                  "type": "method",
+                  "name": "tee",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": [
+                          "v18.10.0",
+                          "v16.18.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/44505",
+                        "description": "Support teeing a readable byte stream."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{ReadableStream\\[]}",
+                          "name": "返回：",
+                          "type": "ReadableStream\\[]"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>返回一对新的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 实例，此 <code>ReadableStream</code> 的数据将被转发到这两个实例。每个实例将接收相同的数据。</p>\n<p>导致 <code>readableStream.locked</code> 变为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`readableStream.values([options])`",
+                  "type": "method",
+                  "name": "values",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`preventCancel` {boolean} 当为 `true` 时，防止 {ReadableStream} 在异步迭代器突然终止时被关闭。 **默认**：`false`。",
+                              "name": "preventCancel",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，防止 {ReadableStream} 在异步迭代器突然终止时被关闭。 **默认**：`false`。"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建并返回一个可用于消费此 <code>ReadableStream</code> 数据的异步迭代器。</p>\n<p>在异步迭代器活跃时，导致 <code>readableStream.locked</code> 变为 <code>true</code>。</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\n\nconst stream = new ReadableStream(getSomeSource());\n\nfor await (const chunk of stream.values({ preventCancel: true }))\n  console.log(Buffer.from(chunk).toString());\n</code></pre>"
+                }
+              ],
+              "modules": [
+                {
+                  "textRaw": "异步迭代",
+                  "name": "异步迭代",
+                  "desc": "<p><a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 对象支持使用 <code>for await</code> 语法的异步迭代器协议。</p>\n<pre><code class=\"language-mjs\">import { Buffer } from 'node:buffer';\n\nconst stream = new ReadableStream(getSomeSource());\n\nfor await (const chunk of stream)\n  console.log(Buffer.from(chunk).toString());\n</code></pre>\n<p>异步迭代器将消费 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 直到其终止。</p>\n<p>默认情况下，如果异步迭代器提前退出（通过 <code>break</code>、<code>return</code> 或 <code>throw</code>），<a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 将被关闭。要防止 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 自动关闭，请使用 <code>readableStream.values()</code> 方法获取异步迭代器，并将 <code>preventCancel</code> 选项设置为 <code>true</code>。</p>\n<p><a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 不得被锁定（即，不得有现有的活跃读取器）。在异步迭代期间，<a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 将被锁定。</p>",
+                  "type": "module",
+                  "displayName": "异步迭代"
+                },
+                {
+                  "textRaw": "使用 `postMessage()` 传输",
+                  "name": "使用_`postmessage()`_传输",
+                  "desc": "<p><a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 实例可以使用 <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a> 进行传输。</p>\n<pre><code class=\"language-js\">const stream = new ReadableStream(getReadableSourceSomehow());\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  data.getReader().read().then((chunk) => {\n    console.log(chunk);\n  });\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
+                  "type": "module",
+                  "displayName": "使用 `postMessage()` 传输"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ReadableStream`"
+            },
+            {
+              "textRaw": "类：`ReadableStreamDefaultReader`",
+              "name": "类：`readablestreamdefaultreader`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p>默认情况下，不带参数调用 <code>readableStream.getReader()</code> 将返回 <code>ReadableStreamDefaultReader</code> 的实例。默认读取器将流中传递的数据块视为不透明值，这允许 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 与通常任何 JavaScript 值一起工作。</p>",
+              "ctors": [
+                {
+                  "textRaw": "`new ReadableStreamDefaultReader(stream)`",
+                  "type": "ctor",
+                  "name": "ReadableStreamDefaultReader",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream}",
+                          "name": "stream",
+                          "type": "ReadableStream"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个锁定到给定 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的新 <a href=\"webstreams.html#class-readablestreamdefaultreader\" class=\"type\">&lt;ReadableStreamDefaultReader&gt;</a>。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`readableStreamDefaultReader.cancel([reason])`",
+                  "type": "method",
+                  "name": "cancel",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>取消 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 并返回一个在底层流被取消时兑现的 promise。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamDefaultReader.read()`",
+                  "type": "method",
+                  "name": "read",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：一个以对象兑现的 promise：",
+                          "name": "返回：一个以对象兑现的",
+                          "desc": "promise：",
+                          "options": [
+                            {
+                              "textRaw": "`value` {any}",
+                              "name": "value",
+                              "type": "any"
+                            },
+                            {
+                              "textRaw": "`done` {boolean}",
+                              "name": "done",
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>从底层 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 请求下一个数据块，并返回一个在数据可用时以数据兑现的 promise。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamDefaultReader.releaseLock()`",
+                  "type": "method",
+                  "name": "releaseLock",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>释放此读取器对底层 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的锁。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`closed` 类型：{Promise} 当关联的 {ReadableStream} 关闭时以 `undefined` 兑现，或者在流发生错误或读取器的锁在流完成关闭之前被释放时拒绝。",
+                  "type": "Promise",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "当关联的 {ReadableStream} 关闭时以 `undefined` 兑现，或者在流发生错误或读取器的锁在流完成关闭之前被释放时拒绝。"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ReadableStreamDefaultReader`"
+            },
+            {
+              "textRaw": "类：`ReadableStreamBYOBReader`",
+              "name": "类：`readablestreambyobreader`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>ReadableStreamBYOBReader</code> 是面向字节的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>（那些在创建 <code>ReadableStream</code> 时将 <code>underlyingSource.type</code> 设置为 <code>'bytes'</code> 的流）的替代消费者。</p>\n<p><code>BYOB</code> 是 \"bring your own buffer\" 的缩写。这是一种允许更高效读取面向字节数据的模式，避免了不必要的复制。</p>\n<pre><code class=\"language-mjs\">import {\n  open,\n} from 'node:fs/promises';\n\nimport {\n  ReadableStream,\n} from 'node:stream/web';\n\nimport { Buffer } from 'node:buffer';\n\nclass Source {\n  type = 'bytes';\n  autoAllocateChunkSize = 1024;\n\n  async start(controller) {\n    this.file = await open(new URL(import.meta.url));\n    this.controller = controller;\n  }\n\n  async pull(controller) {\n    const view = controller.byobRequest?.view;\n    const {\n      bytesRead,\n    } = await this.file.read({\n      buffer: view,\n      offset: view.byteOffset,\n      length: view.byteLength,\n    });\n\n    if (bytesRead === 0) {\n      await this.file.close();\n      this.controller.close();\n    }\n    controller.byobRequest.respond(bytesRead);\n  }\n}\n\nconst stream = new ReadableStream(new Source());\n\nasync function read(stream) {\n  const reader = stream.getReader({ mode: 'byob' });\n\n  const chunks = [];\n  let result;\n  do {\n    result = await reader.read(Buffer.alloc(100));\n    if (result.value !== undefined)\n      chunks.push(Buffer.from(result.value));\n  } while (!result.done);\n\n  return Buffer.concat(chunks);\n}\n\nconst data = await read(stream);\nconsole.log(Buffer.from(data).toString());\n</code></pre>",
+              "ctors": [
+                {
+                  "textRaw": "`new ReadableStreamBYOBReader(stream)`",
+                  "type": "ctor",
+                  "name": "ReadableStreamBYOBReader",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream}",
+                          "name": "stream",
+                          "type": "ReadableStream"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个锁定到给定 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的新 <code>ReadableStreamBYOBReader</code>。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`readableStreamBYOBReader.cancel([reason])`",
+                  "type": "method",
+                  "name": "cancel",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>取消 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 并返回一个在底层流被取消时兑现的 promise。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamBYOBReader.read(view[, options])`",
+                  "type": "method",
+                  "name": "read",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": [
+                          "v21.7.0",
+                          "v20.17.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/50888",
+                        "description": "Added `min` option."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`view` {Buffer|TypedArray|DataView}",
+                          "name": "view",
+                          "type": "Buffer|TypedArray|DataView"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`min` {number} 设置后，返回的 promise 只有在至少有 `min` 个元素可用时才会被兑现。未设置时，promise 在至少有一个元素可用时兑现。",
+                              "name": "min",
+                              "type": "number",
+                              "desc": "设置后，返回的 promise 只有在至少有 `min` 个元素可用时才会被兑现。未设置时，promise 在至少有一个元素可用时兑现。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "返回：一个以对象兑现的 promise：",
+                          "name": "返回：一个以对象兑现的",
+                          "desc": "promise：",
+                          "options": [
+                            {
+                              "textRaw": "`value` {TypedArray|DataView}",
+                              "name": "value",
+                              "type": "TypedArray|DataView"
+                            },
+                            {
+                              "textRaw": "`done` {boolean}",
+                              "name": "done",
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>从底层 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 请求下一个数据块，并返回一个在数据可用时以数据兑现的 promise。</p>\n<p>不要将池化的 <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a> 对象实例传递给此方法。池化的 <code>Buffer</code> 对象是使用 <code>Buffer.allocUnsafe()</code>、<code>Buffer.from()</code> 创建的，或者通常由各种 <code>node:fs</code> 模块回调返回。这些类型的 <code>Buffer</code> 使用一个共享的底层 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer\" class=\"type\">&lt;ArrayBuffer&gt;</a> 对象，其中包含所有池化 <code>Buffer</code> 实例的所有数据。当 <code>Buffer</code>、<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> 或 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> 被传递给 <code>readableStreamBYOBReader.read()</code> 时，视图的底层 <code>ArrayBuffer</code> 会被 <em>分离</em>，使该 <code>ArrayBuffer</code> 上可能存在的所有现有视图无效。这可能对您的应用程序造成灾难性后果。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamBYOBReader.releaseLock()`",
+                  "type": "method",
+                  "name": "releaseLock",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>释放此读取器对底层 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的锁。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`closed` 类型：{Promise} 当关联的 {ReadableStream} 关闭时以 `undefined` 兑现，或者在流发生错误或读取器的锁在流完成关闭之前被释放时拒绝。",
+                  "type": "Promise",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "当关联的 {ReadableStream} 关闭时以 `undefined` 兑现，或者在流发生错误或读取器的锁在流完成关闭之前被释放时拒绝。"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ReadableStreamBYOBReader`"
+            },
+            {
+              "textRaw": "类：`ReadableStreamDefaultController`",
+              "name": "类：`readablestreamdefaultcontroller`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>每个 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 都有一个控制器，负责流的内部状态和管理流的队列。<code>ReadableStreamDefaultController</code> 是非面向字节的 <code>ReadableStream</code> 的默认控制器实现。</p>",
+              "methods": [
+                {
+                  "textRaw": "`readableStreamDefaultController.close()`",
+                  "type": "method",
+                  "name": "close",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>关闭与此控制器关联的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamDefaultController.enqueue([chunk])`",
+                  "type": "method",
+                  "name": "enqueue",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunk` {any}",
+                          "name": "chunk",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将一个新的数据块追加到 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的队列中。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamDefaultController.error([error])`",
+                  "type": "method",
+                  "name": "error",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`error` {any}",
+                          "name": "error",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>发出一个错误信号，导致 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 出错并关闭。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`desiredSize` 类型：{number}",
+                  "type": "number",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>返回填充 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 队列所需的数据量。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ReadableStreamDefaultController`"
+            },
+            {
+              "textRaw": "类：`ReadableByteStreamController`",
+              "name": "类：`readablebytestreamcontroller`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.10.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/44702",
+                    "description": "Support handling a BYOB pull request from a released reader."
+                  }
+                ]
+              },
+              "desc": "<p>每个 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 都有一个控制器，负责流的内部状态和管理流的队列。<code>ReadableByteStreamController</code> 用于面向字节的 <code>ReadableStream</code>。</p>",
+              "properties": [
+                {
+                  "textRaw": "`byobRequest` 类型：{ReadableStreamBYOBRequest}",
+                  "type": "ReadableStreamBYOBRequest",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>返回填充 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 队列所需的数据量。</p>"
+                },
+                {
+                  "textRaw": "`desiredSize` 类型：{number}",
+                  "type": "number",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>返回填充 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 队列所需的数据量。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`readableByteStreamController.close()`",
+                  "type": "method",
+                  "name": "close",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>关闭与此控制器关联的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>。</p>"
+                },
+                {
+                  "textRaw": "`readableByteStreamController.enqueue(chunk)`",
+                  "type": "method",
+                  "name": "enqueue",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunk` {Buffer|TypedArray|DataView}",
+                          "name": "chunk",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将一个新的数据块追加到 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的队列中。</p>"
+                },
+                {
+                  "textRaw": "`readableByteStreamController.error([error])`",
+                  "type": "method",
+                  "name": "error",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`error` {any}",
+                          "name": "error",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>发出一个错误信号，导致 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 出错并关闭。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ReadableByteStreamController`"
+            },
+            {
+              "textRaw": "类：`ReadableStreamBYOBRequest`",
+              "name": "类：`readablestreambyobrequest`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p>当在面向字节的流中使用 <code>ReadableByteStreamController</code>，以及使用 <code>ReadableStreamBYOBReader</code> 时，<code>readableByteStreamController.byobRequest</code> 属性提供对 <code>ReadableStreamBYOBRequest</code> 实例的访问，该实例表示当前的读取请求。该对象用于访问为读取请求提供的 <code>ArrayBuffer</code>/<code>TypedArray</code> 以填充数据，并提供表示数据已提供的方法。</p>",
+              "methods": [
+                {
+                  "textRaw": "`readableStreamBYOBRequest.respond(bytesWritten)`",
+                  "type": "method",
+                  "name": "respond",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`bytesWritten` {number}",
+                          "name": "bytesWritten",
+                          "type": "number"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>表示已将 <code>bytesWritten</code> 数量的字节写入 <code>readableStreamBYOBRequest.view</code>。</p>"
+                },
+                {
+                  "textRaw": "`readableStreamBYOBRequest.respondWithNewView(view)`",
+                  "type": "method",
+                  "name": "respondWithNewView",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`view` {Buffer|TypedArray|DataView}",
+                          "name": "view",
+                          "type": "Buffer|TypedArray|DataView"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>表示请求已通过写入到新的 <code>Buffer</code>、<code>TypedArray</code> 或 <code>DataView</code> 的字节完成。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`view` 类型：{Buffer|TypedArray|DataView}",
+                  "type": "Buffer|TypedArray|DataView",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ReadableStreamBYOBRequest`"
+            },
+            {
+              "textRaw": "类：`WritableStream`",
+              "name": "类：`writablestream`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>WritableStream</code> 是流数据发送到的目的地。</p>\n<pre><code class=\"language-mjs\">import {\n  WritableStream,\n} from 'node:stream/web';\n\nconst stream = new WritableStream({\n  write(chunk) {\n    console.log(chunk);\n  },\n});\n\nawait stream.getWriter().write('Hello World');\n</code></pre>",
+              "ctors": [
+                {
+                  "textRaw": "`new WritableStream([underlyingSink[, strategy]])`",
+                  "type": "ctor",
+                  "name": "WritableStream",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`underlyingSink` {Object}",
+                          "name": "underlyingSink",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`start` {Function} 当 `WritableStream` 创建时立即调用的用户定义函数。",
+                              "name": "start",
+                              "type": "Function",
+                              "desc": "当 `WritableStream` 创建时立即调用的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`controller` {WritableStreamDefaultController}",
+                                  "name": "controller",
+                                  "type": "WritableStreamDefaultController"
+                                },
+                                {
+                                  "textRaw": "返回：`undefined` 或以 `undefined` 兑现的 promise。",
+                                  "name": "返回：",
+                                  "desc": "undefined` 或以 `undefined` 兑现的 promise。"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`write` {Function} 当数据块被写入 `WritableStream` 时调用的用户定义函数。",
+                              "name": "write",
+                              "type": "Function",
+                              "desc": "当数据块被写入 `WritableStream` 时调用的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`chunk` {any}",
+                                  "name": "chunk",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "`controller` {WritableStreamDefaultController}",
+                                  "name": "controller",
+                                  "type": "WritableStreamDefaultController"
+                                },
+                                {
+                                  "textRaw": "返回：以 `undefined` 兑现的 promise。",
+                                  "name": "返回：以",
+                                  "desc": "`undefined` 兑现的 promise。"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`close` {Function} 当 `WritableStream` 关闭时调用的用户定义函数。",
+                              "name": "close",
+                              "type": "Function",
+                              "desc": "当 `WritableStream` 关闭时调用的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "返回：以 `undefined` 兑现的 promise。",
+                                  "name": "返回：以",
+                                  "desc": "`undefined` 兑现的 promise。"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`abort` {Function} 用于突然关闭 `WritableStream` 的用户定义函数。",
+                              "name": "abort",
+                              "type": "Function",
+                              "desc": "用于突然关闭 `WritableStream` 的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`reason` {any}",
+                                  "name": "reason",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "返回：以 `undefined` 兑现的 promise。",
+                                  "name": "返回：以",
+                                  "desc": "`undefined` 兑现的 promise。"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`type` {any} `type` 选项保留供将来使用，_必须_ 为 undefined。",
+                              "name": "type",
+                              "type": "any",
+                              "desc": "`type` 选项保留供将来使用，_必须_ 为 undefined。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`strategy` {Object}",
+                          "name": "strategy",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`highWaterMark` {number} 在应用背压之前的最大内部队列大小。",
+                              "name": "highWaterMark",
+                              "type": "number",
+                              "desc": "在应用背压之前的最大内部队列大小。"
+                            },
+                            {
+                              "textRaw": "`size` {Function} 用于识别每个数据块大小的用户定义函数。",
+                              "name": "size",
+                              "type": "Function",
+                              "desc": "用于识别每个数据块大小的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`chunk` {any}",
+                                  "name": "chunk",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "返回：{number}",
+                                  "name": "返回：",
+                                  "type": "number"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`writableStream.abort([reason])`",
+                  "type": "method",
+                  "name": "abort",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>突然终止 <code>WritableStream</code>。所有排队的写入将被取消，其关联的 promise 将被拒绝。</p>"
+                },
+                {
+                  "textRaw": "`writableStream.close()`",
+                  "type": "method",
+                  "name": "close",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在不需要额外写入时关闭 <code>WritableStream</code>。</p>"
+                },
+                {
+                  "textRaw": "`writableStream.getWriter()`",
+                  "type": "method",
+                  "name": "getWriter",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：{WritableStreamDefaultWriter}",
+                          "name": "返回：",
+                          "type": "WritableStreamDefaultWriter"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建并返回一个新的写入器实例，可用于将数据写入 <code>WritableStream</code>。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`locked` 类型：{boolean}",
+                  "type": "boolean",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p><code>writableStream.locked</code> 属性默认为 <code>false</code>，当有活跃的写入器附加到此 <code>WritableStream</code> 时，会切换为 <code>true</code>。</p>"
+                }
+              ],
+              "modules": [
+                {
+                  "textRaw": "使用 postMessage() 传输",
+                  "name": "使用_postmessage()_传输",
+                  "desc": "<p><a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 实例可以使用 <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a> 进行传输。</p>\n<pre><code class=\"language-js\">const stream = new WritableStream(getWritableSinkSomehow());\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  data.getWriter().write('hello');\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
+                  "type": "module",
+                  "displayName": "使用 postMessage() 传输"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`WritableStream`"
+            },
+            {
+              "textRaw": "类：`WritableStreamDefaultWriter`",
+              "name": "类：`writablestreamdefaultwriter`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new WritableStreamDefaultWriter(stream)`",
+                  "type": "ctor",
+                  "name": "WritableStreamDefaultWriter",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {WritableStream}",
+                          "name": "stream",
+                          "type": "WritableStream"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个锁定到给定 <code>WritableStream</code> 的新 <code>WritableStreamDefaultWriter</code>。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`writableStreamDefaultWriter.abort([reason])`",
+                  "type": "method",
+                  "name": "abort",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>突然终止 <code>WritableStream</code>。所有排队的写入将被取消，其关联的 promise 将被拒绝。</p>"
+                },
+                {
+                  "textRaw": "`writableStreamDefaultWriter.close()`",
+                  "type": "method",
+                  "name": "close",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>在不需要额外写入时关闭 <code>WritableStream</code>。</p>"
+                },
+                {
+                  "textRaw": "`writableStreamDefaultWriter.releaseLock()`",
+                  "type": "method",
+                  "name": "releaseLock",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>释放此写入器对底层 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 的锁。</p>"
+                },
+                {
+                  "textRaw": "`writableStreamDefaultWriter.write([chunk])`",
+                  "type": "method",
+                  "name": "write",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunk` {any}",
+                          "name": "chunk",
+                          "type": "any"
+                        },
+                        {
+                          "textRaw": "返回：一个以 `undefined` 兑现的 promise。",
+                          "name": "返回：一个以",
+                          "desc": "`undefined` 兑现的 promise。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将一个新的数据块追加到 <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 的队列中。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`closed` 类型：{Promise} 当关联的 {WritableStream} 关闭时以 `undefined` 兑现，或者在流发生错误或写入器的锁在流完成关闭之前被释放时拒绝。",
+                  "type": "Promise",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "当关联的 {WritableStream} 关闭时以 `undefined` 兑现，或者在流发生错误或写入器的锁在流完成关闭之前被释放时拒绝。"
+                },
+                {
+                  "textRaw": "`desiredSize` 类型：{number}",
+                  "type": "number",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>填充 <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 队列所需的数据量。</p>"
+                },
+                {
+                  "textRaw": "`ready` 类型：{Promise} 当写入器准备就绪可供使用时以 `undefined` 兑现。",
+                  "type": "Promise",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "当写入器准备就绪可供使用时以 `undefined` 兑现。"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`WritableStreamDefaultWriter`"
+            },
+            {
+              "textRaw": "类：`WritableStreamDefaultController`",
+              "name": "类：`writablestreamdefaultcontroller`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>WritableStreamDefaultController</code> 管理 <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 的内部状态。</p>",
+              "methods": [
+                {
+                  "textRaw": "`writableStreamDefaultController.error([error])`",
+                  "type": "method",
+                  "name": "error",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`error` {any}",
+                          "name": "error",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>由用户代码调用，以表示在处理 <code>WritableStream</code> 数据时发生错误。调用时，<a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 将被中止，当前挂起的写入将被取消。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`signal` 类型：{AbortSignal} 当 {WritableStream} 被中止时，可用于取消挂起的写入或关闭操作的 `AbortSignal`。",
+                  "type": "AbortSignal",
+                  "name": "类型：",
+                  "desc": "当 {WritableStream} 被中止时，可用于取消挂起的写入或关闭操作的 `AbortSignal`。"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`WritableStreamDefaultController`"
+            },
+            {
+              "textRaw": "类：`TransformStream`",
+              "name": "类：`transformstream`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>TransformStream</code> 由一个 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 和一个 <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a> 组成，它们相互连接，使得写入 <code>WritableStream</code> 的数据在被推入 <code>ReadableStream</code> 的队列之前被接收并可能被转换。</p>\n<pre><code class=\"language-mjs\">import {\n  TransformStream,\n} from 'node:stream/web';\n\nconst transform = new TransformStream({\n  transform(chunk, controller) {\n    controller.enqueue(chunk.toUpperCase());\n  },\n});\n\nawait Promise.all([\n  transform.writable.getWriter().write('A'),\n  transform.readable.getReader().read(),\n]);\n</code></pre>",
+              "ctors": [
+                {
+                  "textRaw": "`new TransformStream([transformer[, writableStrategy[, readableStrategy]]])`",
+                  "type": "ctor",
+                  "name": "TransformStream",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`transformer` {Object}",
+                          "name": "transformer",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`start` {Function} 当 `TransformStream` 创建时立即调用的用户定义函数。",
+                              "name": "start",
+                              "type": "Function",
+                              "desc": "当 `TransformStream` 创建时立即调用的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`controller` {TransformStreamDefaultController}",
+                                  "name": "controller",
+                                  "type": "TransformStreamDefaultController"
+                                },
+                                {
+                                  "textRaw": "返回：`undefined` 或以 `undefined` 兑现的 promise",
+                                  "name": "返回：",
+                                  "desc": "undefined` 或以 `undefined` 兑现的 promise"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`transform` {Function} 用户定义的函数，接收写入 `transformStream.writable` 的数据块，并可能在将其转发到 `transformStream.readable` 之前进行修改。",
+                              "name": "transform",
+                              "type": "Function",
+                              "desc": "用户定义的函数，接收写入 `transformStream.writable` 的数据块，并可能在将其转发到 `transformStream.readable` 之前进行修改。",
+                              "options": [
+                                {
+                                  "textRaw": "`chunk` {any}",
+                                  "name": "chunk",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "`controller` {TransformStreamDefaultController}",
+                                  "name": "controller",
+                                  "type": "TransformStreamDefaultController"
+                                },
+                                {
+                                  "textRaw": "返回：以 `undefined` 兑现的 promise。",
+                                  "name": "返回：以",
+                                  "desc": "`undefined` 兑现的 promise。"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`flush` {Function} 在 `TransformStream` 的可写端关闭之前立即调用的用户定义函数，表示转换过程结束。",
+                              "name": "flush",
+                              "type": "Function",
+                              "desc": "在 `TransformStream` 的可写端关闭之前立即调用的用户定义函数，表示转换过程结束。",
+                              "options": [
+                                {
+                                  "textRaw": "`controller` {TransformStreamDefaultController}",
+                                  "name": "controller",
+                                  "type": "TransformStreamDefaultController"
+                                },
+                                {
+                                  "textRaw": "返回：以 `undefined` 兑现的 promise。",
+                                  "name": "返回：以",
+                                  "desc": "`undefined` 兑现的 promise。"
+                                }
+                              ]
+                            },
+                            {
+                              "textRaw": "`readableType` {any} `readableType` 选项保留供将来使用，_必须_ 为 `undefined`。",
+                              "name": "readableType",
+                              "type": "any",
+                              "desc": "`readableType` 选项保留供将来使用，_必须_ 为 `undefined`。"
+                            },
+                            {
+                              "textRaw": "`writableType` {any} `writableType` 选项保留供将来使用，_必须_ 为 `undefined`。",
+                              "name": "writableType",
+                              "type": "any",
+                              "desc": "`writableType` 选项保留供将来使用，_必须_ 为 `undefined`。"
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`writableStrategy` {Object}",
+                          "name": "writableStrategy",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`highWaterMark` {number} 在应用背压之前的最大内部队列大小。",
+                              "name": "highWaterMark",
+                              "type": "number",
+                              "desc": "在应用背压之前的最大内部队列大小。"
+                            },
+                            {
+                              "textRaw": "`size` {Function} 用于识别每个数据块大小的用户定义函数。",
+                              "name": "size",
+                              "type": "Function",
+                              "desc": "用于识别每个数据块大小的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`chunk` {any}",
+                                  "name": "chunk",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "返回：{number}",
+                                  "name": "返回：",
+                                  "type": "number"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "textRaw": "`readableStrategy` {Object}",
+                          "name": "readableStrategy",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`highWaterMark` {number} 在应用背压之前的最大内部队列大小。",
+                              "name": "highWaterMark",
+                              "type": "number",
+                              "desc": "在应用背压之前的最大内部队列大小。"
+                            },
+                            {
+                              "textRaw": "`size` {Function} 用于识别每个数据块大小的用户定义函数。",
+                              "name": "size",
+                              "type": "Function",
+                              "desc": "用于识别每个数据块大小的用户定义函数。",
+                              "options": [
+                                {
+                                  "textRaw": "`chunk` {any}",
+                                  "name": "chunk",
+                                  "type": "any"
+                                },
+                                {
+                                  "textRaw": "返回：{number}",
+                                  "name": "返回：",
+                                  "type": "number"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`readable` 类型：{ReadableStream}",
+                  "type": "ReadableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`writable` 类型：{WritableStream}",
+                  "type": "WritableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "modules": [
+                {
+                  "textRaw": "使用 postMessage() 传输",
+                  "name": "使用_postmessage()_传输",
+                  "desc": "<p><a href=\"webstreams.html#class-transformstream\" class=\"type\">&lt;TransformStream&gt;</a> 实例可以使用 <a href=\"worker_threads.html#class-messageport\" class=\"type\">&lt;MessagePort&gt;</a> 进行传输。</p>\n<pre><code class=\"language-js\">const stream = new TransformStream();\n\nconst { port1, port2 } = new MessageChannel();\n\nport1.onmessage = ({ data }) => {\n  const { writable, readable } = data;\n  // ...\n};\n\nport2.postMessage(stream, [stream]);\n</code></pre>",
+                  "type": "module",
+                  "displayName": "使用 postMessage() 传输"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`TransformStream`"
+            },
+            {
+              "textRaw": "类：`TransformStreamDefaultController`",
+              "name": "类：`transformstreamdefaultcontroller`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "desc": "<p><code>TransformStreamDefaultController</code> 管理 <code>TransformStream</code> 的内部状态。</p>",
+              "properties": [
+                {
+                  "textRaw": "`desiredSize` 类型：{number}",
+                  "type": "number",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>填充可读端队列所需的数据量。</p>"
+                }
+              ],
+              "methods": [
+                {
+                  "textRaw": "`transformStreamDefaultController.enqueue([chunk])`",
+                  "type": "method",
+                  "name": "enqueue",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`chunk` {any}",
+                          "name": "chunk",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>将数据块追加到可读端的队列中。</p>"
+                },
+                {
+                  "textRaw": "`transformStreamDefaultController.error([reason])`",
+                  "type": "method",
+                  "name": "error",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`reason` {any}",
+                          "name": "reason",
+                          "type": "any"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>向可读端和可写端发出信号，表示在处理转换数据时发生错误，导致两端都被突然关闭。</p>"
+                },
+                {
+                  "textRaw": "`transformStreamDefaultController.terminate()`",
+                  "type": "method",
+                  "name": "terminate",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>关闭传输的可读端，并导致可写端因错误而突然关闭。</p>"
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`TransformStreamDefaultController`"
+            },
+            {
+              "textRaw": "类：`ByteLengthQueuingStrategy`",
+              "name": "类：`bytelengthqueuingstrategy`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new ByteLengthQueuingStrategy(init)`",
+                  "type": "ctor",
+                  "name": "ByteLengthQueuingStrategy",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`init` {Object}",
+                          "name": "init",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`highWaterMark` {number}",
+                              "name": "highWaterMark",
+                              "type": "number"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`highWaterMark` 类型：{number}",
+                  "type": "number",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`size` 类型：{Function}",
+                  "type": "Function",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "options": [
+                    {
+                      "textRaw": "`chunk` {any}",
+                      "name": "chunk",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "返回：{number}",
+                      "name": "返回：",
+                      "type": "number"
+                    }
+                  ]
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`ByteLengthQueuingStrategy`"
+            },
+            {
+              "textRaw": "类：`CountQueuingStrategy`",
+              "name": "类：`countqueuingstrategy`",
+              "meta": {
+                "added": [
+                  "v16.5.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new CountQueuingStrategy(init)`",
+                  "type": "ctor",
+                  "name": "CountQueuingStrategy",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`init` {Object}",
+                          "name": "init",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`highWaterMark` {number}",
+                              "name": "highWaterMark",
+                              "type": "number"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`highWaterMark` 类型：{number}",
+                  "type": "number",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`size` 类型：{Function}",
+                  "type": "Function",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.5.0"
+                    ],
+                    "changes": []
+                  },
+                  "options": [
+                    {
+                      "textRaw": "`chunk` {any}",
+                      "name": "chunk",
+                      "type": "any"
+                    },
+                    {
+                      "textRaw": "返回：{number}",
+                      "name": "返回：",
+                      "type": "number"
+                    }
+                  ]
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`CountQueuingStrategy`"
+            },
+            {
+              "textRaw": "类：`TextEncoderStream`",
+              "name": "类：`textencoderstream`",
+              "meta": {
+                "added": [
+                  "v16.6.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new TextEncoderStream()`",
+                  "type": "ctor",
+                  "name": "TextEncoderStream",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": []
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>TextEncoderStream</code> 实例。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`encoding` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p><code>TextEncoderStream</code> 实例支持的编码。</p>"
+                },
+                {
+                  "textRaw": "`readable` 类型：{ReadableStream}",
+                  "type": "ReadableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`writable` 类型：{WritableStream}",
+                  "type": "WritableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`TextEncoderStream`"
+            },
+            {
+              "textRaw": "类：`TextDecoderStream`",
+              "name": "类：`textdecoderstream`",
+              "meta": {
+                "added": [
+                  "v16.6.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new TextDecoderStream([encoding[, options]])`",
+                  "type": "ctor",
+                  "name": "TextDecoderStream",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`encoding` {string} 标识此 `TextDecoder` 实例支持的 `encoding`。**默认：** `'utf-8'`。",
+                          "name": "encoding",
+                          "type": "string",
+                          "desc": "标识此 `TextDecoder` 实例支持的 `encoding`。**默认：** `'utf-8'`。"
+                        },
+                        {
+                          "textRaw": "`options` {Object}",
+                          "name": "options",
+                          "type": "Object",
+                          "options": [
+                            {
+                              "textRaw": "`fatal` {boolean} 如果解码失败是致命的，则为 `true`。",
+                              "name": "fatal",
+                              "type": "boolean",
+                              "desc": "如果解码失败是致命的，则为 `true`。"
+                            },
+                            {
+                              "textRaw": "`ignoreBOM` {boolean} 当为 `true` 时，`TextDecoderStream` 将在解码结果中包含字节顺序标记。当为 `false` 时，字节顺序标记将从输出中移除。此选项仅在 `encoding` 为 `'utf-8'`、`'utf-16be'` 或 `'utf-16le'` 时使用。**默认：** `false`。",
+                              "name": "ignoreBOM",
+                              "type": "boolean",
+                              "desc": "当为 `true` 时，`TextDecoderStream` 将在解码结果中包含字节顺序标记。当为 `false` 时，字节顺序标记将从输出中移除。此选项仅在 `encoding` 为 `'utf-8'`、`'utf-16be'` 或 `'utf-16le'` 时使用。**默认：** `false`。"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<p>创建一个新的 <code>TextDecoderStream</code> 实例。</p>"
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`encoding` 类型：{string}",
+                  "type": "string",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p><code>TextDecoderStream</code> 实例支持的编码。</p>"
+                },
+                {
+                  "textRaw": "`fatal` 类型：{boolean}",
+                  "type": "boolean",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>如果解码错误导致抛出 <code>TypeError</code>，则该值将为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`ignoreBOM` 类型：{boolean}",
+                  "type": "boolean",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  },
+                  "desc": "<p>如果解码结果将包含字节顺序标记，则该值将为 <code>true</code>。</p>"
+                },
+                {
+                  "textRaw": "`readable` 类型：{ReadableStream}",
+                  "type": "ReadableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`writable` 类型：{WritableStream}",
+                  "type": "WritableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v16.6.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`TextDecoderStream`"
+            },
+            {
+              "textRaw": "类：`CompressionStream`",
+              "name": "类：`compressionstream`",
+              "meta": {
+                "added": [
+                  "v17.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new CompressionStream(format)`",
+                  "type": "ctor",
+                  "name": "CompressionStream",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v24.7.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/59464",
+                        "description": "format now accepts `brotli` value."
+                      },
+                      {
+                        "version": [
+                          "v21.2.0",
+                          "v20.12.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/50097",
+                        "description": "format now accepts `deflate-raw` value."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`format` {string} 可以是 `'deflate'`、`'deflate-raw'`、`'gzip'` 或 `'brotli'` 之一。",
+                          "name": "format",
+                          "type": "string",
+                          "desc": "可以是 `'deflate'`、`'deflate-raw'`、`'gzip'` 或 `'brotli'` 之一。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`readable` 类型：{ReadableStream}",
+                  "type": "ReadableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`writable` 类型：{WritableStream}",
+                  "type": "WritableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`CompressionStream`"
+            },
+            {
+              "textRaw": "类：`DecompressionStream`",
+              "name": "类：`decompressionstream`",
+              "meta": {
+                "added": [
+                  "v17.0.0"
+                ],
+                "changes": [
+                  {
+                    "version": "v18.0.0",
+                    "pr-url": "https://github.com/nodejs/node/pull/42225",
+                    "description": "This class is now exposed on the global object."
+                  }
+                ]
+              },
+              "ctors": [
+                {
+                  "textRaw": "`new DecompressionStream(format)`",
+                  "type": "ctor",
+                  "name": "DecompressionStream",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": [
+                      {
+                        "version": "v24.7.0",
+                        "pr-url": "https://github.com/nodejs/node/pull/59464",
+                        "description": "format now accepts `brotli` value."
+                      },
+                      {
+                        "version": [
+                          "v21.2.0",
+                          "v20.12.0"
+                        ],
+                        "pr-url": "https://github.com/nodejs/node/pull/50097",
+                        "description": "format now accepts `deflate-raw` value."
+                      }
+                    ]
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`format` {string} 可以是 `'deflate'`、`'deflate-raw'`、`'gzip'` 或 `'brotli'` 之一。",
+                          "name": "format",
+                          "type": "string",
+                          "desc": "可以是 `'deflate'`、`'deflate-raw'`、`'gzip'` 或 `'brotli'` 之一。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "properties": [
+                {
+                  "textRaw": "`readable` 类型：{ReadableStream}",
+                  "type": "ReadableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  }
+                },
+                {
+                  "textRaw": "`writable` 类型：{WritableStream}",
+                  "type": "WritableStream",
+                  "name": "类型：",
+                  "meta": {
+                    "added": [
+                      "v17.0.0"
+                    ],
+                    "changes": []
+                  }
+                }
+              ],
+              "type": "module",
+              "displayName": "类：`DecompressionStream`"
+            },
+            {
+              "textRaw": "实用消费者函数",
+              "name": "实用消费者函数",
+              "meta": {
+                "added": [
+                  "v16.7.0"
+                ],
+                "changes": []
+              },
+              "desc": "<p>实用消费者函数提供了消费流的常见选项。</p>\n<p>通过以下方式访问它们：</p>\n<pre><code class=\"language-mjs\">import {\n  arrayBuffer,\n  blob,\n  buffer,\n  json,\n  text,\n} from 'node:stream/consumers';\n</code></pre>\n<pre><code class=\"language-cjs\">const {\n  arrayBuffer,\n  blob,\n  buffer,\n  json,\n  text,\n} = require('node:stream/consumers');\n</code></pre>",
+              "methods": [
+                {
+                  "textRaw": "`streamConsumers.arrayBuffer(stream)`",
+                  "type": "method",
+                  "name": "arrayBuffer",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream|stream.Readable|AsyncIterator}",
+                          "name": "stream",
+                          "type": "ReadableStream|stream.Readable|AsyncIterator"
+                        },
+                        {
+                          "textRaw": "返回：{Promise} 以包含流完整内容的 `ArrayBuffer` 兑现。",
+                          "name": "返回：",
+                          "type": "Promise",
+                          "desc": "以包含流完整内容的 `ArrayBuffer` 兑现。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { arrayBuffer } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\nimport { TextEncoder } from 'node:util';\n\nconst encoder = new TextEncoder();\nconst dataArray = encoder.encode('hello world from consumers!');\n\nconst readable = Readable.from(dataArray);\nconst data = await arrayBuffer(readable);\nconsole.log(`from readable: ${data.byteLength}`);\n// 打印：from readable: 76\n</code></pre>\n<pre><code class=\"language-cjs\">const { arrayBuffer } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\nconst { TextEncoder } = require('node:util');\n\nconst encoder = new TextEncoder();\nconst dataArray = encoder.encode('hello world from consumers!');\nconst readable = Readable.from(dataArray);\narrayBuffer(readable).then((data) => {\n  console.log(`from readable: ${data.byteLength}`);\n  // 打印：from readable: 76\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`streamConsumers.blob(stream)`",
+                  "type": "method",
+                  "name": "blob",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream|stream.Readable|AsyncIterator}",
+                          "name": "stream",
+                          "type": "ReadableStream|stream.Readable|AsyncIterator"
+                        },
+                        {
+                          "textRaw": "返回：{Promise} 以包含流完整内容的 {Blob} 兑现。",
+                          "name": "返回：",
+                          "type": "Promise",
+                          "desc": "以包含流完整内容的 {Blob} 兑现。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { blob } from 'node:stream/consumers';\n\nconst dataBlob = new Blob(['hello world from consumers!']);\n\nconst readable = dataBlob.stream();\nconst data = await blob(readable);\nconsole.log(`from readable: ${data.size}`);\n// 打印：from readable: 27\n</code></pre>\n<pre><code class=\"language-cjs\">const { blob } = require('node:stream/consumers');\n\nconst dataBlob = new Blob(['hello world from consumers!']);\n\nconst readable = dataBlob.stream();\nblob(readable).then((data) => {\n  console.log(`from readable: ${data.size}`);\n  // 打印：from readable: 27\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`streamConsumers.buffer(stream)`",
+                  "type": "method",
+                  "name": "buffer",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream|stream.Readable|AsyncIterator}",
+                          "name": "stream",
+                          "type": "ReadableStream|stream.Readable|AsyncIterator"
+                        },
+                        {
+                          "textRaw": "返回：{Promise} 以包含流完整内容的 {Buffer} 兑现。",
+                          "name": "返回：",
+                          "type": "Promise",
+                          "desc": "以包含流完整内容的 {Buffer} 兑现。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { buffer } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\nimport { Buffer } from 'node:buffer';\n\nconst dataBuffer = Buffer.from('hello world from consumers!');\n\nconst readable = Readable.from(dataBuffer);\nconst data = await buffer(readable);\nconsole.log(`from readable: ${data.length}`);\n// 打印：from readable: 27\n</code></pre>\n<pre><code class=\"language-cjs\">const { buffer } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\nconst { Buffer } = require('node:buffer');\n\nconst dataBuffer = Buffer.from('hello world from consumers!');\n\nconst readable = Readable.from(dataBuffer);\nbuffer(readable).then((data) => {\n  console.log(`from readable: ${data.length}`);\n  // 打印：from readable: 27\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`streamConsumers.json(stream)`",
+                  "type": "method",
+                  "name": "json",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream|stream.Readable|AsyncIterator}",
+                          "name": "stream",
+                          "type": "ReadableStream|stream.Readable|AsyncIterator"
+                        },
+                        {
+                          "textRaw": "返回：{Promise} 以流内容解析为 UTF-8 编码字符串后传递给 `JSON.parse()` 的结果兑现。",
+                          "name": "返回：",
+                          "type": "Promise",
+                          "desc": "以流内容解析为 UTF-8 编码字符串后传递给 `JSON.parse()` 的结果兑现。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { json } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\n\nconst items = Array.from(\n  {\n    length: 100,\n  },\n  () => ({\n    message: 'hello world from consumers!',\n  }),\n);\n\nconst readable = Readable.from(JSON.stringify(items));\nconst data = await json(readable);\nconsole.log(`from readable: ${data.length}`);\n// 打印：from readable: 100\n</code></pre>\n<pre><code class=\"language-cjs\">const { json } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\n\nconst items = Array.from(\n  {\n    length: 100,\n  },\n  () => ({\n    message: 'hello world from consumers!',\n  }),\n);\n\nconst readable = Readable.from(JSON.stringify(items));\njson(readable).then((data) => {\n  console.log(`from readable: ${data.length}`);\n  // 打印：from readable: 100\n});\n</code></pre>"
+                },
+                {
+                  "textRaw": "`streamConsumers.text(stream)`",
+                  "type": "method",
+                  "name": "text",
+                  "meta": {
+                    "added": [
+                      "v16.7.0"
+                    ],
+                    "changes": []
+                  },
+                  "signatures": [
+                    {
+                      "params": [
+                        {
+                          "textRaw": "`stream` {ReadableStream|stream.Readable|AsyncIterator}",
+                          "name": "stream",
+                          "type": "ReadableStream|stream.Readable|AsyncIterator"
+                        },
+                        {
+                          "textRaw": "返回：{Promise} 以流内容解析为 UTF-8 编码字符串的结果兑现。",
+                          "name": "返回：",
+                          "type": "Promise",
+                          "desc": "以流内容解析为 UTF-8 编码字符串的结果兑现。"
+                        }
+                      ]
+                    }
+                  ],
+                  "desc": "<pre><code class=\"language-mjs\">import { text } from 'node:stream/consumers';\nimport { Readable } from 'node:stream';\n\nconst readable = Readable.from('Hello world from consumers!');\nconst data = await text(readable);\nconsole.log(`from readable: ${data.length}`);\n// 打印：from readable: 27\n</code></pre>\n<pre><code class=\"language-cjs\">const { text } = require('node:stream/consumers');\nconst { Readable } = require('node:stream');\n\nconst readable = Readable.from('Hello world from consumers!');\ntext(readable).then((data) => {\n  console.log(`from readable: ${data.length}`);\n  // 打印：from readable: 27\n});\n</code></pre>"
+                }
+              ],
+              "type": "module",
+              "displayName": "实用消费者函数"
+            }
+          ],
+          "methods": [
+            {
+              "textRaw": "`ReadableStream.from(iterable)`",
+              "type": "method",
+              "name": "from",
+              "meta": {
+                "added": [
+                  "v20.6.0"
+                ],
+                "changes": []
+              },
+              "signatures": [
+                {
+                  "params": [
+                    {
+                      "textRaw": "`iterable` {Iterable} 实现了 `Symbol.asyncIterator` 或 `Symbol.iterator` 可迭代协议的对象。",
+                      "name": "iterable",
+                      "type": "Iterable",
+                      "desc": "实现了 `Symbol.asyncIterator` 或 `Symbol.iterator` 可迭代协议的对象。"
+                    }
+                  ]
+                }
+              ],
+              "desc": "<p>一个工具方法，从可迭代对象创建新的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a>。</p>\n<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\n\nasync function* asyncIterableGenerator() {\n  yield 'a';\n  yield 'b';\n  yield 'c';\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\nfor await (const chunk of stream)\n  console.log(chunk); // 打印：'a', 'b', 'c'\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\n\nasync function* asyncIterableGenerator() {\n  yield 'a';\n  yield 'b';\n  yield 'c';\n}\n\n(async () => {\n  const stream = ReadableStream.from(asyncIterableGenerator());\n\n  for await (const chunk of stream)\n    console.log(chunk); // 打印：'a', 'b', 'c'\n})();\n</code></pre>\n<p>要将生成的 <a href=\"webstreams.html#class-readablestream\" class=\"type\">&lt;ReadableStream&gt;</a> 管道传输到 <a href=\"webstreams.html#class-writablestream\" class=\"type\">&lt;WritableStream&gt;</a>，<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols#The_iterable_protocol\" class=\"type\">&lt;Iterable&gt;</a> 应该产生 <a href=\"buffer.html#class-buffer\" class=\"type\">&lt;Buffer&gt;</a>、<a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray\" class=\"type\">&lt;TypedArray&gt;</a> 或 <a href=\"https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView\" class=\"type\">&lt;DataView&gt;</a> 对象的序列。</p>\n<pre><code class=\"language-mjs\">import { ReadableStream } from 'node:stream/web';\nimport { Buffer } from 'node:buffer';\n\nasync function* asyncIterableGenerator() {\n  yield Buffer.from('a');\n  yield Buffer.from('b');\n  yield Buffer.from('c');\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\nawait stream.pipeTo(createWritableStreamSomehow());\n</code></pre>\n<pre><code class=\"language-cjs\">const { ReadableStream } = require('node:stream/web');\nconst { Buffer } = require('node:buffer');\n\nasync function* asyncIterableGenerator() {\n  yield Buffer.from('a');\n  yield Buffer.from('b');\n  yield Buffer.from('c');\n}\n\nconst stream = ReadableStream.from(asyncIterableGenerator());\n\n(async () => {\n  await stream.pipeTo(createWritableStreamSomehow());\n})();\n</code></pre>"
+            }
+          ],
+          "type": "module",
+          "displayName": "API"
+        }
+      ],
+      "type": "module",
+      "displayName": "Web Streams API"
+    }
+  ]
+}

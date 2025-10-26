@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="nodejs.org:node-version" content="v24.10.1">
+  <title>Cluster 集群 | Node.js v24.10.1 Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic&display=fallback">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/hljs.css">
+  <link rel="canonical" href="https://nodejs.org/api/cluster.html">
+  <script async defer src="assets/api.js" type="text/javascript"></script>
+  <script>
+      const storedTheme = localStorage.getItem('theme');
+
+      // Follow operating system theme preference
+      if (storedTheme === null && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.matches) {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } else if (storedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+  </script>
+  <style>@media(max-width:542px){.with-40-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}@media(max-width:582px){.with-45-chars>.js-flavor-toggle{float:none;margin:0 0 1em auto;}}</style>
+</head>
+<body class="alt apidoc" id="api-section-cluster">
+  <a href="#apicontent" class="skip-to-content">Skip to content</a>
+  <div id="content" class="clearfix">
+    <div role="navigation" id="column2" class="interior">
+      <div id="intro" class="interior">
+        <a href="/" title="Go back to the home page">
+          Node.js
+        </a>
+      </div>
+      <ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster active">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul>
+    </div>
+
+    <div id="column1" data-id="cluster" class="interior">
+      <header class="header">
+        <div class="header-container">
+          <h1>Node.js v24.10.1 documentation</h1>
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle dark mode/light mode" aria-label="Toggle dark mode/light mode" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon dark-icon" height="24" width="24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path d="M11.1 12.08c-2.33-4.51-.5-8.48.53-10.07C6.27 2.2 1.98 6.59 1.98 12c0 .14.02.28.02.42.62-.27 1.29-.42 2-.42 1.66 0 3.18.83 4.1 2.15A4.01 4.01 0 0111 18c0 1.52-.87 2.83-2.12 3.51.98.32 2.03.5 3.11.5 3.5 0 6.58-1.8 8.37-4.52-2.36.23-6.98-.97-9.26-5.41z"/>
+              <path d="M7 16h-.18C6.4 14.84 5.3 14 4 14c-1.66 0-3 1.34-3 3s1.34 3 3 3h3c1.1 0 2-.9 2-2s-.9-2-2-2z"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon light-icon" height="24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="gtoc">
+          <ul>
+            <li class="pinned-header">Node.js v24.10.1</li>
+            
+    <li class="picker-header">
+      <a href="#toc-picker" aria-controls="toc-picker">
+        <span class="picker-arrow"></span>
+        Table of contents
+      </a>
+
+      <div class="picker" tabindex="-1"><div class="toc"><ul id="toc-picker">
+<li><span class="stability_2"><a href="#cluster-">Cluster 集群</a></span>
+<ul>
+<li><a href="#">工作原理</a></li>
+<li><a href="#worker">类：<code>Worker</code></a>
+<ul>
+<li><a href="#disconnect">事件：<code>'disconnect'</code></a></li>
+<li><a href="#error">事件：<code>'error'</code></a></li>
+<li><a href="#exit">事件：<code>'exit'</code></a></li>
+<li><a href="#listening">事件：<code>'listening'</code></a></li>
+<li><a href="#message">事件：<code>'message'</code></a></li>
+<li><a href="#online">事件：<code>'online'</code></a></li>
+<li><a href="#workerdisconnect"><code>worker.disconnect()</code></a></li>
+<li><a href="#workerexitedafterdisconnect"><code>worker.exitedAfterDisconnect</code></a></li>
+<li><a href="#workerid"><code>worker.id</code></a></li>
+<li><a href="#workerisconnected"><code>worker.isConnected()</code></a></li>
+<li><a href="#workerisdead"><code>worker.isDead()</code></a></li>
+<li><a href="#workerkillsignal"><code>worker.kill([signal])</code></a></li>
+<li><a href="#workerprocess"><code>worker.process</code></a></li>
+<li><a href="#workersendmessage-sendhandle-options-callback"><code>worker.send(message[, sendHandle[, options]][, callback])</code></a></li>
+</ul>
+</li>
+<li><a href="#disconnect_1">事件：<code>'disconnect'</code></a></li>
+<li><a href="#exit_1">事件：<code>'exit'</code></a></li>
+<li><a href="#fork">事件：<code>'fork'</code></a></li>
+<li><a href="#listening_1">事件：<code>'listening'</code></a></li>
+<li><a href="#message_1">事件：<code>'message'</code></a></li>
+<li><a href="#online_1">事件：<code>'online'</code></a></li>
+<li><a href="#setup">事件：<code>'setup'</code></a></li>
+<li><a href="#clusterdisconnectcallback"><code>cluster.disconnect([callback])</code></a></li>
+<li><a href="#clusterforkenv"><code>cluster.fork([env])</code></a></li>
+<li><span class="stability_0"><a href="#clusterismaster"><code>cluster.isMaster</code></a></span></li>
+<li><a href="#clusterisprimary"><code>cluster.isPrimary</code></a></li>
+<li><a href="#clusterisworker"><code>cluster.isWorker</code></a></li>
+<li><a href="#clusterschedulingpolicy"><code>cluster.schedulingPolicy</code></a></li>
+<li><a href="#clustersettings"><code>cluster.settings</code></a></li>
+<li><span class="stability_0"><a href="#clustersetupmastersettings"><code>cluster.setupMaster([settings])</code></a></span></li>
+<li><a href="#clustersetupprimarysettings"><code>cluster.setupPrimary([settings])</code></a></li>
+<li><a href="#clusterworker"><code>cluster.worker</code></a></li>
+<li><a href="#clusterworkers"><code>cluster.workers</code></a></li>
+</ul>
+</li>
+</ul></div></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#gtoc-picker" aria-controls="gtoc-picker">
+        <span class="picker-arrow"></span>
+        Index
+      </a>
+
+      <div class="picker" tabindex="-1" id="gtoc-picker"><ul>
+<li><a href="documentation.html" class="nav-documentation">关于本文档</a></li>
+<li><a href="synopsis.html" class="nav-synopsis">使用方法及示例</a></li>
+
+      <li>
+        <a href="index.html">Index</a>
+      </li>
+    </ul>
+  
+<hr class="line">
+<ul>
+<li><a href="assert.html" class="nav-assert">Assertion testing</a></li>
+<li><a href="async_context.html" class="nav-async_context">Asynchronous context tracking</a></li>
+<li><a href="async_hooks.html" class="nav-async_hooks">Async hooks</a></li>
+<li><a href="buffer.html" class="nav-buffer">Buffer</a></li>
+<li><a href="addons.html" class="nav-addons">C++ addons</a></li>
+<li><a href="n-api.html" class="nav-n-api">C/C++ addons with Node-API</a></li>
+<li><a href="embedding.html" class="nav-embedding">C++ embedder API</a></li>
+<li><a href="child_process.html" class="nav-child_process">Child processes</a></li>
+<li><a href="cluster.html" class="nav-cluster active">Cluster</a></li>
+<li><a href="cli.html" class="nav-cli">Command-line options</a></li>
+<li><a href="console.html" class="nav-console">Console</a></li>
+<li><a href="crypto.html" class="nav-crypto">Crypto</a></li>
+<li><a href="debugger.html" class="nav-debugger">Debugger</a></li>
+<li><a href="deprecations.html" class="nav-deprecations">Deprecated APIs</a></li>
+<li><a href="diagnostics_channel.html" class="nav-diagnostics_channel">Diagnostics Channel</a></li>
+<li><a href="dns.html" class="nav-dns">DNS</a></li>
+<li><a href="domain.html" class="nav-domain">Domain</a></li>
+<li><a href="environment_variables.html" class="nav-environment_variables">Environment Variables</a></li>
+<li><a href="errors.html" class="nav-errors">Errors</a></li>
+<li><a href="events.html" class="nav-events">Events</a></li>
+<li><a href="fs.html" class="nav-fs">File system</a></li>
+<li><a href="globals.html" class="nav-globals">Globals</a></li>
+<li><a href="http.html" class="nav-http">HTTP</a></li>
+<li><a href="http2.html" class="nav-http2">HTTP/2</a></li>
+<li><a href="https.html" class="nav-https">HTTPS</a></li>
+<li><a href="inspector.html" class="nav-inspector">Inspector</a></li>
+<li><a href="intl.html" class="nav-intl">Internationalization</a></li>
+<li><a href="modules.html" class="nav-modules">Modules: CommonJS modules</a></li>
+<li><a href="esm.html" class="nav-esm">Modules: ECMAScript modules</a></li>
+<li><a href="module.html" class="nav-module">Modules: <code>node:module</code> API</a></li>
+<li><a href="packages.html" class="nav-packages">Modules: Packages</a></li>
+<li><a href="typescript.html" class="nav-typescript">Modules: TypeScript</a></li>
+<li><a href="net.html" class="nav-net">Net</a></li>
+<li><a href="os.html" class="nav-os">OS</a></li>
+<li><a href="path.html" class="nav-path">Path</a></li>
+<li><a href="perf_hooks.html" class="nav-perf_hooks">Performance hooks</a></li>
+<li><a href="permissions.html" class="nav-permissions">Permissions</a></li>
+<li><a href="process.html" class="nav-process">Process</a></li>
+<li><a href="punycode.html" class="nav-punycode">Punycode</a></li>
+<li><a href="querystring.html" class="nav-querystring">Query strings</a></li>
+<li><a href="readline.html" class="nav-readline">Readline</a></li>
+<li><a href="repl.html" class="nav-repl">REPL</a></li>
+<li><a href="report.html" class="nav-report">Report</a></li>
+<li><a href="single-executable-applications.html" class="nav-single-executable-applications">Single executable applications</a></li>
+<li><a href="sqlite.html" class="nav-sqlite">SQLite</a></li>
+<li><a href="stream.html" class="nav-stream">Stream</a></li>
+<li><a href="string_decoder.html" class="nav-string_decoder">String decoder</a></li>
+<li><a href="test.html" class="nav-test">Test runner</a></li>
+<li><a href="timers.html" class="nav-timers">Timers</a></li>
+<li><a href="tls.html" class="nav-tls">TLS/SSL</a></li>
+<li><a href="tracing.html" class="nav-tracing">Trace events</a></li>
+<li><a href="tty.html" class="nav-tty">TTY</a></li>
+<li><a href="dgram.html" class="nav-dgram">UDP/datagram</a></li>
+<li><a href="url.html" class="nav-url">URL</a></li>
+<li><a href="util.html" class="nav-util">Utilities</a></li>
+<li><a href="v8.html" class="nav-v8">V8</a></li>
+<li><a href="vm.html" class="nav-vm">VM</a></li>
+<li><a href="wasi.html" class="nav-wasi">WASI</a></li>
+<li><a href="webcrypto.html" class="nav-webcrypto">Web Crypto API</a></li>
+<li><a href="webstreams.html" class="nav-webstreams">Web Streams API</a></li>
+<li><a href="worker_threads.html" class="nav-worker_threads">Worker threads</a></li>
+<li><a href="zlib.html" class="nav-zlib">Zlib</a></li>
+</ul>
+<hr class="line">
+<ul>
+<li><a href="https://github.com/nodejs/node" class="nav-https-github-com-nodejs-node">Code repository and issue tracker</a></li>
+</ul></div>
+    </li>
+  
+            
+    <li class="picker-header">
+      <a href="#alt-docs" aria-controls="alt-docs">
+        <span class="picker-arrow"></span>
+        Other versions
+      </a>
+      <div class="picker" tabindex="-1"><ol id="alt-docs"><li><a href="https://nodejs.org/docs/latest-v25.x/api/cluster.html">25.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v24.x/api/cluster.html">24.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v23.x/api/cluster.html">23.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v22.x/api/cluster.html">22.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v21.x/api/cluster.html">21.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v20.x/api/cluster.html">20.x <b>LTS</b></a></li>
+<li><a href="https://nodejs.org/docs/latest-v19.x/api/cluster.html">19.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v18.x/api/cluster.html">18.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v17.x/api/cluster.html">17.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v16.x/api/cluster.html">16.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v15.x/api/cluster.html">15.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v14.x/api/cluster.html">14.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v13.x/api/cluster.html">13.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v12.x/api/cluster.html">12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v11.x/api/cluster.html">11.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v10.x/api/cluster.html">10.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v9.x/api/cluster.html">9.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v8.x/api/cluster.html">8.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v7.x/api/cluster.html">7.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v6.x/api/cluster.html">6.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v5.x/api/cluster.html">5.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v4.x/api/cluster.html">4.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.12.x/api/cluster.html">0.12.x</a></li>
+<li><a href="https://nodejs.org/docs/latest-v0.10.x/api/cluster.html">0.10.x</a></li></ol></div>
+    </li>
+  
+            <li class="picker-header">
+              <a href="#options-picker" aria-controls="options-picker">
+                <span class="picker-arrow"></span>
+                Options
+              </a>
+        
+              <div class="picker" tabindex="-1">
+                <ul id="options-picker">
+                  <li>
+                    <a href="all.html">View on single page</a>
+                  </li>
+                  <li>
+                    <a href="cluster.json">View as JSON</a>
+                  </li>
+                  <li class="edit_on_github"><a href="https://github.com/nodejs/node/edit/main/doc/api/cluster.md">Edit on GitHub</a></li>    
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <hr>
+      </header>
+
+      <details role="navigation" id="toc" open><summary>Table of contents</summary><ul>
+<li><span class="stability_2"><a href="#cluster-">Cluster 集群</a></span>
+<ul>
+<li><a href="#">工作原理</a></li>
+<li><a href="#worker">类：<code>Worker</code></a>
+<ul>
+<li><a href="#disconnect">事件：<code>'disconnect'</code></a></li>
+<li><a href="#error">事件：<code>'error'</code></a></li>
+<li><a href="#exit">事件：<code>'exit'</code></a></li>
+<li><a href="#listening">事件：<code>'listening'</code></a></li>
+<li><a href="#message">事件：<code>'message'</code></a></li>
+<li><a href="#online">事件：<code>'online'</code></a></li>
+<li><a href="#workerdisconnect"><code>worker.disconnect()</code></a></li>
+<li><a href="#workerexitedafterdisconnect"><code>worker.exitedAfterDisconnect</code></a></li>
+<li><a href="#workerid"><code>worker.id</code></a></li>
+<li><a href="#workerisconnected"><code>worker.isConnected()</code></a></li>
+<li><a href="#workerisdead"><code>worker.isDead()</code></a></li>
+<li><a href="#workerkillsignal"><code>worker.kill([signal])</code></a></li>
+<li><a href="#workerprocess"><code>worker.process</code></a></li>
+<li><a href="#workersendmessage-sendhandle-options-callback"><code>worker.send(message[, sendHandle[, options]][, callback])</code></a></li>
+</ul>
+</li>
+<li><a href="#disconnect_1">事件：<code>'disconnect'</code></a></li>
+<li><a href="#exit_1">事件：<code>'exit'</code></a></li>
+<li><a href="#fork">事件：<code>'fork'</code></a></li>
+<li><a href="#listening_1">事件：<code>'listening'</code></a></li>
+<li><a href="#message_1">事件：<code>'message'</code></a></li>
+<li><a href="#online_1">事件：<code>'online'</code></a></li>
+<li><a href="#setup">事件：<code>'setup'</code></a></li>
+<li><a href="#clusterdisconnectcallback"><code>cluster.disconnect([callback])</code></a></li>
+<li><a href="#clusterforkenv"><code>cluster.fork([env])</code></a></li>
+<li><span class="stability_0"><a href="#clusterismaster"><code>cluster.isMaster</code></a></span></li>
+<li><a href="#clusterisprimary"><code>cluster.isPrimary</code></a></li>
+<li><a href="#clusterisworker"><code>cluster.isWorker</code></a></li>
+<li><a href="#clusterschedulingpolicy"><code>cluster.schedulingPolicy</code></a></li>
+<li><a href="#clustersettings"><code>cluster.settings</code></a></li>
+<li><span class="stability_0"><a href="#clustersetupmastersettings"><code>cluster.setupMaster([settings])</code></a></span></li>
+<li><a href="#clustersetupprimarysettings"><code>cluster.setupPrimary([settings])</code></a></li>
+<li><a href="#clusterworker"><code>cluster.worker</code></a></li>
+<li><a href="#clusterworkers"><code>cluster.workers</code></a></li>
+</ul>
+</li>
+</ul></details>
+
+      <div role="main" id="apicontent">
+        <h2>Cluster 集群<span><a class="mark" href="#cluster-" id="cluster-">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster"></a></h2>
+
+<p></p><div class="api_stability api_stability_2"><a href="documentation.html#stability-index">Stability: 2</a> - Stable</div><p></p>
+<p><strong>Source Code:</strong> <a href="https://github.com/nodejs/node/blob/v24.10.1/lib/cluster.js">lib/cluster.js</a></p>
+<p>Node.js 的进程集群可用于运行多个 Node.js 实例，这些实例可以分配工作负载 among their application threads。当不需要进程隔离时，改用 <a href="worker_threads.html"><code>worker_threads</code></a> 模块，它允许在单个 Node.js 实例中运行多个应用程序线程。</p>
+<p>cluster 模块允·许轻松创建共享服务器端口的子进程。</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+<span class="hljs-keyword">import</span> http <span class="hljs-keyword">from</span> <span class="hljs-string">'node:http'</span>;
+<span class="hljs-keyword">import</span> { availableParallelism } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:os'</span>;
+<span class="hljs-keyword">import</span> process <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-keyword">const</span> numCPUs = <span class="hljs-title function_">availableParallelism</span>();
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Primary <span class="hljs-subst">${process.pid}</span> is running`</span>);
+
+  <span class="hljs-comment">// Fork workers.</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &#x3C; numCPUs; i++) {
+    cluster.<span class="hljs-title function_">fork</span>();
+  }
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`worker <span class="hljs-subst">${worker.process.pid}</span> died`</span>);
+  });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// Workers can share any TCP connection</span>
+  <span class="hljs-comment">// In this case it is an HTTP server</span>
+  http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+    res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>);
+    res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'hello world\n'</span>);
+  }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Worker <span class="hljs-subst">${process.pid}</span> started`</span>);
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+<span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+<span class="hljs-keyword">const</span> numCPUs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:os'</span>).<span class="hljs-title function_">availableParallelism</span>();
+<span class="hljs-keyword">const</span> process = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:process'</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Primary <span class="hljs-subst">${process.pid}</span> is running`</span>);
+
+  <span class="hljs-comment">// Fork workers.</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &#x3C; numCPUs; i++) {
+    cluster.<span class="hljs-title function_">fork</span>();
+  }
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`worker <span class="hljs-subst">${worker.process.pid}</span> died`</span>);
+  });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// Workers can share any TCP connection</span>
+  <span class="hljs-comment">// In this case it is an HTTP server</span>
+  http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+    res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>);
+    res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'hello world\n'</span>);
+  }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Worker <span class="hljs-subst">${process.pid}</span> started`</span>);
+}</code><button class="copy-button">copy</button></pre>
+<p>现在运行 Node.js 将在工作进程之间共享端口 8000：</p>
+<pre><code class="language-console"><span class="hljs-meta prompt_">$ </span><span class="language-bash">node server.js</span>
+Primary 3596 is running
+Worker 4324 started
+Worker 4520 started
+Worker 6056 started
+Worker 5644 started</code> <button class="copy-button">copy</button></pre>
+<p>在 Windows 上，尚无法在工作进程中设置命名管道服务器。</p>
+<section><h3>工作原理<span><a class="mark" href="#" id="">#</a></span><a aria-hidden="true" class="legacy" id="cluster"></a></h3>
+
+<p>工作进程使用 <a href="child_process.html#child_processforkmodulepath-args-options"><code>child_process.fork()</code></a> 方法生成，因此它们可以通过 IPC 与父进程通信并在来回传递服务器句柄。</p>
+<p>cluster 模块支持两种分发传入连接的方法。</p>
+<p>第一种（也是除 Windows 外所有平台上的默认方法）是轮询方法，其中主进程监听一个端口，接受新连接并以轮询方式将它们分发给工作进程，同时内置了一些智能机制以避免工作进程过载。</p>
+<p>第二种方法是主进程创建监听套接字并将其发送给感兴趣的工作进程。然后工作进程直接接受传入连接。</p>
+<p>理论上，第二种方法应该能提供最佳性能。然而，实际上，由于操作系统调度程序的变幻莫测，分发往往非常不平衡。据观察，在总共八个进程的情况下，超过 70% 的连接最终只集中在两个进程中。</p>
+<p>因为 <code>server.listen()</code> 将大部分工作交给了主进程，所以在以下三种情况下，普通 Node.js 进程和集群工作进程的行为会有所不同：</p>
+<ol>
+<li><code>server.listen({fd: 7})</code> 因为消息被传递给主进程，所以将监听<strong>父进程</strong>中的文件描述符 7，并将句柄传递给工作进程，而不是监听工作进程所认为的文件描述符 7 所引用的内容。</li>
+<li><code>server.listen(handle)</code> 显式地监听句柄将导致工作进程使用提供的句柄，而不是与主进程通信。</li>
+<li><code>server.listen(0)</code> 通常，这会导致服务器监听一个随机端口。然而，在集群中，每个工作进程在每次执行 <code>listen(0)</code> 时都会收到相同的"随机"端口。本质上，端口在第一次是随机的，但此后是可预测的。要监听唯一端口，请基于集群工作进程 ID 生成端口号。</li>
+</ol>
+<p>Node.js 不提供路由逻辑。因此，设计应用程序时，重要的一点是不要过于依赖内存中的数据对象来处理会话和登录等事务。</p>
+<p>因为工作进程都是独立的进程，它们可以根据程序的需要被杀死或重新生成，而不会影响其他工作进程。只要还有工作进程存活，服务器就会继续接受连接。如果没有工作进程存活，现有连接将被丢弃，新连接将被拒绝。然而，Node.js 不会自动管理工作进程的数量。应用程序有责任根据自己的需要管理工作进程池。</p>
+<p>尽管 <code>node:cluster</code> 模块的一个主要用例是网络，但它也可以用于其他需要工作进程的用例。</p>
+</section><section><h3>类：<code>Worker</code><span><a class="mark" href="#worker" id="worker">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li>继承自：<a href="events.html#class-eventemitter" class="type">&#x3C;EventEmitter></a></li>
+</ul>
+<p><code>Worker</code> 对象包含关于工作进程的所有公共信息和方法。在主进程中，可以通过 <code>cluster.workers</code> 获取。在工作进程中，可以通过 <code>cluster.worker</code> 获取。</p>
+<div>
+<h4>事件：<code>'disconnect'</code><span><a class="mark" href="#disconnect" id="disconnect">#</a></span><a aria-hidden="true" class="legacy" id="cluster_disconnect"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<p>类似于 <code>cluster.on('disconnect')</code> 事件，但特定于此工作进程。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">fork</span>().<span class="hljs-title function_">on</span>(<span class="hljs-string">'disconnect'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// Worker has disconnected</span>
+});</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'error'</code><span><a class="mark" href="#error" id="error">#</a></span><a aria-hidden="true" class="legacy" id="cluster_error"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.3</span>
+</div>
+<p>此事件与 <a href="child_process.html#child_processforkmodulepath-args-options"><code>child_process.fork()</code></a> 提供的事件相同。</p>
+<p>在工作进程中，也可以使用 <code>process.on('error')</code>。</p>
+</div><div>
+<h4>事件：<code>'exit'</code><span><a class="mark" href="#exit" id="exit">#</a></span><a aria-hidden="true" class="legacy" id="cluster_exit"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.2</span>
+</div>
+<ul>
+<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 退出代码，如果正常退出。</li>
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 导致进程被终止的信号名称（例如 <code>'SIGHUP'</code>）。</li>
+</ul>
+<p>类似于 <code>cluster.on('exit')</code> 事件，但特定于此工作进程。</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-keyword">const</span> worker = cluster.<span class="hljs-title function_">fork</span>();
+  worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code, signal</span>) =></span> {
+    <span class="hljs-keyword">if</span> (signal) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`worker was killed by signal: <span class="hljs-subst">${signal}</span>`</span>);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`worker exited with error code: <span class="hljs-subst">${code}</span>`</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker success!'</span>);
+    }
+  });
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-keyword">const</span> worker = cluster.<span class="hljs-title function_">fork</span>();
+  worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">code, signal</span>) =></span> {
+    <span class="hljs-keyword">if</span> (signal) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`worker was killed by signal: <span class="hljs-subst">${signal}</span>`</span>);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (code !== <span class="hljs-number">0</span>) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`worker exited with error code: <span class="hljs-subst">${code}</span>`</span>);
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker success!'</span>);
+    }
+  });
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'listening'</code><span><a class="mark" href="#listening" id="listening">#</a></span><a aria-hidden="true" class="legacy" id="cluster_listening"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>类似于 <code>cluster.on('listening')</code> 事件，但特定于此工作进程。</p>
+
+<pre class="with-45-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs">cluster.<span class="hljs-title function_">fork</span>().<span class="hljs-title function_">on</span>(<span class="hljs-string">'listening'</span>, <span class="hljs-function">(<span class="hljs-params">address</span>) =></span> {
+  <span class="hljs-comment">// Worker is listening</span>
+});</code><code class="language-js cjs">cluster.<span class="hljs-title function_">fork</span>().<span class="hljs-title function_">on</span>(<span class="hljs-string">'listening'</span>, <span class="hljs-function">(<span class="hljs-params">address</span>) =></span> {
+  <span class="hljs-comment">// Worker is listening</span>
+});</code><button class="copy-button">copy</button></pre>
+<p>此事件不会在工作进程中触发。</p>
+</div><div>
+<h4>事件：<code>'message'</code><span><a class="mark" href="#message" id="message">#</a></span><a aria-hidden="true" class="legacy" id="cluster_message"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>handle</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>类似于 <code>cluster</code> 的 <code>'message'</code> 事件，但特定于此工作进程。</p>
+<p>在工作进程中，也可以使用 <code>process.on('message')</code>。</p>
+<p>参见 <a href="process.html#event-message"><code>process</code> event: <code>'message'</code></a>。</p>
+<p>下面是一个使用消息系统的例子。它在主进程中记录工作进程接收到的 HTTP 请求数量：</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+<span class="hljs-keyword">import</span> http <span class="hljs-keyword">from</span> <span class="hljs-string">'node:http'</span>;
+<span class="hljs-keyword">import</span> { availableParallelism } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:os'</span>;
+<span class="hljs-keyword">import</span> process <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+
+  <span class="hljs-comment">// Keep track of http requests</span>
+  <span class="hljs-keyword">let</span> numReqs = <span class="hljs-number">0</span>;
+  <span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`numReqs = <span class="hljs-subst">${numReqs}</span>`</span>);
+  }, <span class="hljs-number">1000</span>);
+
+  <span class="hljs-comment">// Count requests</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">messageHandler</span>(<span class="hljs-params">msg</span>) {
+    <span class="hljs-keyword">if</span> (msg.<span class="hljs-property">cmd</span> &#x26;&#x26; msg.<span class="hljs-property">cmd</span> === <span class="hljs-string">'notifyRequest'</span>) {
+      numReqs += <span class="hljs-number">1</span>;
+    }
+  }
+
+  <span class="hljs-comment">// Start workers and listen for messages containing notifyRequest</span>
+  <span class="hljs-keyword">const</span> numCPUs = <span class="hljs-title function_">availableParallelism</span>();
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &#x3C; numCPUs; i++) {
+    cluster.<span class="hljs-title function_">fork</span>();
+  }
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> id <span class="hljs-keyword">in</span> cluster.<span class="hljs-property">workers</span>) {
+    cluster.<span class="hljs-property">workers</span>[id].<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, messageHandler);
+  }
+
+} <span class="hljs-keyword">else</span> {
+
+  <span class="hljs-comment">// Worker processes have a http server.</span>
+  http.<span class="hljs-title class_">Server</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+    res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>);
+    res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'hello world\n'</span>);
+
+    <span class="hljs-comment">// Notify primary about the request</span>
+    process.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">cmd</span>: <span class="hljs-string">'notifyRequest'</span> });
+  }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+<span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+<span class="hljs-keyword">const</span> numCPUs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:os'</span>).<span class="hljs-title function_">availableParallelism</span>();
+<span class="hljs-keyword">const</span> process = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:process'</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+
+  <span class="hljs-comment">// Keep track of http requests</span>
+  <span class="hljs-keyword">let</span> numReqs = <span class="hljs-number">0</span>;
+  <span class="hljs-built_in">setInterval</span>(<span class="hljs-function">() =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`numReqs = <span class="hljs-subst">${numReqs}</span>`</span>);
+  }, <span class="hljs-number">1000</span>);
+
+  <span class="hljs-comment">// Count requests</span>
+  <span class="hljs-keyword">function</span> <span class="hljs-title function_">messageHandler</span>(<span class="hljs-params">msg</span>) {
+    <span class="hljs-keyword">if</span> (msg.<span class="hljs-property">cmd</span> &#x26;&#x26; msg.<span class="hljs-property">cmd</span> === <span class="hljs-string">'notifyRequest'</span>) {
+      numReqs += <span class="hljs-number">1</span>;
+    }
+  }
+
+  <span class="hljs-comment">// Start workers and listen for messages containing notifyRequest</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &#x3C; numCPUs; i++) {
+    cluster.<span class="hljs-title function_">fork</span>();
+  }
+
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> id <span class="hljs-keyword">in</span> cluster.<span class="hljs-property">workers</span>) {
+    cluster.<span class="hljs-property">workers</span>[id].<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, messageHandler);
+  }
+
+} <span class="hljs-keyword">else</span> {
+
+  <span class="hljs-comment">// Worker processes have a http server.</span>
+  http.<span class="hljs-title class_">Server</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+    res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>);
+    res.<span class="hljs-title function_">end</span>(<span class="hljs-string">'hello world\n'</span>);
+
+    <span class="hljs-comment">// Notify primary about the request</span>
+    process.<span class="hljs-title function_">send</span>({ <span class="hljs-attr">cmd</span>: <span class="hljs-string">'notifyRequest'</span> });
+  }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4>事件：<code>'online'</code><span><a class="mark" href="#online" id="online">#</a></span><a aria-hidden="true" class="legacy" id="cluster_online"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<p>类似于 <code>cluster.on('online')</code> 事件，但特定于此工作进程。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">fork</span>().<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-function">() =></span> {
+  <span class="hljs-comment">// Worker is online</span>
+});</code> <button class="copy-button">copy</button></pre>
+<p>此事件不会在工作进程中触发。</p>
+</div><div>
+<h4><code>worker.disconnect()</code><span><a class="mark" href="#workerdisconnect" id="workerdisconnect">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_disconnect"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v7.3.0</td>
+<td><p>This method now returns a reference to <code>worker</code>.</p></td></tr>
+<tr><td>v0.7.7</td>
+<td><p><span>Added in: v0.7.7</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>返回：<a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a> 对 <code>worker</code> 的引用。</li>
+</ul>
+<p>在工作进程中，此函数将关闭所有服务器，等待这些服务器上的 <code>'close'</code> 事件，然后断开 IPC 通道。</p>
+<p>在主进程中，会向工作进程发送一个内部消息，使其调用自身的 <code>.disconnect()</code>。</p>
+<p>会导致 <code>.exitedAfterDisconnect</code> 被设置。</p>
+<p>服务器关闭后，它将不再接受新连接，但新连接可能被任何其他正在监听的工作进程接受。现有连接将被允许正常关闭。当不再存在连接时（参见 <a href="net.html#event-close"><code>server.close()</code></a>），到工作进程的 IPC 通道将关闭，允许其优雅地退出。</p>
+<p>以上内容<em>仅</em>适用于服务器连接，客户端连接不会由工作进程自动关闭，并且在退出前，disconnect 不会等待它们关闭。</p>
+<p>在工作进程中，<code>process.disconnect</code> 存在，但它不是此函数；它是 <a href="child_process.html#subprocessdisconnect"><code>disconnect()</code></a>。</p>
+<p>由于长时间存活的服务器连接可能会阻止工作进程断开连接，发送一条消息可能会有用，以便可以采取应用程序特定的操作来关闭它们。实现超时机制也可能有用，如果在一定时间后仍未发出 <code>'disconnect'</code> 事件，则杀死工作进程。</p>
+<pre><code class="language-js"><span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-keyword">const</span> worker = cluster.<span class="hljs-title function_">fork</span>();
+  <span class="hljs-keyword">let</span> timeout;
+
+  worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'listening'</span>, <span class="hljs-function">(<span class="hljs-params">address</span>) =></span> {
+    worker.<span class="hljs-title function_">send</span>(<span class="hljs-string">'shutdown'</span>);
+    worker.<span class="hljs-title function_">disconnect</span>();
+    timeout = <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =></span> {
+      worker.<span class="hljs-title function_">kill</span>();
+    }, <span class="hljs-number">2000</span>);
+  });
+
+  worker.<span class="hljs-title function_">on</span>(<span class="hljs-string">'disconnect'</span>, <span class="hljs-function">() =></span> {
+    <span class="hljs-built_in">clearTimeout</span>(timeout);
+  });
+
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isWorker</span>) {
+  <span class="hljs-keyword">const</span> net = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:net'</span>);
+  <span class="hljs-keyword">const</span> server = net.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">socket</span>) =></span> {
+    <span class="hljs-comment">// Connections never end</span>
+  });
+
+  server.<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+
+  process.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =></span> {
+    <span class="hljs-keyword">if</span> (msg === <span class="hljs-string">'shutdown'</span>) {
+      <span class="hljs-comment">// Initiate graceful close of any connections to server</span>
+    }
+  });
+}</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>worker.exitedAfterDisconnect</code><span><a class="mark" href="#workerexitedafterdisconnect" id="workerexitedafterdisconnect">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_exitedafterdisconnect"></a></h4>
+<div class="api_metadata">
+<span>Added in: v6.0.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果工作进程由于 <code>.disconnect()</code> 而退出，则此属性为 <code>true</code>。如果工作进程以任何其他方式退出，则为 <code>false</code>。如果工作进程尚未退出，则为 <code>undefined</code>。</p>
+<p>布尔值 <a href="#workerexitedafterdisconnect"><code>worker.exitedAfterDisconnect</code></a> 允许区分自愿退出和意外退出，主进程可以根据此值选择不重新生成工作进程。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+  <span class="hljs-keyword">if</span> (worker.<span class="hljs-property">exitedAfterDisconnect</span> === <span class="hljs-literal">true</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Oh, it was just voluntary – no need to worry'</span>);
+  }
+});
+
+<span class="hljs-comment">// kill worker</span>
+worker.<span class="hljs-title function_">kill</span>();</code> <button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>worker.id</code><span><a class="mark" href="#workerid" id="workerid">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_id"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.8.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;integer></a></li>
+</ul>
+<p>每个新工作进程都会被赋予自己唯一的 id，这个 id 存储在 <code>id</code> 中。</p>
+<p>当工作进程存活时，这是在 <code>cluster.workers</code> 中索引它的键。</p>
+</div><div>
+<h4><code>worker.isConnected()</code><span><a class="mark" href="#workerisconnected" id="workerisconnected">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_isconnected"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.14</span>
+</div>
+<p>如果工作进程通过其 IPC 通道连接到其主进程，则此函数返回 <code>true</code>，否则返回 <code>false</code>。工作进程在创建后即连接到其主进程。在 <code>'disconnect'</code> 事件发出后，它会断开连接。</p>
+</div><div>
+<h4><code>worker.isDead()</code><span><a class="mark" href="#workerisdead" id="workerisdead">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_isdead"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.11.14</span>
+</div>
+<p>如果工作进程的进程已终止（无论是由于退出还是被发送信号），则此函数返回 <code>true</code>。否则，返回 <code>false</code>。</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+<span class="hljs-keyword">import</span> http <span class="hljs-keyword">from</span> <span class="hljs-string">'node:http'</span>;
+<span class="hljs-keyword">import</span> { availableParallelism } <span class="hljs-keyword">from</span> <span class="hljs-string">'node:os'</span>;
+<span class="hljs-keyword">import</span> process <span class="hljs-keyword">from</span> <span class="hljs-string">'node:process'</span>;
+
+<span class="hljs-keyword">const</span> numCPUs = <span class="hljs-title function_">availableParallelism</span>();
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Primary <span class="hljs-subst">${process.pid}</span> is running`</span>);
+
+  <span class="hljs-comment">// Fork workers.</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &#x3C; numCPUs; i++) {
+    cluster.<span class="hljs-title function_">fork</span>();
+  }
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'fork'</span>, <span class="hljs-function">(<span class="hljs-params">worker</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker is dead:'</span>, worker.<span class="hljs-title function_">isDead</span>());
+  });
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker is dead:'</span>, worker.<span class="hljs-title function_">isDead</span>());
+  });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// Workers can share any TCP connection. In this case, it is an HTTP server.</span>
+  http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+    res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>);
+    res.<span class="hljs-title function_">end</span>(<span class="hljs-string">`Current process\n <span class="hljs-subst">${process.pid}</span>`</span>);
+    process.<span class="hljs-title function_">kill</span>(process.<span class="hljs-property">pid</span>);
+  }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+<span class="hljs-keyword">const</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:http'</span>);
+<span class="hljs-keyword">const</span> numCPUs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:os'</span>).<span class="hljs-title function_">availableParallelism</span>();
+<span class="hljs-keyword">const</span> process = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:process'</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Primary <span class="hljs-subst">${process.pid}</span> is running`</span>);
+
+  <span class="hljs-comment">// Fork workers.</span>
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &#x3C; numCPUs; i++) {
+    cluster.<span class="hljs-title function_">fork</span>();
+  }
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'fork'</span>, <span class="hljs-function">(<span class="hljs-params">worker</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker is dead:'</span>, worker.<span class="hljs-title function_">isDead</span>());
+  });
+
+  cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker is dead:'</span>, worker.<span class="hljs-title function_">isDead</span>());
+  });
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-comment">// Workers can share any TCP connection. In this case, it is an HTTP server.</span>
+  http.<span class="hljs-title function_">createServer</span>(<span class="hljs-function">(<span class="hljs-params">req, res</span>) =></span> {
+    res.<span class="hljs-title function_">writeHead</span>(<span class="hljs-number">200</span>);
+    res.<span class="hljs-title function_">end</span>(<span class="hljs-string">`Current process\n <span class="hljs-subst">${process.pid}</span>`</span>);
+    process.<span class="hljs-title function_">kill</span>(process.<span class="hljs-property">pid</span>);
+  }).<span class="hljs-title function_">listen</span>(<span class="hljs-number">8000</span>);
+}</code><button class="copy-button">copy</button></pre>
+</div><div>
+<h4><code>worker.kill([signal])</code><span><a class="mark" href="#workerkillsignal" id="workerkillsignal">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_kill_signal"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.9.12</span>
+</div>
+<ul>
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 要发送给工作进程的终止信号名称。<strong>默认值:</strong> <code>'SIGTERM'</code></li>
+</ul>
+<p>此函数将杀死工作进程。在主工作进程中，它通过断开 <code>worker.process</code> 的连接来实现，一旦断开连接，就用 <code>signal</code> 杀死。在工作进程中，它通过用 <code>signal</code> 杀死进程来实现。</p>
+<p><code>kill()</code> 函数在不等待优雅断开连接的情况下杀死工作进程，它具有与 <code>worker.process.kill()</code> 相同的行为。</p>
+<p>此方法别名为 <code>worker.destroy()</code> 以保持向后兼容性。</p>
+<p>在工作进程中，<code>process.kill()</code> 存在，但它不是此函数；它是 <a href="process.html#processkillpid-signal"><code>kill()</code></a>。</p>
+</div><div>
+<h4><code>worker.process</code><span><a class="mark" href="#workerprocess" id="workerprocess">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_process"></a></h4>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li>类型：<a href="child_process.html#class-childprocess" class="type">&#x3C;ChildProcess></a></li>
+</ul>
+<p>所有工作进程都是使用 <a href="child_process.html#child_processforkmodulepath-args-options"><code>child_process.fork()</code></a> 创建的，该函数返回的对象存储为 <code>.process</code>。在工作进程中，全局 <code>process</code> 被存储。</p>
+<p>参见：<a href="child_process.html#child_processforkmodulepath-args-options">Child Process module</a>。</p>
+<p>如果 <code>process</code> 上发生 <code>'disconnect'</code> 事件且 <code>.exitedAfterDisconnect</code> 不为 <code>true</code>，工作进程将调用 <code>process.exit(0)</code>。这可以防止意外断开连接。</p>
+</div><div>
+<h4><code>worker.send(message[, sendHandle[, options]][, callback])</code><span><a class="mark" href="#workersendmessage-sendhandle-options-callback" id="workersendmessage-sendhandle-options-callback">#</a></span><a aria-hidden="true" class="legacy" id="cluster_worker_send_message_sendhandle_options_callback"></a></h4>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v4.0.0</td>
+<td><p>The <code>callback</code> parameter is supported now.</p></td></tr>
+<tr><td>v0.7.0</td>
+<td><p><span>Added in: v0.7.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>sendHandle</code> <a href="net.html#serverlistenhandle-backlog-callback" class="type">&#x3C;Handle></a></li>
+<li><code>options</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 如果存在 <code>options</code> 参数，它是一个用于参数化某些类型句柄的传递的对象。<code>options</code> 支持以下属性：
+<ul>
+<li><code>keepOpen</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 当传递 <code>net.Socket</code> 实例时可以使用的值。当为 <code>true</code> 时，套接字在发送进程中保持打开状态。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a></li>
+<li>返回：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>向工作进程或主进程发送消息，可以选择附带一个句柄。</p>
+<p>在主进程中，这会向特定工作进程发送消息。它与 <a href="child_process.html#subprocesssendmessage-sendhandle-options-callback"><code>ChildProcess.send()</code></a> 相同。</p>
+<p>在工作进程中，这会向主进程发送消息。它与 <code>process.send()</code> 相同。</p>
+<p>这个例子将回显来自主进程的所有消息：</p>
+<pre><code class="language-js"><span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-keyword">const</span> worker = cluster.<span class="hljs-title function_">fork</span>();
+  worker.<span class="hljs-title function_">send</span>(<span class="hljs-string">'hi there'</span>);
+
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isWorker</span>) {
+  process.<span class="hljs-title function_">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-function">(<span class="hljs-params">msg</span>) =></span> {
+    process.<span class="hljs-title function_">send</span>(msg);
+  });
+}</code> <button class="copy-button">copy</button></pre>
+</div>
+</section><section><h3>事件：<code>'disconnect'</code><span><a class="mark" href="#disconnect_1" id="disconnect_1">#</a></span><a aria-hidden="true" class="legacy" id="cluster_disconnect_1"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.9</span>
+</div>
+<ul>
+<li><code>worker</code> <a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+</ul>
+<p>在工作进程 IPC 通道断开连接后发出。这可能发生在工作进程优雅退出、被杀死或手动断开连接（例如使用 <code>worker.disconnect()</code>）时。</p>
+<p>在 <code>'disconnect'</code> 和 <code>'exit'</code> 事件之间可能会有延迟。这些事件可用于检测进程是否在清理过程中卡住，或者是否存在长时间存活的连接。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'disconnect'</span>, <span class="hljs-function">(<span class="hljs-params">worker</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`The worker #<span class="hljs-subst">${worker.id}</span> has disconnected`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>事件：<code>'exit'</code><span><a class="mark" href="#exit_1" id="exit_1">#</a></span><a aria-hidden="true" class="legacy" id="cluster_exit_1"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.9</span>
+</div>
+<ul>
+<li><code>worker</code> <a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+<li><code>code</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 退出代码，如果正常退出。</li>
+<li><code>signal</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 导致进程被终止的信号名称（例如 <code>'SIGHUP'</code>）。</li>
+</ul>
+<p>当任何工作进程死亡时，cluster 模块将发出 <code>'exit'</code> 事件。</p>
+<p>这可用于通过再次调用 <a href="#clusterforkenv"><code>.fork()</code></a> 来重新启动工作进程。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'worker %d died (%s). restarting...'</span>,
+              worker.<span class="hljs-property">process</span>.<span class="hljs-property">pid</span>, signal || code);
+  cluster.<span class="hljs-title function_">fork</span>();
+});</code> <button class="copy-button">copy</button></pre>
+<p>参见 <a href="child_process.html#event-exit"><code>child_process</code> event: <code>'exit'</code></a>。</p>
+</section><section><h3>事件：<code>'fork'</code><span><a class="mark" href="#fork" id="fork">#</a></span><a aria-hidden="true" class="legacy" id="cluster_fork"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li><code>worker</code> <a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+</ul>
+<p>当新的工作进程被 fork 时，cluster 模块将发出 <code>'fork'</code> 事件。这可用于记录工作进程活动，并创建自定义超时。</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> timeouts = [];
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">errorMsg</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">'Something must be wrong with the connection ...'</span>);
+}
+
+cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'fork'</span>, <span class="hljs-function">(<span class="hljs-params">worker</span>) =></span> {
+  timeouts[worker.<span class="hljs-property">id</span>] = <span class="hljs-built_in">setTimeout</span>(errorMsg, <span class="hljs-number">2000</span>);
+});
+cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'listening'</span>, <span class="hljs-function">(<span class="hljs-params">worker, address</span>) =></span> {
+  <span class="hljs-built_in">clearTimeout</span>(timeouts[worker.<span class="hljs-property">id</span>]);
+});
+cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'exit'</span>, <span class="hljs-function">(<span class="hljs-params">worker, code, signal</span>) =></span> {
+  <span class="hljs-built_in">clearTimeout</span>(timeouts[worker.<span class="hljs-property">id</span>]);
+  <span class="hljs-title function_">errorMsg</span>();
+});</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>事件：<code>'listening'</code><span><a class="mark" href="#listening_1" id="listening_1">#</a></span><a aria-hidden="true" class="legacy" id="cluster_listening_1"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li><code>worker</code> <a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+<li><code>address</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>当从工作进程调用 <code>listen()</code> 后，在服务器上发出 <code>'listening'</code> 事件时，在主进程的 <code>cluster</code> 上也会发出 <code>'listening'</code> 事件。</p>
+<p>事件处理程序使用两个参数执行，<code>worker</code> 包含工作进程对象，<code>address</code> 对象包含以下连接属性：<code>address</code>、<code>port</code> 和 <code>addressType</code>。如果工作进程正在监听多个地址，这将非常有用。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'listening'</span>, <span class="hljs-function">(<span class="hljs-params">worker, address</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(
+    <span class="hljs-string">`A worker is now connected to <span class="hljs-subst">${address.address}</span>:<span class="hljs-subst">${address.port}</span>`</span>);
+});</code> <button class="copy-button">copy</button></pre>
+<p><code>addressType</code> 是以下之一：</p>
+<ul>
+<li><code>4</code> (TCPv4)</li>
+<li><code>6</code> (TCPv6)</li>
+<li><code>-1</code> (Unix 域套接字)</li>
+<li><code>'udp4'</code> 或 <code>'udp6'</code> (UDPv4 或 UDPv6)</li>
+</ul>
+</section><section><h3>事件：<code>'message'</code><span><a class="mark" href="#message_1" id="message_1">#</a></span><a aria-hidden="true" class="legacy" id="cluster_message_1"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v6.0.0</td>
+<td><p>The <code>worker</code> parameter is passed now; see below for details.</p></td></tr>
+<tr><td>v2.5.0</td>
+<td><p><span>Added in: v2.5.0</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li><code>worker</code> <a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+<li><code>message</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+<li><code>handle</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type" class="type">&#x3C;undefined></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>当集群主进程从任何工作进程接收到消息时发出。</p>
+<p>参见 <a href="child_process.html#event-message"><code>child_process</code> event: <code>'message'</code></a>。</p>
+</section><section><h3>事件：<code>'online'</code><span><a class="mark" href="#online_1" id="online_1">#</a></span><a aria-hidden="true" class="legacy" id="cluster_online_1"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li><code>worker</code> <a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+</ul>
+<p>在 fork 新的工作进程后，工作进程应回复一条在线消息。当主进程收到在线消息时，将发出此事件。<code>'fork'</code> 和 <code>'online'</code> 之间的区别在于，fork 是在主进程 fork 工作进程时发出的，而 <code>'online'</code> 是在工作进程运行时发出的。</p>
+<pre><code class="language-js">cluster.<span class="hljs-title function_">on</span>(<span class="hljs-string">'online'</span>, <span class="hljs-function">(<span class="hljs-params">worker</span>) =></span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'Yay, the worker responded after it was forked'</span>);
+});</code> <button class="copy-button">copy</button></pre>
+</section><section><h3>事件：<code>'setup'</code><span><a class="mark" href="#setup" id="setup">#</a></span><a aria-hidden="true" class="legacy" id="cluster_setup"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.1</span>
+</div>
+<ul>
+<li><code>settings</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>每次调用 <a href="#clustersetupprimarysettings"><code>.setupPrimary()</code></a> 时发出。</p>
+<p><code>settings</code> 对象是 <a href="#clustersetupprimarysettings"><code>.setupPrimary()</code></a> 调用时的 <code>cluster.settings</code> 对象，并且仅是建议性的，因为可以在单个 tick 内多次调用 <a href="#clustersetupprimarysettings"><code>.setupPrimary()</code></a>。</p>
+<p>如果准确性很重要，请使用 <code>cluster.settings</code>。</p>
+</section><section><h3><code>cluster.disconnect([callback])</code><span><a class="mark" href="#clusterdisconnectcallback" id="clusterdisconnectcallback">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_disconnect_callback"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.7</span>
+</div>
+<ul>
+<li><code>callback</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 当所有工作进程都断开连接且句柄关闭时调用。</li>
+</ul>
+<p>在 <code>cluster.workers</code> 中的每个工作进程上调用 <code>.disconnect()</code>。</p>
+<p>当它们都断开连接后，所有内部句柄都将关闭，如果没有其他事件在等待，则允许主进程优雅退出。</p>
+<p>该方法接受一个可选的回调参数，该参数在完成时调用。</p>
+<p>这只能从主进程调用。</p>
+</section><section><h3><code>cluster.fork([env])</code><span><a class="mark" href="#clusterforkenv" id="clusterforkenv">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_fork_env"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.6.0</span>
+</div>
+<ul>
+<li><code>env</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 要添加到工作进程环境中的键/值对。</li>
+<li>返回：<a href="cluster.html#class-worker" class="type">&#x3C;cluster.Worker></a></li>
+</ul>
+<p>生成一个新的工作进程。</p>
+<p>这只能从主进程调用。</p>
+</section><section><h3><code>cluster.isMaster</code><span><a class="mark" href="#clusterismaster" id="clusterismaster">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_ismaster"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.8.1</span><span>Deprecated since: v16.0.0</span>
+</div>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated</div><p></p>
+<p><a href="#clusterisprimary"><code>cluster.isPrimary</code></a> 的已弃用别名。</p>
+</section><section><h3><code>cluster.isPrimary</code><span><a class="mark" href="#clusterisprimary" id="clusterisprimary">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_isprimary"></a></h3>
+<div class="api_metadata">
+<span>Added in: v16.0.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果进程是主进程，则为 true。这是由 <code>process.env.NODE_UNIQUE_ID</code> 决定的。如果 <code>process.env.NODE_UNIQUE_ID</code> 未定义，则 <code>isPrimary</code> 为 <code>true</code>。</p>
+</section><section><h3><code>cluster.isWorker</code><span><a class="mark" href="#clusterisworker" id="clusterisworker">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_isworker"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.6.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a></li>
+</ul>
+<p>如果进程不是主进程（它是 <code>cluster.isPrimary</code> 的否定），则为 true。</p>
+</section><section><h3><code>cluster.schedulingPolicy</code><span><a class="mark" href="#clusterschedulingpolicy" id="clusterschedulingpolicy">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_schedulingpolicy"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.11.2</span>
+</div>
+<p>调度策略，可以是用于轮询的 <code>cluster.SCHED_RR</code>，或者是留给操作系统的 <code>cluster.SCHED_NONE</code>。这是一个全局设置，并且在第一个工作进程生成或调用 <a href="#clustersetupprimarysettings"><code>.setupPrimary()</code></a> 时（以先发生者为准）有效冻结。</p>
+<p>除 Windows 外，所有操作系统上默认都是 <code>SCHED_RR</code>。一旦 libuv 能够有效地分发 IOCP 句柄而不会导致大的性能损失，Windows 将更改为 <code>SCHED_RR</code>。</p>
+<p><code>cluster.schedulingPolicy</code> 也可以通过 <code>NODE_CLUSTER_SCHED_POLICY</code> 环境变量设置。有效值为 <code>'rr'</code> 和 <code>'none'</code>。</p>
+</section><section><h3><code>cluster.settings</code><span><a class="mark" href="#clustersettings" id="clustersettings">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_settings"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v13.2.0, v12.16.0</td>
+<td><p>The <code>serialization</code> option is supported now.</p></td></tr>
+<tr><td>v9.5.0</td>
+<td><p>The <code>cwd</code> option is supported now.</p></td></tr>
+<tr><td>v9.4.0</td>
+<td><p>The <code>windowsHide</code> option is supported now.</p></td></tr>
+<tr><td>v8.2.0</td>
+<td><p>The <code>inspectPort</code> option is supported now.</p></td></tr>
+<tr><td>v6.4.0</td>
+<td><p>The <code>stdio</code> option is supported now.</p></td></tr>
+<tr><td>v0.7.1</td>
+<td><p><span>Added in: v0.7.1</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a>
+<ul>
+<li><code>execArgv</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 传递给 Node.js 可执行文件的字符串参数列表。<strong>默认值:</strong> <code>process.execArgv</code>。</li>
+<li><code>exec</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 工作进程文件的路径。<strong>默认值:</strong> <code>process.argv[1]</code>。</li>
+<li><code>args</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string[]></a> 传递给工作进程的字符串参数。<strong>默认值:</strong> <code>process.argv.slice(2)</code>。</li>
+<li><code>cwd</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 工作进程的当前工作目录。<strong>默认值:</strong> <code>undefined</code>（继承自父进程）。</li>
+<li><code>serialization</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type" class="type">&#x3C;string></a> 指定用于在进程之间发送消息的序列化类型。可能的值是 <code>'json'</code> 和 <code>'advanced'</code>。有关更多详细信息，请参阅 <a href="child_process.html#advanced-serialization">Advanced serialization for <code>child_process</code></a>。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>silent</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 是否将输出发送到父进程的 stdio。<strong>默认值:</strong> <code>false</code>。</li>
+<li><code>stdio</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" class="type">&#x3C;Array></a> 配置 fork 进程的 stdio。因为 cluster 模块依赖 IPC 来工作，此配置必须包含一个 <code>'ipc'</code> 条目。当提供此选项时，它会覆盖 <code>silent</code>。参见 <a href="child_process.html#child_processspawncommand-args-options"><code>child_process.spawn()</code></a> 的 <a href="child_process.html#optionsstdio"><code>stdio</code></a>。</li>
+<li><code>uid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 设置进程的用户标识。（参见 <a href="http://man7.org/linux/man-pages/man2/setuid.2.html"><code>setuid(2)</code></a>。）</li>
+<li><code>gid</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> 设置进程的组标识。（参见 <a href="http://man7.org/linux/man-pages/man2/setgid.2.html"><code>setgid(2)</code></a>。）</li>
+<li><code>inspectPort</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type" class="type">&#x3C;number></a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" class="type">&#x3C;Function></a> 设置工作进程的检查器端口。这可以是一个数字，也可以是一个不带参数并返回数字的函数。默认情况下，每个工作进程获取自己的端口，从主进程的 <code>process.debugPort</code> 递增。</li>
+<li><code>windowsHide</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type" class="type">&#x3C;boolean></a> 隐藏通常在 Windows 系统上创建的 fork 进程的控制台窗口。<strong>默认值:</strong> <code>false</code>。</li>
+</ul>
+</li>
+</ul>
+<p>在调用 <a href="#clustersetupprimarysettings"><code>.setupPrimary()</code></a>（或 <a href="#clusterforkenv"><code>.fork()</code></a>）之后，此设置对象将包含设置，包括默认值。</p>
+<p>此对象不打算手动更改或设置。</p>
+</section><section><h3><code>cluster.setupMaster([settings])</code><span><a class="mark" href="#clustersetupmastersettings" id="clustersetupmastersettings">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_setupmaster_settings"></a></h3>
+<div class="api_metadata">
+<details class="changelog"><summary>History</summary>
+<table>
+<tbody><tr><th>Version</th><th>Changes</th></tr>
+<tr><td>v16.0.0</td>
+<td><p><span>Deprecated since: v16.0.0</span></p></td></tr>
+<tr><td>v6.4.0</td>
+<td><p>The <code>stdio</code> option is supported now.</p></td></tr>
+<tr><td>v0.7.1</td>
+<td><p><span>Added in: v0.7.1</span></p></td></tr>
+</tbody></table>
+</details>
+</div>
+<p></p><div class="api_stability api_stability_0"><a href="documentation.html#stability-index">Stability: 0</a> - Deprecated</div><p></p>
+<p><a href="#clustersetupprimarysettings"><code>.setupPrimary()</code></a> 的已弃用别名。</p>
+</section><section><h3><code>cluster.setupPrimary([settings])</code><span><a class="mark" href="#clustersetupprimarysettings" id="clustersetupprimarysettings">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_setupprimary_settings"></a></h3>
+<div class="api_metadata">
+<span>Added in: v16.0.0</span>
+</div>
+<ul>
+<li><code>settings</code> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a> 参见 <a href="#clustersettings"><code>cluster.settings</code></a>。</li>
+</ul>
+<p><code>setupPrimary</code> 用于更改默认的 'fork' 行为。一旦调用，设置将出现在 <code>cluster.settings</code> 中。</p>
+<p>任何设置更改仅影响未来对 <a href="#clusterforkenv"><code>.fork()</code></a> 的调用，对已运行的工作进程没有影响。</p>
+<p>工作进程的唯一不能通过 <code>.setupPrimary()</code> 设置的属性是传递给 <a href="#clusterforkenv"><code>.fork()</code></a> 的 <code>env</code>。</p>
+<p>上面的默认值仅适用于第一次调用；后续调用的默认值是调用 <code>cluster.setupPrimary()</code> 时的当前值。</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+
+cluster.<span class="hljs-title function_">setupPrimary</span>({
+  <span class="hljs-attr">exec</span>: <span class="hljs-string">'worker.js'</span>,
+  <span class="hljs-attr">args</span>: [<span class="hljs-string">'--use'</span>, <span class="hljs-string">'https'</span>],
+  <span class="hljs-attr">silent</span>: <span class="hljs-literal">true</span>,
+});
+cluster.<span class="hljs-title function_">fork</span>(); <span class="hljs-comment">// https worker</span>
+cluster.<span class="hljs-title function_">setupPrimary</span>({
+  <span class="hljs-attr">exec</span>: <span class="hljs-string">'worker.js'</span>,
+  <span class="hljs-attr">args</span>: [<span class="hljs-string">'--use'</span>, <span class="hljs-string">'http'</span>],
+});
+cluster.<span class="hljs-title function_">fork</span>(); <span class="hljs-comment">// http worker</span></code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+
+cluster.<span class="hljs-title function_">setupPrimary</span>({
+  <span class="hljs-attr">exec</span>: <span class="hljs-string">'worker.js'</span>,
+  <span class="hljs-attr">args</span>: [<span class="hljs-string">'--use'</span>, <span class="hljs-string">'https'</span>],
+  <span class="hljs-attr">silent</span>: <span class="hljs-literal">true</span>,
+});
+cluster.<span class="hljs-title function_">fork</span>(); <span class="hljs-comment">// https worker</span>
+cluster.<span class="hljs-title function_">setupPrimary</span>({
+  <span class="hljs-attr">exec</span>: <span class="hljs-string">'worker.js'</span>,
+  <span class="hljs-attr">args</span>: [<span class="hljs-string">'--use'</span>, <span class="hljs-string">'http'</span>],
+});
+cluster.<span class="hljs-title function_">fork</span>(); <span class="hljs-comment">// http worker</span></code><button class="copy-button">copy</button></pre>
+<p>这只能从主进程调用。</p>
+</section><section><h3><code>cluster.worker</code><span><a class="mark" href="#clusterworker" id="clusterworker">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_worker"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>对当前工作进程对象的引用。在主进程中不可用。</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'I am primary'</span>);
+  cluster.<span class="hljs-title function_">fork</span>();
+  cluster.<span class="hljs-title function_">fork</span>();
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isWorker</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`I am worker #<span class="hljs-subst">${cluster.worker.id}</span>`</span>);
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+
+<span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isPrimary</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">'I am primary'</span>);
+  cluster.<span class="hljs-title function_">fork</span>();
+  cluster.<span class="hljs-title function_">fork</span>();
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cluster.<span class="hljs-property">isWorker</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`I am worker #<span class="hljs-subst">${cluster.worker.id}</span>`</span>);
+}</code><button class="copy-button">copy</button></pre>
+</section><section><h3><code>cluster.workers</code><span><a class="mark" href="#clusterworkers" id="clusterworkers">#</a></span><a aria-hidden="true" class="legacy" id="cluster_cluster_workers"></a></h3>
+<div class="api_metadata">
+<span>Added in: v0.7.0</span>
+</div>
+<ul>
+<li>类型：<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" class="type">&#x3C;Object></a></li>
+</ul>
+<p>一个存储活动工作进程对象的哈希，以 <code>id</code> 字段为键。这使得遍历所有工作进程变得容易。它仅在主进程中可用。</p>
+<p>在工作进程断开连接<em>并</em>退出后，会从 <code>cluster.workers</code> 中移除工作进程。这两个事件之间的顺序无法提前确定。但是，可以保证从 <code>cluster.workers</code> 列表中移除的操作发生在最后一个 <code>'disconnect'</code> 或 <code>'exit'</code> 事件发出之前。</p>
+
+<pre class="with-40-chars"><input class="js-flavor-toggle" type="checkbox" checked aria-label="Show modern ES modules syntax"><code class="language-js mjs"><span class="hljs-keyword">import</span> cluster <span class="hljs-keyword">from</span> <span class="hljs-string">'node:cluster'</span>;
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> worker <span class="hljs-keyword">of</span> <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">values</span>(cluster.<span class="hljs-property">workers</span>)) {
+  worker.<span class="hljs-title function_">send</span>(<span class="hljs-string">'big announcement to all workers'</span>);
+}</code><code class="language-js cjs"><span class="hljs-keyword">const</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'node:cluster'</span>);
+
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> worker <span class="hljs-keyword">of</span> <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">values</span>(cluster.<span class="hljs-property">workers</span>)) {
+  worker.<span class="hljs-title function_">send</span>(<span class="hljs-string">'big announcement to all workers'</span>);
+}</code><button class="copy-button">copy</button></pre></section>
+        <!-- API END -->
+      </div>
+    </div>
+  </div>
+</body>
+</html>
